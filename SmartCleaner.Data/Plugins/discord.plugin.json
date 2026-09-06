@@ -1,0 +1,27 @@
+﻿{
+  "id": "discord_cache",
+  "name": "Discord Client Cache",
+  "author": "Community",
+  "version": "1.0.0",
+  "description": "Очищает кэш медиа, GPU-кэш и временные логи мессенджера Discord.",
+  "category": "Мессенджеры",
+  "icon": "\uE715",
+  "isEnabled": true,
+  "rules": [
+    {
+      "pathTemplate": "%APPDATA%\\discord\\Cache",
+      "pattern": "*",
+      "recursive": true
+    },
+    {
+      "pathTemplate": "%APPDATA%\\discord\\Code Cache",
+      "pattern": "*",
+      "recursive": true
+    },
+    {
+      "pathTemplate": "%APPDATA%\\discord\\GPUCache",
+      "pattern": "*",
+      "recursive": true
+    }
+  ]
+}

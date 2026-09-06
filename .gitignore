@@ -1,0 +1,36 @@
+# Build Results
+[Bb]in/
+[Oo]bj/
+[Pp]ublish/
+release/
+tmp/
+*.log
+crash.log
+build_log.txt
+build_output.txt
+
+# Visual Studio & VS Code
+.vs/
+.vscode/
+*.user
+*.userosscache
+*.suo
+*.userprefs
+*.sln.docstates
+
+# Archives & Temporary
+*.rar
+*.zip
+*.7z
+*.tar.gz
+
+# Python & Other Environments
+venv/
+.venv/
+__pycache__/
+*.pyc
+
+# Local runtime data
+config/
+.opencode/
+.aider*

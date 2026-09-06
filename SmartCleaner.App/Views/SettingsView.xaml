@@ -1,0 +1,356 @@
+<UserControl x:Class="SmartCleaner.App.Views.SettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="24,20" Padding="0,0,8,0">
+        <StackPanel>
+            
+            <!-- Header -->
+            <DockPanel Margin="0,0,0,24">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <Border Width="32" Height="32" CornerRadius="8" Background="{DynamicResource AccentGradientBrush}" Margin="0,0,10,0" VerticalAlignment="Center">
+                            <TextBlock Text="&#xE713;" FontFamily="Segoe MDL2 Assets" FontSize="16" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <TextBlock Text="Параметры и настройки" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
+                        <Border Background="{DynamicResource AccentBrush}" CornerRadius="4" Padding="6,2" Margin="10,0,0,0" VerticalAlignment="Center">
+                            <TextBlock Text="PREFERENCES" FontSize="9.5" Foreground="White" FontWeight="Bold"/>
+                        </Border>
+                    </StackPanel>
+                    <TextBlock Text="Конфигурация тем оформления, белых списков, звуковых оповещений и интеграции в систему" 
+                               FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,4,0,0"/>
+                </StackPanel>
+            </DockPanel>
+
+            <!-- Appearance / Theme -->
+            <Border Style="{StaticResource Card}" Margin="0,0,0,16">
+                <StackPanel>
+                    <TextBlock Text="Внешний вид" 
+                               Style="{StaticResource Heading2}"
+                               Margin="0,0,0,12"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Тема оформления:" 
+                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                   VerticalAlignment="Center"
+                                   Margin="0,0,16,0"/>
+                        <ComboBox Grid.Column="1"
+                                  Width="180"
+                                  HorizontalAlignment="Left"
+                                  ItemsSource="{Binding ThemeOptions}"
+                                  SelectedIndex="{Binding SelectedThemeIndex}"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- Mode Info -->
+            <Border Style="{StaticResource Card}" Margin="0,0,0,16">
+                <StackPanel>
+                    <TextBlock Text="Режим работы" 
+                               Style="{StaticResource Heading2}"
+                               Margin="0,0,0,12"/>
+                    
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Text="Режим:" 
+                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                   Margin="0,0,16,8"/>
+                        <TextBlock Grid.Column="1" 
+                                   Text="{Binding ConfigModeText}"
+                                   FontWeight="SemiBold"/>
+
+                        <TextBlock Grid.Row="1" 
+                                   Text="Путь:" 
+                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                   Margin="0,0,16,0"/>
+                        <TextBlock Grid.Row="1" Grid.Column="1" 
+                                   Text="{Binding ConfigPath}"
+                                   TextTrimming="CharacterEllipsis"
+                                   ToolTip="{Binding ConfigPath}"
+                                   Foreground="{DynamicResource TextSecondaryBrush}"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- Cleaning Settings -->
+            <Border Style="{StaticResource Card}" Margin="0,0,0,16">
+                <StackPanel>
+                    <TextBlock Text="Очистка" 
+                               Style="{StaticResource Heading2}"
+                               Margin="0,0,0,12"/>
+
+                    <CheckBox Content="Удалять в корзину (рекомендуется)"
+                              IsChecked="{Binding UseRecycleBin}"
+                              Margin="0,0,0,12"/>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                        <TextBlock Text="Защищённый период:" 
+                                   VerticalAlignment="Center"
+                                   Margin="0,0,12,0"/>
+                        <TextBox Text="{Binding ProtectedHours, UpdateSourceTrigger=PropertyChanged}"
+                                 Width="60"
+                                 VerticalAlignment="Center"
+                                 Padding="8,4"
+                                 Background="{DynamicResource SurfaceVariantBrush}"
+                                 Foreground="{DynamicResource TextPrimaryBrush}"
+                                 BorderBrush="{DynamicResource BorderBrush}"/>
+                        <TextBlock Text="часов" 
+                                   VerticalAlignment="Center"
+                                   Margin="8,0,0,0"
+                                   Foreground="{DynamicResource TextSecondaryBrush}"/>
+                    </StackPanel>
+                    
+                    <TextBlock Text="Файлы, созданные или изменённые в этот период, не будут удалены."
+                               Style="{StaticResource Caption}"
+                               Margin="0,8,0,0"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Custom Scan Paths -->
+            <Border Style="{StaticResource Card}" Margin="0,0,0,16">
+                <StackPanel>
+                    <TextBlock Text="Дополнительные папки для сканирования" 
+                               Style="{StaticResource Heading2}"
+                               Margin="0,0,0,4"/>
+                    <TextBlock Text="Добавьте папки с других дисков для поиска мусора"
+                               Style="{StaticResource Caption}"
+                               Margin="0,0,0,16"/>
+
+                    <!-- Add Path -->
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBox Text="{Binding NewScanPath, UpdateSourceTrigger=PropertyChanged}"
+                                 Padding="12,8"
+                                 Background="{DynamicResource SurfaceVariantBrush}"
+                                 Foreground="{DynamicResource TextPrimaryBrush}"
+                                 BorderBrush="{DynamicResource BorderBrush}"
+                                 VerticalAlignment="Center">
+                            <TextBox.InputBindings>
+                                <KeyBinding Key="Enter" Command="{Binding AddScanPathCommand}"/>
+                            </TextBox.InputBindings>
+                        </TextBox>
+                        
+                        <Button Grid.Column="1" 
+                                ToolTip="Выбрать папку"
+                                Style="{StaticResource SecondaryButton}"
+                                Command="{Binding BrowseFolderCommand}"
+                                Margin="8,0,0,0">
+                            <TextBlock Text="&#xE8B7;" FontFamily="Segoe MDL2 Assets" FontSize="12"/>
+                        </Button>
+                        
+                        <Button Grid.Column="2" 
+                                Content="Добавить"
+                                Style="{StaticResource PrimaryButton}"
+                                Command="{Binding AddScanPathCommand}"
+                                Margin="8,0,0,0"/>
+                    </Grid>
+
+                    <!-- Paths List -->
+                    <ItemsControl ItemsSource="{Binding CustomScanPaths}" 
+                                  MaxHeight="200">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="{DynamicResource SurfaceVariantBrush}"
+                                        CornerRadius="4"
+                                        Padding="12,8"
+                                        Margin="0,0,0,4">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock Text="{Binding}"
+                                                   FontFamily="Consolas"
+                                                   VerticalAlignment="Center"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   ToolTip="{Binding}"/>
+
+                                        <Button Grid.Column="1"
+                                                Content="&#xE711;" FontFamily="Segoe MDL2 Assets"
+                                                Background="Transparent"
+                                                Foreground="{DynamicResource DangerBrush}"
+                                                BorderThickness="0"
+                                                Cursor="Hand"
+                                                Padding="8,4"
+                                                Command="{Binding DataContext.RemoveScanPathCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                CommandParameter="{Binding}"/>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+
+            <!-- Whitelist -->
+            <Border Style="{StaticResource Card}">
+                <StackPanel>
+                    <TextBlock Text="Белый список (защита от удаления)" 
+                               Style="{StaticResource Heading2}"
+                               Margin="0,0,0,4"/>
+                    <TextBlock Text="Паттерны файлов и папок, которые никогда не будут удалены"
+                               Style="{StaticResource Caption}"
+                               Margin="0,0,0,16"/>
+
+                    <!-- Add Pattern -->
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBox Text="{Binding NewWhitelistPattern, UpdateSourceTrigger=PropertyChanged}"
+                                 Padding="12,8"
+                                 Background="{DynamicResource SurfaceVariantBrush}"
+                                 Foreground="{DynamicResource TextPrimaryBrush}"
+                                 BorderBrush="{DynamicResource BorderBrush}"
+                                 VerticalAlignment="Center">
+                            <TextBox.InputBindings>
+                                <KeyBinding Key="Enter" Command="{Binding AddPatternCommand}"/>
+                            </TextBox.InputBindings>
+                        </TextBox>
+                        
+                        <Button Grid.Column="1" 
+                                Content="Добавить"
+                                Style="{StaticResource PrimaryButton}"
+                                Command="{Binding AddPatternCommand}"
+                                Margin="8,0,0,0"/>
+                    </Grid>
+
+                    <!-- Pattern Examples -->
+                    <TextBlock Style="{StaticResource Caption}" Margin="0,0,0,12">
+                        <Run Text="Примеры:"/>
+                        <Run Text="**\SaveGames\**" FontFamily="Consolas" Foreground="{DynamicResource AccentBrush}"/>
+                        <Run Text="—"/>
+                        <Run Text="%USERPROFILE%\.myconfig" FontFamily="Consolas" Foreground="{DynamicResource AccentBrush}"/>
+                    </TextBlock>
+
+                    <!-- Patterns List -->
+                    <ItemsControl ItemsSource="{Binding WhitelistPatterns}" 
+                                  MaxHeight="300">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="{DynamicResource SurfaceVariantBrush}"
+                                        CornerRadius="4"
+                                        Padding="12,8"
+                                        Margin="0,0,0,4">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock Text="{Binding}"
+                                                   FontFamily="Consolas"
+                                                   VerticalAlignment="Center"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   ToolTip="{Binding}"/>
+
+                                        <Button Grid.Column="1"
+                                                Content="&#xE711;" FontFamily="Segoe MDL2 Assets"
+                                                Background="Transparent"
+                                                Foreground="{DynamicResource DangerBrush}"
+                                                BorderThickness="0"
+                                                Cursor="Hand"
+                                                Padding="8,4"
+                                                Command="{Binding DataContext.RemovePatternCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                CommandParameter="{Binding}"/>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <!-- Built-in notice -->
+                    <Border Background="{DynamicResource SurfaceVariantBrush}"
+                            CornerRadius="4"
+                            Padding="12,8"
+                            Margin="0,12,0,0">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="ℹ️" Margin="0,0,8,0"/>
+                            <TextBlock Text="Встроенные паттерны защиты (Antigravity, сохранения игр, базы данных) нельзя удалить."
+                                       Style="{StaticResource Caption}"
+                                       TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Border>
+
+            <!-- Sound & Audio Feedback -->
+            <Border Style="{StaticResource Card}" Margin="0,0,0,16">
+                <StackPanel>
+                    <TextBlock Text="Звуковое сопровождение" 
+                               Style="{StaticResource Heading2}"
+                               Margin="0,0,0,12"/>
+                    <CheckBox Content="Воспроизводить звуковые сигналы при завершении сканирования, очистки и активации Game Boost"
+                              IsChecked="{Binding IsSoundEnabled, Mode=TwoWay}"
+                              Foreground="{DynamicResource TextPrimaryBrush}" FontSize="13"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Executive System Passport & HTML Report -->
+            <Border Style="{StaticResource Card}" Margin="0,0,0,16">
+                <StackPanel>
+                    <TextBlock Text="Паспорт системы и экспорт отчета" 
+                               Style="{StaticResource Heading2}"
+                               Margin="0,0,0,8"/>
+                    <TextBlock Text="Сформируйте интерактивный темный HTML-отчет с полной аппаратной телеметрией (CPU, RAM, S.M.A.R.T. SSD, температура) и детальной статистикой очистки для печати или сохранения в PDF."
+                               Style="{StaticResource BodyText}" Margin="0,0,0,14"/>
+
+                    <Button Content="Сформировать и открыть паспорт системы (HTML / PDF)" 
+                            Command="{Binding GenerateSystemReportCommand}"
+                            Style="{StaticResource PrimaryButton}" HorizontalAlignment="Left" Padding="18,10" FontSize="13" FontWeight="SemiBold"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Windows Explorer Shell Integration -->
+            <Border Style="{StaticResource Card}" Margin="0,0,0,16">
+                <StackPanel>
+                    <TextBlock Text="Интеграция в контекстное меню Windows Explorer" 
+                               Style="{StaticResource Heading2}"
+                               Margin="0,0,0,12"/>
+                    <TextBlock Text="Управление пунктами правого клика мыши в Проводнике Windows:"
+                               Style="{StaticResource BodyText}" Margin="0,0,0,14"/>
+
+                    <StackPanel>
+                        <CheckBox Content="Пункт «Анализировать в SmartCleaner» (для папок)"
+                                  IsChecked="{Binding IsAnalyzeMenuEnabled, Mode=TwoWay}"
+                                  Command="{Binding ToggleAnalyzeMenuCommand}"
+                                  Foreground="{DynamicResource TextPrimaryBrush}" FontSize="13" Margin="0,0,0,8"/>
+
+                        <CheckBox Content="Пункт «Сжать через CompactOS (LZX)» (для папок)"
+                                  IsChecked="{Binding IsCompactMenuEnabled, Mode=TwoWay}"
+                                  Command="{Binding ToggleCompactMenuCommand}"
+                                  Foreground="{DynamicResource TextPrimaryBrush}" FontSize="13" Margin="0,0,0,8"/>
+
+                        <CheckBox Content="Пункт «Безвозвратно уничтожить (Шредер DoD)» (для файлов)"
+                                  IsChecked="{Binding IsShredMenuEnabled, Mode=TwoWay}"
+                                  Command="{Binding ToggleShredMenuCommand}"
+                                  Foreground="{DynamicResource TextPrimaryBrush}" FontSize="13"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

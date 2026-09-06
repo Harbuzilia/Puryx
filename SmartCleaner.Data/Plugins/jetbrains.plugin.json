@@ -1,0 +1,22 @@
+﻿{
+  "id": "jetbrains_cache",
+  "name": "JetBrains IDEs Caches",
+  "author": "SmartCleaner Core Team",
+  "version": "1.1.0",
+  "description": "Очищает индексы, кэши и логи всех IDE JetBrains (IntelliJ, PyCharm, WebStorm, Rider, GoLand, CLion, PhpStorm, DataGrip).",
+  "category": "Разработка",
+  "icon": "\uE7B8",
+  "isEnabled": true,
+  "rules": [
+    {
+      "pathTemplate": "%LOCALAPPDATA%\\JetBrains\\*\\caches",
+      "pattern": "*",
+      "recursive": true
+    },
+    {
+      "pathTemplate": "%LOCALAPPDATA%\\JetBrains\\*\\log",
+      "pattern": "*",
+      "recursive": true
+    }
+  ]
+}

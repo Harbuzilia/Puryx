@@ -1,0 +1,22 @@
+﻿{
+  "id": "telegram_cache",
+  "name": "Telegram Desktop Cache",
+  "author": "Community",
+  "version": "1.0.0",
+  "description": "Очищает временные загруженные медиа и стикеры Telegram Desktop.",
+  "category": "Мессенджеры",
+  "icon": "\uE715",
+  "isEnabled": true,
+  "rules": [
+    {
+      "pathTemplate": "%APPDATA%\\Telegram Desktop\\tdata\\temp",
+      "pattern": "*",
+      "recursive": true
+    },
+    {
+      "pathTemplate": "%APPDATA%\\Telegram Desktop\\tdata\\user_data\\cache",
+      "pattern": "*",
+      "recursive": true
+    }
+  ]
+}

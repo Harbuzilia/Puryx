@@ -1,0 +1,30 @@
+<Application x:Class="SmartCleaner.App.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:converters="clr-namespace:SmartCleaner.App.Converters"
+             Startup="Application_Startup">
+    <Application.Resources>
+        <ResourceDictionary>
+            <!-- Converters -->
+            <converters:SizeConverter x:Key="SizeConverter"/>
+            <converters:RiskToBackgroundConverter x:Key="RiskToBackgroundConverter"/>
+            <converters:RiskToTextConverter x:Key="RiskToTextConverter"/>
+            <converters:RiskToEnabledConverter x:Key="RiskToEnabledConverter"/>
+            <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+            <converters:CountToVisibilityConverter x:Key="CountToVisibilityConverter"/>
+            <converters:InverseBoolConverter x:Key="InverseBoolConverter"/>
+            <converters:BoolToAddedTextConverter x:Key="BoolToAddedTextConverter"/>
+            <converters:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
+            <converters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter"/>
+            <converters:CountToVisibilityInverseConverter x:Key="CountToVisibilityInverseConverter"/>
+            <converters:IntToVisibilityConverter x:Key="IntToVisibilityConverter"/>
+            <converters:BoolToToggleTextConverter x:Key="BoolToToggleTextConverter"/>
+            <converters:ZeroToColorConverter x:Key="ZeroToColorConverter"/>
+            <converters:DeadStatusColorConverter x:Key="DeadStatusColorConverter"/>
+            <converters:EmptyStringToVisibilityConverter x:Key="EmptyStringToVisibilityConverter"/>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Themes/DarkTheme.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

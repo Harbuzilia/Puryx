@@ -1,0 +1,17 @@
+﻿{
+  "id": "blender_cache",
+  "name": "Blender Autosave & Temp",
+  "author": "3D Artists Community",
+  "version": "1.0.0",
+  "description": "Очищает временные файлы рендера и старые автосохранения Blender.",
+  "category": "Медиа и Графика",
+  "icon": "\uE790",
+  "isEnabled": true,
+  "rules": [
+    {
+      "pathTemplate": "%LOCALAPPDATA%\\Temp\\blender_*",
+      "pattern": "*",
+      "recursive": true
+    }
+  ]
+}

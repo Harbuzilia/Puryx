@@ -1,0 +1,894 @@
+<Window x:Class="SmartCleaner.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Smart System Cleaner — Full Suite v2.7"
+        Height="740" Width="1180"
+        MinHeight="560" MinWidth="880"
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource BackgroundBrush}"
+        Foreground="{DynamicResource TextPrimaryBrush}"
+        FontFamily="Segoe UI Variable Display, Segoe UI Variable Text, Segoe UI, sans-serif"
+        UseLayoutRounding="True"
+        TextOptions.TextFormattingMode="Display"
+        TextOptions.TextRenderingMode="ClearType">
+    
+    <!-- Keyboard Shortcuts -->
+    <Window.InputBindings>
+        <KeyBinding Key="A" Modifiers="Control" Command="{Binding SelectAllCommand}"/>
+        <KeyBinding Key="F" Modifiers="Control" Command="{Binding FocusSearchCommand}"/>
+        <KeyBinding Key="S" Modifiers="Control" Command="{Binding ScanCommand}"/>
+        <KeyBinding Key="Delete" Command="{Binding CleanCommand}"/>
+        <KeyBinding Key="Escape" Command="{Binding CancelScanCommand}"/>
+    </Window.InputBindings>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="240"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Sidebar -->
+        <Border Grid.Column="0" 
+                Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="{DynamicResource BorderBrush}"
+                BorderThickness="0,0,1,0">
+            <DockPanel>
+                <!-- Logo & Brand Header -->
+                <Border DockPanel.Dock="Top" Padding="16,20,16,18" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Border Width="42" Height="42" CornerRadius="10" Background="{DynamicResource AccentGradientBrush}"
+                                HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <TextBlock Text="&#xE74D;" 
+                                       FontFamily="Segoe MDL2 Assets" 
+                                       FontSize="22"
+                                       Foreground="White"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                        </Border>
+                        <StackPanel Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center">
+                            <TextBlock Text="Smart Cleaner" 
+                                       FontSize="16" 
+                                       FontWeight="Bold"
+                                       Foreground="{DynamicResource TextPrimaryBrush}"/>
+                            <Border Background="{DynamicResource SurfaceVariantBrush}"
+                                    CornerRadius="4" Padding="6,2" Margin="0,4,0,0" HorizontalAlignment="Left">
+                                <TextBlock Text="v2.7 FULL SUITE" 
+                                           FontSize="9.5" 
+                                           FontWeight="Bold"
+                                           Foreground="{DynamicResource AccentBrush}"/>
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- Footer (Theme toggle & About) -->
+                <Border DockPanel.Dock="Bottom" Padding="12,12" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,0">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Button Style="{StaticResource SecondaryButton}" 
+                                Content="Тема"
+                                HorizontalAlignment="Stretch"
+                                Margin="0,0,6,0"
+                                Padding="8,6"
+                                Click="ToggleTheme_Click"
+                                ToolTip="Быстрое переключение темы оформления"/>
+                        <Button Grid.Column="1"
+                                Style="{StaticResource SubtleButton}" 
+                                Content="ℹ️"
+                                FontSize="14"
+                                Padding="8,6"
+                                Click="ShowAbout_Click"
+                                ToolTip="О программе"/>
+                    </Grid>
+                </Border>
+
+                <!-- Scrollable Navigation Tree -->
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="8,8,8,8">
+                    <StackPanel>
+                        <!-- ═══ СЕКЦИЯ: ОЧИСТКА ═══ -->
+                        <TextBlock Text="ОЧИСТКА" 
+                                   FontSize="11"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextDisabledBrush}"
+                                   Margin="12,8,0,6"/>
+
+                        <!-- Кнопка "Обзор" (все категории) -->
+                        <RadioButton Style="{StaticResource NavButton}" 
+                                     Content="Обзор" 
+                                     Tag="&#xE80F;"
+                                     IsChecked="True"
+                                     Checked="NavigateToAllCategories"
+                                     GroupName="Nav"/>
+
+                        <!-- Динамические категории из результатов сканирования -->
+                        <ItemsControl ItemsSource="{Binding Categories}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <RadioButton GroupName="Nav"
+                                                 Checked="NavigateToCategory"
+                                                 Tag="{Binding Icon}"
+                                                 Margin="0,1"
+                                                 Cursor="Hand"
+                                                 ToolTip="{Binding TooltipText}"
+                                                 Visibility="{Binding IsAll, Converter={StaticResource InverseBoolToVisibilityConverter}}">
+                                        <RadioButton.Style>
+                                            <Style TargetType="RadioButton" BasedOn="{StaticResource NavButton}"/>
+                                        </RadioButton.Style>
+                                        <RadioButton.Content>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+                                                <Border Grid.Column="1" Background="{DynamicResource SurfaceVariantBrush}" 
+                                                        CornerRadius="4" Padding="6,2" Margin="6,0,0,0">
+                                                    <TextBlock Text="{Binding TotalSize, Converter={StaticResource SizeConverter}, Mode=OneWay}"
+                                                               FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                                </Border>
+                                            </Grid>
+                                        </RadioButton.Content>
+                                    </RadioButton>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <!-- ═══ СЕКЦИЯ: ИНСТРУМЕНТЫ ═══ -->
+                        <TextBlock Text="ИНСТРУМЕНТЫ" 
+                                   FontSize="11"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextDisabledBrush}"
+                                   Margin="12,18,0,6"/>
+
+                        <RadioButton Style="{StaticResource NavButton}" 
+                                     Content="Дубликаты" 
+                                     Tag="&#xE8B7;"
+                                     Checked="NavigateToDuplicates"
+                                     GroupName="Nav"/>
+                        <RadioButton Style="{StaticResource NavButton}" 
+                                     Content="Карта диска" 
+                                     Tag="&#xE9F9;"
+                                     Checked="NavigateToDiskMap"
+                                     GroupName="Nav"/>
+                        <RadioButton Style="{StaticResource NavButton}" 
+                                     Content="Большие файлы" 
+                                     Tag="&#xE8F1;"
+                                     Checked="NavigateToLargeFiles"
+                                     GroupName="Nav"/>
+                        <RadioButton Style="{StaticResource NavButton}" 
+                                     Content="Автозагрузка" 
+                                     Tag="&#xE7B5;"
+                                     Checked="NavigateToStartup"
+                                     GroupName="Nav"/>
+                        <RadioButton Style="{StaticResource NavButton}" 
+                                     Content="Обнаружение" 
+                                     Tag="&#xE773;"
+                                     Checked="NavigateToDiscovery"
+                                     GroupName="Nav"/>
+                        <RadioButton Style="{StaticResource NavButton}" 
+                                     Content="CLI и AI Агенты" 
+                                     Tag="&#xE756;"
+                                     Checked="NavigateToCliInspector"
+                                     GroupName="Nav"/>
+                        <RadioButton Style="{StaticResource NavButton}" 
+                                     Content="AI Ассистент" 
+                                     Tag="&#xE99A;"
+                                     Checked="NavigateToAiAssistant"
+                                     GroupName="Nav"/>
+                        <RadioButton Style="{StaticResource NavButton}" 
+                                     Content="Деинсталлятор" 
+                                     Tag="&#xE74D;"
+                                     Checked="NavigateToUninstaller"
+                                     GroupName="Nav"/>
+                        <RadioButton Style="{StaticResource NavButton}" 
+                                     Content="Сжатие CompactOS" 
+                                     Tag="&#xE7B8;"
+                                     Checked="NavigateToCompact"
+                                     GroupName="Nav"/>
+                        <RadioButton Style="{StaticResource NavButton}" 
+                                     Content="Очистка ядра WinSxS" 
+                                     Tag="&#xEA1F;"
+                                     Checked="NavigateToSystemDeepClean"
+                                     GroupName="Nav"/>
+                        <RadioButton Style="{StaticResource NavButton}" 
+                                     Content="Карантин Sandbox" 
+                                     Tag="&#xEA3B;"
+                                     Checked="NavigateToQuarantine"
+                                     GroupName="Nav"/>
+                        <RadioButton Style="{StaticResource NavButton}" 
+                                     Content="Плагины сообщества" 
+                                     Tag="&#xE71D;"
+                                     Checked="NavigateToPlugins"
+                                     GroupName="Nav"/>
+                        <RadioButton Style="{StaticResource NavButton}" 
+                                     Content="Оптимизация RAM и БД" 
+                                     Tag="&#xE950;"
+                                     Checked="NavigateToRamOptimizer"
+                                     GroupName="Nav"/>
+                        <RadioButton Style="{StaticResource NavButton}" 
+                                     Content="Оптимизация сети (DNS)" 
+                                     Tag="&#xE704;"
+                                     Checked="NavigateToNetworkOptimizer"
+                                     GroupName="Nav"/>
+
+                        <!-- ═══ СЕКЦИЯ: СИСТЕМА ═══ -->
+                        <TextBlock Text="СИСТЕМА" 
+                                   FontSize="11"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextDisabledBrush}"
+                                   Margin="12,18,0,6"/>
+
+                        <RadioButton Style="{StaticResource NavButton}" 
+                                     Content="Приватность и защита" 
+                                     Tag="&#xE727;"
+                                     Checked="NavigateToPrivacyDebloat"
+                                     GroupName="Nav"/>
+                        <RadioButton Style="{StaticResource NavButton}" 
+                                     Content="Оптимизатор служб" 
+                                     Tag="&#xE8B9;"
+                                     Checked="NavigateToServicesOptimizer"
+                                     GroupName="Nav"/>
+                        <RadioButton Style="{StaticResource NavButton}" 
+                                     Content="Дашборд" 
+                                     Tag="&#xE9D9;"
+                                     Checked="NavigateToDashboard"
+                                     GroupName="Nav"/>
+                        <RadioButton Style="{StaticResource NavButton}" 
+                                     Content="Планировщик" 
+                                     Tag="&#xE787;"
+                                     Checked="NavigateToScheduler"
+                                     GroupName="Nav"/>
+                        <RadioButton Style="{StaticResource NavButton}" 
+                                     Content="Настройки" 
+                                     Tag="&#xE713;"
+                                     Checked="NavigateToSettings"
+                                     GroupName="Nav"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </DockPanel>
+        </Border>
+
+        <!-- Content Area -->
+        <Grid Grid.Column="1">
+            <!-- Main View -->
+            <Grid x:Name="MainView" Margin="24,20">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Header (Row 0) -->
+                <StackPanel Grid.Row="0">
+                    <DockPanel>
+                        <!-- Title & Subtitle -->
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Text="Умная очистка диска" Style="{StaticResource Heading1}"/>
+                            <TextBlock Text="{Binding StatusText}" Style="{StaticResource BodyText}" Margin="0,4,0,0"/>
+                        </StackPanel>
+
+                        <!-- Right Controls: All-time Stats Pill + Scan Options Button -->
+                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                            <!-- All-time Stats Info Pill -->
+                            <Border Margin="0,0,10,0" Padding="12,6" 
+                                    CornerRadius="14" 
+                                    Background="{DynamicResource SurfaceVariantBrush}"
+                                    BorderBrush="{DynamicResource BorderBrush}"
+                                    BorderThickness="1"
+                                    Visibility="{Binding SessionCount, Converter={StaticResource CountToVisibilityInverseConverter}}">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <TextBlock Text="&#xE9D9;" FontFamily="Segoe MDL2 Assets" FontSize="12" 
+                                               Foreground="{DynamicResource CautionBrush}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                    <TextBlock Style="{StaticResource Caption}" VerticalAlignment="Center">
+                                        <Run Text="Освобождено: " Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                        <Run Text="{Binding TotalFreedAllTime, Mode=OneWay}" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}"/>
+                                        <Run Text=" (" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                        <Run Text="{Binding SessionCount, Mode=OneWay}" FontWeight="SemiBold"/>
+                                        <Run Text=" сессий)" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                    </TextBlock>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Кнопка настроек сканирования -->
+                            <Button Style="{StaticResource SecondaryButton}"
+                                    Command="{Binding ToggleScanConfigCommand}"
+                                    Padding="10,6"
+                                    ToolTip="Параметры и фильтры сканирования">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE713;" FontFamily="Segoe MDL2 Assets" FontSize="13" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                    <TextBlock Text="Параметры" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </DockPanel>
+
+                    <!-- Scan Configuration Panel (collapsible dropdown) -->
+                    <Border Margin="0,12,0,0"
+                            Style="{StaticResource Card}" Padding="16,14"
+                            Visibility="{Binding IsScanConfigVisible, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <StackPanel>
+                            <!-- Профили -->
+                            <TextBlock Text="ПРОФИЛЬ" FontSize="11" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextDisabledBrush}" Margin="0,0,0,8"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                                <Button Style="{StaticResource SecondaryButton}" Content="Быстрая"
+                                        Command="{Binding ApplyProfileCommand}" CommandParameter="Быстрая"
+                                        Padding="12,6" Margin="0,0,8,0"
+                                        ToolTip="Система + Браузеры"/>
+                                <Button Style="{StaticResource SecondaryButton}" Content="Разработка"
+                                        Command="{Binding ApplyProfileCommand}" CommandParameter="Разработка"
+                                        Padding="12,6" Margin="0,0,8,0"
+                                        ToolTip="npm/pip/NuGet кэши, node_modules, venv, bin/obj, Docker"/>
+                                <Button Style="{StaticResource SecondaryButton}" Content="Полное"
+                                        Command="{Binding ApplyProfileCommand}" CommandParameter="Полное"
+                                        Padding="12,6"
+                                        ToolTip="Все категории"/>
+                                <TextBlock Text="{Binding SelectedProfile}" 
+                                           Foreground="{DynamicResource AccentBrush}" 
+                                           FontWeight="SemiBold"
+                                           VerticalAlignment="Center" Margin="12,0,0,0"/>
+                            </StackPanel>
+
+                            <!-- Категории сканирования -->
+                            <TextBlock Text="СКАНИРОВАТЬ" FontSize="11" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextDisabledBrush}" Margin="0,0,0,8"/>
+                            <ItemsControl ItemsSource="{Binding ScannerOptions}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <CheckBox IsChecked="{Binding IsEnabled}" 
+                                                  Margin="0,0,16,6" Cursor="Hand">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="{Binding Icon}" 
+                                                           FontFamily="Segoe MDL2 Assets" FontSize="12"
+                                                           Foreground="{DynamicResource AccentBrush}"
+                                                           VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                                <TextBlock Text="{Binding CategoryName}" 
+                                                           VerticalAlignment="Center"/>
+                                            </StackPanel>
+                                        </CheckBox>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+
+                            <!-- Дополнительная папка -->
+                            <TextBlock Text="ДОПОЛНИТЕЛЬНАЯ ПАПКА" FontSize="11" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextDisabledBrush}" Margin="0,8,0,6"/>
+                            <DockPanel>
+                                <Button DockPanel.Dock="Right"
+                                        Style="{StaticResource SecondaryButton}"
+                                        Command="{Binding BrowseFolderCommand}"
+                                        Padding="12,4" Margin="8,0,0,0">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="&#xED25;" FontFamily="Segoe MDL2 Assets" FontSize="13" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                                        <TextBlock Text="Обзор" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Button>
+                                <Border BorderBrush="{DynamicResource BorderBrush}" 
+                                        BorderThickness="1" CornerRadius="4" Padding="8,4">
+                                    <TextBox Text="{Binding CustomScanPath, UpdateSourceTrigger=PropertyChanged}"
+                                             BorderThickness="0" Background="Transparent"
+                                             Foreground="{DynamicResource TextPrimaryBrush}"
+                                             VerticalAlignment="Center"/>
+                                </Border>
+                            </DockPanel>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <!-- Summary Cards (Row 1) -->
+                <UniformGrid Grid.Row="1" Columns="4" Margin="0,16,0,16">
+                    <!-- Found -->
+                    <Border Style="{StaticResource Card}" Margin="0,0,8,0">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Border Width="42" Height="42" CornerRadius="8" Background="{DynamicResource AccentBadgeBrush}"
+                                    HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,12,0">
+                                <TextBlock Text="&#xE7C3;" FontFamily="Segoe MDL2 Assets" FontSize="20"
+                                           Foreground="{DynamicResource AccentBrush}"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding TotalSize, Converter={StaticResource SizeConverter}}" 
+                                           FontSize="21" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                <TextBlock Text="НАЙДЕНО МУСОРА" FontSize="10" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- Selected -->
+                    <Border Style="{StaticResource Card}" Margin="4,0">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Border Width="42" Height="42" CornerRadius="8" Background="{DynamicResource SafeBadgeBrush}"
+                                    HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,12,0">
+                                <TextBlock Text="&#xE73E;" FontFamily="Segoe MDL2 Assets" FontSize="20"
+                                           Foreground="{DynamicResource SafeBrush}"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding SelectedSize, Converter={StaticResource SizeConverter}}" 
+                                           FontSize="21" FontWeight="Bold" Foreground="{DynamicResource SafeBrush}"/>
+                                <TextBlock Text="ВЫБРАНО К ОЧИСТКЕ" FontSize="10" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- Count -->
+                    <Border Style="{StaticResource Card}" Margin="4,0">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Border Width="42" Height="42" CornerRadius="8" Background="{DynamicResource AccentBadgeBrush}"
+                                    HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,12,0">
+                                <TextBlock Text="&#xE8B7;" FontFamily="Segoe MDL2 Assets" FontSize="20"
+                                           Foreground="{DynamicResource AccentBrush}"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding SelectedCount}" FontSize="21" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                    <TextBlock Text="/" FontSize="16" Foreground="{DynamicResource TextSecondaryBrush}" Margin="3,0"/>
+                                    <TextBlock Text="{Binding TotalCount}" FontSize="16" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                </StackPanel>
+                                <TextBlock Text="ОБЪЕКТОВ" FontSize="10" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- Scan Button -->
+                    <Button Style="{StaticResource PrimaryButton}" 
+                            Command="{Binding ScanCommand}"
+                            Margin="8,0,0,0"
+                            Padding="16,8">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <TextBlock Text="&#xE721;" 
+                                       FontFamily="Segoe MDL2 Assets" 
+                                       FontSize="22"
+                                       Margin="0,0,12,0"
+                                       VerticalAlignment="Center"/>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="Сканировать" 
+                                           FontSize="14"
+                                           FontWeight="Bold"/>
+                                <TextBlock Text="Анализ дисков" 
+                                           FontSize="10"
+                                           Opacity="0.85"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Button>
+                </UniformGrid>
+
+                <!-- Results List -->
+                <Border Grid.Row="2" Style="{StaticResource Card}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Filters -->
+                        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,12">
+                            <!-- Search -->
+                            <Border BorderBrush="{DynamicResource BorderBrush}" 
+                                    BorderThickness="1" CornerRadius="6" 
+                                    Background="{DynamicResource SurfaceVariantBrush}"
+                                    Height="34"
+                                    Padding="8,0" Margin="0,0,12,0" VerticalAlignment="Center">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE721;" 
+                                               FontFamily="Segoe MDL2 Assets" FontSize="12"
+                                               Foreground="{DynamicResource TextSecondaryBrush}"
+                                               VerticalAlignment="Center" Margin="2,0,8,0"/>
+                                    <TextBox x:Name="SearchBox"
+                                             Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged, Delay=300}"
+                                             Width="190" BorderThickness="0" 
+                                             Background="Transparent"
+                                             FontSize="13"
+                                             Foreground="{DynamicResource TextPrimaryBrush}"
+                                             VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Border>
+
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,12,0">
+                                <TextBlock Text="Источник:" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,8,0"/>
+                                <ComboBox Width="140" Height="34"
+                                          ItemsSource="{Binding SourceFilters}"
+                                          SelectedItem="{Binding SelectedSourceFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="Область:" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,8,0"/>
+                                <ComboBox Width="150" Height="34"
+                                          ItemsSource="{Binding ScopeFilters}"
+                                          SelectedItem="{Binding SelectedScopeFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- Header Row (sortable) -->
+                        <Grid Grid.Row="1" VerticalAlignment="Top" Margin="0,0,17,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="28"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="100"/>
+                                <ColumnDefinition Width="90"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <TextBlock Grid.Column="1" Cursor="Hand" Margin="0,0,0,0">
+                                <Hyperlink Command="{Binding SortByCommand}" CommandParameter="Name"
+                                           TextDecorations="None" Foreground="{DynamicResource TextSecondaryBrush}">
+                                    <Run Text="Путь ↕"/>
+                                </Hyperlink>
+                            </TextBlock>
+                            <TextBlock Grid.Column="2" HorizontalAlignment="Right" Margin="0,0,8,0" Cursor="Hand">
+                                <Hyperlink Command="{Binding SortByCommand}" CommandParameter="Size"
+                                           TextDecorations="None" Foreground="{DynamicResource TextSecondaryBrush}">
+                                    <Run Text="Размер ↕"/>
+                                </Hyperlink>
+                            </TextBlock>
+                            <TextBlock Grid.Column="3" HorizontalAlignment="Center" Cursor="Hand">
+                                <Hyperlink Command="{Binding SortByCommand}" CommandParameter="Risk"
+                                           TextDecorations="None" Foreground="{DynamicResource TextSecondaryBrush}">
+                                    <Run Text="Статус ↕"/>
+                                </Hyperlink>
+                            </TextBlock>
+                        </Grid>
+
+                        <!-- Items List -->
+                        <ListView Grid.Row="2"
+                                  ItemsSource="{Binding FilteredItems}"
+                                  Background="Transparent"
+                                  BorderThickness="0"
+                                  ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                            <!-- Grouping -->
+                            <ListView.GroupStyle>
+                                <GroupStyle>
+                                    <GroupStyle.HeaderTemplate>
+                                        <DataTemplate>
+                                            <Border Background="{DynamicResource SurfaceVariantBrush}" 
+                                                    CornerRadius="4" Padding="8,4" Margin="0,8,0,4">
+                                                <TextBlock FontWeight="SemiBold" FontSize="12"
+                                                           Foreground="{DynamicResource AccentBrush}">
+                                                    <Run Text="{Binding Name, Mode=OneWay}"/>
+                                                    <Run Text=" (" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                                    <Run Text="{Binding ItemCount, Mode=OneWay}" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                                    <Run Text=")" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                                </TextBlock>
+                                            </Border>
+                                        </DataTemplate>
+                                    </GroupStyle.HeaderTemplate>
+                                </GroupStyle>
+                            </ListView.GroupStyle>
+                            <ListView.AlternationCount>2</ListView.AlternationCount>
+                            <ListView.ItemContainerStyle>
+                                <Style TargetType="ListViewItem">
+                                    <Setter Property="Padding" Value="0,6"/>
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                    <Setter Property="Background" Value="Transparent"/>
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="ListViewItem">
+                                                <Border Background="{TemplateBinding Background}" 
+                                                        Padding="{TemplateBinding Padding}">
+                                                    <ContentPresenter/>
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Style.Triggers>
+                                        <Trigger Property="ItemsControl.AlternationIndex" Value="1">
+                                            <Setter Property="Background" Value="{DynamicResource SurfaceVariantBrush}"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ListView.ItemContainerStyle>
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Grid.ToolTip>
+                                            <ToolTip MaxWidth="450">
+                                                <TextBlock Text="{Binding ToolTipText}" TextWrapping="Wrap"/>
+                                            </ToolTip>
+                                        </Grid.ToolTip>
+                                        <Grid.ContextMenu>
+                                            <ContextMenu>
+                                                <MenuItem Header="Открыть папку" 
+                                                          Command="{Binding DataContext.OpenFolderCommand, RelativeSource={RelativeSource AncestorType=ListView}}"
+                                                          CommandParameter="{Binding}"/>
+                                                <MenuItem Header="Копировать путь" 
+                                                          Command="{Binding DataContext.CopyPathCommand, RelativeSource={RelativeSource AncestorType=ListView}}"
+                                                          CommandParameter="{Binding}"/>
+                                                <Separator/>
+                                                <MenuItem Header="Добавить в белый список" 
+                                                          Command="{Binding DataContext.AddToWhitelistCommand, RelativeSource={RelativeSource AncestorType=ListView}}"
+                                                          CommandParameter="{Binding}"/>
+                                            </ContextMenu>
+                                        </Grid.ContextMenu>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="28"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="100"/>
+                                            <ColumnDefinition Width="90"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <CheckBox IsChecked="{Binding IsSelected}"
+                                                  IsEnabled="{Binding Risk, Converter={StaticResource RiskToEnabledConverter}}"
+                                                  VerticalAlignment="Center"/>
+                                        
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,12,0">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="{Binding Name}" 
+                                                           FontWeight="Medium"
+                                                           TextTrimming="CharacterEllipsis"
+                                                           MaxWidth="400"/>
+                                                <!-- Parent App Badge -->
+                                                <Border Background="{DynamicResource AccentBrush}"
+                                                        CornerRadius="3"
+                                                        Padding="6,1"
+                                                        Margin="8,0,0,0"
+                                                        Visibility="{Binding ParentApp, Converter={StaticResource NullToVisibilityConverter}}">
+                                                    <TextBlock Text="{Binding ParentApp}"
+                                                               FontSize="10"
+                                                               Foreground="White"/>
+                                                </Border>
+                                            </StackPanel>
+                                            <TextBlock Style="{StaticResource Caption}"
+                                                       TextTrimming="CharacterEllipsis">
+                                                <Run Text="{Binding CategoryName, Mode=OneWay}"/>
+                                                <Run Text=" • "/>
+                                                <Run Text="{Binding Path, Mode=OneWay}"/>
+                                            </TextBlock>
+                                        </StackPanel>
+
+                                        <TextBlock Grid.Column="2" 
+                                                   Text="{Binding SizeFormatted}"
+                                                   HorizontalAlignment="Right"
+                                                   VerticalAlignment="Center"
+                                                   Margin="0,0,8,0"/>
+
+                                        <Border Grid.Column="3" 
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"
+                                                CornerRadius="10"
+                                                Padding="10,3"
+                                                Background="{Binding Risk, Converter={StaticResource RiskToBackgroundConverter}}">
+                                            <TextBlock Text="{Binding Risk, Converter={StaticResource RiskToTextConverter}}"
+                                                       FontSize="10.5"
+                                                       FontWeight="SemiBold"
+                                                       Foreground="White"/>
+                                        </Border>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+
+                        <!-- Empty State -->
+                        <StackPanel Grid.Row="2"
+                                    VerticalAlignment="Center" 
+                                    HorizontalAlignment="Center"
+                                    Visibility="{Binding FilteredCount, Converter={StaticResource CountToVisibilityConverter}}">
+                            <TextBlock Text="&#xE721;" 
+                                       FontFamily="Segoe MDL2 Assets" 
+                                       FontSize="48"
+                                       Foreground="{DynamicResource TextDisabledBrush}"
+                                       HorizontalAlignment="Center"/>
+                            <TextBlock Text="Нажмите «Сканировать» для поиска мусора" 
+                                       Style="{StaticResource BodyText}"
+                                       Margin="0,12,0,0"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- Footer -->
+                <Grid Grid.Row="3" Margin="0,16,0,0">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                        <Button Content="Выбрать безопасные" 
+                                Style="{StaticResource SecondaryButton}"
+                                Command="{Binding SelectAllCommand}"
+                                Margin="0,0,8,0"/>
+                        <Button Content="+ кэши" 
+                                Style="{StaticResource SecondaryButton}"
+                                Command="{Binding SelectCacheCommand}"
+                                ToolTip="Выбрать SafeToDelete + PerformanceCache"
+                                Margin="0,0,8,0"/>
+                        <Button Content="Снять выбор" 
+                                Style="{StaticResource SecondaryButton}"
+                                Command="{Binding DeselectAllCommand}"
+                                Margin="0,0,8,0"/>
+                        <Button Content="Экспорт" 
+                                Style="{StaticResource SecondaryButton}"
+                                Command="{Binding ExportResultsCommand}"/>
+                    </StackPanel>
+
+                    <Button Content="Очистить выбранное"
+                            Style="{StaticResource DangerButton}"
+                            Command="{Binding CleanCommand}"
+                            Padding="22,9"
+                            FontSize="13.5"
+                            FontWeight="Bold"
+                            HorizontalAlignment="Right"/>
+                </Grid>
+            </Grid>
+
+            <!-- Settings/Discovery View (hidden by default) -->
+            <ContentPresenter x:Name="ContentArea" 
+                              Visibility="Collapsed"
+                              Margin="24,20"/>
+        </Grid>
+
+        <!-- Loading Overlay (Scanning) -->
+        <Border x:Name="ScanOverlay" Grid.ColumnSpan="2" 
+                Background="#B3000000">
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                    <Setter Property="Opacity" Value="0"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsScanning}" Value="True">
+                            <Setter Property="Visibility" Value="Visible"/>
+                            <DataTrigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.25"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </DataTrigger.EnterActions>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+            <Border Background="{DynamicResource SurfaceBrush}"
+                    BorderBrush="{DynamicResource BorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="16"
+                    Padding="36,28"
+                    MinWidth="340"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center">
+                <StackPanel HorizontalAlignment="Center">
+                    <Border Width="52" Height="52" CornerRadius="12" Background="{DynamicResource AccentBadgeBrush}" HorizontalAlignment="Center" Margin="0,0,0,16">
+                        <TextBlock Text="&#xE721;" FontFamily="Segoe MDL2 Assets" FontSize="24" Foreground="{DynamicResource AccentBrush}"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <TextBlock Text="Сканирование системы..." FontSize="17" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" HorizontalAlignment="Center"/>
+                    <ProgressBar IsIndeterminate="True" Width="260" Height="5" Margin="0,16,0,0" Foreground="{DynamicResource AccentBrush}"/>
+                    <TextBlock Text="{Binding StatusText}" 
+                               Foreground="{DynamicResource TextSecondaryBrush}"
+                               HorizontalAlignment="Center"
+                               TextTrimming="CharacterEllipsis"
+                               MaxWidth="320"
+                               Margin="0,12,0,0"/>
+                    <Button Content="Отменить сканирование"
+                            Command="{Binding CancelScanCommand}"
+                            Style="{StaticResource SecondaryButton}"
+                            HorizontalAlignment="Center"
+                            Margin="0,18,0,0"
+                            Padding="16,6"/>
+                </StackPanel>
+            </Border>
+        </Border>
+
+        <!-- Cleaning Overlay -->
+        <Border x:Name="CleanOverlay" Grid.ColumnSpan="2" 
+                Background="#B3000000">
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                    <Setter Property="Opacity" Value="0"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsCleaning}" Value="True">
+                            <Setter Property="Visibility" Value="Visible"/>
+                            <DataTrigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.25"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </DataTrigger.EnterActions>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+            <Border Background="{DynamicResource SurfaceBrush}"
+                    BorderBrush="{DynamicResource BorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="16"
+                    Padding="36,28"
+                    MinWidth="380"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center">
+                <StackPanel HorizontalAlignment="Center">
+                    <Border Width="52" Height="52" CornerRadius="12" Background="{DynamicResource DangerBadgeBrush}" HorizontalAlignment="Center" Margin="0,0,0,16">
+                        <TextBlock Text="&#xE74D;" FontFamily="Segoe MDL2 Assets" FontSize="26" Foreground="{DynamicResource DangerBrush}"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <TextBlock Text="Выполняется безопасная очистка" FontSize="17" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" HorizontalAlignment="Center"/>
+                    <ProgressBar Value="{Binding CleaningProgressValue}" 
+                                 Maximum="100" 
+                                 Width="320" 
+                                 Height="6"
+                                 Foreground="{DynamicResource AccentBrush}"
+                                 Margin="0,16,0,0"/>
+                    <TextBlock Text="{Binding CleaningStatusText}" 
+                               Foreground="{DynamicResource TextPrimaryBrush}"
+                               FontWeight="SemiBold"
+                               HorizontalAlignment="Center"
+                               TextTrimming="CharacterEllipsis"
+                               MaxWidth="360"
+                               Margin="0,12,0,0"/>
+                    <TextBlock Text="{Binding StatusText}" 
+                               Foreground="{DynamicResource TextSecondaryBrush}"
+                               FontSize="11.5"
+                               HorizontalAlignment="Center"
+                               Margin="0,4,0,0"/>
+                </StackPanel>
+            </Border>
+        </Border>
+
+        <!-- Toast Notification -->
+        <Border Grid.ColumnSpan="2" 
+                Panel.ZIndex="100"
+                VerticalAlignment="Bottom"
+                HorizontalAlignment="Center"
+                Margin="0,0,0,28"
+                CornerRadius="12"
+                Padding="20,10"
+                Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="{DynamicResource AccentBrush}"
+                BorderThickness="1.5">
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                    <Setter Property="Opacity" Value="0"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsToastVisible}" Value="True">
+                            <Setter Property="Visibility" Value="Visible"/>
+                            <DataTrigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.25"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </DataTrigger.EnterActions>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <TextBlock Text="&#xE73E;" FontFamily="Segoe MDL2 Assets" FontSize="15" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                <TextBlock Text="{Binding ToastMessage}" 
+                           FontSize="13" 
+                           FontWeight="SemiBold"
+                           Foreground="{DynamicResource TextPrimaryBrush}"
+                           VerticalAlignment="Center"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>

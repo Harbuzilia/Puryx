@@ -1,0 +1,239 @@
+<UserControl x:Class="SmartCleaner.App.Views.ServicesOptimizerPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" 
+             d:DesignHeight="750" d:DesignWidth="950">
+    <Grid Margin="24,20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <DockPanel Grid.Row="0" Margin="0,0,0,16">
+            <StackPanel DockPanel.Dock="Left">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border Width="32" Height="32" CornerRadius="8" Background="{DynamicResource AccentGradientBrush}" Margin="0,0,10,0" VerticalAlignment="Center">
+                        <TextBlock Text="&#xE912;" FontFamily="Segoe MDL2 Assets" FontSize="16" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <TextBlock Text="Оптимизатор фоновых служб Windows" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
+                    <Border Background="{DynamicResource AccentBrush}" CornerRadius="4" Padding="6,2" Margin="10,0,0,0" VerticalAlignment="Center">
+                        <TextBlock Text="ULTIMATE" FontSize="9.5" Foreground="White" FontWeight="Bold"/>
+                    </Border>
+                </StackPanel>
+                <TextBlock Text="Умное профилирование системных служб: снижение нагрузки на процессор и диск в играх с сохранением стабильности и 1-Click бэкапом" 
+                           FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,4,0,0"/>
+            </StackPanel>
+
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                <Button Command="{Binding RestoreDefaultsCommand}"
+                        IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"
+                        Style="{StaticResource SecondaryButton}" Margin="0,0,8,0">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xE777;" FontFamily="Segoe MDL2 Assets" FontSize="13" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="Восстановить службы" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+
+                <Button Command="{Binding ScanCommand}"
+                        IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"
+                        Style="{StaticResource SecondaryButton}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xE72C;" FontFamily="Segoe MDL2 Assets" FontSize="13" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="Обновить" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </DockPanel>
+
+        <!-- Profile Preset Cards -->
+        <UniformGrid Grid.Row="1" Columns="3" Margin="0,0,0,16">
+            <!-- Gaming Profile -->
+            <Border Style="{StaticResource Card}" Margin="0,0,8,0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <StackPanel Grid.Row="0" Orientation="Horizontal">
+                        <Border Width="38" Height="38" CornerRadius="8" Background="{DynamicResource AccentBadgeBrush}" Margin="0,0,10,0" VerticalAlignment="Center">
+                            <TextBlock Text="&#xE7FC;" FontFamily="Segoe MDL2 Assets" FontSize="18" Foreground="{DynamicResource AccentBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Text="Игровой профиль" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                            <TextBlock Text="Максимум FPS и отклика" FontSize="11" Foreground="{DynamicResource AccentBrush}"/>
+                        </StackPanel>
+                    </StackPanel>
+                    <TextBlock Grid.Row="1" Text="Отключает SysMain, телеметрию, факсы, удаленный реестр, WerSvc и демо-службы для устранения микрофризов." 
+                               FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" Margin="0,8,0,12"/>
+                    <Button Grid.Row="2" Content="Применить профиль" 
+                            Command="{Binding ApplyGamingProfileCommand}"
+                            IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"
+                            Style="{StaticResource PrimaryButton}" HorizontalAlignment="Stretch"/>
+                </Grid>
+            </Border>
+
+            <!-- Balanced Profile -->
+            <Border Style="{StaticResource Card}" Margin="4,0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <StackPanel Grid.Row="0" Orientation="Horizontal">
+                        <Border Width="38" Height="38" CornerRadius="8" Background="{DynamicResource SafeBadgeBrush}" Margin="0,0,10,0" VerticalAlignment="Center">
+                            <TextBlock Text="&#xE945;" FontFamily="Segoe MDL2 Assets" FontSize="18" Foreground="{DynamicResource SafeBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Text="Сбалансированный" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                            <TextBlock Text="100% безопасная очистка" FontSize="11" Foreground="{DynamicResource SafeBrush}"/>
+                        </StackPanel>
+                    </StackPanel>
+                    <TextBlock Grid.Row="1" Text="Отключает неиспользуемый системный балласт (факсы, карты, ритейл демо, телеметрию). Рекомендуется для всех ПК." 
+                               FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" Margin="0,8,0,12"/>
+                    <Button Grid.Row="2" Content="Применить профиль" 
+                            Command="{Binding ApplyBalancedProfileCommand}"
+                            IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"
+                            Style="{StaticResource SecondaryButton}" HorizontalAlignment="Stretch"/>
+                </Grid>
+            </Border>
+
+            <!-- Workstation Profile -->
+            <Border Style="{StaticResource Card}" Margin="8,0,0,0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <StackPanel Grid.Row="0" Orientation="Horizontal">
+                        <Border Width="38" Height="38" CornerRadius="8" Background="{DynamicResource AccentBadgeBrush}" Margin="0,0,10,0" VerticalAlignment="Center">
+                            <TextBlock Text="&#xE821;" FontFamily="Segoe MDL2 Assets" FontSize="18" Foreground="{DynamicResource CautionBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Text="Рабочая станция" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                            <TextBlock Text="Сохранение принтеров и сети" FontSize="11" Foreground="{DynamicResource AccentBrush}"/>
+                        </StackPanel>
+                    </StackPanel>
+                    <TextBlock Grid.Row="1" Text="Блокирует рекламу и трекинг, сохраняя работоспособность диспетчера печати, сетевых папок и Windows Hello." 
+                               FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" Margin="0,8,0,12"/>
+                    <Button Grid.Row="2" Content="Применить профиль" 
+                            Command="{Binding ApplyWorkstationProfileCommand}"
+                            IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"
+                            Style="{StaticResource SecondaryButton}" HorizontalAlignment="Stretch"/>
+                </Grid>
+            </Border>
+        </UniformGrid>
+
+        <!-- Services Table -->
+        <Border Grid.Row="2" Style="{StaticResource Card}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <DockPanel Grid.Row="0" Margin="0,0,0,12">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="Фильтр риска:" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,8,0" FontWeight="SemiBold"/>
+                        <ComboBox SelectedIndex="{Binding SelectedRiskFilterIndex, Mode=TwoWay}" Width="220" Height="32">
+                            <ComboBoxItem Content="Все службы"/>
+                            <ComboBoxItem Content="Безопасные к отключению"/>
+                            <ComboBoxItem Content="Умеренный риск"/>
+                        </ComboBox>
+                    </StackPanel>
+
+                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right">
+                        <TextBlock Text="Отключено служб:" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                        <TextBlock Text="{Binding DisabledCount}" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center"/>
+                        <TextBlock Text="из" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" Margin="4,0"/>
+                        <TextBlock Text="{Binding TotalCount}" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </DockPanel>
+
+                <DataGrid Grid.Row="1" ItemsSource="{Binding FilteredServices}" AutoGenerateColumns="False" CanUserAddRows="False" Background="Transparent" BorderThickness="0" GridLinesVisibility="Horizontal" HeadersVisibility="Column">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Binding="{Binding DisplayName}" Header="Служба" Width="260" FontWeight="SemiBold"/>
+                        <DataGridTextColumn Binding="{Binding Category}" Header="Категория" Width="140"/>
+                        <DataGridTextColumn Binding="{Binding StatusFormatted}" Header="Состояние" Width="120"/>
+                        <DataGridTextColumn Binding="{Binding StartupTypeFormatted}" Header="Тип запуска" Width="100"/>
+                        
+                        <DataGridTemplateColumn Header="Риск" Width="120">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Border CornerRadius="10" Padding="8,2" HorizontalAlignment="Left">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="Background" Value="{DynamicResource SafeBadgeBrush}"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding RiskLevel}" Value="Moderate">
+                                                        <Setter Property="Background" Value="{DynamicResource CautionBadgeBrush}"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding RiskLevel}" Value="Critical">
+                                                        <Setter Property="Background" Value="{DynamicResource DangerBadgeBrush}"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                        <TextBlock Text="{Binding RiskFormatted}" FontSize="11" FontWeight="SemiBold">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Foreground" Value="{DynamicResource SafeBrush}"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding RiskLevel}" Value="Moderate">
+                                                            <Setter Property="Foreground" Value="{DynamicResource CautionBrush}"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding RiskLevel}" Value="Critical">
+                                                            <Setter Property="Foreground" Value="{DynamicResource DangerBrush}"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </Border>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                        <DataGridTemplateColumn Header="Действие" Width="*">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Button Command="{Binding DataContext.ToggleServiceCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            CommandParameter="{Binding}"
+                                            Padding="12,4" Height="26" FontSize="11" FontWeight="SemiBold"
+                                            IsEnabled="{Binding DataContext.IsBusy, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource InverseBoolConverter}}">
+                                        <Button.Style>
+                                            <Style TargetType="Button" BasedOn="{StaticResource SecondaryButton}">
+                                                <Setter Property="Content" Value="Отключить"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsDisabled}" Value="True">
+                                                        <Setter Property="Content" Value="Включить"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </Border>
+
+        <!-- Footer Status -->
+        <Border Grid.Row="3" Margin="0,12,0,0" Padding="12,8" Background="{DynamicResource SurfaceBrush}" CornerRadius="6">
+            <DockPanel>
+                <TextBlock Text="ℹ️ Изменения служб полностью обратимы. Начальное состояние сохраняется в services_backup.json." 
+                           FontSize="11.5" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
+                <TextBlock Text="{Binding StatusText}" HorizontalAlignment="Right" FontSize="11.5" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center"/>
+            </DockPanel>
+        </Border>
+    </Grid>
+</UserControl>

@@ -1,0 +1,150 @@
+{
+    "version": "1.0",
+    "apps": {
+        "Steam": {
+            "displayName": "Steam",
+            "rootPaths": [
+                "%PROGRAMFILES(X86)%\\Steam",
+                "%LOCALAPPDATA%\\Steam"
+            ],
+            "cachePatterns": [
+                "appcache",
+                "depotcache",
+                "logs",
+                "dumps",
+                "*.log"
+            ],
+            "protectedPatterns": [
+                "userdata",
+                "steamapps",
+                "config"
+            ],
+            "description": "Кэш Steam. Сохранения игр в userdata защищены."
+        },
+        "EpicGames": {
+            "displayName": "Epic Games Launcher",
+            "rootPaths": [
+                "%LOCALAPPDATA%\\EpicGamesLauncher",
+                "%PROGRAMDATA%\\Epic"
+            ],
+            "cachePatterns": [
+                "Saved/webcache",
+                "Saved/Logs",
+                "VaultCache"
+            ],
+            "protectedPatterns": [
+                "Saved/Config"
+            ]
+        },
+        "NvidiaShaderCache": {
+            "displayName": "NVIDIA Shader Cache",
+            "rootPaths": [
+                "%LOCALAPPDATA%\\NVIDIA\\DXCache",
+                "%LOCALAPPDATA%\\NVIDIA\\GLCache"
+            ],
+            "cachePatterns": [
+                "*"
+            ],
+            "protectedPatterns": [],
+            "description": "Кэш шейдеров NVIDIA. После очистки игры могут подтормаживать при первом запуске."
+        },
+        "AMDShaderCache": {
+            "displayName": "AMD Shader Cache",
+            "rootPaths": [
+                "%LOCALAPPDATA%\\AMD\\DxCache",
+                "%LOCALAPPDATA%\\AMD\\GLCache"
+            ],
+            "cachePatterns": [
+                "*"
+            ],
+            "protectedPatterns": [],
+            "description": "Кэш шейдеров AMD. После очистки игры могут подтормаживать при первом запуске."
+        },
+        "IntelShaderCache": {
+            "displayName": "Intel Shader Cache",
+            "rootPaths": [
+                "%LOCALAPPDATA%\\Intel\\ShaderCache"
+            ],
+            "cachePatterns": [
+                "*"
+            ],
+            "protectedPatterns": []
+        },
+        "GOG": {
+            "displayName": "GOG Galaxy",
+            "rootPaths": [
+                "%LOCALAPPDATA%\\GOG.com\\Galaxy\\webcache",
+                "%PROGRAMDATA%\\GOG.com\\Galaxy\\logs"
+            ],
+            "cachePatterns": [
+                "*"
+            ],
+            "protectedPatterns": []
+        },
+        "Ubisoft": {
+            "displayName": "Ubisoft Connect",
+            "rootPaths": [
+                "%LOCALAPPDATA%\\Ubisoft Game Launcher"
+            ],
+            "cachePatterns": [
+                "cache",
+                "logs"
+            ],
+            "protectedPatterns": [
+                "savegames",
+                "settings"
+            ]
+        },
+        "EA": {
+            "displayName": "EA App",
+            "rootPaths": [
+                "%LOCALAPPDATA%\\Electronic Arts\\EA Desktop"
+            ],
+            "cachePatterns": [
+                "cache",
+                "Logs"
+            ],
+            "protectedPatterns": []
+        },
+        "UnrealEngine": {
+            "displayName": "Unreal Engine",
+            "rootPaths": [
+                "%LOCALAPPDATA%\\UnrealEngine"
+            ],
+            "cachePatterns": [
+                "*/Saved/Logs",
+                "*/Saved/Crashes",
+                "*/DerivedDataCache"
+            ],
+            "protectedPatterns": [
+                "*/Saved/Config"
+            ]
+        },
+        "Unity": {
+            "displayName": "Unity Hub",
+            "rootPaths": [
+                "%LOCALAPPDATA%\\Unity"
+            ],
+            "cachePatterns": [
+                "cache",
+                "Logs"
+            ],
+            "protectedPatterns": [
+                "Editor"
+            ]
+        }
+    },
+    "protectedGameFolders": [
+        "SaveGames",
+        "Saves",
+        "Save",
+        "SaveData",
+        "savegames",
+        "saves",
+        "save",
+        "savedata",
+        "userdata",
+        "profiles",
+        "SAVE*"
+    ]
+}

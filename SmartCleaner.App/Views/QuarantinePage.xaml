@@ -1,0 +1,114 @@
+<UserControl x:Class="SmartCleaner.App.Views.QuarantinePage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" 
+             d:DesignHeight="650" d:DesignWidth="900">
+    <Grid Margin="24,20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Grid Grid.Row="0" Margin="0,0,0,16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border Width="32" Height="32" CornerRadius="8" Background="{DynamicResource AccentGradientBrush}" Margin="0,0,10,0" VerticalAlignment="Center">
+                        <TextBlock Text="&#xF133;" FontFamily="Segoe MDL2 Assets" FontSize="16" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <TextBlock Text="Карантин и Безопасная песочница" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
+                    <Border Background="{DynamicResource AccentBrush}" CornerRadius="4" Padding="6,2" Margin="10,0,0,0" VerticalAlignment="Center">
+                        <TextBlock Text="ZERO-RISK" FontSize="9.5" Foreground="White" FontWeight="Bold"/>
+                    </Border>
+                </StackPanel>
+                <TextBlock Text="Изоляция удаленных файлов с гарантией безопасного восстановления в 1 клик" 
+                           FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,4,0,0"/>
+            </StackPanel>
+            <Button Grid.Column="1" 
+                    Style="{StaticResource PrimaryButton}" 
+                    Command="{Binding LoadItemsCommand}"
+                    VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="&#xE72C;" FontFamily="Segoe MDL2 Assets" FontSize="13" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                    <TextBlock Text="Обновить" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+        </Grid>
+
+        <!-- Metrics -->
+        <Grid Grid.Row="1" Margin="0,0,0,16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" Style="{StaticResource Card}" Margin="0,0,8,0">
+                <StackPanel>
+                    <TextBlock Text="Элементов в изоляции" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                    <TextBlock FontSize="20" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" Margin="0,4,0,0" Text="{Binding QuarantinedCount, Mode=OneWay}"/>
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="1" Style="{StaticResource Card}" Margin="8,0,0,0">
+                <StackPanel>
+                    <TextBlock Text="Объем изолированных файлов" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                    <TextBlock FontSize="20" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,4,0,0" Text="{Binding TotalSizeFormatted, Mode=OneWay}"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- Items List -->
+        <ListBox Grid.Row="2" ItemsSource="{Binding Items}" 
+                 Background="Transparent" BorderThickness="0">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Border Style="{StaticResource Card}" Margin="0,0,0,8" Padding="14,10">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="14"/>
+                                    <Border Background="{DynamicResource SurfaceVariantBrush}" CornerRadius="4" Padding="6,2" Margin="8,0,0,0" VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding Category}" FontSize="10" Foreground="{DynamicResource AccentBrush}"/>
+                                    </Border>
+                                </StackPanel>
+                                <TextBlock Text="{Binding OriginalPath, StringFormat='Исходный путь: {0}'}" FontSize="11" Foreground="{DynamicResource TextDisabledBrush}" Margin="0,3,0,0" TextTrimming="CharacterEllipsis"/>
+                                <TextBlock Text="{Binding QuarantinedAt, StringFormat='Изолировано: {0:dd.MM.yyyy HH:mm}'}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1" Margin="16,0" VerticalAlignment="Center" HorizontalAlignment="Right">
+                                <TextBlock Text="{Binding SizeFormatted}" FontWeight="SemiBold" FontSize="13" HorizontalAlignment="Right"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                                <Button Style="{StaticResource PrimaryButton}" 
+                                        Command="{Binding DataContext.RestoreItemCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        CommandParameter="{Binding .}"
+                                        Content="Восстановить" 
+                                        Padding="10,5" Margin="0,0,6,0"/>
+
+                                <Button Style="{StaticResource DangerButton}" 
+                                        Command="{Binding DataContext.PurgeItemCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        CommandParameter="{Binding .}"
+                                        Content="Удалить навсегда" 
+                                        Padding="8,5"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </Grid>
+</UserControl>
