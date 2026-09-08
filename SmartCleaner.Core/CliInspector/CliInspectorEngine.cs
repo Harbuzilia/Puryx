@@ -170,7 +170,7 @@ public class CliInspectorEngine
                 }
             }
         }
-        catch { }
+        catch (Exception ex) { Debug.WriteLine($"[CliInspectorEngine] UserHome scan error: {ex.Message}"); }
 
         // 2. Scan Custom Program Directories
         var programFolders = new[]
@@ -247,7 +247,7 @@ public class CliInspectorEngine
                         });
                     }
                 }
-                catch { }
+                catch (Exception ex) { Debug.WriteLine($"[CliInspectorEngine] Programs subdirs enumeration error: {ex.Message}"); }
             }
             else
             {
@@ -317,7 +317,7 @@ public class CliInspectorEngine
                                 }
                             }
                         }
-                        catch { }
+                        catch (Exception ex) { Debug.WriteLine($"[CliInspectorEngine] NPM package.json read error: {ex.Message}"); }
                     }
 
                     var (size, mtime, count) = GetDirSizeAndMTime(item, maxDepth: 3);
@@ -343,7 +343,7 @@ public class CliInspectorEngine
                     });
                 }
             }
-            catch { }
+            catch (Exception ex) { Debug.WriteLine($"[CliInspectorEngine] NPM node_modules enumeration error: {ex.Message}"); }
         }
 
         return tools;
@@ -383,7 +383,7 @@ public class CliInspectorEngine
                     });
                 }
             }
-            catch { }
+            catch (Exception ex) { Debug.WriteLine($"[CliInspectorEngine] Pipx venvs enumeration error: {ex.Message}"); }
         }
 
         return tools;
@@ -425,7 +425,7 @@ public class CliInspectorEngine
                     });
                 }
             }
-            catch { }
+            catch (Exception ex) { Debug.WriteLine($"[CliInspectorEngine] Scoop apps enumeration error: {ex.Message}"); }
         }
 
         // 2. Chocolatey Packages
@@ -460,7 +460,7 @@ public class CliInspectorEngine
                     });
                 }
             }
-            catch { }
+            catch (Exception ex) { Debug.WriteLine($"[CliInspectorEngine] Chocolatey packages enumeration error: {ex.Message}"); }
         }
 
         // 3. Cargo Binaries
@@ -494,7 +494,7 @@ public class CliInspectorEngine
                     });
                 }
             }
-            catch { }
+            catch (Exception ex) { Debug.WriteLine($"[CliInspectorEngine] Cargo binaries enumeration error: {ex.Message}"); }
         }
 
         // 4. Winget Links
@@ -528,7 +528,7 @@ public class CliInspectorEngine
                     });
                 }
             }
-            catch { }
+            catch (Exception ex) { Debug.WriteLine($"[CliInspectorEngine] Winget links enumeration error: {ex.Message}"); }
         }
 
         return tools;
@@ -600,7 +600,7 @@ public class CliInspectorEngine
                         }
                     }
                 }
-                catch { }
+                catch (Exception ex) { Debug.WriteLine($"[CliInspectorEngine] PATH dir enumeration error: {ex.Message}"); }
             }
 
             var status = !exists ? "Мертвый путь (Папка не найдена)" : (exes.Count > 0 ? "Активен" : "Пустая директория");
@@ -654,7 +654,7 @@ public class CliInspectorEngine
                         IsModule = false
                     });
                 }
-                catch { }
+                catch (Exception ex) { Debug.WriteLine($"[CliInspectorEngine] PowerShell profile read error: {ex.Message}"); }
             }
         }
 
@@ -687,7 +687,7 @@ public class CliInspectorEngine
                         });
                     }
                 }
-                catch { }
+                catch (Exception ex) { Debug.WriteLine($"[CliInspectorEngine] PowerShell module enumeration error: {ex.Message}"); }
             }
         }
 
@@ -723,7 +723,7 @@ public class CliInspectorEngine
                                 latestMTime = fi.LastWriteTime;
                             }
                         }
-                        catch { }
+                        catch (Exception ex) { Debug.WriteLine($"[CliInspectorEngine] File size read error: {ex.Message}"); }
                     }
 
                     foreach (var dir in Directory.EnumerateDirectories(current))
@@ -731,12 +731,12 @@ public class CliInspectorEngine
                         Walk(dir, depth + 1);
                     }
                 }
-                catch { }
+                catch (Exception ex) { Debug.WriteLine($"[CliInspectorEngine] Dir enumeration error in Walk: {ex.Message}"); }
             }
 
             Walk(path, 0);
         }
-        catch { }
+        catch (Exception ex) { Debug.WriteLine($"[CliInspectorEngine] GetDirSizeAndMTime error: {ex.Message}"); }
 
         return (size, latestMTime, count);
     }
@@ -758,7 +758,7 @@ public class CliInspectorEngine
                 }
             }
         }
-        catch { }
+        catch (Exception ex) { Debug.WriteLine($"[CliInspectorEngine] GetExecutablesInDir error: {ex.Message}"); }
         return list;
     }
 }

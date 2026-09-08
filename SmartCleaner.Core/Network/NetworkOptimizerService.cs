@@ -34,7 +34,7 @@ public class NetworkOptimizerService
                 return reply.RoundtripTime;
             }
         }
-        catch { }
+        catch (Exception ex) { Debug.WriteLine($"[NetworkOptimizerService] Ping failed: {ex.Message}"); }
 
         return -1;
     }
@@ -168,8 +168,8 @@ public class NetworkOptimizerService
                             }
                         }
                     }
-                    catch { }
-                }
+                    catch (Exception ex) { Debug.WriteLine($"[NetworkOptimizerService] TCP registry subkey error: {ex.Message}"); }
+                    }
 
                 return (true, enable
                     ? "Игровой твик TCP NoDelay (отключение алгоритма Нагла) успешно активирован!"

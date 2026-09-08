@@ -13,7 +13,7 @@ public class AudioFeedbackService
         {
             SystemSounds.Asterisk.Play();
         }
-        catch { }
+        catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[AudioFeedbackService] PlayScanComplete error: {ex.Message}"); }
     }
 
     public void PlayCleanComplete()
@@ -23,7 +23,7 @@ public class AudioFeedbackService
         {
             SystemSounds.Beep.Play();
         }
-        catch { }
+        catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[AudioFeedbackService] PlayCleanComplete error: {ex.Message}"); }
     }
 
     public void PlayBoostActivated()
@@ -33,6 +33,6 @@ public class AudioFeedbackService
         {
             SystemSounds.Exclamation.Play();
         }
-        catch { }
+        catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[AudioFeedbackService] PlayBoostActivated error: {ex.Message}"); }
     }
 }

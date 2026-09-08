@@ -210,7 +210,7 @@ public class GamesScanner : ScannerBase
                         "Epic Games"));
                 }
             }
-            catch { }
+            catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[GamesScanner] Epic cache scan error: {ex.Message}"); }
         }
     }
 
@@ -240,7 +240,7 @@ public class GamesScanner : ScannerBase
                         "NVIDIA"));
                 }
             }
-            catch { }
+            catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[GamesScanner] Nvidia cache scan error: {ex.Message}"); }
         }
     }
 
@@ -270,7 +270,7 @@ public class GamesScanner : ScannerBase
                         "AMD"));
                 }
             }
-            catch { }
+            catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[GamesScanner] AMD cache scan error: {ex.Message}"); }
         }
     }
 
@@ -291,7 +291,7 @@ public class GamesScanner : ScannerBase
                     "Intel"));
             }
         }
-        catch { }
+        catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[GamesScanner] Intel cache scan error: {ex.Message}"); }
     }
 
     private void ScanUnity(List<ScannedItem> items, CancellationToken ct)
@@ -316,7 +316,7 @@ public class GamesScanner : ScannerBase
                 }
             }
         }
-        catch { }
+        catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[GamesScanner] Unity cache scan error: {ex.Message}"); }
     }
 
     private void ScanUnreal(List<ScannedItem> items, CancellationToken ct)
@@ -377,6 +377,6 @@ public class GamesScanner : ScannerBase
                 }
             }
         }
-        catch { }
+        catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[GamesScanner] Unreal cache scan error: {ex.Message}"); }
     }
 }

@@ -211,7 +211,7 @@ public class CustomFolderScanner : ScannerBase
                                 if (!Directory.EnumerateFiles(parentDir, requireSibling).Any())
                                     continue;
                             }
-                            catch { continue; }
+                            catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[CustomFolderScanner] Sibling dir check error: {ex.Message}"); continue; }
                         }
 
                         var size = CalculateDirectorySize(subDir);
@@ -241,7 +241,7 @@ public class CustomFolderScanner : ScannerBase
             }
         }
         catch (OperationCanceledException) { throw; }
-        catch { /* Пропускаем ошибки доступа */ }
+        catch (Exception ex) { /* Пропускаем ошибки доступа */ System.Diagnostics.Debug.WriteLine($"[CustomFolderScanner] ScanPattern error: {ex.Message}"); }
     }
 
     /// <summary>
@@ -266,7 +266,7 @@ public class CustomFolderScanner : ScannerBase
                 }
             }
         }
-        catch { }
+        catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[CustomFolderScanner] ScanTempFiles error: {ex.Message}"); }
 
         if (tempFiles.Count > 0 && totalSize > 0)
         {

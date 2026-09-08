@@ -9,7 +9,7 @@
         Foreground="{DynamicResource TextPrimaryBrush}"
         FontFamily="Segoe UI Variable, Segoe UI">
     
-    <Grid Margin="24">
+    <Grid Margin="24,20">
         <Border Style="{StaticResource Card}" Padding="28,24" VerticalAlignment="Center">
             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                 <!-- Icon with radiant gradient container -->

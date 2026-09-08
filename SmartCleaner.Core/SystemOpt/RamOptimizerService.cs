@@ -93,10 +93,10 @@ public class RamOptimizerService
                         count++;
                     }
                 }
-                catch { }
+                catch (Exception ex) { Debug.WriteLine($"[RamOptimizerService] EmptyWorkingSet error: {ex.Message}"); }
                 finally
                 {
-                    try { proc.Dispose(); } catch { }
+                    try { proc.Dispose(); } catch (Exception ex) { Debug.WriteLine($"[RamOptimizerService] Process dispose error: {ex.Message}"); }
                 }
             }
 

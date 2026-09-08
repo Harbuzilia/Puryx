@@ -203,7 +203,7 @@ public class MftReader
                     });
                 }
             }
-            catch { }
+            catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[MftReader] Directory scan error: {ex.Message}"); }
         }
 
         return entries;

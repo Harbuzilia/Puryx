@@ -153,7 +153,7 @@ public partial class RamOptimizerViewModel : ObservableObject
             PhysicalDisks.Clear();
             foreach (var d in disks) PhysicalDisks.Add(d);
         }
-        catch { }
+        catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[RamOptimizerViewModel] LoadDisksHealth error: {ex.Message}"); }
     }
 
     [RelayCommand]

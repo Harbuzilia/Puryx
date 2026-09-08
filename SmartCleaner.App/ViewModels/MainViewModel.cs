@@ -561,7 +561,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         if (!string.IsNullOrEmpty(folder) && Directory.Exists(folder))
         {
             try { Process.Start(new ProcessStartInfo("explorer.exe", $"\"{folder}\"") { UseShellExecute = true }); }
-            catch { /* Не критично */ }
+            catch (Exception ex) { /* Не критично */ Debug.WriteLine($"[MainViewModel] OpenFolder error: {ex.Message}"); }
         }
     }
 
@@ -573,7 +573,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     {
         if (item == null) return;
         try { Clipboard.SetText(item.Path); }
-        catch { /* Не критично */ }
+        catch (Exception ex) { /* Не критично */ Debug.WriteLine($"[MainViewModel] CopyPath error: {ex.Message}"); }
     }
 
     /// <summary>

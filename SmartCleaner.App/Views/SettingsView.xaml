@@ -287,7 +287,6 @@
                             Padding="12,8"
                             Margin="0,12,0,0">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="ℹ️" Margin="0,0,8,0"/>
                             <TextBlock Text="Встроенные паттерны защиты (Antigravity, сохранения игр, базы данных) нельзя удалить."
                                        Style="{StaticResource Caption}"
                                        TextWrapping="Wrap"/>

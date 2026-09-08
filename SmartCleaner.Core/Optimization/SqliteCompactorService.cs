@@ -71,10 +71,10 @@ public class SqliteCompactorService
                                 });
                             }
                         }
-                        catch { }
+                        catch (Exception ex) { Debug.WriteLine($"[SqliteCompactor] File info error: {ex.Message}"); }
                     }
                 }
-                catch { }
+                catch (Exception ex) { Debug.WriteLine($"[SqliteCompactor] Search root enumeration error: {ex.Message}"); }
             }
         }, ct);
 
@@ -98,35 +98,33 @@ public class SqliteCompactorService
 
                 try
                 {
-                    // Execute sqlite3 or powershell command
-                    var script = $"[System.Reflection.Assembly]::LoadWithPartialName('System.Data.SQLite'); try {{ $conn = New-Object System.Data.SQLite.SQLiteConnection('Data Source={target.Path};Version=3;'); $conn.Open(); $cmd = $conn.CreateCommand(); $cmd.CommandText = 'VACUUM; PRAGMA wal_checkpoint(TRUNCATE);'; $cmd.ExecuteNonQuery(); $conn.Close(); }} catch {{ }}";
-                    
-                    var psi = new ProcessStartInfo
-                    {
-                        FileName = "powershell.exe",
-                        Arguments = $"-NoProfile -NonInteractive -Command \"{script}\"",
-                        CreateNoWindow = true,
-                        UseShellExecute = false
-                    };
+                    var connString = $"Data Source={target.Path}";
+                    using var conn = new Microsoft.Data.Sqlite.SqliteConnection(connString);
+                    conn.Open();
 
-                    using var proc = Process.Start(psi);
-                    if (proc != null)
-                    {
-                        proc.WaitForExit(5000);
-                    }
+                    using var vacCmd = conn.CreateCommand();
+                    vacCmd.CommandText = "VACUUM;";
+                    vacCmd.ExecuteNonQuery();
+
+                    using var checkpointCmd = conn.CreateCommand();
+                    checkpointCmd.CommandText = "PRAGMA wal_checkpoint(TRUNCATE);";
+                    checkpointCmd.ExecuteNonQuery();
 
                     var newSize = new FileInfo(target.Path).Length;
                     var saved = Math.Max(0, initialSize - newSize);
                     target.CompactedSizeBytes = newSize;
                     target.CompactedSizeFormatted = SizeFormatter.Format(newSize);
                     target.SpaceSavedBytes = saved;
-                    target.Status = saved > 0 ? $"Сжато (высвобождено {SizeFormatter.Format(saved)})" : "Уже оптимизировано";
+                    target.Status = saved > 0
+                        ? $"Сжато (высвобождено {SizeFormatter.Format(saved)})"
+                        : "Уже оптимизировано";
 
                     count++;
                     totalSaved += saved;
                 }
                 catch (Exception ex)
                 {
+                    System.Diagnostics.Debug.WriteLine($"[SqliteCompactor] Ошибка при сжатии {target.Path}: {ex.Message}");
                     target.Status = $"Ошибка: {ex.Message}";
                 }
             }

@@ -45,13 +45,10 @@ public abstract class ScannerBase : IScannerStrategy
                 .Sum(file => 
                 {
                     try { return file.Length; }
-                    catch { return 0; }
+                    catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[ScannerBase] File size error: {ex.Message}"); return 0; }
                 });
         }
-        catch
-        {
-            return 0;
-        }
+        catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[ScannerBase] CalculateDirectorySize error: {ex.Message}"); return 0; }
     }
 
     /// <summary>
@@ -216,7 +213,7 @@ public abstract class ScannerBase : IScannerStrategy
             if (File.Exists(path))
                 return File.GetLastAccessTime(path);
         }
-        catch { }
+        catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[ScannerBase] GetLastAccess error: {ex.Message}"); }
         
         return DateTime.MinValue;
     }

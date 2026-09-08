@@ -59,7 +59,7 @@ public class WslShrinkService
                 await diskpartProc.WaitForExitAsync();
             }
 
-            try { File.Delete(tempScript); } catch { }
+            try { File.Delete(tempScript); } catch (Exception ex) { Debug.WriteLine($"[WslShrinkService] Temp script cleanup error: {ex.Message}"); }
 
             var newSize = new FileInfo(vhdxPath).Length;
             var saved = Math.Max(0, initialSize - newSize);

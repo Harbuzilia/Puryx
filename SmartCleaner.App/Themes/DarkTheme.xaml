@@ -48,6 +48,8 @@
     <SolidColorBrush x:Key="SafeSoftBrush" Color="#143328"/>
     <SolidColorBrush x:Key="CautionBrush" Color="{StaticResource CautionColor}"/>
     <SolidColorBrush x:Key="CautionSoftBrush" Color="#332714"/>
+    <SolidColorBrush x:Key="WarningBrush" Color="{StaticResource CautionColor}"/>
+    <SolidColorBrush x:Key="WarningBackgroundBrush" Color="#332714"/>
     <SolidColorBrush x:Key="DangerBrush" Color="{StaticResource DangerColor}"/>
     <SolidColorBrush x:Key="DangerSoftBrush" Color="#331414"/>
     <SolidColorBrush x:Key="LockedBrush" Color="{StaticResource LockedColor}"/>

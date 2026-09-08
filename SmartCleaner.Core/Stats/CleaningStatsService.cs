@@ -28,7 +28,14 @@ public sealed class CleaningStatsService
         var dir = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
             "SmartCleaner");
-        Directory.CreateDirectory(dir);
+        try
+        {
+            Directory.CreateDirectory(dir);
+        }
+        catch
+        {
+            // Если не удалось создать директорию — работаем без сохранения статистики
+        }
         _filePath = Path.Combine(dir, "cleaning_stats.json");
         Load();
     }

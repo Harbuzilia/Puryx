@@ -59,7 +59,7 @@ public class BrowserScanner : ScannerBase
                     System.Diagnostics.Process.GetProcesses().Select(p => p.ProcessName),
                     StringComparer.OrdinalIgnoreCase);
             }
-            catch { _runningProcessNames = new(StringComparer.OrdinalIgnoreCase); }
+            catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[BrowserScanner] Process enumeration error: {ex.Message}"); _runningProcessNames = new(StringComparer.OrdinalIgnoreCase); }
 
             // Chromium браузеры
             foreach (var (name, pathTemplate) in ChromiumBrowsers)

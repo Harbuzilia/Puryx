@@ -84,11 +84,11 @@
                                 ToolTip="Быстрое переключение темы оформления"/>
                         <Button Grid.Column="1"
                                 Style="{StaticResource SubtleButton}" 
-                                Content="ℹ️"
-                                FontSize="14"
                                 Padding="8,6"
                                 Click="ShowAbout_Click"
-                                ToolTip="О программе"/>
+                                ToolTip="О программе">
+                            <TextBlock Text="&#xE946;" FontFamily="Segoe MDL2 Assets" FontSize="14"/>
+                        </Button>
                     </Grid>
                 </Border>
 

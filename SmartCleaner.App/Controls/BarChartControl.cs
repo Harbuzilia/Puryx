@@ -161,7 +161,7 @@ public class BarChartControl : Control
             if (Application.Current?.MainWindow != null)
                 return VisualTreeHelper.GetDpi(Application.Current.MainWindow).PixelsPerDip;
         }
-        catch { /* designer mode */ }
+        catch (Exception ex) { /* designer mode */ System.Diagnostics.Debug.WriteLine($"[BarChartControl] GetSafeDpi error: {ex.Message}"); }
         return 1.0;
     }
 }

@@ -122,6 +122,6 @@ public sealed class DeletionLogService
             Directory.CreateDirectory(LogDir);
             File.WriteAllText(LogPath, JsonSerializer.Serialize(history, JsonOpts));
         }
-        catch { /* best-effort */ }
+        catch (Exception ex) { /* best-effort */ System.Diagnostics.Debug.WriteLine($"[DeletionLog] SaveHistory error: {ex.Message}"); }
     }
 }

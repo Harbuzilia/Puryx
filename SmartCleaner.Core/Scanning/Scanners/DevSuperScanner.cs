@@ -129,7 +129,7 @@ public class DevSuperScanner : ScannerBase
                     AddDirectoryIfFound(items, snapDir, "Android Emulator Snapshot", "Снимки состояния эмуляторов Android", "Снимок пересоздастся при закрытии эмулятора", RiskCategory.PerformanceCache);
                 }
             }
-            catch { }
+            catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[DevSuperScanner] Android snapshot enumeration error: {ex.Message}"); }
         }
 
         // 7. Dart / Flutter Pub Cache

@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Diagnostics;
+using System.IO;
 using System.Security.Cryptography;
 
 namespace SmartCleaner.Core.Safety;
@@ -104,7 +105,7 @@ public class FileShredderService
         {
             Directory.Delete(directoryPath, true);
         }
-        catch { }
+        catch (Exception ex) { Debug.WriteLine($"[FileShredderService] ShredDirectory cleanup error: {ex.Message}"); }
 
         return (count, errors);
     }

@@ -35,7 +35,14 @@ public class QuarantineService
         _storageDir = Path.Combine(_quarantineDir, "Storage");
         _manifestFile = Path.Combine(_quarantineDir, "manifest.json");
 
-        Directory.CreateDirectory(_storageDir);
+        try
+        {
+            Directory.CreateDirectory(_storageDir);
+        }
+        catch
+        {
+            // Если не удалось создать директорию — карантин недоступен
+        }
     }
 
     public async Task<List<QuarantinedItem>> GetQuarantinedItemsAsync()

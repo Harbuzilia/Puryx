@@ -102,7 +102,7 @@ public class KnowledgeBase : IKnowledgeBase
                         // Файлы в корне приложения
                         totalSize = new DirectoryInfo(appDir)
                             .EnumerateFiles()
-                            .Sum(f => { try { return f.Length; } catch { return 0L; } });
+                            .Sum(f => { try { return f.Length; } catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[KnowledgeBase] File length error: {ex.Message}"); return 0L; } });
 
                         // Размер обнаруженных кэш-подпапок
                         foreach (var cacheFolder in suggestedCache)
@@ -114,13 +114,13 @@ public class KnowledgeBase : IKnowledgeBase
                                 {
                                     totalSize += new DirectoryInfo(cachePath)
                                         .EnumerateFiles("*", SearchOption.AllDirectories)
-                                        .Sum(f => { try { return f.Length; } catch { return 0L; } });
+                                        .Sum(f => { try { return f.Length; } catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[KnowledgeBase] Cache file length error: {ex.Message}"); return 0L; } });
                                 }
-                                catch { }
+                                catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[KnowledgeBase] Cache folder enumeration error: {ex.Message}"); }
                             }
                         }
                     }
-                    catch { }
+                    catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[KnowledgeBase] App dir size calculation error: {ex.Message}"); }
 
                     discovered.Add(new DiscoveredApp
                     {
@@ -248,7 +248,7 @@ public class KnowledgeBase : IKnowledgeBase
                 SaveUserRules();
             }
         }
-        catch { }
+        catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[KnowledgeBase] LoadExternalRules error: {ex.Message}"); }
     }
 
     public void SaveUserRules()

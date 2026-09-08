@@ -83,7 +83,7 @@ public class DotnetArtifactsScanner : ScannerBase
                         || Directory.EnumerateFiles(directory, "*.fsproj").Any()
                         || Directory.EnumerateFiles(directory, "*.vbproj").Any();
         }
-        catch { /* Нет доступа — пропускаем */ }
+        catch (Exception ex) { /* Нет доступа — пропускаем */ System.Diagnostics.Debug.WriteLine($"[DotnetArtifactsScanner] Project file check error: {ex.Message}"); }
 
         if (isProjectDir)
         {

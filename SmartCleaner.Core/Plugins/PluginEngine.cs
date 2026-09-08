@@ -1,4 +1,5 @@
 ﻿using SmartCleaner.Core.Helpers;
+using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
 
@@ -44,10 +45,10 @@ public class PluginEngine
                             plugins.Add(manifest);
                         }
                     }
-                    catch { }
+                    catch (Exception ex) { Debug.WriteLine($"[PluginEngine] Plugin JSON parse error: {ex.Message}"); }
                 }
             }
-            catch { }
+            catch (Exception ex) { Debug.WriteLine($"[PluginEngine] Plugin dir enumeration error: {ex.Message}"); }
         }
 
         return plugins;
@@ -81,7 +82,7 @@ public class PluginEngine
                                     AddTargetItem(results, plugin, matchingDir);
                                 }
                             }
-                            catch { }
+                            catch (Exception ex) { Debug.WriteLine($"[PluginEngine] Rule dir enumeration error: {ex.Message}"); }
                         }
                     }
                     else if (Directory.Exists(resolvedPath))
@@ -120,7 +121,7 @@ public class PluginEngine
                         saved += item.SizeBytes;
                     }
                 }
-                catch { }
+                catch (Exception ex) { Debug.WriteLine($"[PluginEngine] Clean item error: {ex.Message}"); }
             }
         });
 
@@ -132,7 +133,7 @@ public class PluginEngine
         try
         {
             var size = Directory.EnumerateFiles(dir, "*", SearchOption.AllDirectories)
-                .Sum(f => { try { return new FileInfo(f).Length; } catch { return 0; } });
+                .Sum(f => { try { return new FileInfo(f).Length; } catch (Exception ex) { Debug.WriteLine($"[PluginEngine] File size error: {ex.Message}"); return 0; } });
 
             if (size > 0)
             {
@@ -147,6 +148,6 @@ public class PluginEngine
                 });
             }
         }
-        catch { }
+        catch (Exception ex) { Debug.WriteLine($"[PluginEngine] AddTargetItem error: {ex.Message}"); }
     }
 }

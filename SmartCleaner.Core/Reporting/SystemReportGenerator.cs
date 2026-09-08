@@ -40,7 +40,7 @@ public class SystemReportGenerator
                 UseShellExecute = true
             });
         }
-        catch { }
+        catch (Exception ex) { Debug.WriteLine($"[SystemReportGenerator] Browser open error: {ex.Message}"); }
 
         return filePath;
     }

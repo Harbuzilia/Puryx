@@ -408,7 +408,7 @@ public partial class DuplicatesViewModel : ObservableObject
                         Microsoft.VisualBasic.FileIO.RecycleOption.SendToRecycleBin);
                     deleted++;
                 }
-                catch { errors++; }
+                catch (Exception ex) { Debug.WriteLine($"[DuplicatesViewModel] Delete file error: {ex.Message}"); errors++; }
             }
         });
 
@@ -446,7 +446,7 @@ public partial class DuplicatesViewModel : ObservableObject
                 UseShellExecute = true
             });
         }
-        catch { /* best-effort */ }
+        catch (Exception ex) { /* best-effort */ Debug.WriteLine($"[DuplicatesViewModel] OpenRecycleBin error: {ex.Message}"); }
     }
 
     [RelayCommand]

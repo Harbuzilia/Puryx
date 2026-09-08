@@ -67,10 +67,9 @@ public class GameBoostService
                         }
                     }
                 }
-                catch { }
+                catch (Exception ex) { Debug.WriteLine($"[GameBoostService] Service stop error: {ex.Message}"); }
             }
 
-            // 3. Switch to Ultimate/High Performance Power Plan
             try
             {
                 var psi = new ProcessStartInfo
@@ -83,7 +82,7 @@ public class GameBoostService
                 using var p = Process.Start(psi);
                 p?.WaitForExit(2000);
             }
-            catch { }
+            catch (Exception ex) { Debug.WriteLine($"[GameBoostService] Powercfg enable error: {ex.Message}"); }
         });
 
         CurrentState.IsBoostActive = true;
@@ -114,10 +113,9 @@ public class GameBoostService
                     using var proc = Process.Start(psi);
                     proc?.WaitForExit(1500);
                 }
-                catch { }
+                catch (Exception ex) { Debug.WriteLine($"[GameBoostService] Service start error: {ex.Message}"); }
             }
 
-            // Switch back to Balanced power scheme
             try
             {
                 var psi = new ProcessStartInfo
@@ -130,7 +128,7 @@ public class GameBoostService
                 using var p = Process.Start(psi);
                 p?.WaitForExit(2000);
             }
-            catch { }
+            catch (Exception ex) { Debug.WriteLine($"[GameBoostService] Powercfg disable error: {ex.Message}"); }
         });
 
         CurrentState.StoppedServices.Clear();

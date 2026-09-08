@@ -406,7 +406,7 @@ public class SystemScanner : ScannerBase
                     IsSelected = true
                 });
             }
-            catch { }
+            catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[SystemScanner] Memory dump add error: {ex.Message}"); }
         }
 
         // Мини-дампы
@@ -539,7 +539,7 @@ public class SystemScanner : ScannerBase
                     });
                 }
             }
-            catch { }
+            catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[SystemScanner] Cache scan error: {ex.Message}"); }
         }
 
         // Thumbcache файлы

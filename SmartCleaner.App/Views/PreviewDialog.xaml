@@ -10,7 +10,7 @@
         Foreground="{DynamicResource TextPrimaryBrush}"
         FontFamily="Segoe UI Variable, Segoe UI">
     
-    <Grid Margin="24">
+    <Grid Margin="24,20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>

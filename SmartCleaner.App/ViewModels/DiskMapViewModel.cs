@@ -182,6 +182,6 @@ public partial class DiskMapViewModel : ObservableObject
                 UseShellExecute = true
             });
         }
-        catch { /* best-effort */ }
+        catch (Exception ex) { /* best-effort */ System.Diagnostics.Debug.WriteLine($"[DiskMapViewModel] OpenInExplorer error: {ex.Message}"); }
     }
 }

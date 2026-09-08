@@ -111,9 +111,9 @@ public class UninstallerEngine
                         try
                         {
                             size = Directory.EnumerateFiles(installLoc, "*", SearchOption.AllDirectories)
-                                .Sum(f => { try { return new FileInfo(f).Length; } catch { return 0; } });
+                                .Sum(f => { try { return new FileInfo(f).Length; } catch (Exception ex) { Debug.WriteLine($"[UninstallerEngine] File size error: {ex.Message}"); return 0; } });
                         }
-                        catch { }
+                        catch (Exception ex) { Debug.WriteLine($"[UninstallerEngine] Install location size error: {ex.Message}"); }
                     }
 
                     list.Add(new InstalledAppItem
@@ -133,10 +133,10 @@ public class UninstallerEngine
                         AppType = uninstallStr.Contains("MsiExec", StringComparison.OrdinalIgnoreCase) ? "MSI" : "Win32"
                     });
                 }
-                catch { }
+                catch (Exception ex) { Debug.WriteLine($"[UninstallerEngine] Registry subkey error: {ex.Message}"); }
             }
         }
-        catch { }
+        catch (Exception ex) { Debug.WriteLine($"[UninstallerEngine] Registry uninstall key scan error: {ex.Message}"); }
     }
 
     private (string FileName, string Arguments) ParseCommand(string commandLine)

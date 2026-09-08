@@ -78,7 +78,7 @@ public sealed class StartupEngine
                     return false;
             }
         }
-        catch { return false; }
+        catch (Exception ex) { Debug.WriteLine($"[StartupEngine] DisableItem error: {ex.Message}"); return false; }
     }
 
     /// <summary>
@@ -110,7 +110,7 @@ public sealed class StartupEngine
                     return false;
             }
         }
-        catch { return false; }
+        catch (Exception ex) { Debug.WriteLine($"[StartupEngine] EnableItem error: {ex.Message}"); return false; }
     }
 
     /// <summary>
@@ -149,7 +149,7 @@ public sealed class StartupEngine
                     return false;
             }
         }
-        catch { return false; }
+        catch (Exception ex) { Debug.WriteLine($"[StartupEngine] DeleteItem error: {ex.Message}"); return false; }
     }
 
     // ─── Реестр ────────────────────────────────
@@ -186,7 +186,7 @@ public sealed class StartupEngine
                 });
             }
         }
-        catch { /* insufficient permissions */ }
+        catch (Exception ex) { /* insufficient permissions */ Debug.WriteLine($"[StartupEngine] Registry scan error: {ex.Message}"); }
     }
 
     /// <summary>
@@ -229,7 +229,7 @@ public sealed class StartupEngine
                 });
             }
         }
-        catch { /* insufficient permissions */ }
+        catch (Exception ex) { /* insufficient permissions */ Debug.WriteLine($"[StartupEngine] Startup folder scan error: {ex.Message}"); }
     }
 
     /// <summary>
@@ -296,7 +296,7 @@ public sealed class StartupEngine
 
             process.WaitForExit(3000);
         }
-        catch { /* schtasks not available or permission denied */ }
+        catch (Exception ex) { /* schtasks not available or permission denied */ Debug.WriteLine($"[StartupEngine] Task scheduler scan error: {ex.Message}"); }
     }
 
     // ─── Реестровые операции ────────────────────
@@ -390,7 +390,7 @@ public sealed class StartupEngine
             var vi = FileVersionInfo.GetVersionInfo(filePath);
             return vi.CompanyName ?? "";
         }
-        catch { return ""; }
+        catch (Exception ex) { Debug.WriteLine($"[StartupEngine] GetPublisher error: {ex.Message}"); return ""; }
     }
 
     /// <summary>

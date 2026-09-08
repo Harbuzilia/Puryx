@@ -44,7 +44,14 @@ public sealed class CleaningSchedulerService
         var appData = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
             "SmartCleaner");
-        Directory.CreateDirectory(appData);
+        try
+        {
+            Directory.CreateDirectory(appData);
+        }
+        catch
+        {
+            // Если не удалось создать директорию — работаем без сохранения настроек
+        }
         _settingsPath = Path.Combine(appData, "schedule_settings.json");
     }
 

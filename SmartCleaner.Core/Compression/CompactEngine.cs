@@ -50,7 +50,7 @@ public class CompactEngine
                         }
                     }
                 }
-                catch { }
+                catch (Exception ex) { Debug.WriteLine($"[CompactEngine] Steam dir enumeration error: {ex.Message}"); }
             }
 
             // 2. Scan Epic Games & GOG
@@ -78,7 +78,7 @@ public class CompactEngine
                         }
                     }
                 }
-                catch { }
+                catch (Exception ex) { Debug.WriteLine($"[CompactEngine] Epic dir enumeration error: {ex.Message}"); }
             }
 
             // 3. Scan Developer Heavy Project Folders
@@ -113,7 +113,7 @@ public class CompactEngine
                         }
                     }
                 }
-                catch { }
+                catch (Exception ex) { Debug.WriteLine($"[CompactEngine] Dev project dir enumeration error: {ex.Message}"); }
             }
 
         }, ct);
@@ -223,9 +223,9 @@ public class CompactEngine
         try
         {
             return Directory.EnumerateFiles(dir, "*", SearchOption.AllDirectories)
-                .Sum(f => { try { return new FileInfo(f).Length; } catch { return 0; } });
+                .Sum(f => { try { return new FileInfo(f).Length; } catch (Exception ex) { Debug.WriteLine($"[CompactEngine] File size error: {ex.Message}"); return 0; } });
         }
-        catch { return 0; }
+        catch (Exception ex) { Debug.WriteLine($"[CompactEngine] CalculateSize error: {ex.Message}"); return 0; }
     }
 
     private long GetCompressedSizeOnDisk(string dir)

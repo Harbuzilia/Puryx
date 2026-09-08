@@ -76,7 +76,7 @@ public class TraySentinelService : IDisposable
                 }
             }
         }
-        catch { }
+        catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[TraySentinelService] CheckAllDrives error: {ex.Message}"); }
 
         return alerts;
     }

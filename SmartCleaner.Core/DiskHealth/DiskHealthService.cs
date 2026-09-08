@@ -64,7 +64,7 @@ public class DiskHealthService
                     }
                 }
             }
-            catch { }
+            catch (Exception ex) { Debug.WriteLine($"[DiskHealthService] WMIC disk info parse error: {ex.Message}"); }
 
             // Fallback if empty
             if (list.Count == 0)

@@ -59,7 +59,7 @@ public class LeftoverHunter
                         }
                     }
                 }
-                catch { }
+                catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[LeftoverHunter] FindLeftovers dir enumeration error: {ex.Message}"); }
             }
 
             // 2. Scan Registry
@@ -106,7 +106,7 @@ public class LeftoverHunter
                         }
                     }
                 }
-                catch { }
+                catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[LeftoverHunter] CleanLeftovers item error: {ex.Message}"); }
             }
         });
 
@@ -137,7 +137,7 @@ public class LeftoverHunter
                 }
             }
         }
-        catch { }
+        catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[LeftoverHunter] Registry scan error: {ex.Message}"); }
     }
 
     private List<string> GenerateKeywords(InstalledAppItem app)
@@ -186,8 +186,8 @@ public class LeftoverHunter
         try
         {
             return Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories)
-                .Sum(f => { try { return new FileInfo(f).Length; } catch { return 0; } });
+                .Sum(f => { try { return new FileInfo(f).Length; } catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[LeftoverHunter] File size error: {ex.Message}"); return 0; } });
         }
-        catch { return 0; }
+        catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[LeftoverHunter] GetDirSizeSafe error: {ex.Message}"); return 0; }
     }
 }

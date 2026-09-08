@@ -97,7 +97,7 @@ public partial class LargeFilesViewModel : ObservableObject
                 UseShellExecute = true
             });
         }
-        catch { /* best-effort */ }
+        catch (Exception ex) { /* best-effort */ Debug.WriteLine($"[LargeFilesViewModel] OpenInExplorer error: {ex.Message}"); }
     }
 
     /// <summary>

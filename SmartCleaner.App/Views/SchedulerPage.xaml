@@ -90,7 +90,7 @@
         <!-- Info Card -->
         <Border Grid.Row="2" Background="{DynamicResource SurfaceBrush}" CornerRadius="10" Padding="20">
             <StackPanel>
-                <TextBlock Text="ℹ️ ИНФОРМАЦИЯ" FontSize="11" FontWeight="SemiBold"
+                <TextBlock Text="ИНФОРМАЦИЯ" FontSize="11" FontWeight="SemiBold"
                            Foreground="{DynamicResource TextDisabledBrush}" Margin="0,0,0,8"/>
                 <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
                     <TextBlock Text="Статус задачи:" Width="120"/>

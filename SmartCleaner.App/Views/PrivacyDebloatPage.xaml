@@ -233,7 +233,7 @@
         <!-- Footer Status -->
         <Border Grid.Row="3" Margin="0,12,0,0" Padding="12,8" Background="{DynamicResource SurfaceBrush}" CornerRadius="6">
             <DockPanel>
-                <TextBlock Text="ℹ️ Все параметры обратимы. Перед изменением создается автоматический снимок реестра в privacy_backup.json." 
+                <TextBlock Text="Все параметры обратимы. Перед изменением создается автоматический снимок реестра в privacy_backup.json." 
                            FontSize="11.5" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
                 <TextBlock Text="{Binding StatusText}" HorizontalAlignment="Right" FontSize="11.5" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center"/>
             </DockPanel>

@@ -504,7 +504,7 @@ public sealed class DuplicateEngine
                     Modified = fi.LastWriteTime
                 };
             }
-            catch { /* skip */ }
+            catch (Exception ex) { /* skip */ System.Diagnostics.Debug.WriteLine($"[DuplicateEngine] IndexFolder file error: {ex.Message}"); }
         }
     }
 
@@ -526,12 +526,12 @@ public sealed class DuplicateEngine
                 foreach (var subDir in Directory.EnumerateDirectories(dir))
                     stack.Push(subDir);
             }
-            catch { /* skip */ }
+            catch (Exception ex) { /* skip */ System.Diagnostics.Debug.WriteLine($"[DuplicateEngine] SafeEnumerateFiles dir error: {ex.Message}"); }
 
             // Файлы
             IEnumerable<string> files;
             try { files = Directory.EnumerateFiles(dir); }
-            catch { continue; }
+            catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[DuplicateEngine] SafeEnumerateFiles files error: {ex.Message}"); continue; }
 
             foreach (var file in files)
             {

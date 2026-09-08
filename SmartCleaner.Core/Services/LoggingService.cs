@@ -1,4 +1,5 @@
 using SmartCleaner.Core.Models;
+using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
 
@@ -85,7 +86,7 @@ public class LoggingService
                 if (session != null)
                     logs.Add(session);
             }
-            catch { }
+            catch (Exception ex) { Debug.WriteLine($"[LoggingService] Log file read error: {ex.Message}"); }
         }
 
         return logs;

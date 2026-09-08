@@ -137,7 +137,7 @@ public partial class SettingsViewModel : ObservableObject
                 });
             }
         }
-        catch { }
+        catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[SettingsViewModel] LoadAvailableDrives error: {ex.Message}"); }
     }
 
     partial void OnSelectedThemeIndexChanged(int value)
