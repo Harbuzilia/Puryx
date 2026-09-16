@@ -87,6 +87,12 @@ public sealed class CleaningSchedulerService
     }
 
     /// <summary>
+    /// Профиль очистки для аргумента --profile. Значение попадает в командную строку
+    /// schtasks, поэтому допускаются только заранее известные варианты.
+    /// </summary>
+    private static readonly string[] AllowedProfiles = ["Быстрая", "Разработка", "Полное"];
+
+    /// <summary>
     /// Регистрирует или обновляет задачу в Windows Task Scheduler.
     /// Возвращает true при успехе.
     /// </summary>
@@ -102,6 +108,8 @@ public sealed class CleaningSchedulerService
             var exePath = Process.GetCurrentProcess().MainModule?.FileName;
             if (string.IsNullOrEmpty(exePath)) return false;
 
+            var profile = AllowedProfiles.Contains(settings.Profile) ? settings.Profile : AllowedProfiles[0];
+
             // Формируем расписание для schtasks
             var scheduleType = settings.Interval switch
             {
@@ -112,7 +120,7 @@ public sealed class CleaningSchedulerService
 
             var startTime = $"{settings.Hour:D2}:{settings.Minute:D2}";
 
-            var args = $"/Create /TN \"{TaskName}\" /TR \"\\\"{exePath}\\\" --auto-clean --profile {settings.Profile}\" " +
+            var args = $"/Create /TN \"{TaskName}\" /TR \"\\\"{exePath}\\\" --auto-clean --profile \\\"{profile}\\\"\" " +
                        $"/SC {scheduleType} /ST {startTime} /F /RL LIMITED";
 
             if (scheduleType == "WEEKLY")

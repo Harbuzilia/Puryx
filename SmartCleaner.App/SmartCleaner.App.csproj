@@ -5,6 +5,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- Встроенные плагины: копируются в output\Plugins для работы из любой директории -->
+    <None Include="..\SmartCleaner.Data\Plugins\*.plugin.json" Link="Plugins\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.1" />
@@ -17,9 +22,9 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
-    <Version>2.7.1</Version>
-    <AssemblyVersion>2.7.1.0</AssemblyVersion>
-    <FileVersion>2.7.1.0</FileVersion>
+    <Version>2.7.2</Version>
+    <AssemblyVersion>2.7.2.0</AssemblyVersion>
+    <FileVersion>2.7.2.0</FileVersion>
     <Product>Smart System Cleaner — Full Suite</Product>
   </PropertyGroup>
 

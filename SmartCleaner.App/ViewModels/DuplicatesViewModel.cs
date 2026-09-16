@@ -8,6 +8,8 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
 using SmartCleaner.Core.Duplicates;
 using SmartCleaner.Core.Helpers;
+using SmartCleaner.Core.Models;
+using SmartCleaner.Core.Safety;
 
 namespace SmartCleaner.App.ViewModels;
 
@@ -19,12 +21,14 @@ public partial class DuplicatesViewModel : ObservableObject
 {
     private readonly DuplicateEngine _engine;
     private readonly DeletionLogService _deletionLog;
+    private readonly ISafetyService _safety;
     private CancellationTokenSource? _cts;
 
-    public DuplicatesViewModel(DuplicateEngine engine, DeletionLogService deletionLog)
+    public DuplicatesViewModel(DuplicateEngine engine, DeletionLogService deletionLog, ISafetyService safety)
     {
         _engine = engine;
         _deletionLog = deletionLog;
+        _safety = safety;
         LoadDeletionHistory();
     }
 
@@ -82,6 +86,8 @@ public partial class DuplicatesViewModel : ObservableObject
     [ObservableProperty] private string _previewText = "";
     [ObservableProperty] private string _previewInfo = "";
 
+    private CancellationTokenSource? _previewCts;
+
     private static readonly HashSet<string> ImageExtensions = new(StringComparer.OrdinalIgnoreCase)
     {
         ".jpg", ".jpeg", ".png", ".bmp", ".gif", ".webp", ".ico", ".tiff", ".tif"
@@ -99,6 +105,8 @@ public partial class DuplicatesViewModel : ObservableObject
     /// </summary>
     partial void OnSelectedPreviewFileChanged(DuplicateFileViewModel? value)
     {
+        _previewCts?.Cancel();
+
         if (value == null)
         {
             PreviewMode = "none";
@@ -108,70 +116,118 @@ public partial class DuplicatesViewModel : ObservableObject
             return;
         }
 
-        var ext = Path.GetExtension(value.Path);
+        _ = LoadPreviewAsync(value);
+    }
 
-        if (ImageExtensions.Contains(ext))
+    /// <summary>
+    /// Загружает превью в фоне, чтобы файловый IO не блокировал UI-поток.
+    /// Токен отменяет устаревшую загрузку при быстрой смене выбора.
+    /// </summary>
+    private async Task LoadPreviewAsync(DuplicateFileViewModel file)
+    {
+        _previewCts?.Dispose();
+        _previewCts = new CancellationTokenSource();
+        var token = _previewCts.Token;
+
+        try
         {
-            try
+            var ext = Path.GetExtension(file.Path);
+
+            if (ImageExtensions.Contains(ext))
             {
-                var bi = new BitmapImage();
-                bi.BeginInit();
-                bi.CacheOption = BitmapCacheOption.OnLoad;
-                bi.UriSource = new Uri(value.Path, UriKind.Absolute);
-                bi.DecodePixelWidth = 400;
-                bi.EndInit();
-                bi.Freeze();
-                PreviewImage = bi;
-                PreviewMode = "image";
+                var image = await Task.Run(() =>
+                {
+                    token.ThrowIfCancellationRequested();
+                    try
+                    {
+                        var bi = new BitmapImage();
+                        bi.BeginInit();
+                        bi.CacheOption = BitmapCacheOption.OnLoad;
+                        bi.UriSource = new Uri(file.Path, UriKind.Absolute);
+                        bi.DecodePixelWidth = 400;
+                        bi.EndInit();
+                        bi.Freeze();
+                        return bi;
+                    }
+                    catch
+                    {
+                        return null;
+                    }
+                }, token);
+
+                if (image != null)
+                {
+                    token.ThrowIfCancellationRequested();
+                    PreviewImage = image;
+                    PreviewMode = "image";
+                    return;
+                }
             }
-            catch
+            else if (TextExtensions.Contains(ext))
             {
-                ShowInfoPreview(value);
+                var text = await Task.Run(() =>
+                {
+                    token.ThrowIfCancellationRequested();
+                    try
+                    {
+                        // Ограничиваем до 10KB для производительности
+                        using var reader = new StreamReader(file.Path);
+                        var buffer = new char[10240];
+                        int read = reader.Read(buffer, 0, buffer.Length);
+                        var content = new string(buffer, 0, read);
+                        if (read == buffer.Length) content += "\n\n... (обрезано до 10 КБ) ...";
+                        return content;
+                    }
+                    catch
+                    {
+                        return null;
+                    }
+                }, token);
+
+                if (text != null)
+                {
+                    token.ThrowIfCancellationRequested();
+                    PreviewText = text;
+                    PreviewMode = "text";
+                    return;
+                }
             }
+
+            await ShowInfoPreviewAsync(file, token);
         }
-        else if (TextExtensions.Contains(ext))
+        catch (OperationCanceledException)
         {
-            try
-            {
-                // Ограничиваем до 10KB для производительности
-                using var reader = new StreamReader(value.Path);
-                var buffer = new char[10240];
-                int read = reader.Read(buffer, 0, buffer.Length);
-                PreviewText = new string(buffer, 0, read);
-                if (read == buffer.Length) PreviewText += "\n\n...（обрезано до 10 КБ）...";
-                PreviewMode = "text";
-            }
-            catch
-            {
-                ShowInfoPreview(value);
-            }
-        }
-        else
-        {
-            ShowInfoPreview(value);
+            // Выбор уже сменился — результат этой загрузки не нужен
         }
     }
 
     /// <summary>
     /// Показывает базовую информацию о файле.
     /// </summary>
-    private void ShowInfoPreview(DuplicateFileViewModel file)
+    private async Task ShowInfoPreviewAsync(DuplicateFileViewModel file, CancellationToken token)
     {
-        try
+        var info = await Task.Run(() =>
         {
-            var fi = new FileInfo(file.Path);
-            PreviewInfo = $"📁 {fi.Name}\n" +
-                          $"Размер: {SizeFormatter.Format(fi.Length)}\n" +
-                          $"Создан: {fi.CreationTime:dd.MM.yyyy HH:mm}\n" +
-                          $"Изменён: {fi.LastWriteTime:dd.MM.yyyy HH:mm}\n" +
-                          $"Расширение: {fi.Extension}\n" +
-                          $"Атрибуты: {fi.Attributes}\n" +
-                          $"Путь: {fi.FullName}";
-        }
-        catch (Exception ex)
-        {
-            PreviewInfo = $"Ошибка: {ex.Message}";
-        }
+            token.ThrowIfCancellationRequested();
+            try
+            {
+                var fi = new FileInfo(file.Path);
+                return $"📁 {fi.Name}\n" +
+                       $"Размер: {SizeFormatter.Format(fi.Length)}\n" +
+                       $"Создан: {fi.CreationTime:dd.MM.yyyy HH:mm}\n" +
+                       $"Изменён: {fi.LastWriteTime:dd.MM.yyyy HH:mm}\n" +
+                       $"Расширение: {fi.Extension}\n" +
+                       $"Атрибуты: {fi.Attributes}\n" +
+                       $"Путь: {fi.FullName}";
+            }
+            catch (Exception ex)
+            {
+                return $"Ошибка: {ex.Message}";
+            }
+        }, token);
+
+        token.ThrowIfCancellationRequested();
+        PreviewInfo = info;
         PreviewMode = "info";
     }
 
@@ -379,45 +435,76 @@ public partial class DuplicatesViewModel : ObservableObject
     [RelayCommand]
     private async Task DeleteSelectedDuplicatesAsync()
     {
-        var toDelete = DuplicateGroups
+        var selected = DuplicateGroups
             .SelectMany(g => g.Files.Where(f => f.IsSelected))
-            .Select(f => (f.Path, f.Size))
             .ToList();
 
-        if (toDelete.Count == 0)
+        if (selected.Count == 0)
         {
             StatusText = "⚠️ Выберите файлы для удаления";
             return;
         }
 
-        // Записываем в лог ДО удаления
-        _deletionLog.LogDeletion(toDelete);
+        // Safety-гейт: whitelist, блокировки, права
+        var allowed = new List<(DuplicateFileViewModel File, long Size)>();
+        int blocked = 0;
+        string? firstBlockReason = null;
+
+        foreach (var file in selected)
+        {
+            var validation = _safety.ValidateForDeletion(new ScannedItem
+            {
+                Path = file.Path,
+                Size = file.Size,
+                Risk = RiskCategory.PerformanceCache,
+                Description = "duplicate:manual"
+            });
+
+            if (validation.CanDelete && !validation.RequiresElevation)
+            {
+                allowed.Add((file, file.Size));
+            }
+            else
+            {
+                blocked++;
+                firstBlockReason ??= validation.BlockReason ?? "Требуются права администратора";
+            }
+        }
 
         int deleted = 0;
         int errors = 0;
+        var deletedPaths = new List<(string Path, long Size)>();
 
         await Task.Run(() =>
         {
-            foreach (var (path, _) in toDelete)
+            foreach (var (file, size) in allowed)
             {
                 try
                 {
                     Microsoft.VisualBasic.FileIO.FileSystem.DeleteFile(
-                        path,
+                        file.Path,
                         Microsoft.VisualBasic.FileIO.UIOption.OnlyErrorDialogs,
                         Microsoft.VisualBasic.FileIO.RecycleOption.SendToRecycleBin);
                     deleted++;
+                    deletedPaths.Add((file.Path, size));
                 }
                 catch (Exception ex) { Debug.WriteLine($"[DuplicatesViewModel] Delete file error: {ex.Message}"); errors++; }
             }
         });
 
-        StatusText = $"Удалено {deleted} файлов в корзину" + (errors > 0 ? $" ({errors} ошибок)" : "");
+        // Лог фиксирует только фактически удалённые файлы
+        _deletionLog.LogDeletion(deletedPaths);
 
-        // Обновляем списки
+        StatusText = $"Удалено {deleted} файлов в корзину"
+            + (blocked > 0 ? $", заблокировано {blocked} ({firstBlockReason})" : "")
+            + (errors > 0 ? $" ({errors} ошибок)" : "");
+
+        // Обновляем списки — убираем только реально удалённые файлы
+        var deletedSet = deletedPaths.Select(p => p.Path).ToHashSet(StringComparer.OrdinalIgnoreCase);
+
         foreach (var group in DuplicateGroups.ToList())
         {
-            foreach (var file in group.Files.Where(f => f.IsSelected).ToList())
+            foreach (var file in group.Files.Where(f => deletedSet.Contains(f.Path)).ToList())
                 group.Files.Remove(file);
 
             if (group.Files.Count < 2)

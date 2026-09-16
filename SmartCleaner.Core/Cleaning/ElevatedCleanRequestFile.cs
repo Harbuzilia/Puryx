@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -20,6 +21,9 @@ public sealed record ElevatedCleanRequestItem
     public required string Path { get; init; }
     public required bool IsDirectory { get; init; }
     public long Size { get; init; }
+
+    /// <summary>Категория риска исходного ScannedItem (строковое значение RiskCategory).</summary>
+    public string Risk { get; init; } = nameof(RiskCategory.PerformanceCache);
 }
 
 public sealed record ElevatedCleanPolicyContract
@@ -77,7 +81,8 @@ public static class ElevatedCleanRequestFile
             {
                 Path = Path.GetFullPath(i.Path),
                 IsDirectory = i.IsDirectory,
-                Size = i.Size
+                Size = i.Size,
+                Risk = i.Risk.ToString()
             }).ToList()
         };
 
@@ -140,6 +145,13 @@ public static class ElevatedCleanRequestFile
                 return null;
             }
 
+            // Категория риска должна быть корректным значением RiskCategory —
+            // подделка ломает подпись, но проверяем и без неё
+            if (request.Items.Any(i => !Enum.TryParse<RiskCategory>(i.Risk, out _)))
+            {
+                return null;
+            }
+
             if (!ValidateSignature(request, authToken))
             {
                 return null;
@@ -152,8 +164,9 @@ public static class ElevatedCleanRequestFile
 
             return request;
         }
-        catch
+        catch (Exception ex)
         {
+            Debug.WriteLine($"[ElevatedClean] Request validation failed: {ex.Message}");
             return null;
         }
     }
@@ -190,8 +203,9 @@ public static class ElevatedCleanRequestFile
                 File.Delete(requestFile);
             }
         }
-        catch
+        catch (Exception ex)
         {
+            Debug.WriteLine($"[ElevatedClean] Request file delete failed: {ex.Message}");
         }
     }
 
@@ -219,8 +233,9 @@ public static class ElevatedCleanRequestFile
             var payload = await File.ReadAllTextAsync(resultFile, ct);
             return JsonSerializer.Deserialize<ElevatedCleanExecutionResult>(payload, JsonOptions);
         }
-        catch
+        catch (Exception ex)
         {
+            Debug.WriteLine($"[ElevatedClean] Result read failed: {ex.Message}");
             return null;
         }
     }
@@ -235,8 +250,9 @@ public static class ElevatedCleanRequestFile
                 File.Delete(resultFile);
             }
         }
-        catch
+        catch (Exception ex)
         {
+            Debug.WriteLine($"[ElevatedClean] Result file delete failed: {ex.Message}");
         }
     }
 
@@ -259,8 +275,9 @@ public static class ElevatedCleanRequestFile
             var expectedBytes = Encoding.UTF8.GetBytes(expected);
             return CryptographicOperations.FixedTimeEquals(actualBytes, expectedBytes);
         }
-        catch
+        catch (Exception ex)
         {
+            Debug.WriteLine($"[ElevatedClean] Signature validation failed: {ex.Message}");
             return false;
         }
     }
@@ -280,10 +297,12 @@ public static class ElevatedCleanRequestFile
         }
         catch (IOException)
         {
+            // Файл nonce уже существует — повторное использование, ожидаемая защита от replay
             return false;
         }
-        catch
+        catch (Exception ex)
         {
+            Debug.WriteLine($"[ElevatedClean] Nonce consume failed: {ex.Message}");
             return false;
         }
     }
@@ -301,8 +320,9 @@ public static class ElevatedCleanRequestFile
                     File.Delete(file);
                 }
             }
-            catch
+            catch (Exception ex)
             {
+                Debug.WriteLine($"[ElevatedClean] Expired nonce cleanup failed for {file}: {ex.Message}");
             }
         }
     }

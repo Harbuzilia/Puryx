@@ -353,9 +353,9 @@ public sealed class StartupEngine
     // ─── Helpers ────────────────────────────────
 
     /// <summary>
-    /// Парсит команду на путь к файлу и аргументы.
+    /// Парсирует команду на путь к файлу и аргументы.
     /// </summary>
-    private static (string FilePath, string Arguments) ParseCommand(string command)
+    internal static (string FilePath, string Arguments) ParseCommand(string command)
     {
         command = command.Trim();
 

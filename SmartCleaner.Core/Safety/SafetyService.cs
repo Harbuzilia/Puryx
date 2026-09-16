@@ -28,13 +28,31 @@ public class SafetyService : ISafetyService
     public bool IsWhitelisted(string path)
     {
         var normalizedPath = NormalizePath(path);
-        
+
+        if (MatchesAnyPattern(normalizedPath))
+        {
+            return true;
+        }
+
+        // Паттерны вида «...\**» защищают содержимое, но не саму папку: удаление
+        // папки удалило бы всё защищённое внутри. Существующая директория считается
+        // защищённой, если под неё подходит любой ребёнок (хвост «\*»).
+        if (Directory.Exists(path) && MatchesAnyPattern(normalizedPath + "\\*"))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    private bool MatchesAnyPattern(string normalizedPath)
+    {
         // Проверяем все паттерны
         foreach (var pattern in _builtInPatterns.Concat(_userPatterns))
         {
             var expandedPattern = Environment.ExpandEnvironmentVariables(pattern);
             var normalizedPattern = NormalizePath(expandedPattern);
-            
+
             try
             {
                 var glob = Glob.Parse(normalizedPattern);
@@ -48,7 +66,7 @@ public class SafetyService : ISafetyService
                     return true;
             }
         }
-        
+
         return false;
     }
 
@@ -231,15 +249,23 @@ public class SafetyService : ISafetyService
     /// </summary>
     private static bool RequiresElevation(string path)
     {
-        var windowsDir = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
-        var programFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
-        var programFilesX86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
-        
         var normalizedPath = NormalizePath(path);
-        
-        return normalizedPath.StartsWith(NormalizePath(windowsDir)) ||
-               normalizedPath.StartsWith(NormalizePath(programFiles)) ||
-               normalizedPath.StartsWith(NormalizePath(programFilesX86));
+
+        return IsUnder(normalizedPath, NormalizePath(Environment.GetFolderPath(Environment.SpecialFolder.Windows))) ||
+               IsUnder(normalizedPath, NormalizePath(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles))) ||
+               IsUnder(normalizedPath, NormalizePath(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86)));
+    }
+
+    /// <summary>
+    /// Путь находится внутри root или совпадает с ним. Сравнение по границе каталога:
+    /// «C:\WindowsFoo» не считается частью C:\Windows.
+    /// </summary>
+    private static bool IsUnder(string path, string root)
+    {
+        if (string.IsNullOrEmpty(root)) return false;
+
+        return path.Equals(root, StringComparison.OrdinalIgnoreCase) ||
+               path.StartsWith(root + "\\", StringComparison.OrdinalIgnoreCase);
     }
 
     private static string NormalizePath(string path)

@@ -8,6 +8,7 @@ using SmartCleaner.Core.Reporting;
 using SmartCleaner.Core.Safety;
 using SmartCleaner.Core.Services;
 using SmartCleaner.Core.Shell;
+using SmartCleaner.Core.SystemOpt;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Windows;
@@ -27,6 +28,7 @@ public partial class SettingsViewModel : ObservableObject
     private readonly AudioFeedbackService _audioService;
     private readonly SystemReportGenerator _reportGenerator;
     private readonly DiskHealthService _diskHealthService;
+    private readonly RamOptimizerService _ramOptimizer;
 
     [ObservableProperty]
     private bool _useRecycleBin = true;
@@ -74,7 +76,8 @@ public partial class SettingsViewModel : ObservableObject
         ExplorerContextMenuManager shellManager,
         AudioFeedbackService audioService,
         SystemReportGenerator reportGenerator,
-        DiskHealthService diskHealthService)
+        DiskHealthService diskHealthService,
+        RamOptimizerService ramOptimizer)
     {
         _safetyService = safetyService;
         _configService = configService;
@@ -84,6 +87,7 @@ public partial class SettingsViewModel : ObservableObject
         _audioService = audioService;
         _reportGenerator = reportGenerator;
         _diskHealthService = diskHealthService;
+        _ramOptimizer = ramOptimizer;
 
         _protectedHours = (int)_safetyService.ProtectedPeriod.TotalHours;
         _selectedThemeIndex = _themeManager.CurrentTheme switch
@@ -203,10 +207,14 @@ public partial class SettingsViewModel : ObservableObject
         try
         {
             var disks = await _diskHealthService.GetPhysicalDisksHealthAsync();
+            // Физическая RAM через GlobalMemoryStatusEx; GC-хип — только как fallback
+            var totalRam = _ramOptimizer.GetMemoryStatus().TotalBytes;
             var reportData = new SystemReportData
             {
                 Disks = disks,
-                TotalRamBytes = (long)GC.GetGCMemoryInfo().TotalAvailableMemoryBytes,
+                TotalRamBytes = totalRam > 0
+                    ? totalRam
+                    : (long)GC.GetGCMemoryInfo().TotalAvailableMemoryBytes,
                 TotalFreedFormatted = "Анализ системы завершен"
             };
 

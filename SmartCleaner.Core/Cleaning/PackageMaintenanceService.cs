@@ -43,6 +43,7 @@ public sealed class PackageMaintenanceService : IPackageMaintenanceService
         var succeeded = 0;
         var failed = 0;
         var skipped = 0;
+        long freedBytes = 0;
         var allowedRoots = GetAllowedRoots();
         var started = Stopwatch.StartNew();
 
@@ -111,6 +112,7 @@ public sealed class PackageMaintenanceService : IPackageMaintenanceService
             }
 
             succeeded++;
+            freedBytes += item.Size;
         }
 
         started.Stop();
@@ -121,6 +123,7 @@ public sealed class PackageMaintenanceService : IPackageMaintenanceService
             SucceededCount = succeeded,
             FailedCount = failed,
             SkippedCount = skipped,
+            FreedBytes = freedBytes,
             Errors = errors,
             Duration = started.Elapsed
         };

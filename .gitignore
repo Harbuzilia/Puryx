@@ -2,16 +2,20 @@
 [Bb]in/
 [Oo]bj/
 [Pp]ublish/
-release/
+[Rr]elease/
 tmp/
 *.log
 crash.log
 build_log.txt
 build_output.txt
+TestResults/
+*.binlog
+artifacts/
 
 # Visual Studio & VS Code
 .vs/
 .vscode/
+.idea/
 *.user
 *.userosscache
 *.suo
@@ -34,3 +38,6 @@ __pycache__/
 config/
 .opencode/
 .aider*
+
+# Agent session state
+.zcode/

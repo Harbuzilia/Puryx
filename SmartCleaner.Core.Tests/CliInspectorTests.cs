@@ -1,4 +1,5 @@
-﻿using SmartCleaner.Core.CliInspector;
+using SmartCleaner.Core.CliInspector;
+using System.IO;
 using Xunit;
 
 namespace SmartCleaner.Core.Tests;
@@ -17,6 +18,7 @@ public class CliInspectorTests
     }
 
     [Fact]
+    [Trait("Category", "Integration")]
     public async Task CliInspectorEngine_ScanAsync_CompletesSuccessfully()
     {
         var pathService = new PathEnvironmentService();
@@ -33,21 +35,41 @@ public class CliInspectorTests
     }
 
     [Fact]
-    public void PathHealthItem_CorrectlyDetectsDeadPath()
+    public async Task CliInspectorEngine_ScanAsync_MarksDeadPathAsDeadAndLivePathAsActive()
     {
-        var fakeDeadPath = @"C:\NonExistent_Fake_Directory_123456789";
-        var isDead = !Directory.Exists(fakeDeadPath);
-
-        var item = new PathHealthItem
+        var tempDir = Path.Combine(Path.GetTempPath(), $"cli_live_{Guid.NewGuid():N}");
+        Directory.CreateDirectory(tempDir);
+        var deadPath = Path.Combine(Path.GetTempPath(), $"cli_dead_{Guid.NewGuid():N}");
+        try
         {
-            Path = fakeDeadPath,
-            Scope = "User",
-            Exists = !isDead,
-            IsDead = isDead,
-            Status = "Мертвый путь"
-        };
+            var engine = new CliInspectorEngine(new FakePathEnvironmentService([tempDir], [deadPath]));
 
-        Assert.True(item.IsDead);
-        Assert.False(item.Exists);
+            var result = await engine.ScanAsync();
+
+            var dead = Assert.Single(result.PathHealth, p => p.Path == deadPath);
+            Assert.True(dead.IsDead);
+            Assert.False(dead.Exists);
+            Assert.Equal("System", dead.Scope);
+            Assert.Contains("Мертвый путь", dead.Status);
+
+            var live = Assert.Single(result.PathHealth, p => p.Path == tempDir);
+            Assert.True(live.Exists);
+            Assert.False(live.IsDead);
+            Assert.Equal("User", live.Scope);
+
+            Assert.Equal(1, result.DeadPathsCount);
+        }
+        finally
+        {
+            try { Directory.Delete(tempDir, recursive: true); } catch { }
+        }
+    }
+
+    private sealed class FakePathEnvironmentService(
+        IReadOnlyList<string> userPaths,
+        IReadOnlyList<string> systemPaths) : PathEnvironmentService
+    {
+        public override List<string> GetUserPathEntries() => [.. userPaths];
+        public override List<string> GetSystemPathEntries() => [.. systemPaths];
     }
 }

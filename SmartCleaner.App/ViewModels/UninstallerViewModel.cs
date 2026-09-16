@@ -107,7 +107,7 @@ public partial class UninstallerViewModel : ObservableObject
     [RelayCommand]
     private async Task UninstallAsync(InstalledAppItem? app)
     {
-        if (app == null) return;
+        if (app == null || IsLoading) return;
 
         var result = MessageBox.Show(
             $"Запустить деинсталляцию приложения:\n\n{app.DisplayName}\nВерсия: {app.DisplayVersion}\nИздатель: {app.Publisher}\n\nПосле завершения будет выполнен автоматический поиск оставшихся файлов и записей реестра («хвостов»).",
@@ -117,66 +117,117 @@ public partial class UninstallerViewModel : ObservableObject
 
         if (result != MessageBoxResult.Yes) return;
 
-        StatusText = $"Запуск деинсталлятора для {app.DisplayName}...";
-        var (success, msg) = await _engine.UninstallAppAsync(app);
-
-        // Scan for leftovers regardless
-        StatusText = $"Поиск остаточных файлов («хвостов») для {app.DisplayName}...";
-        var leftovers = await _hunter.FindLeftoversAsync(app);
-
-        if (leftovers.Count > 0)
+        IsLoading = true;
+        try
         {
-            CurrentLeftovers.Clear();
-            foreach (var l in leftovers) CurrentLeftovers.Add(l);
-            IsLeftoversVisible = true;
-            StatusText = $"Найдено {leftovers.Count} остаточных файлов/ключей реестра для {app.DisplayName}";
+            StatusText = $"Запуск деинсталлятора для {app.DisplayName}...";
+            var (success, msg) = await _engine.UninstallAppAsync(app);
+
+            // Scan for leftovers regardless
+            StatusText = $"Поиск остаточных файлов («хвостов») для {app.DisplayName}...";
+            var leftovers = await _hunter.FindLeftoversAsync(app);
+
+            if (leftovers.Count > 0)
+            {
+                CurrentLeftovers.Clear();
+                foreach (var l in leftovers) CurrentLeftovers.Add(l);
+                IsLeftoversVisible = true;
+                StatusText = $"Найдено {leftovers.Count} остаточных файлов/ключей реестра для {app.DisplayName}";
+            }
+            else
+            {
+                StatusText = $"Деинсталляция завершена. Хвостов не обнаружено.";
+                AllApps.Remove(app);
+                FilteredApps.Remove(app);
+                TotalAppsCount = AllApps.Count;
+            }
         }
-        else
+        catch (Exception ex)
         {
-            StatusText = $"Деинсталляция завершена. Хвостов не обнаружено.";
-            AllApps.Remove(app);
-            FilteredApps.Remove(app);
-            TotalAppsCount = AllApps.Count;
+            StatusText = $"Ошибка деинсталляции: {ex.Message}";
+        }
+        finally
+        {
+            IsLoading = false;
         }
     }
 
     [RelayCommand]
     private async Task ScanLeftoversOnlyAsync(InstalledAppItem? app)
     {
-        if (app == null) return;
+        if (app == null || IsLoading) return;
 
-        StatusText = $"Поиск хвостов для {app.DisplayName}...";
-        var leftovers = await _hunter.FindLeftoversAsync(app);
+        IsLoading = true;
+        try
+        {
+            StatusText = $"Поиск хвостов для {app.DisplayName}...";
+            var leftovers = await _hunter.FindLeftoversAsync(app);
 
-        CurrentLeftovers.Clear();
-        foreach (var l in leftovers) CurrentLeftovers.Add(l);
-        IsLeftoversVisible = true;
+            CurrentLeftovers.Clear();
+            foreach (var l in leftovers) CurrentLeftovers.Add(l);
+            IsLeftoversVisible = true;
 
-        StatusText = leftovers.Count > 0
-            ? $"Найдено {leftovers.Count} остаточных элементов для {app.DisplayName}"
-            : $"Остаточных файлов и записей реестра не найдено.";
+            StatusText = leftovers.Count > 0
+                ? $"Найдено {leftovers.Count} остаточных элементов для {app.DisplayName}"
+                : $"Остаточных файлов и записей реестра не найдено.";
+        }
+        catch (Exception ex)
+        {
+            StatusText = $"Ошибка поиска хвостов: {ex.Message}";
+        }
+        finally
+        {
+            IsLoading = false;
+        }
     }
 
     [RelayCommand]
     private async Task CleanSelectedLeftoversAsync()
     {
         var selected = CurrentLeftovers.Where(l => l.IsSelected).ToList();
-        if (selected.Count == 0) return;
+        if (selected.Count == 0 || IsLoading) return;
 
-        var (count, space) = await _hunter.CleanLeftoversAsync(selected);
-
-        foreach (var item in selected)
+        IsLoading = true;
+        try
         {
-            CurrentLeftovers.Remove(item);
-        }
+            StatusText = "Очистка остаточных файлов и записей реестра...";
+            var cleanResult = await _hunter.CleanLeftoversAsync(selected);
 
-        if (CurrentLeftovers.Count == 0)
+            // Из списка убираем только реально удалённые элементы
+            foreach (var item in cleanResult.CleanedItems)
+            {
+                CurrentLeftovers.Remove(item);
+            }
+
+            if (CurrentLeftovers.Count == 0)
+            {
+                IsLeftoversVisible = false;
+            }
+
+            StatusText = $"Успешно вычищено {cleanResult.CleanedCount} остаточных элементов (Освобождено: {SizeFormatter.Format(cleanResult.SavedBytes)})!";
+
+            var summary = $"Очищено {cleanResult.CleanedCount} элементов ({SizeFormatter.Format(cleanResult.SavedBytes)}).";
+            if (cleanResult.SkippedMessages.Count > 0)
+            {
+                summary += $"\n\nПропущено {cleanResult.SkippedMessages.Count}:\n" +
+                           string.Join("\n", cleanResult.SkippedMessages.Take(10));
+                if (cleanResult.SkippedMessages.Count > 10)
+                    summary += $"\n… и ещё {cleanResult.SkippedMessages.Count - 10}";
+            }
+
+            MessageBox.Show(summary, "Очистка хвостов", MessageBoxButton.OK,
+                cleanResult.SkippedMessages.Count > 0 ? MessageBoxImage.Warning : MessageBoxImage.Information);
+        }
+        catch (Exception ex)
         {
-            IsLeftoversVisible = false;
+            StatusText = $"Ошибка очистки хвостов: {ex.Message}";
+            MessageBox.Show($"Не удалось очистить хвосты: {ex.Message}", "Очистка хвостов",
+                MessageBoxButton.OK, MessageBoxImage.Warning);
         }
-
-        StatusText = $"Успешно вычищено {count} остаточных элементов (Освобождено: {SizeFormatter.Format(space)})!";
-        MessageBox.Show($"Очищено {count} элементов ({SizeFormatter.Format(space)}).", "Очистка хвостов", MessageBoxButton.OK, MessageBoxImage.Information);
+        finally
+        {
+            IsLoading = false;
+        }
     }
 
     [RelayCommand]

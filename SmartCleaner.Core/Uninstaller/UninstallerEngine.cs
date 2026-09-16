@@ -7,13 +7,6 @@ namespace SmartCleaner.Core.Uninstaller;
 
 public class UninstallerEngine
 {
-    private readonly LeftoverHunter _hunter;
-
-    public UninstallerEngine(LeftoverHunter hunter)
-    {
-        _hunter = hunter;
-    }
-
     public async Task<List<InstalledAppItem>> ScanInstalledAppsAsync(CancellationToken ct = default)
     {
         var apps = new List<InstalledAppItem>();

@@ -147,7 +147,7 @@
                     <controls:BarChartControl 
                         Values="{Binding WeeklyValues}" 
                         Labels="{Binding WeeklyLabels}"
-                        BarColor="LimeGreen"
+                        BarColor="{DynamicResource SafeBrush}"
                         Height="300"
                         Foreground="{DynamicResource TextSecondaryBrush}"/>
                 </StackPanel>

@@ -5,6 +5,8 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
 using SmartCleaner.Core.Helpers;
 using SmartCleaner.Core.LargeFiles;
+using SmartCleaner.Core.Models;
+using SmartCleaner.Core.Safety;
 
 namespace SmartCleaner.App.ViewModels;
 
@@ -14,11 +16,13 @@ namespace SmartCleaner.App.ViewModels;
 public partial class LargeFilesViewModel : ObservableObject
 {
     private readonly LargeFilesEngine _engine;
+    private readonly ISafetyService _safety;
     private CancellationTokenSource? _cts;
 
-    public LargeFilesViewModel(LargeFilesEngine engine)
+    public LargeFilesViewModel(LargeFilesEngine engine, ISafetyService safety)
     {
         _engine = engine;
+        _safety = safety;
     }
 
     [ObservableProperty] private bool _isScanning;
@@ -101,12 +105,35 @@ public partial class LargeFilesViewModel : ObservableObject
     }
 
     /// <summary>
-    /// Удаляет файл в корзину.
+    /// Удаляет файл в корзину (после проверки ISafetyService).
     /// </summary>
     [RelayCommand]
     private async Task DeleteFileAsync(LargeFileInfo? file)
     {
         if (file == null) return;
+
+        // Risk=PerformanceCache: явное удаление по клику пользователя — защищённый период
+        // не применяется, но whitelist/блокировки/elevation действуют
+        var validation = _safety.ValidateForDeletion(new ScannedItem
+        {
+            Path = file.Path,
+            Size = file.Size,
+            Risk = RiskCategory.PerformanceCache,
+            Description = "large-file:manual"
+        });
+
+        if (!validation.CanDelete)
+        {
+            StatusText = $"⚠️ Заблокировано: {validation.BlockReason}";
+            return;
+        }
+
+        if (validation.RequiresElevation)
+        {
+            StatusText = "⚠️ Файл требует прав администратора — удалите через контекстное меню проводника";
+            return;
+        }
+
         try
         {
             await Task.Run(() =>

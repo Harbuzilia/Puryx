@@ -73,18 +73,29 @@ public partial class QuarantineViewModel : ObservableObject
         if (result != MessageBoxResult.Yes) return;
 
         IsBusy = true;
-        var (success, msg) = await _quarantine.RestoreItemAsync(item.Id);
-        IsBusy = false;
+        try
+        {
+            var (success, msg) = await _quarantine.RestoreItemAsync(item.Id);
 
-        if (success)
-        {
-            Items.Remove(item);
-            QuarantinedCount = Items.Count;
-            MessageBox.Show(msg, "Восстановлено", MessageBoxButton.OK, MessageBoxImage.Information);
+            if (success)
+            {
+                Items.Remove(item);
+                QuarantinedCount = Items.Count;
+                MessageBox.Show(msg, "Восстановлено", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            else
+            {
+                MessageBox.Show(msg, "Ошибка восстановления", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
         }
-        else
+        catch (Exception ex)
         {
-            MessageBox.Show(msg, "Ошибка восстановления", MessageBoxButton.OK, MessageBoxImage.Warning);
+            StatusText = $"Ошибка восстановления: {ex.Message}";
+            MessageBox.Show(ex.Message, "Ошибка восстановления", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+        finally
+        {
+            IsBusy = false;
         }
     }
 
@@ -102,13 +113,29 @@ public partial class QuarantineViewModel : ObservableObject
         if (result != MessageBoxResult.Yes) return;
 
         IsBusy = true;
-        var success = await _quarantine.PurgeItemAsync(item.Id);
-        IsBusy = false;
-
-        if (success)
+        try
         {
-            Items.Remove(item);
-            QuarantinedCount = Items.Count;
+            var success = await _quarantine.PurgeItemAsync(item.Id);
+
+            if (success)
+            {
+                Items.Remove(item);
+                QuarantinedCount = Items.Count;
+            }
+            else
+            {
+                MessageBox.Show("Не удалось удалить элемент из карантина.", "Ошибка удаления",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+        catch (Exception ex)
+        {
+            StatusText = $"Ошибка удаления: {ex.Message}";
+            MessageBox.Show(ex.Message, "Ошибка удаления", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+        finally
+        {
+            IsBusy = false;
         }
     }
 }

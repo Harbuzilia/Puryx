@@ -1,4 +1,5 @@
 ﻿using SmartCleaner.Core.Helpers;
+using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
 
@@ -39,9 +40,10 @@ public class QuarantineService
         {
             Directory.CreateDirectory(_storageDir);
         }
-        catch
+        catch (Exception ex)
         {
             // Если не удалось создать директорию — карантин недоступен
+            Debug.WriteLine($"[Quarantine] Storage directory unavailable: {ex.Message}");
         }
     }
 
@@ -56,8 +58,9 @@ public class QuarantineService
             var manifest = JsonSerializer.Deserialize<QuarantineManifest>(json);
             return manifest?.Items ?? new List<QuarantinedItem>();
         }
-        catch
+        catch (Exception ex)
         {
+            Debug.WriteLine($"[Quarantine] Manifest read failed (treated as empty): {ex.Message}");
             return new List<QuarantinedItem>();
         }
     }
@@ -107,8 +110,9 @@ public class QuarantineService
 
             return true;
         }
-        catch
+        catch (Exception ex)
         {
+            Debug.WriteLine($"[Quarantine] Move to quarantine failed for {path}: {ex.Message}");
             return false;
         }
     }
@@ -169,8 +173,9 @@ public class QuarantineService
             await SaveManifestAsync(items);
             return true;
         }
-        catch
+        catch (Exception ex)
         {
+            Debug.WriteLine($"[Quarantine] Purge failed for {id}: {ex.Message}");
             return false;
         }
     }

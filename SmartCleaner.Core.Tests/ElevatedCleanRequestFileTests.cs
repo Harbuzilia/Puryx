@@ -244,4 +244,52 @@ public class ElevatedCleanRequestFileTests
             ElevatedCleanRequestFile.TryDelete(launchData.RequestFile);
         }
     }
+
+    [Fact]
+    public async Task ReadValidatedAsync_RejectsInvalidRiskEnumValue()
+    {
+        // Подделка с ВАЛИДНОЙ подписью, но некорректной строкой Risk:
+        // проверка категории риска должна отклонять запрос независимо от подписи.
+        var authToken = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
+        var request = new ElevatedCleanRequest
+        {
+            CreatedAtUtc = DateTime.UtcNow,
+            ExpiresAtUtc = DateTime.UtcNow.AddMinutes(10),
+            Nonce = Guid.NewGuid().ToString("N"),
+            Policy = ElevatedCleanTargetPolicy.CreateContract(),
+            Items =
+            [
+                new ElevatedCleanRequestItem
+                {
+                    Path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "Temp", "risk-test"),
+                    IsDirectory = true,
+                    Size = 1,
+                    Risk = "DefinitelyNotARiskCategory"
+                }
+            ]
+        };
+
+        var jsonOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true, WriteIndented = false };
+        var payloadBytes = JsonSerializer.SerializeToUtf8Bytes(request with { Signature = string.Empty }, jsonOptions);
+        using var hmac = new HMACSHA256(Convert.FromBase64String(authToken));
+        var signed = request with { Signature = Convert.ToBase64String(hmac.ComputeHash(payloadBytes)) };
+
+        var requestFile = Path.GetTempFileName();
+        try
+        {
+            await File.WriteAllTextAsync(requestFile, JsonSerializer.Serialize(signed, jsonOptions));
+
+            var validated = await ElevatedCleanRequestFile.ReadValidatedAsync(
+                requestFile,
+                authToken,
+                TimeSpan.FromMinutes(10));
+
+            Assert.Null(validated);
+        }
+        finally
+        {
+            ElevatedCleanRequestFile.TryDeleteResult(requestFile);
+            ElevatedCleanRequestFile.TryDelete(requestFile);
+        }
+    }
 }

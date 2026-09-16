@@ -216,8 +216,9 @@ public class PrivacyDebloatService
 
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine($"[PrivacyDebloat] Apply failed for {tweakId}: {ex.Message}");
                 return false;
             }
         });
@@ -244,8 +245,9 @@ public class PrivacyDebloatService
 
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine($"[PrivacyDebloat] Revert failed for {tweakId}: {ex.Message}");
                 return false;
             }
         });
@@ -390,9 +392,10 @@ public class PrivacyDebloatService
                 File.WriteAllText(BackupFilePath, JsonSerializer.Serialize(backupMap, new JsonSerializerOptions { WriteIndented = true }));
             }
         }
-        catch
+        catch (Exception ex)
         {
-            // Backup should never block user action
+            // Backup should never block user action, but its absence must be visible
+            System.Diagnostics.Debug.WriteLine($"[PrivacyDebloat] Backup save failed for {tweak.Id}: {ex.Message}");
         }
     }
 

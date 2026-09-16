@@ -24,19 +24,23 @@ public sealed class CleaningStatsService
     private List<CleaningSession> _sessions = [];
 
     public CleaningStatsService()
-    {
-        var dir = Path.Combine(
+        : this(Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "SmartCleaner");
+            "SmartCleaner"))
+    {
+    }
+
+    internal CleaningStatsService(string statsDirectory)
+    {
         try
         {
-            Directory.CreateDirectory(dir);
+            Directory.CreateDirectory(statsDirectory);
         }
         catch
         {
             // Если не удалось создать директорию — работаем без сохранения статистики
         }
-        _filePath = Path.Combine(dir, "cleaning_stats.json");
+        _filePath = Path.Combine(statsDirectory, "cleaning_stats.json");
         Load();
     }
 

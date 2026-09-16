@@ -8,6 +8,8 @@ using Microsoft.VisualBasic.FileIO;
 using Microsoft.Win32;
 using SmartCleaner.Core.CliInspector;
 using SmartCleaner.Core.Helpers;
+using SmartCleaner.Core.Models;
+using SmartCleaner.Core.Safety;
 
 namespace SmartCleaner.App.ViewModels;
 
@@ -15,6 +17,7 @@ public partial class CliInspectorViewModel : ObservableObject
 {
     private readonly CliInspectorEngine _engine;
     private readonly PathEnvironmentService _pathService;
+    private readonly ISafetyService _safety;
 
     [ObservableProperty]
     private bool _isScanning;
@@ -55,10 +58,11 @@ public partial class CliInspectorViewModel : ObservableObject
     public ObservableCollection<PathHealthItem> PathEntries { get; } = new();
     public ObservableCollection<PowerShellProfileItem> PsProfiles { get; } = new();
 
-    public CliInspectorViewModel(CliInspectorEngine engine, PathEnvironmentService pathService)
+    public CliInspectorViewModel(CliInspectorEngine engine, PathEnvironmentService pathService, ISafetyService safety)
     {
         _engine = engine;
         _pathService = pathService;
+        _safety = safety;
     }
 
     [RelayCommand]
@@ -193,10 +197,12 @@ public partial class CliInspectorViewModel : ObservableObject
 
         try
         {
+            // Рабочая директория задаётся через ProcessStartInfo — никакой
+            // инъекции пути в командную строку PowerShell (апостроф в имени папки)
             var startInfo = new ProcessStartInfo
             {
                 FileName = "powershell.exe",
-                Arguments = $"-NoExit -Command \"Set-Location -LiteralPath '{workDir}'\"",
+                Arguments = "-NoExit",
                 WorkingDirectory = workDir,
                 UseShellExecute = true
             };
@@ -236,6 +242,27 @@ public partial class CliInspectorViewModel : ObservableObject
             MessageBoxImage.Question);
 
         if (result != MessageBoxResult.Yes) return;
+
+        var validation = _safety.ValidateForDeletion(new ScannedItem
+        {
+            Path = item.Path,
+            IsDirectory = Directory.Exists(item.Path) && !File.Exists(item.Path),
+            Size = item.SizeBytes,
+            Risk = RiskCategory.PerformanceCache,
+            Description = $"cli-tool:{item.Name}"
+        });
+
+        if (!validation.CanDelete)
+        {
+            MessageBox.Show($"Удаление заблокировано: {validation.BlockReason}", "Защита", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+
+        if (validation.RequiresElevation)
+        {
+            MessageBox.Show("Инструмент находится в защищённом каталоге и требует прав администратора.", "Защита", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
 
         try
         {

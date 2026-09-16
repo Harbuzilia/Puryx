@@ -4,6 +4,63 @@
 
 ---
 
+## [2.7.2] — 16.09.2026
+
+### 🎯 Тема релиза: Полный аудит — критические баги UI, ужесточение безопасности, вычистка мёртвого кода, рост тестов 124 → 214
+
+---
+
+### 1. 🩹 Критические баги UI (страницы блокировались навсегда)
+- **Что сделано:**
+  - `ServicesOptimizerViewModel` и `PrivacyDebloatViewModel`: `IsBusy` сбрасывался только в `catch` — после **успешного** применения профиля страница оставалась заблокированной до перезапуска. Сброс перенесён в `finally`, вложенный no-op `ScanAsync()` заменён прямой перезагрузкой списка.
+  - `QuarantineViewModel`, `UninstallerViewModel`, `AiAssistantViewModel` и команды `CompactViewModel`: любое необработанное исключение оставляло `IsBusy=true` и роняло приложение — все команды обёрнуты в try/catch/finally; `CancellationTokenSource` теперь освобождается.
+  - `MainViewModel.MergeResults`: статистика «освобождено» учитывала только файлы — теперь суммируются и package-действия.
+  - `crash.log` писался в `BaseDirectory` (под Program Files — только чтение) — перенесён в конфиг-директорию приложения.
+  - `SettingsViewModel`: «всего RAM» показывало GC-хип вместо физической памяти — заменено на `GlobalMemoryStatusEx`.
+  - `DuplicatesViewModel`: синхронное IO предпросмотра на UI-потоке при каждом клике — асинхронно, с отменой при смене выбора.
+- **Почему:** Страница, которую нельзя разблокировать без перезапуска, и упавшее приложение — дефекты первого приоритета для интерактивного инструмента.
+
+### 2. 🔐 Безопасность (удаления в обход SafetyService и инъекции)
+- **Что сделано:**
+  - `PluginEngine.CleanPluginItemsAsync` и `LeftoverHunter.CleanLeftoversAsync`: удаления шли напрямую в обход `ISafetyService` и Корзины — злонамеренный `*.plugin.json` мог перманентно снести любой каталог. Оба пути теперь прогоняются через `ValidateForDeletion` и удаляют только в Корзину.
+  - ViewModel-удаления (`LargeFiles`, `Duplicates`, `CliInspector`) также прогоняются через safety-проверку.
+  - PowerShell-инъекция в `CliInspectorViewModel.OpenTerminal` (`cd 'path'` с апострофом в имени папки): заменено на `ProcessStartInfo.WorkingDirectory`.
+  - `CleaningService.ExecuteDockerDeleteAsync`: `docker rmi -f {imageId}` без экранирования — добавлена валидация идентификатора.
+  - `CleaningSchedulerService`: `--profile {name}` без кавычек — экранирован.
+  - `SafetyService.RequiresElevation`: сравнение префиксов без разделителя (`C:\WindowsFoo` ложно требовал UAC) — заменено на сравнение по каталогу.
+  - `SafetyService.IsWhitelisted`: паттерны вида `**\.git\**` защищали содержимое, но не саму папку — удаление папки `.git` сносило всё защищённое внутри. Существующая директория, чей ребёнок совпадает с паттерном, теперь тоже защищена (найдено новым тестом).
+  - `ElevatedCleanRequestFile`: elevated-запрос теперь переносит реальную категорию риска вместо захардкоженного `PerformanceCache` (правило защищённого периода соблюдается); добавлена проверка валидности значения `Risk`.
+  - `PluginEngine`: wildcard-шаблоны с `*` в середине пути (`...\JetBrains\*\caches`) молча не резолвились — реализован рекурсивный резолв сегментов.
+  - `FileShredderService`: шрединг без whitelist-проверки — добавлен `ISafetyService`-гейт.
+- **Почему:** Приложение, чья единственная функция — безопасное удаление, не должно иметь путей удаления в обход центрального защитного контура.
+
+### 3. 🗑️ Вычистка мёртвого кода и мусора
+- **Что сделано:**
+  - Удалены мёртвые модули Core: `Mft/` (MftReader/MftScanner/MftEntry — зарегистрированы в DI, нигде не потребляются; заодно исчез нативный memory-leak), `WslShrinkService`, `Localization/`.
+  - Удалены `TraySentinelService` (недостижим), мёртвые DI-регистрации и дублирующие `ApplySystemTheme`/`IsSystemDarkTheme` в `App.xaml.cs`.
+  - Удалены 5 неиспользуемых JSON из `SmartCleaner.Data`; загрузка `Plugins/*.plugin.json` переведена с хрупкого dev-only относительного пути на директорию приложения.
+  - Из git и с диска удалены `publish/`, `release/`, scratch-файлы (~140 МБ устаревших сборок); `.gitignore` расширен.
+- **Почему:** Мёртвый код с нативными буферами — это утечки и ложная поверхность атаки; 140 МБ устаревших бинарников в репозитории — мусор.
+
+### 4. ✅ Тесты: 124 → 214
+- **Что сделано:**
+  - Починены таутологические тесты (всегда-true), удалены дублирующие группы, приватные фейки консолидированы в `TestSupport.cs`.
+  - Новые suites с нулевого покрытия: `SafetyServiceTests` (whitelist, защищённый период, elevation), `ConfigServiceTests` (portable/installed), `CleaningStatsServiceTests`, `PluginEngineTests` (multi-segment wildcard + safety-gate), `LeftoverHunterTests` (включая регрессию блокировки `.git`), `StartupEngineTests` (ParseCommand), проверка `Risk` в `ElevatedCleanRequestFileTests`.
+  - Machine-зависимые тесты помечены `[Trait("Category","Integration")]`.
+  - Тестами найден и пофикшен реальный баг whitelist-защиты папок (см. п. 2).
+- **Почему:** У protective-логики без тестов нет доверия; два реальных бага безопасности были найдены именно новыми тестами.
+
+### 5. 🎨 Консистентность UI/доков/сборки
+- **Что сделано:**
+  - Версия UI (заголовок окна, бейджи) теперь читается из сборки через `AppInfo` — XAML не дрейфует относительно csproj.
+  - `DashboardPage`: захардкоженный `LimeGreen` заменён на `SafeBrush` темы; overlay-скримы вынесены в ресурс `OverlayScrimBrush` обеих тем.
+  - README: убрано ложное «очистка теневых копий VSS» (кода нет), счётчик сканеров исправлен на 16, добавлен отсутствующий сканер «Разработка», тесты запускаются из решения; создан `LICENSE` (MIT).
+  - CHANGELOG: удалены 22 локальные `file:///`-ссылки, исправлено противоречие 21/19 представлений.
+  - `build.bat`: починены ANSI-цвета, Clean-режим охватывает тесты и `release/`, добавлен пункт запуска тестов, убран фейковый «Installer»-режим; `publish_portable.bat` проверяет код возврата publish.
+- **Почему:** Документация, обещающая несуществующие функции, подрывает доверие ко всем остальным заявлениям продукта.
+
+---
+
 ## [2.7.1] — 07.09.2026
 
 ### 🎯 Тема релиза: Полная дизайн-система Fluent, чистка эмодзи, токены тем, исправление биндингов и версионирование
@@ -30,12 +87,12 @@
 
 ### 2. 🔤 Полная зачистка эмодзи и переход на Segoe MDL2 Assets
 - **Что сделано:**
-  - Устранены дублирующие цветные эмодзи из заголовков, вкладок, кнопок и статусов во всех 19 XAML-файлах представлений и главном окне.
+  - Устранены дублирующие цветные эмодзи из заголовков, вкладок, кнопок и статусов во всех 21 XAML-файлах представлений и главном окне.
   - Иконки навигации, кнопок действий и служебных элементов переведены строго на векторные глифы шрифта `Segoe MDL2 Assets`.
   - Заголовки вкладок (`TabItem.Header`) очищены от префиксов-эмодзи и приведены к лаконичному Fluent-виду.
 - **Файлы:**
   - `SmartCleaner.App/MainWindow.xaml`
-  - `SmartCleaner.App/Views/*.xaml` (все 19 страниц)
+  - `SmartCleaner.App/Views/*.xaml` (все 21 страница)
 - **Почему:** Соблюдение строгой дизайн-системы Fluent UI и исключение разнобоя шрифтов/эмодзи в интерфейсе.
 
 ---
@@ -72,7 +129,7 @@
 ---
 
 ### 1. 🛡️ Windows Privacy & Anti-Spy Telemetry Debloater (Защита приватности)
-- **Что сделано:** Создан движок [`PrivacyDebloatService.cs`](file:///e:/AllMyProject/CHISTilka/SmartCleaner.Core/Privacy/PrivacyDebloatService.cs) и страница управления [`PrivacyDebloatPage.xaml`](file:///e:/AllMyProject/CHISTilka/SmartCleaner.App/Views/PrivacyDebloatPage.xaml):
+- **Что сделано:** Создан движок `PrivacyDebloatService.cs` и страница управления `PrivacyDebloatPage.xaml`:
   - 14 целевых твиков реестра и служб в 4 категориях: Телеметрия (DiagTrack, dmwappushservice, AllowTelemetry), Реклама (Advertising ID, Bing Search, рекомендации Explorer, промо-приложения Пуск), Отчеты (WER, CEIP, отзывы SIUF), Слежка и датчики (геолокация, Activity History).
   - 1-Click отключение всех рекомендуемых параметров («Отключить всё рекомендуемое»).
   - Автоматическое создание снимка реестра `privacy_backup.json` и 1-Click восстановление настроек по умолчанию Windows.
@@ -90,7 +147,7 @@
 ---
 
 ### 2. ⚙️ Windows Services Optimizer (Умный оптимизатор фоновых служб)
-- **Что сделано:** Создан оптимизатор системных служб [`WindowsServicesOptimizer.cs`](file:///e:/AllMyProject/CHISTilka/SmartCleaner.Core/ServicesOpt/WindowsServicesOptimizer.cs) и экран [`ServicesOptimizerPage.xaml`](file:///e:/AllMyProject/CHISTilka/SmartCleaner.App/Views/ServicesOptimizerPage.xaml):
+- **Что сделано:** Создан оптимизатор системных служб `WindowsServicesOptimizer.cs` и экран `ServicesOptimizerPage.xaml`:
   - Готовые пресеты в 1 клик:
     - 🎮 **Игровой профиль (Gaming / Max FPS)**: Отключение SysMain, телеметрии, WAP Push, WerSvc, факсов, удаленного реестра, карт и ритейл демо для устранения микрозадержек.
     - ⚡ **Сбалансированный профиль (Balanced)**: 100% безопасное отключение неиспользуемого системного балласта (факсы, карты, ритейл демо, телеметрия).
@@ -111,7 +168,7 @@
 ---
 
 ### 3. 🧪 Тестирование и валидация
-- **Что сделано:** Добавлены 4 новых модульных теста в [`TierFeaturesTests.cs`](file:///e:/AllMyProject/CHISTilka/SmartCleaner.Core.Tests/TierFeaturesTests.cs) (всего 51 тест, 100% пройдено).
+- **Что сделано:** Добавлены 4 новых модульных теста в `TierFeaturesTests.cs` (всего 51 тест, 100% пройдено).
 - **Файлы:**
   - `SmartCleaner.Core.Tests/TierFeaturesTests.cs`
 - **Почему:** Гарантия надежности и корректности определений твиков, профилей и сканеров.
@@ -162,7 +219,7 @@
 ---
 
 ### 1. 🎨 Deep Obsidian & Modern Slate Design System (Темы оформления)
-- **Что сделано:** Полностью переработана палитра и стилизация [`DarkTheme.xaml`](file:///e:/AllMyProject/CHISTilka/SmartCleaner.App/Themes/DarkTheme.xaml) и [`LightTheme.xaml`](file:///e:/AllMyProject/CHISTilka/SmartCleaner.App/Themes/LightTheme.xaml):
+- **Что сделано:** Полностью переработана палитра и стилизация `DarkTheme.xaml` и `LightTheme.xaml`:
   - Глубокая стильная палитра Obsidian (`#0D1117` фон, `#161B22` карточки, `#21262D` возвышение, `#30363D` тонкие границы).
   - Электрические акцентные градиенты (`AccentGradientBrush`, `PrimaryButtonGradientBrush`, `DangerButtonGradientBrush`).
   - Минималистичные кастомные скроллбары (тонкая полоса 7px, прозрачный трек, скругленный бегунок 3.5px, плавная подсветка при наведении).
@@ -177,7 +234,7 @@
 ---
 
 ### 2. 🧭 Редизайн навигации и боковой панели (Sidebar & Brand Header)
-- **Что сделано:** Обновлена боковая панель в [`MainWindow.xaml`](file:///e:/AllMyProject/CHISTilka/SmartCleaner.App/MainWindow.xaml):
+- **Что сделано:** Обновлена боковая панель в `MainWindow.xaml`:
   - Брендовый логотип в светящемся градиентном контейнере с бейджем `v2.5 ULTIMATE`.
   - Кнопки навигации `NavButton` получили активный вертикальный индикатор (pill bar 3.5px) на левой грани и плавную подложку при выборе.
   - Четкая микротипографика заголовков секций ("ОЧИСТКА", "ИНСТРУМЕНТЫ", "СИСТЕМА").
@@ -191,7 +248,7 @@
 
 ### 3. 📊 Карточки сводной статистики и Hero-кнопки (Stat Widgets & Hero Actions)
 - **Что сделано:**
-  - 4 карточки сводки ("Найдено мусора", "Выбрано к очистке", "Объектов", "Сканировать") в [`MainWindow.xaml`](file:///e:/AllMyProject/CHISTilka/SmartCleaner.App/MainWindow.xaml) и [`DashboardPage.xaml`](file:///e:/AllMyProject/CHISTilka/SmartCleaner.App/Views/DashboardPage.xaml) переработаны в представительские виджеты:
+  - 4 карточки сводки ("Найдено мусора", "Выбрано к очистке", "Объектов", "Сканировать") в `MainWindow.xaml` и `DashboardPage.xaml` переработаны в представительские виджеты:
     - Контейнеры иконок со скруглением и полупрозрачным фоном (акцентный синий, изумрудный, индиго, янтарный).
     - Крупные четкие цифры метрик (21-22px Bold).
     - Hero-кнопка сканирования с градиентом, иконкой и подписью.
@@ -212,7 +269,7 @@
 ---
 
 ### 1. 🌐 Gaming Network & Ping / Latency Optimizer (Оптимизатор сети и DNS)
-- **Что сделано:** Создан сервис [`NetworkOptimizerService.cs`](file:///e:/AllMyProject/CHISTilka/SmartCleaner.Core/Network/NetworkOptimizerService.cs) и страница [`NetworkOptimizerPage.xaml`](file:///e:/AllMyProject/CHISTilka/SmartCleaner.App/Views/NetworkOptimizerPage.xaml).
+- **Что сделано:** Создан сервис `NetworkOptimizerService.cs` и страница `NetworkOptimizerPage.xaml`.
   - 1-Click сброс DNS-кэша (`flushdns`), очистка ARP-таблицы и сокетов Winsock.
   - Быстрое переключение DNS с замером задержки (Ping) в реальном времени: Cloudflare (1.1.1.1), Google (8.8.8.8), Quad9 (9.9.9.9), AdGuard DNS и возврат на DHCP.
   - Игровой твик реестра TCP NoDelay (отключение алгоритма Нагла `TcpAckFrequency = 1`, `TCPNoDelay = 1`) для устранения микрозадержек в онлайн-играх.
@@ -228,7 +285,7 @@
 ---
 
 ### 2. 🖱️ Windows Explorer Shell Integration (Интеграция в контекстное меню Проводника)
-- **Что сделано:** Реализован менеджер контекстного меню [`ExplorerContextMenuManager.cs`](file:///e:/AllMyProject/CHISTilka/SmartCleaner.Core/Shell/ExplorerContextMenuManager.cs) с переключателями в Настройках:
+- **Что сделано:** Реализован менеджер контекстного меню `ExplorerContextMenuManager.cs` с переключателями в Настройках:
   - «⚡ Анализировать в SmartCleaner» (для папок)
   - «🗜️ Сжать через CompactOS (LZX)» (для папок)
   - «🔥 Безвозвратно уничтожить (Шредер DoD)» (для файлов)
@@ -241,7 +298,7 @@
 ---
 
 ### 3. 📄 Executive HTML System Passport & Report Generator (Паспорт системы и отчет)
-- **Что сделано:** Создан генератор отчетов [`SystemReportGenerator.cs`](file:///e:/AllMyProject/CHISTilka/SmartCleaner.Core/Reporting/SystemReportGenerator.cs), формирующий стильный интерактивный темный HTML-отчет с паспортом ПК (CPU, RAM, S.M.A.R.T. дисков, температура), таблицей освобожденного места и кнопкой печати / сохранения в PDF.
+- **Что сделано:** Создан генератор отчетов `SystemReportGenerator.cs`, формирующий стильный интерактивный темный HTML-отчет с паспортом ПК (CPU, RAM, S.M.A.R.T. дисков, температура), таблицей освобожденного места и кнопкой печати / сохранения в PDF.
 - **Файлы:**
   - `SmartCleaner.Core/Reporting/SystemReportGenerator.cs`
   - `SmartCleaner.App/ViewModels/SettingsViewModel.cs`
@@ -251,7 +308,7 @@
 ---
 
 ### 4. 🔊 Audio Feedback & Sound FX Engine (Звуковое сопровождение)
-- **Что сделано:** Создан сервис звукового сопровождения [`AudioFeedbackService.cs`](file:///e:/AllMyProject/CHISTilka/SmartCleaner.App/Services/AudioFeedbackService.cs), воспроизводящий аккуратные системные сигналы при завершении сканирования, очистки и включении Turbo Boost с возможностью отключения в Настройках.
+- **Что сделано:** Создан сервис звукового сопровождения `AudioFeedbackService.cs`, воспроизводящий аккуратные системные сигналы при завершении сканирования, очистки и включении Turbo Boost с возможностью отключения в Настройках.
 - **Файлы:**
   - `SmartCleaner.App/Services/AudioFeedbackService.cs`
   - `SmartCleaner.App/ViewModels/SettingsViewModel.cs`
@@ -267,7 +324,7 @@
 ---
 
 ### 1. 🚀 1-Click Game Turbo Boost (Турбо-режим для игр и рендера)
-- **Что сделано:** Реализован сервис [`GameBoostService.cs`](file:///e:/AllMyProject/CHISTilka/SmartCleaner.Core/SystemOpt/GameBoostService.cs) для максимального ускорения ПК в играх в 1 клик. Сервис сбрасывает неиспользуемые страницы оперативной памяти (`EmptyWorkingSet`), временно приостанавливает фоновые пожиратели ресурсов (`SysMain`, `wuauserv`, `DiagTrack`, `WSearch`) и переключает схему электропитания на «Высокая производительность». Поддерживается мгновенный возврат в исходный режим.
+- **Что сделано:** Реализован сервис `GameBoostService.cs` для максимального ускорения ПК в играх в 1 клик. Сервис сбрасывает неиспользуемые страницы оперативной памяти (`EmptyWorkingSet`), временно приостанавливает фоновые пожиратели ресурсов (`SysMain`, `wuauserv`, `DiagTrack`, `WSearch`) и переключает схему электропитания на «Высокая производительность». Поддерживается мгновенный возврат в исходный режим.
 - **Файлы:**
   - `SmartCleaner.Core/SystemOpt/GameBoostService.cs`
   - `SmartCleaner.App/ViewModels/RamOptimizerViewModel.cs`
@@ -277,7 +334,7 @@
 ---
 
 ### 2. 📊 S.M.A.R.T. SSD Health, Temperature & Wear Telemetry (Здоровье и износ SSD)
-- **Что сделано:** Создан сервис [`DiskHealthService.cs`](file:///e:/AllMyProject/CHISTilka/SmartCleaner.Core/DiskHealth/DiskHealthService.cs), запрашивающий аппаратную телеметрию физических накопителей (NVMe/SATA SSD, HDD) через WMI и PowerShell. Отображает модель диска, тип шины, состояние здоровья (`Healthy`/`Warning`), процент оставшегося ресурса ячеек памяти и температуру в реальном времени.
+- **Что сделано:** Создан сервис `DiskHealthService.cs`, запрашивающий аппаратную телеметрию физических накопителей (NVMe/SATA SSD, HDD) через WMI и PowerShell. Отображает модель диска, тип шины, состояние здоровья (`Healthy`/`Warning`), процент оставшегося ресурса ячеек памяти и температуру в реальном времени.
 - **Файлы:**
   - `SmartCleaner.Core/DiskHealth/DiskHealthService.cs`
   - `SmartCleaner.App/ViewModels/RamOptimizerViewModel.cs`
@@ -287,7 +344,7 @@
 ---
 
 ### 3. 📦 Single-File Portable Release Publish Script (Автономный сборщик)
-- **Что сделано:** Создан скрипт [`publish_portable.bat`](file:///e:/AllMyProject/CHISTilka/publish_portable.bat) для компиляции и сборки автономного исполняемого файла `SmartCleaner.App.exe` со всеми упакованными DLL, нативными библиотеками и плагинами сообщества.
+- **Что сделано:** Создан скрипт `publish_portable.bat` для компиляции и сборки автономного исполняемого файла `SmartCleaner.App.exe` со всеми упакованными DLL, нативными библиотеками и плагинами сообщества.
 - **Файлы:**
   - `publish_portable.bat`
 - **Почему:** Возможность запускать чистилку с флешки на любом ПК с Windows 10/11 без необходимости установки .NET Runtime.
@@ -301,7 +358,7 @@
 ---
 
 ### 1. 🗺️ Squarified Treemap Interactive Visualizer (Визуализатор карты диска)
-- **Что сделано:** Реализован алгоритм раскладки Squarified Treemap (`SmartCleaner.Core/DiskMap/TreemapLayout.cs`), цветовая подсветка типов файлов (видео, архивы, исполняемые файлы, код, документы, изображения) и интерактивный зум / проваливание в папки по двойному клику в [`TreeMapControl.cs`](file:///e:/AllMyProject/CHISTilka/SmartCleaner.App/Controls/TreeMapControl.cs).
+- **Что сделано:** Реализован алгоритм раскладки Squarified Treemap (`SmartCleaner.Core/DiskMap/TreemapLayout.cs`), цветовая подсветка типов файлов (видео, архивы, исполняемые файлы, код, документы, изображения) и интерактивный зум / проваливание в папки по двойному клику в `TreeMapControl.cs`.
 - **Файлы:**
   - `SmartCleaner.Core/DiskMap/TreemapLayout.cs`
   - `SmartCleaner.App/Controls/TreeMapControl.cs`
@@ -322,7 +379,7 @@
 ---
 
 ### 3. 🎮 GPU Shader Cache & DirectX Optimizer (Кэши шейдеров NVIDIA, AMD, Intel, DirectX)
-- **Что сделано:** Создан специализированный сканер [`ShaderCacheScanner.cs`](file:///e:/AllMyProject/CHISTilka/SmartCleaner.Core/Scanning/Scanners/ShaderCacheScanner.cs) для очистки устаревших скомпилированных шейдеров DirectX 11/12 (`D3DSCache`), NVIDIA (`DXCache`, `GLCache`, `NV_Cache`), AMD Radeon (`DxCache`, `GLCache`), Intel и Steam Shader Pre-Caching.
+- **Что сделано:** Создан специализированный сканер `ShaderCacheScanner.cs` для очистки устаревших скомпилированных шейдеров DirectX 11/12 (`D3DSCache`), NVIDIA (`DXCache`, `GLCache`, `NV_Cache`), AMD Radeon (`DxCache`, `GLCache`), Intel и Steam Shader Pre-Caching.
 - **Файлы:**
   - `SmartCleaner.Core/Scanning/Scanners/ShaderCacheScanner.cs`
 - **Почему:** Освобождение 5–30 ГБ быстрого SSD пространства и предотвращение микрофризов в играх из-за устаревших шейдерных бинарников.
@@ -350,7 +407,7 @@
 ---
 
 ### 6. 🔔 System Tray Sentinel & Дисковый страж
-- **Что сделано:** Создан сервис фонового мониторинга дисков [`TraySentinelService.cs`](file:///e:/AllMyProject/CHISTilka/SmartCleaner.App/Services/TraySentinelService.cs) для заблаговременного предупреждения пользователя о падении свободного места ниже 12% (<10 ГБ).
+- **Что сделано:** Создан сервис фонового мониторинга дисков `TraySentinelService.cs` для заблаговременного предупреждения пользователя о падении свободного места ниже 12% (<10 ГБ).
 - **Файлы:**
   - `SmartCleaner.App/Services/TraySentinelService.cs`
 - **Почему:** Проактивная защита системы от внезапного переполнения диска C:.
@@ -358,7 +415,7 @@
 ---
 
 ### 7. 🌐 Multi-Language Runtime Localization Engine
-- **Что сделано:** Создан синглтон-менеджер локализации [`LocalizationManager.cs`](file:///e:/AllMyProject/CHISTilka/SmartCleaner.Core/Localization/LocalizationManager.cs) с поддержкой русского и английского языков и динамическим обновлением UI.
+- **Что сделано:** Создан синглтон-менеджер локализации `LocalizationManager.cs` с поддержкой русского и английского языков и динамическим обновлением UI.
 - **Файлы:**
   - `SmartCleaner.Core/Localization/LocalizationManager.cs`
 - **Почему:** Готовность приложения для международной аудитории.
@@ -481,9 +538,9 @@
 
 ### 1. Нативный C# Core движок CLI-инспектора и реестровый сервис PATH
 - **Что сделано:** 
-  - Реализован класс [`PathEnvironmentService`](file:///e:/AllMyProject/CHISTilka/SmartCleaner.Core/CliInspector/PathEnvironmentService.cs) для прямого чтения пользовательских и системных записей переменной среды Windows `PATH` через реестр (`HKCU\Environment`, `HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment`), обнаружения мертвых директорий и их безопасного удаления.
+  - Реализован класс `PathEnvironmentService` для прямого чтения пользовательских и системных записей переменной среды Windows `PATH` через реестр (`HKCU\Environment`, `HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment`), обнаружения мертвых директорий и их безопасного удаления.
   - Добавлен P/Invoke вызов `SendMessageTimeoutW(HWND_BROADCAST, WM_SETTINGCHANGE, ...)` для мгновенного оповещения всех запущенных процессов Windows об обновлении переменных окружения без необходимости перезагрузки или выхода из системы.
-  - Реализован высокопроизводительный многопоточный сканер [`CliInspectorEngine`](file:///e:/AllMyProject/CHISTilka/SmartCleaner.Core/CliInspector/CliInspectorEngine.cs), проверяющий:
+  - Реализован высокопроизводительный многопоточный сканер `CliInspectorEngine`, проверяющий:
     - Dot-папки в домашней директории пользователя с базой сигнатур AI-ассистентов (OpenCode, Orca, Hermes, Claude, Copilot, Gemini/Antigravity, Kimi, Cline, Roo-Cline, Continue, Aider, Bolt AI, V0, Bun и др.).
     - Глобальные пакеты NPM (`%APPDATA%\npm\node_modules`) с парсингом `package.json` (версии, описание, алиасы команд).
     - Изолированные приложения Python Pipx (`%LOCALAPPDATA%\pipx\venvs`).
@@ -501,10 +558,10 @@
 
 ### 2. WPF UI и ViewModel модуля «CLI и AI Агенты»
 - **Что сделано:**
-  - Создан [`CliInspectorViewModel`](file:///e:/AllMyProject/CHISTilka/SmartCleaner.App/ViewModels/CliInspectorViewModel.cs) с поддержкой асинхронного сканирования, фильтрации по категориям и тексту в реальном времени, безопасного удаления утилит в Корзину (`FileSystem.DeleteDirectory(..., RecycleOption.SendToRecycleBin)`), открытия папок в Проводнике, запуска PowerShell в целевой папке, копирования команд деинсталляции и экспорта полного отчета в JSON/CSV.
-  - Создана страница [`CliInspectorPage.xaml`](file:///e:/AllMyProject/CHISTilka/SmartCleaner.App/Views/CliInspectorPage.xaml) со сводными карточками метрик и 3 вкладками («Инструменты & AI-агенты», «Здоровье PATH & Битые пути», «PowerShell Profiles ($PROFILE)»).
+  - Создан `CliInspectorViewModel` с поддержкой асинхронного сканирования, фильтрации по категориям и тексту в реальном времени, безопасного удаления утилит в Корзину (`FileSystem.DeleteDirectory(..., RecycleOption.SendToRecycleBin)`), открытия папок в Проводнике, запуска PowerShell в целевой папке, копирования команд деинсталляции и экспорта полного отчета в JSON/CSV.
+  - Создана страница `CliInspectorPage.xaml` со сводными карточками метрик и 3 вкладками («Инструменты & AI-агенты», «Здоровье PATH & Битые пути», «PowerShell Profiles ($PROFILE)»).
   - Добавлены новые конвертеры значений (`ZeroToColorConverter`, `DeadStatusColorConverter`, `EmptyStringToVisibilityConverter`).
-  - Добавлен пункт навигации «CLI и AI Агенты» (`\uE756`) в боковое меню [`MainWindow.xaml`](file:///e:/AllMyProject/CHISTilka/SmartCleaner.App/MainWindow.xaml) и зарегистрированы сервисы в DI [`App.xaml.cs`](file:///e:/AllMyProject/CHISTilka/SmartCleaner.App/App.xaml.cs).
+  - Добавлен пункт навигации «CLI и AI Агенты» (`\uE756`) в боковое меню `MainWindow.xaml` и зарегистрированы сервисы в DI `App.xaml.cs`.
 - **Файлы:**
   - `SmartCleaner.App/ViewModels/CliInspectorViewModel.cs`
   - `SmartCleaner.App/Views/CliInspectorPage.xaml`

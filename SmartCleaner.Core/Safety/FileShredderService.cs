@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.IO;
 using System.Security.Cryptography;
+using SmartCleaner.Core.Models;
 
 namespace SmartCleaner.Core.Safety;
 
@@ -12,10 +13,38 @@ public enum ShredMethod
 
 public class FileShredderService
 {
+    private readonly ISafetyService _safety;
+
+    public FileShredderService(ISafetyService safety)
+    {
+        _safety = safety;
+    }
+
     public async Task<(bool Success, string Message)> ShredFileAsync(string filePath, ShredMethod method = ShredMethod.DoD522022M3Pass, IProgress<string>? progress = null)
     {
         if (!File.Exists(filePath))
             return (false, "Файл не найден");
+
+        // Безвозвратное удаление — обязательный whitelist-гейт.
+        // PerformanceCache: явное действие пользователя, защищённый период не применяется,
+        // но whitelist (.git, сохранения, конфиги AI) и блокировки действуют
+        var validation = _safety.ValidateForDeletion(new ScannedItem
+        {
+            Path = filePath,
+            Size = new FileInfo(filePath).Length,
+            Risk = RiskCategory.PerformanceCache,
+            Description = "shred:manual"
+        });
+
+        if (!validation.CanDelete)
+        {
+            return (false, $"Заблокировано: {validation.BlockReason}");
+        }
+
+        if (validation.RequiresElevation)
+        {
+            return (false, "Файл требует прав администратора");
+        }
 
         try
         {
@@ -101,11 +130,16 @@ public class FileShredderService
             else errors.Add($"{file}: {msg}");
         }
 
-        try
+        // Каталог удаляем только если ни один файл не был заблокирован safety-гейтом —
+        // иначе recursive-delete снёс бы и защищённые файлы
+        if (errors.Count == 0)
         {
-            Directory.Delete(directoryPath, true);
+            try
+            {
+                Directory.Delete(directoryPath, true);
+            }
+            catch (Exception ex) { Debug.WriteLine($"[FileShredderService] ShredDirectory cleanup error: {ex.Message}"); }
         }
-        catch (Exception ex) { Debug.WriteLine($"[FileShredderService] ShredDirectory cleanup error: {ex.Message}"); }
 
         return (count, errors);
     }

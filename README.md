@@ -1,18 +1,19 @@
-# 🧹 Smart System Cleaner (CHISTilka) — Full Suite v2.7.1
+# 🧹 Smart System Cleaner (CHISTilka) — Full Suite v2.7.2
 
-**Комплексная утилита очистки, анализа, защиты приватности и глубокой оптимизации Windows** — WPF-приложение на .NET 8 LTS с интерфейсом Fluent Design, 18+ модулями сканирования, инструментами сжатия NTFS Compact, оптимизацией оперативной памяти, управлением службами и защитой от телеметрии.
+**Комплексная утилита очистки, анализа, защиты приватности и глубокой оптимизации Windows** — WPF-приложение на .NET 8 LTS с интерфейсом Fluent Design, 16 модулями сканирования, инструментами сжатия NTFS Compact, оптимизацией оперативной памяти, управлением службами и защитой от телеметрии.
 
 ---
 
 ## 🚀 Основные возможности
 
-### 14 встроенных сканеров
+### 16 встроенных сканеров
 | Сканер | Описание |
 |--------|----------|
 | **Система** | Temp, Prefetch, WER (отчёты об ошибках), CrashDumps, Thumbnail Cache, Windows Update кэш |
 | **Браузеры** | Chrome, Edge, Brave, Opera, Vivaldi, Yandex, Firefox — кэш, логи и временные данные |
 | **Приложения** | Telegram, Discord, Spotify, Steam, Obsidian, Postman, Figma, JetBrains, VS Code, Slack кэш |
 | **Игры** | Steam, Epic Games, шейдерные кэши NVIDIA / AMD / Intel, Unity, Unreal Engine |
+| **Разработка** | WSL2 виртуальные диски (ext4.vhdx), Rust cargo/target, Gradle, Maven, Go, Android SDK, Unity/Unreal DDC |
 | **AI-агенты** | Cursor, VSCode AI, Windsurf, Claude — кэш (Antigravity, Kiro и критичные данные защищены) |
 | **Кэши пакетов** | npm, yarn, pnpm, pip, NuGet, vcpkg, cargo кэши |
 | **Node Modules** | Рекурсивный поиск node_modules с анализом возраста и lock-файлов |
@@ -40,7 +41,6 @@
 3. **Глубокая очистка системы (System Deep Clean)**:
    - Анализ и сжатие хранилища компонентов WinSxS (`Dism.exe /ResetBase`).
    - Очистка старых версий драйверов устройств (Driver Store).
-   - Очистка теневых копий VSS и точек восстановления системы.
 
 4. **Сжатие диска (Compact NTFS)**:
    - Прозрачное сжатие системных файлов и приложений алгоритмами Windows CompactOS (XPRESS4K, XPRESS8K, XPRESS16K, LZX) без потери производительности.
@@ -137,7 +137,7 @@
 dotnet build SmartCleaner.sln
 
 # Запуск тестов
-dotnet test SmartCleaner.Core.Tests
+dotnet test SmartCleaner.sln
 
 # Интерактивное меню сборки и публикации
 build.bat
@@ -147,4 +147,4 @@ build.bat
 
 ## 📄 Лицензия
 
-MIT
+MIT — см. [LICENSE](LICENSE).

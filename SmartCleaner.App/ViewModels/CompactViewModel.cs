@@ -111,6 +111,7 @@ public partial class CompactViewModel : ObservableObject
         finally
         {
             IsBusy = false;
+            _cts?.Dispose();
             _cts = null;
         }
     }
@@ -146,6 +147,7 @@ public partial class CompactViewModel : ObservableObject
         finally
         {
             IsBusy = false;
+            _cts?.Dispose();
             _cts = null;
         }
     }
@@ -153,6 +155,7 @@ public partial class CompactViewModel : ObservableObject
     [RelayCommand]
     public void Cancel()
     {
-        _cts?.Cancel();
+        try { _cts?.Cancel(); }
+        catch (ObjectDisposedException) { }
     }
 }

@@ -1,6 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Win32;
 using SmartCleaner.App.ViewModels;
 using SmartCleaner.Core.Cleaning;
 using SmartCleaner.Core.Knowledge;
@@ -113,19 +112,35 @@ public partial class App : Application
     }
 
     /// <summary>
-    /// Записать крэш-лог в файл рядом с исполняемым файлом
+    /// Записать крэш-лог в доступную для записи директорию:
+    /// рядом с exe в portable-режиме, иначе в %APPDATA%\SmartCleaner
+    /// (BaseDirectory под Program Files доступен только на чтение)
     /// </summary>
     private static void LogCrash(Exception ex)
     {
         try
         {
-            var logPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "crash.log");
+            string baseDir;
+            var portableMarker = Path.Combine(AppContext.BaseDirectory, "portable.txt");
+            if (File.Exists(portableMarker))
+            {
+                baseDir = AppContext.BaseDirectory;
+            }
+            else
+            {
+                var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+                baseDir = Path.Combine(appData, "SmartCleaner");
+                Directory.CreateDirectory(baseDir);
+            }
+
+            var logPath = Path.Combine(baseDir, "crash.log");
             var entry = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] {ex}\n\n";
             File.AppendAllText(logPath, entry);
         }
-        catch
+        catch (Exception logEx)
         {
-            // Молча проглатываем — логирование не должно рушить приложение
+            // Логирование не должно рушить приложение — хотя бы в Debug-выход
+            Debug.WriteLine($"[CrashLog] Failed to write crash log: {logEx.Message}");
         }
     }
 
@@ -194,10 +209,8 @@ public partial class App : Application
         services.AddSingleton<SmartCleaner.Core.CliInspector.CliInspectorEngine>();
 
         // Tier Features Services
-        services.AddSingleton<SmartCleaner.Core.Services.WslShrinkService>();
         services.AddSingleton<SmartCleaner.Core.Uninstaller.LeftoverHunter>();
         services.AddSingleton<SmartCleaner.Core.Uninstaller.UninstallerEngine>();
-        services.AddSingleton<SmartCleaner.Core.Mft.MftScanner>();
         services.AddSingleton<SmartCleaner.Core.Compression.CompactEngine>();
         services.AddSingleton<SmartCleaner.Core.WinSxS.WinSxSEngine>();
         services.AddSingleton<SmartCleaner.Core.WinSxS.DriverStoreCleaner>();
@@ -211,7 +224,6 @@ public partial class App : Application
         services.AddSingleton<SmartCleaner.Core.SystemOpt.GameBoostService>();
         services.AddSingleton<SmartCleaner.Core.DiskHealth.DiskHealthService>();
         services.AddSingleton<SmartCleaner.Core.Safety.FileShredderService>();
-        services.AddSingleton<SmartCleaner.App.Services.TraySentinelService>();
         services.AddSingleton<SmartCleaner.Core.Network.NetworkOptimizerService>();
         services.AddSingleton<SmartCleaner.Core.Shell.ExplorerContextMenuManager>();
         services.AddSingleton<SmartCleaner.Core.Reporting.SystemReportGenerator>();
@@ -320,13 +332,19 @@ public partial class App : Application
                     continue;
                 }
 
+                // Реальная категория риска из запроса — защищённый период
+                // для UserData применяется и в elevated-режиме
+                var itemRisk = Enum.TryParse<RiskCategory>(item.Risk, out var parsedRisk)
+                    ? parsedRisk
+                    : RiskCategory.PerformanceCache;
+
                 var scannedItem = new ScannedItem
                 {
                     Path = fullPath,
                     IsDirectory = item.IsDirectory,
                     Size = item.Size,
                     LastAccess = DateTime.MinValue,
-                    Risk = RiskCategory.PerformanceCache,
+                    Risk = itemRisk,
                     Description = "elevated-clean"
                 };
 
@@ -479,55 +497,6 @@ public partial class App : Application
         {
             Debug.WriteLine($"[auto-clean] Error: {ex.Message}");
         }
-    }
-
-    /// <summary>
-    /// Применить системную тему (темная/светлая)
-    /// </summary>
-    private void ApplySystemTheme()
-    {
-        bool isDark = IsSystemDarkTheme();
-
-        var themePath = isDark
-            ? "Themes/DarkTheme.xaml"
-            : "Themes/LightTheme.xaml";
-
-        var dict = Resources.MergedDictionaries.FirstOrDefault();
-        if (dict != null)
-        {
-            Resources.MergedDictionaries.Remove(dict);
-        }
-
-        Resources.MergedDictionaries.Add(new ResourceDictionary
-        {
-            Source = new Uri(themePath, UriKind.Relative)
-        });
-    }
-
-    /// <summary>
-    /// Проверить, используется ли темная тема в Windows
-    /// </summary>
-    private static bool IsSystemDarkTheme()
-    {
-        try
-        {
-            using var key = Registry.CurrentUser.OpenSubKey(
-                @"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize");
-
-            if (key != null)
-            {
-                var value = key.GetValue("AppsUseLightTheme");
-                if (value is int intValue)
-                {
-                    return intValue == 0;
-                }
-            }
-        }
-        catch
-        {
-        }
-
-        return true;
     }
 
     protected override void OnExit(ExitEventArgs e)

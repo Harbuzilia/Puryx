@@ -55,6 +55,14 @@ public partial class AiAssistantViewModel : ObservableObject
             var reply = await _engine.ProcessUserQueryAsync(query);
             Messages.Add(reply);
         }
+        catch (Exception ex)
+        {
+            Messages.Add(new AiChatMessage
+            {
+                IsUser = false,
+                Text = $"⚠ Не удалось обработать запрос: {ex.Message}\nПопробуйте переформулировать вопрос."
+            });
+        }
         finally
         {
             IsThinking = false;

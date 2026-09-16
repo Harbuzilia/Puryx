@@ -311,11 +311,19 @@ public class CleaningService : ICleaningService
             if (dockerPath.StartsWith("docker:image:", StringComparison.OrdinalIgnoreCase))
             {
                 var imageId = dockerPath["docker:image:".Length..];
+                if (!IsSafeDockerIdentifier(imageId))
+                {
+                    return (false, "Недопустимый идентификатор Docker-образа");
+                }
                 arguments = $"rmi -f {imageId}";
             }
             else if (dockerPath.StartsWith("docker:container:", StringComparison.OrdinalIgnoreCase))
             {
                 var containerId = dockerPath["docker:container:".Length..];
+                if (!IsSafeDockerIdentifier(containerId))
+                {
+                    return (false, "Недопустимый идентификатор Docker-контейнера");
+                }
                 arguments = $"rm -f {containerId}";
             }
             else if (dockerPath.Equals("docker:build-cache", StringComparison.OrdinalIgnoreCase))
@@ -348,6 +356,16 @@ public class CleaningService : ICleaningService
         {
             return (false, ex.Message);
         }
+    }
+
+    /// <summary>
+    /// Docker ID от `docker images/ps --format` — только буквы/цифры/дефисы/подчёркивания.
+    /// Отсекает любые метасимволы командной строки.
+    /// </summary>
+    private static bool IsSafeDockerIdentifier(string id)
+    {
+        return id.Length is >= 4 and <= 128 &&
+               id.All(c => char.IsAsciiLetterOrDigit(c) || c is '_' or '-');
     }
 
     private static bool PathExists(string path)

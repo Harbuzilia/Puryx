@@ -1,18 +1,39 @@
 ﻿using Microsoft.Win32;
+using Microsoft.VisualBasic.FileIO;
 using SmartCleaner.Core.Helpers;
+using SmartCleaner.Core.Models;
+using SmartCleaner.Core.Safety;
 using System.IO;
 
 namespace SmartCleaner.Core.Uninstaller;
+
+/// <summary>
+/// Результат очистки хвостов: содержит только реально удалённые элементы
+/// </summary>
+public record LeftoverCleanResult
+{
+    public int CleanedCount { get; init; }
+    public long SavedBytes { get; init; }
+    public IReadOnlyList<LeftoverItem> CleanedItems { get; init; } = [];
+    public IReadOnlyList<string> SkippedMessages { get; init; } = [];
+}
 
 /// <summary>
 /// Охотник за остаточными файлами (хвостами) программ в реестре, AppData, ProgramData
 /// </summary>
 public class LeftoverHunter
 {
+    private readonly ISafetyService _safety;
+
     private static readonly string UserProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
     private static readonly string LocalAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
     private static readonly string RoamingAppData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
     private static readonly string ProgramData = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+
+    public LeftoverHunter(ISafetyService safety)
+    {
+        _safety = safety;
+    }
 
     public async Task<List<LeftoverItem>> FindLeftoversAsync(InstalledAppItem app, CancellationToken ct = default)
     {
@@ -72,9 +93,10 @@ public class LeftoverHunter
         return leftovers;
     }
 
-    public async Task<(int CleanedCount, long SpaceSavedBytes)> CleanLeftoversAsync(IEnumerable<LeftoverItem> items)
+    public async Task<LeftoverCleanResult> CleanLeftoversAsync(IEnumerable<LeftoverItem> items)
     {
-        int count = 0;
+        var cleaned = new List<LeftoverItem>();
+        var skipped = new List<string>();
         long space = 0;
 
         await Task.Run(() =>
@@ -85,14 +107,24 @@ public class LeftoverHunter
                 {
                     if (item.Type == LeftoverType.Folder && Directory.Exists(item.Path))
                     {
-                        Directory.Delete(item.Path, true);
-                        count++;
+                        if (!ValidateAndReport(item, skipped)) continue;
+
+                        FileSystem.DeleteDirectory(
+                            item.Path,
+                            UIOption.OnlyErrorDialogs,
+                            RecycleOption.SendToRecycleBin);
+                        cleaned.Add(item);
                         space += item.SizeBytes;
                     }
                     else if (item.Type == LeftoverType.File && File.Exists(item.Path))
                     {
-                        File.Delete(item.Path);
-                        count++;
+                        if (!ValidateAndReport(item, skipped)) continue;
+
+                        FileSystem.DeleteFile(
+                            item.Path,
+                            UIOption.OnlyErrorDialogs,
+                            RecycleOption.SendToRecycleBin);
+                        cleaned.Add(item);
                         space += item.SizeBytes;
                     }
                     else if (item.Type == LeftoverType.RegistryKey)
@@ -102,15 +134,44 @@ public class LeftoverHunter
                         {
                             var root = parts[0] == "HKCU" ? Registry.CurrentUser : Registry.LocalMachine;
                             root.DeleteSubKeyTree(parts[1], false);
-                            count++;
+                            cleaned.Add(item);
                         }
                     }
                 }
-                catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[LeftoverHunter] CleanLeftovers item error: {ex.Message}"); }
+                catch (Exception ex) { skipped.Add($"{item.Path}: {ex.Message}"); }
             }
         });
 
-        return (count, space);
+        return new LeftoverCleanResult
+        {
+            CleanedCount = cleaned.Count,
+            SavedBytes = space,
+            CleanedItems = cleaned,
+            SkippedMessages = skipped
+        };
+    }
+
+    /// <summary>
+    /// Прогоняет путь через ISafetyService (whitelist, блокировки, права) и регистрирует отказ
+    /// </summary>
+    private bool ValidateAndReport(LeftoverItem item, List<string> skipped)
+    {
+        var validation = _safety.ValidateForDeletion(new ScannedItem
+        {
+            Path = item.Path,
+            IsDirectory = item.Type == LeftoverType.Folder,
+            Size = item.SizeBytes,
+            Risk = RiskCategory.PerformanceCache,
+            Description = $"leftover:{item.Description}"
+        });
+
+        if (validation.CanDelete && !validation.RequiresElevation) return true;
+
+        var reason = validation.BlockReason ?? (validation.RequiresElevation
+            ? "Требуются права администратора"
+            : "Заблокировано службой безопасности");
+        skipped.Add($"{item.Path}: {reason}");
+        return false;
     }
 
     private void ScanRegistryKeys(RegistryKey rootKey, string subPath, List<string> keywords, List<LeftoverItem> leftovers)
@@ -140,7 +201,7 @@ public class LeftoverHunter
         catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[LeftoverHunter] Registry scan error: {ex.Message}"); }
     }
 
-    private List<string> GenerateKeywords(InstalledAppItem app)
+    internal List<string> GenerateKeywords(InstalledAppItem app)
     {
         var list = new List<string>();
         if (!string.IsNullOrWhiteSpace(app.DisplayName))
@@ -160,7 +221,7 @@ public class LeftoverHunter
         return list.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
     }
 
-    private bool MatchesAnyKeyword(string name, List<string> keywords)
+    internal bool MatchesAnyKeyword(string name, List<string> keywords)
     {
         if (string.IsNullOrWhiteSpace(name) || name.Length < 3) return false;
         
@@ -185,7 +246,7 @@ public class LeftoverHunter
     {
         try
         {
-            return Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories)
+            return Directory.EnumerateFiles(path, "*", System.IO.SearchOption.AllDirectories)
                 .Sum(f => { try { return new FileInfo(f).Length; } catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[LeftoverHunter] File size error: {ex.Message}"); return 0; } });
         }
         catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[LeftoverHunter] GetDirSizeSafe error: {ex.Message}"); return 0; }

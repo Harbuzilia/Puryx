@@ -1,4 +1,7 @@
-﻿using SmartCleaner.Core.Helpers;
+using Microsoft.VisualBasic.FileIO;
+using SmartCleaner.Core.Helpers;
+using SmartCleaner.Core.Models;
+using SmartCleaner.Core.Safety;
 using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
@@ -15,16 +18,32 @@ public class PluginScanItem
     public bool IsSelected { get; set; } = true;
 }
 
+public class PluginCleanResult
+{
+    public int CleanedCount { get; init; }
+    public long SavedBytes { get; init; }
+    public IReadOnlyList<PluginScanItem> CleanedItems { get; init; } = [];
+    public IReadOnlyList<string> SkippedMessages { get; init; } = [];
+}
+
 public class PluginEngine
 {
+    private readonly ISafetyService _safety;
+
+    public PluginEngine(ISafetyService safety)
+    {
+        _safety = safety;
+    }
+
     public async Task<List<PluginManifest>> LoadPluginsAsync()
     {
         var plugins = new List<PluginManifest>();
 
+        // Встроенные плагины лежат рядом с приложением (копируются сборкой),
+        // пользовательские — в %APPDATA%\SmartCleaner\Plugins.
         var searchDirs = new[]
         {
             Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Plugins"),
-            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "SmartCleaner.Data", "Plugins"),
             Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SmartCleaner", "Plugins")
         };
 
@@ -40,7 +59,7 @@ public class PluginEngine
                     {
                         var json = await File.ReadAllTextAsync(file);
                         var manifest = JsonSerializer.Deserialize<PluginManifest>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                        if (manifest != null && !plugins.Any(p => p.Id == manifest.Id))
+                        if (manifest != null && !string.IsNullOrWhiteSpace(manifest.Id) && !plugins.Any(p => p.Id == manifest.Id))
                         {
                             plugins.Add(manifest);
                         }
@@ -68,26 +87,9 @@ public class PluginEngine
                 foreach (var rule in plugin.Rules)
                 {
                     var resolvedPath = Environment.ExpandEnvironmentVariables(rule.PathTemplate);
-                    if (resolvedPath.Contains('*'))
+                    foreach (var targetPath in ResolveRuleTargets(resolvedPath))
                     {
-                        var parentDir = Path.GetDirectoryName(resolvedPath.Split('*')[0]);
-                        var pattern = resolvedPath.Substring(parentDir?.Length ?? 0).TrimStart('\\', '/');
-
-                        if (Directory.Exists(parentDir))
-                        {
-                            try
-                            {
-                                foreach (var matchingDir in Directory.EnumerateDirectories(parentDir, pattern, SearchOption.TopDirectoryOnly))
-                                {
-                                    AddTargetItem(results, plugin, matchingDir);
-                                }
-                            }
-                            catch (Exception ex) { Debug.WriteLine($"[PluginEngine] Rule dir enumeration error: {ex.Message}"); }
-                        }
-                    }
-                    else if (Directory.Exists(resolvedPath))
-                    {
-                        AddTargetItem(results, plugin, resolvedPath);
+                        AddTargetItem(results, plugin, targetPath);
                     }
                 }
             }
@@ -96,9 +98,10 @@ public class PluginEngine
         return results;
     }
 
-    public async Task<(int CleanedCount, long SavedBytes)> CleanPluginItemsAsync(IEnumerable<PluginScanItem> items, IProgress<string>? progress = null)
+    public async Task<PluginCleanResult> CleanPluginItemsAsync(IEnumerable<PluginScanItem> items, IProgress<string>? progress = null)
     {
-        int count = 0;
+        var cleanedItems = new List<PluginScanItem>();
+        var skippedMessages = new List<string>();
         long saved = 0;
 
         await Task.Run(() =>
@@ -107,32 +110,130 @@ public class PluginEngine
             {
                 try
                 {
-                    if (Directory.Exists(item.Path))
+                    if (!Directory.Exists(item.Path) && !File.Exists(item.Path))
                     {
-                        progress?.Report($"Очистка {item.PluginName} -> {Path.GetFileName(item.Path)}...");
-                        Directory.Delete(item.Path, true);
-                        count++;
-                        saved += item.SizeBytes;
+                        continue;
                     }
-                    else if (File.Exists(item.Path))
+
+                    var isDirectory = Directory.Exists(item.Path);
+                    var validation = _safety.ValidateForDeletion(new ScannedItem
                     {
-                        File.Delete(item.Path);
-                        count++;
-                        saved += item.SizeBytes;
+                        Path = item.Path,
+                        IsDirectory = isDirectory,
+                        Size = item.SizeBytes,
+                        Risk = RiskCategory.PerformanceCache,
+                        Description = $"plugin:{item.PluginId}"
+                    });
+
+                    if (!validation.CanDelete)
+                    {
+                        skippedMessages.Add($"{item.Path}: {validation.BlockReason ?? "Заблокировано политикой безопасности"}");
+                        continue;
                     }
+
+                    if (validation.RequiresElevation)
+                    {
+                        skippedMessages.Add($"{item.Path}: требует прав администратора, пропущено");
+                        continue;
+                    }
+
+                    progress?.Report($"Очистка {item.PluginName} -> {Path.GetFileName(item.Path)}...");
+
+                    // Плагины — сторонний код, поэтому удаление только в Корзину, без перманентного режима.
+                    if (isDirectory)
+                    {
+                        FileSystem.DeleteDirectory(item.Path, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
+                    }
+                    else
+                    {
+                        FileSystem.DeleteFile(item.Path, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
+                    }
+
+                    cleanedItems.Add(item);
+                    saved += item.SizeBytes;
                 }
                 catch (Exception ex) { Debug.WriteLine($"[PluginEngine] Clean item error: {ex.Message}"); }
             }
         });
 
-        return (count, saved);
+        return new PluginCleanResult
+        {
+            CleanedCount = cleanedItems.Count,
+            SavedBytes = saved,
+            CleanedItems = cleanedItems,
+            SkippedMessages = skippedMessages
+        };
+    }
+
+    /// <summary>
+    /// Резолвит шаблон правила в конкретные каталоги. Поддерживает '*' в любом сегменте
+    /// (например, %LOCALAPPDATA%\JetBrains\*\caches — '*' в середине пути).
+    /// </summary>
+    private static IEnumerable<string> ResolveRuleTargets(string resolvedPath)
+    {
+        if (!resolvedPath.Contains('*'))
+        {
+            if (Directory.Exists(resolvedPath))
+            {
+                yield return resolvedPath;
+            }
+            yield break;
+        }
+
+        var starIndex = resolvedPath.IndexOf('*');
+        var fixedPrefix = resolvedPath[..starIndex];
+        var rootDir = Path.GetDirectoryName(fixedPrefix.TrimEnd('\\', '/'));
+        if (string.IsNullOrEmpty(rootDir) || !Directory.Exists(rootDir))
+        {
+            yield break;
+        }
+
+        var remainingPattern = resolvedPath[rootDir.Length..].TrimStart('\\', '/');
+
+        foreach (var match in EnumeratePatternMatches(rootDir, remainingPattern))
+        {
+            yield return match;
+        }
+    }
+
+    private static IEnumerable<string> EnumeratePatternMatches(string currentDir, string remainingPattern)
+    {
+        var separatorIndex = remainingPattern.IndexOfAny(['\\', '/']);
+        var currentPattern = separatorIndex < 0 ? remainingPattern : remainingPattern[..separatorIndex];
+        var rest = separatorIndex < 0 ? null : remainingPattern[(separatorIndex + 1)..];
+
+        IEnumerable<string> matches;
+        try
+        {
+            matches = Directory.EnumerateDirectories(currentDir, currentPattern, System.IO.SearchOption.TopDirectoryOnly);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[PluginEngine] Rule dir enumeration error: {ex.Message}");
+            yield break;
+        }
+
+        foreach (var match in matches)
+        {
+            if (rest is null)
+            {
+                yield return match;
+            }
+            else
+            {
+                foreach (var subMatch in EnumeratePatternMatches(match, rest))
+                {
+                    yield return subMatch;
+                }
+            }
+        }
     }
 
     private void AddTargetItem(List<PluginScanItem> results, PluginManifest plugin, string dir)
     {
         try
         {
-            var size = Directory.EnumerateFiles(dir, "*", SearchOption.AllDirectories)
+            var size = Directory.EnumerateFiles(dir, "*", System.IO.SearchOption.AllDirectories)
                 .Sum(f => { try { return new FileInfo(f).Length; } catch (Exception ex) { Debug.WriteLine($"[PluginEngine] File size error: {ex.Message}"); return 0; } });
 
             if (size > 0)

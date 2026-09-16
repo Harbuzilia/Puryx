@@ -802,7 +802,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         return new CleaningResult
         {
             DeletedCount = fileResult.DeletedCount + packageResult.SucceededCount,
-            FreedBytes = fileResult.FreedBytes,
+            FreedBytes = fileResult.FreedBytes + packageResult.FreedBytes,
             SkippedCount = fileResult.SkippedCount + packageResult.SkippedCount,
             FailedCount = fileResult.FailedCount + packageResult.FailedCount,
             Errors = fileResult.Errors.Concat(packageResult.Errors).ToList(),
@@ -820,12 +820,15 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         if (hasFileOps && hasPackageOps)
         {
-            return $"Выполнено: удалено {fileResult.DeletedCount}, деинсталлировано {packageResult.SucceededCount}, освобождено {FormatSize(fileResult.FreedBytes)}";
+            return $"Выполнено: удалено {fileResult.DeletedCount}, деинсталлировано {packageResult.SucceededCount}, освобождено {FormatSize(mergedResult.FreedBytes)}";
         }
 
         if (hasPackageOps)
         {
-            return $"Пакеты: деинсталлировано {packageResult.SucceededCount}, ошибок {packageResult.FailedCount}, пропущено {packageResult.SkippedCount}";
+            var packageStatus = $"Пакеты: деинсталлировано {packageResult.SucceededCount}, ошибок {packageResult.FailedCount}, пропущено {packageResult.SkippedCount}";
+            return packageResult.FreedBytes > 0
+                ? $"{packageStatus}, освобождено {FormatSize(packageResult.FreedBytes)}"
+                : packageStatus;
         }
 
         return $"Очищено: {FormatSize(mergedResult.FreedBytes)} ({mergedResult.DeletedCount} элементов)";

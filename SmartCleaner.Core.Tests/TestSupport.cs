@@ -56,6 +56,29 @@ internal sealed class AllowAllSafetyService : ISafetyService
     }
 }
 
+internal sealed class BlockingSafetyService : ISafetyService
+{
+    public TimeSpan ProtectedPeriod { get; set; }
+
+    public bool IsWhitelisted(string path) => true;
+    public void AddToWhitelist(string pattern) { }
+    public void RemoveFromWhitelist(string pattern) { }
+    public IEnumerable<string> GetWhitelistPatterns() => ["**"];
+    public bool IsWithinProtectedPeriod(string path) => false;
+    public bool IsFileLocked(string path) => false;
+    public void SaveWhitelist() { }
+    public void LoadWhitelist() { }
+
+    public DeleteValidation ValidateForDeletion(ScannedItem item)
+    {
+        return new DeleteValidation
+        {
+            CanDelete = false,
+            BlockReason = "Заблокировано тестовым фейком"
+        };
+    }
+}
+
 internal sealed class NoopKnowledgeBase : IKnowledgeBase
 {
     public IEnumerable<AppDefinition> GetBuiltInApps() => [];

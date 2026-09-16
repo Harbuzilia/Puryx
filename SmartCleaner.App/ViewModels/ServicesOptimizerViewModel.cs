@@ -45,10 +45,7 @@ public partial class ServicesOptimizerViewModel : ObservableObject
 
         try
         {
-            _allServices = await _servicesOptimizer.ScanServicesAsync();
-            TotalCount = _allServices.Count;
-            DisabledCount = _allServices.Count(s => s.IsDisabled);
-            ApplyFilter();
+            await ReloadServicesAsync();
             StatusText = $"Сканирование завершено: {DisabledCount} из {TotalCount} служб отключено.";
         }
         catch (Exception ex)
@@ -59,6 +56,18 @@ public partial class ServicesOptimizerViewModel : ObservableObject
         {
             IsBusy = false;
         }
+    }
+
+    /// <summary>
+    /// Перезагружает список служб без проверки IsBusy — вызывается из команд,
+    /// которые уже держат IsBusy=true (guard в ScanAsync сделал бы перезагрузку no-op).
+    /// </summary>
+    private async Task ReloadServicesAsync()
+    {
+        _allServices = await _servicesOptimizer.ScanServicesAsync();
+        TotalCount = _allServices.Count;
+        DisabledCount = _allServices.Count(s => s.IsDisabled);
+        ApplyFilter();
     }
 
     [RelayCommand]
@@ -128,12 +137,15 @@ public partial class ServicesOptimizerViewModel : ObservableObject
             var progress = new Progress<string>(msg => StatusText = msg);
             int restored = await _servicesOptimizer.RestoreDefaultServicesAsync(progress);
             _audioService.PlayBoostActivated();
-            await ScanAsync();
+            await ReloadServicesAsync();
             StatusText = $"Восстановлено {restored} служб в стандартное состояние Windows.";
         }
         catch (Exception ex)
         {
             StatusText = $"Ошибка восстановления: {ex.Message}";
+        }
+        finally
+        {
             IsBusy = false;
         }
     }
@@ -149,12 +161,15 @@ public partial class ServicesOptimizerViewModel : ObservableObject
             var progress = new Progress<string>(msg => StatusText = msg);
             int modified = await _servicesOptimizer.ApplyProfileAsync(profileType, progress);
             _audioService.PlayCleanComplete();
-            await ScanAsync();
+            await ReloadServicesAsync();
             StatusText = $"Профиль применен. Настроено {modified} служб.";
         }
         catch (Exception ex)
         {
             StatusText = $"Ошибка применения профиля: {ex.Message}";
+        }
+        finally
+        {
             IsBusy = false;
         }
     }

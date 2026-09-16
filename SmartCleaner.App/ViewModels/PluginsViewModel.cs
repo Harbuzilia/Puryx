@@ -88,14 +88,23 @@ public partial class PluginsViewModel : ObservableObject
 
         try
         {
-            var (count, saved) = await _engine.CleanPluginItemsAsync(selected);
-            foreach (var item in selected)
+            var cleanResult = await _engine.CleanPluginItemsAsync(selected);
+            foreach (var item in cleanResult.CleanedItems)
             {
                 ScanItems.Remove(item);
             }
 
-            StatusText = $"Успешно очищено {count} элементов (Освобождено: {SizeFormatter.Format(saved)})!";
-            MessageBox.Show($"Очищено {count} объектов ({SizeFormatter.Format(saved)}).", "Очистка завершена", MessageBoxButton.OK, MessageBoxImage.Information);
+            long remaining = ScanItems.Sum(i => i.SizeBytes);
+            TotalCleanableSize = SizeFormatter.Format(remaining);
+
+            var skippedNote = cleanResult.SkippedMessages.Count > 0
+                ? $"\nПропущено (политика безопасности): {cleanResult.SkippedMessages.Count}."
+                : string.Empty;
+
+            StatusText = $"Успешно очищено {cleanResult.CleanedCount} элементов (Освобождено: {SizeFormatter.Format(cleanResult.SavedBytes)})!";
+            MessageBox.Show(
+                $"Очищено {cleanResult.CleanedCount} объектов ({SizeFormatter.Format(cleanResult.SavedBytes)}).{skippedNote}",
+                "Очистка завершена", MessageBoxButton.OK, MessageBoxImage.Information);
         }
         catch (Exception ex)
         {

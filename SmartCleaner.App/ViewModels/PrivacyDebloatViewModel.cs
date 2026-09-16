@@ -45,10 +45,7 @@ public partial class PrivacyDebloatViewModel : ObservableObject
 
         try
         {
-            _allTweaks = await _privacyService.ScanStatusesAsync();
-            TotalCount = _allTweaks.Count;
-            AppliedCount = _allTweaks.Count(t => t.IsApplied);
-            ApplyFilter();
+            await ReloadTweaksAsync();
             StatusText = $"Сканирование завершено: отключено {AppliedCount} из {TotalCount} параметров сбора данных.";
         }
         catch (Exception ex)
@@ -59,6 +56,18 @@ public partial class PrivacyDebloatViewModel : ObservableObject
         {
             IsBusy = false;
         }
+    }
+
+    /// <summary>
+    /// Перезагружает список твиков без проверки IsBusy — вызывается из команд,
+    /// которые уже держат IsBusy=true (guard в ScanAsync сделал бы перезагрузку no-op).
+    /// </summary>
+    private async Task ReloadTweaksAsync()
+    {
+        _allTweaks = await _privacyService.ScanStatusesAsync();
+        TotalCount = _allTweaks.Count;
+        AppliedCount = _allTweaks.Count(t => t.IsApplied);
+        ApplyFilter();
     }
 
     [RelayCommand]
@@ -110,12 +119,15 @@ public partial class PrivacyDebloatViewModel : ObservableObject
         {
             int applied = await _privacyService.ApplyAllRecommendedAsync();
             _audioService.PlayCleanComplete();
-            await ScanAsync();
+            await ReloadTweaksAsync();
             StatusText = $"Успешно отключено {applied} рекомендуемых параметров сбора данных и рекламы.";
         }
         catch (Exception ex)
         {
             StatusText = $"Ошибка: {ex.Message}";
+        }
+        finally
+        {
             IsBusy = false;
         }
     }
@@ -131,12 +143,15 @@ public partial class PrivacyDebloatViewModel : ObservableObject
         {
             int restored = await _privacyService.RestoreAllDefaultsAsync();
             _audioService.PlayBoostActivated();
-            await ScanAsync();
+            await ReloadTweaksAsync();
             StatusText = $"Восстановлено {restored} параметров в исходное состояние Windows.";
         }
         catch (Exception ex)
         {
             StatusText = $"Ошибка восстановления: {ex.Message}";
+        }
+        finally
+        {
             IsBusy = false;
         }
     }

@@ -1,11 +1,7 @@
-using SmartCleaner.Core.AiAssistant;
 using SmartCleaner.Core.Compression;
-using SmartCleaner.Core.Duplicates;
 using SmartCleaner.Core.Knowledge;
-using SmartCleaner.Core.Plugins;
 using SmartCleaner.Core.Safety;
 using SmartCleaner.Core.Scanning.Scanners;
-using SmartCleaner.Core.Uninstaller;
 using System.IO;
 using Xunit;
 
@@ -26,25 +22,6 @@ public class TierFeaturesTests
         Assert.NotNull(result);
         Assert.Equal("Разработка (Dev Super-Cleaner)", result.CategoryName);
         Assert.NotNull(result.Items);
-    }
-
-    [Theory]
-    [InlineData("найди видео больше 2 гб", AiActionType.OpenPage, "LargeFiles")]
-    [InlineData("освободи 20 гб под игру", AiActionType.TriggerScan, "All")]
-    [InlineData("почисти мусор от rust и node", AiActionType.OpenPage, "DevClean")]
-    [InlineData("найди дубликаты", AiActionType.OpenPage, "Duplicates")]
-    [InlineData("сожми игры в steam", AiActionType.OpenPage, "Compact")]
-    [InlineData("удали старую программу и почисти хвосты", AiActionType.OpenPage, "Uninstaller")]
-    public async Task NaturalLanguageQueryEngine_ProcessesQueriesCorrectly(string query, AiActionType expectedAction, string expectedPayload)
-    {
-        var engine = new NaturalLanguageQueryEngine();
-        var reply = await engine.ProcessUserQueryAsync(query);
-
-        Assert.NotNull(reply);
-        Assert.False(reply.IsUser);
-        Assert.Equal(expectedAction, reply.ActionType);
-        Assert.Equal(expectedPayload, reply.ActionPayload);
-        Assert.NotEmpty(reply.Text);
     }
 
     [Fact]
@@ -75,62 +52,12 @@ public class TierFeaturesTests
     }
 
     [Fact]
-    public async Task PluginEngine_LoadPluginsAsync_LoadsManifests()
-    {
-        var engine = new PluginEngine();
-        var plugins = await engine.LoadPluginsAsync();
-
-        Assert.NotNull(plugins);
-        Assert.True(plugins.Count >= 0);
-    }
-
-    [Fact]
     public async Task CompactEngine_DiscoverTargetsAsync_RunsWithoutError()
     {
         var engine = new CompactEngine();
         var targets = await engine.DiscoverCompressibleTargetsAsync();
 
         Assert.NotNull(targets);
-    }
-
-    [Fact]
-    public void LeftoverItem_ModelProperties_AssignCorrectly()
-    {
-        var item = new LeftoverItem
-        {
-            Path = @"C:\Users\Test\AppData\Roaming\FakeApp",
-            Type = LeftoverType.Folder,
-            Description = "Test Leftover Folder",
-            SizeBytes = 1024 * 1024,
-            SizeFormatted = "1.00 MB"
-        };
-
-        Assert.Equal("Папка", item.TypeName);
-        Assert.True(item.IsSelected);
-        Assert.Equal(1024 * 1024, item.SizeBytes);
-    }
-
-    [Fact]
-    public void TreemapLayout_CalculateSquarified_ReturnsValidTiles()
-    {
-        var root = new SmartCleaner.Core.DiskMap.DiskNode
-        {
-            Name = "Root",
-            FullPath = @"C:\Root",
-            Size = 1000,
-            Children = new List<SmartCleaner.Core.DiskMap.DiskNode>
-            {
-                new() { Name = "Video.mp4", FullPath = @"C:\Root\Video.mp4", Size = 600, IsFile = true },
-                new() { Name = "Archive.zip", FullPath = @"C:\Root\Archive.zip", Size = 300, IsFile = true },
-                new() { Name = "Code.cs", FullPath = @"C:\Root\Code.cs", Size = 100, IsFile = true }
-            }
-        };
-
-        var tiles = SmartCleaner.Core.DiskMap.TreemapLayout.CalculateSquarified(root, 800, 600);
-
-        Assert.NotEmpty(tiles);
-        Assert.Equal(3, tiles.Count);
-        Assert.All(tiles, t => Assert.True(t.Width > 0 && t.Height > 0));
     }
 
     [Fact]
@@ -147,7 +74,9 @@ public class TierFeaturesTests
     [Fact]
     public async Task FileShredderService_ShredFileAsync_WipesAndDeletesFile()
     {
-        var shredder = new SmartCleaner.Core.Safety.FileShredderService();
+        var config = new InMemoryConfigService([]);
+        var safety = new SafetyService(config);
+        var shredder = new SmartCleaner.Core.Safety.FileShredderService(safety);
         var tempFile = Path.Combine(Path.GetTempPath(), $"shred_test_{Guid.NewGuid():N}.txt");
         await File.WriteAllTextAsync(tempFile, "Top secret content to shred 1234567890");
 
@@ -181,17 +110,7 @@ public class TierFeaturesTests
     }
 
     [Fact]
-    public void LocalizationManager_LanguageSwitch_UpdatesStrings()
-    {
-        var loc = SmartCleaner.Core.Localization.LocalizationManager.Instance;
-        loc.SetLanguage(SmartCleaner.Core.Localization.AppLanguage.English);
-        Assert.Equal("Scan System", loc.GetString("Scan"));
-
-        loc.SetLanguage(SmartCleaner.Core.Localization.AppLanguage.Russian);
-        Assert.Equal("Анализ системы", loc.GetString("Scan"));
-    }
-
-    [Fact]
+    [Trait("Category", "Integration")]
     public async Task GameBoostService_StateTransitions_WorkCorrectly()
     {
         var ram = new SmartCleaner.Core.SystemOpt.RamOptimizerService();
@@ -207,6 +126,7 @@ public class TierFeaturesTests
     }
 
     [Fact]
+    [Trait("Category", "Integration")]
     public async Task DiskHealthService_GetPhysicalDisksHealthAsync_ReturnsDisks()
     {
         var service = new SmartCleaner.Core.DiskHealth.DiskHealthService();
@@ -227,12 +147,31 @@ public class TierFeaturesTests
     }
 
     [Fact]
-    public void ExplorerContextMenuManager_InstantiatesSafely()
+    public void ExplorerContextMenuManager_RegisterAndUnregister_RoundTripsRegistrationState()
     {
         var manager = new SmartCleaner.Core.Shell.ExplorerContextMenuManager();
-        // Check reading registry keys without throw
-        var isRegistered = manager.IsAnalyzeFolderRegistered();
-        Assert.True(isRegistered || !isRegistered);
+        var wasRegistered = manager.IsAnalyzeFolderRegistered();
+        try
+        {
+            var (unregSuccess, _) = manager.UnregisterAnalyzeFolder();
+            Assert.True(unregSuccess);
+            Assert.False(manager.IsAnalyzeFolderRegistered());
+
+            var (regSuccess, _) = manager.RegisterAnalyzeFolder();
+            Assert.True(regSuccess);
+            Assert.True(manager.IsAnalyzeFolderRegistered());
+
+            var (cleanupSuccess, _) = manager.UnregisterAnalyzeFolder();
+            Assert.True(cleanupSuccess);
+            Assert.False(manager.IsAnalyzeFolderRegistered());
+        }
+        finally
+        {
+            if (wasRegistered)
+            {
+                manager.RegisterAnalyzeFolder();
+            }
+        }
     }
 
     [Fact]

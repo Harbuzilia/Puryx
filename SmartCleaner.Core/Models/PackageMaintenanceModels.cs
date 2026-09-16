@@ -18,6 +18,7 @@ public record PackageMaintenanceResult
     public int SucceededCount { get; init; }
     public int FailedCount { get; init; }
     public int SkippedCount { get; init; }
+    public long FreedBytes { get; init; }
     public IReadOnlyList<CleaningError> Errors { get; init; } = [];
     public TimeSpan Duration { get; init; }
 }

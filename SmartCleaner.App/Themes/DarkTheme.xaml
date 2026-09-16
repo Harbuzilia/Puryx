@@ -53,6 +53,7 @@
     <SolidColorBrush x:Key="DangerBrush" Color="{StaticResource DangerColor}"/>
     <SolidColorBrush x:Key="DangerSoftBrush" Color="#331414"/>
     <SolidColorBrush x:Key="LockedBrush" Color="{StaticResource LockedColor}"/>
+    <SolidColorBrush x:Key="OverlayScrimBrush" Color="#B3000000"/>
 
     <!-- Gradients -->
     <LinearGradientBrush x:Key="AccentGradientBrush" StartPoint="0,0" EndPoint="1,1">

@@ -20,7 +20,7 @@ public class PathEnvironmentService
         uint uTimeout,
         out UIntPtr lpdwResult);
 
-    public List<string> GetUserPathEntries()
+    public virtual List<string> GetUserPathEntries()
     {
         try
         {
@@ -37,7 +37,7 @@ public class PathEnvironmentService
         }
     }
 
-    public List<string> GetSystemPathEntries()
+    public virtual List<string> GetSystemPathEntries()
     {
         try
         {
