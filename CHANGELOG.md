@@ -4,60 +4,97 @@
 
 ---
 
-## [2.7.2] — 16.09.2026
+## [2.7.2] — 20.09.2026
 
-### 🎯 Тема релиза: Полный аудит — критические баги UI, ужесточение безопасности, вычистка мёртвого кода, рост тестов 124 → 214
+### 🎯 Тема релиза: Полный аудит проекта — критические баги UI, закрытие всех путей удаления в обход защиты, вычистка мёртвого кода и мусора, тесты 124 → 214
+
+Аудит по утверждённому плану в 6 этапов (бейзлайн → мусор → критические UI-баги → безопасность → тесты → консистентность → финал). Итог: сборка 0 ошибок / 0 предупреждений, 214/214 тестов зелёные, репозиторий .git 136 МБ → 0.55 МБ. Seal-коммит `55aaa0c` — 67 файлов, +2149/−1759.
 
 ---
 
 ### 1. 🩹 Критические баги UI (страницы блокировались навсегда)
 - **Что сделано:**
-  - `ServicesOptimizerViewModel` и `PrivacyDebloatViewModel`: `IsBusy` сбрасывался только в `catch` — после **успешного** применения профиля страница оставалась заблокированной до перезапуска. Сброс перенесён в `finally`, вложенный no-op `ScanAsync()` заменён прямой перезагрузкой списка.
-  - `QuarantineViewModel`, `UninstallerViewModel`, `AiAssistantViewModel` и команды `CompactViewModel`: любое необработанное исключение оставляло `IsBusy=true` и роняло приложение — все команды обёрнуты в try/catch/finally; `CancellationTokenSource` теперь освобождается.
-  - `MainViewModel.MergeResults`: статистика «освобождено» учитывала только файлы — теперь суммируются и package-действия.
-  - `crash.log` писался в `BaseDirectory` (под Program Files — только чтение) — перенесён в конфиг-директорию приложения.
-  - `SettingsViewModel`: «всего RAM» показывало GC-хип вместо физической памяти — заменено на `GlobalMemoryStatusEx`.
-  - `DuplicatesViewModel`: синхронное IO предпросмотра на UI-потоке при каждом клике — асинхронно, с отменой при смене выбора.
-- **Почему:** Страница, которую нельзя разблокировать без перезапуска, и упавшее приложение — дефекты первого приоритета для интерактивного инструмента.
+  - `ServicesOptimizerViewModel` и `PrivacyDebloatViewModel`: `IsBusy` сбрасывался только в `catch` — после **успешного** применения профиля страница оставалась заблокированной до перезапуска. Сброс перенесён в `finally`, вложенный no-op `ScanAsync()` (срезался guard'ом `IsBusy`) заменён прямой перезагрузкой списка приватным методом.
+  - `QuarantineViewModel`, `UninstallerViewModel` (3 команды), `AiAssistantViewModel`: любое необработанное исключение оставляло `IsBusy=true` и роняло приложение в crash-диалог — все команды обёрнуты в try/catch/finally.
+  - `CompactViewModel`: `CancellationTokenSource` не освобождался (утечка на каждом запуске) — dispose в `finally`.
+  - Занижение статистики очистки пакетов: `PackageMaintenanceService` не суммировал освобождённые байты — добавлено накопление и поле `FreedBytes` в `PackageMaintenanceResult`; `MainViewModel.MergeResults` брал только файловый результат. Теперь итог считается по файлам + пакетам, строки статуса («Выполнено…», «Пакеты…») показывают «освобождено» и для чисто package-очистки.
+  - `App.LogCrash`: крэш-лог писался в `BaseDirectory` (под Program Files — только чтение, логгер молча падал). Теперь: portable-режим (маркер `portable.txt` рядом с exe) — пишем рядом с exe, иначе `%APPDATA%\SmartCleaner\crash.log`.
+  - `SettingsViewModel`: «всего RAM» показывал размер GC-хипа — заменено на P/Invoke `GlobalMemoryStatusEx` (реальная физическая память).
+  - `DuplicatesViewModel.OnSelectedPreviewFileChanged`: синхронное чтение файла предпросмотра на UI-потоке при каждом клике по списку — асинхронно, с отменой предыдущего чтения при смене выбора.
+- **Файлы:**
+  - `SmartCleaner.App/ViewModels/ServicesOptimizerViewModel.cs`, `PrivacyDebloatViewModel.cs`, `QuarantineViewModel.cs`, `UninstallerViewModel.cs`, `AiAssistantViewModel.cs`, `CompactViewModel.cs`, `MainViewModel.cs`, `SettingsViewModel.cs`, `DuplicatesViewModel.cs`
+  - `SmartCleaner.App/App.xaml.cs`
+  - `SmartCleaner.Core/Cleaning/PackageMaintenanceService.cs`, `SmartCleaner.Core/Models/PackageMaintenanceModels.cs`
+- **Почему:** Страница, которую нельзя разблокировать без перезапуска, заниженная статистика и молча теряющийся крэш-лог — дефекты первого приоритета для интерактивного инструмента.
 
 ### 2. 🔐 Безопасность (удаления в обход SafetyService и инъекции)
 - **Что сделано:**
-  - `PluginEngine.CleanPluginItemsAsync` и `LeftoverHunter.CleanLeftoversAsync`: удаления шли напрямую в обход `ISafetyService` и Корзины — злонамеренный `*.plugin.json` мог перманентно снести любой каталог. Оба пути теперь прогоняются через `ValidateForDeletion` и удаляют только в Корзину.
-  - ViewModel-удаления (`LargeFiles`, `Duplicates`, `CliInspector`) также прогоняются через safety-проверку.
-  - PowerShell-инъекция в `CliInspectorViewModel.OpenTerminal` (`cd 'path'` с апострофом в имени папки): заменено на `ProcessStartInfo.WorkingDirectory`.
-  - `CleaningService.ExecuteDockerDeleteAsync`: `docker rmi -f {imageId}` без экранирования — добавлена валидация идентификатора.
-  - `CleaningSchedulerService`: `--profile {name}` без кавычек — экранирован.
-  - `SafetyService.RequiresElevation`: сравнение префиксов без разделителя (`C:\WindowsFoo` ложно требовал UAC) — заменено на сравнение по каталогу.
-  - `SafetyService.IsWhitelisted`: паттерны вида `**\.git\**` защищали содержимое, но не саму папку — удаление папки `.git` сносило всё защищённое внутри. Существующая директория, чей ребёнок совпадает с паттерном, теперь тоже защищена (найдено новым тестом).
-  - `ElevatedCleanRequestFile`: elevated-запрос теперь переносит реальную категорию риска вместо захардкоженного `PerformanceCache` (правило защищённого периода соблюдается); добавлена проверка валидности значения `Risk`.
-  - `PluginEngine`: wildcard-шаблоны с `*` в середине пути (`...\JetBrains\*\caches`) молча не резолвились — реализован рекурсивный резолв сегментов.
-  - `FileShredderService`: шрединг без whitelist-проверки — добавлен `ISafetyService`-гейт.
-- **Почему:** Приложение, чья единственная функция — безопасное удаление, не должно иметь путей удаления в обход центрального защитного контура.
+  - `PluginEngine.CleanPluginItemsAsync`: удаления шли напрямую (`Directory.Delete`/`File.Delete`) в обход `ISafetyService` и Корзины — злонамеренный `*.plugin.json` мог перманентно снести любой каталог. Движок получил `ISafetyService` через DI; каждый путь проходит `ValidateForDeletion` (заблокированные и требующие UAC пропускаются с пояснением в `SkippedMessages`); удаление по правилам плагинов — только в Корзину (перманентного режима для сторонних правил нет by design). Результат стал типизированным `PluginCleanResult` (CleanedCount/SavedBytes/CleanedItems/SkippedMessages); `PluginsViewModel` обновляет остаточный `TotalCleanableSize` и показывает число пропущенных политикой безопасности.
+  - `LeftoverHunter`: перманентные удаления по fuzzy keyword-match без whitelist — тот же гейт `ValidateForDeletion` + удаление в Корзину.
+  - ViewModel-удаления (`LargeFilesViewModel`, `DuplicatesViewModel`, `CliInspectorViewModel`) прогоняются через safety-проверку; блокировка и требование UAC показываются пользователю с причиной.
+  - PowerShell-инъекция в `CliInspectorViewModel.OpenTerminal`: `Set-Location -LiteralPath '{path}'` — апостроф в имени папки ломал команду и позволял инъекцию. Запуск упрощён до `powershell -NoExit` с рабочей директорией через `ProcessStartInfo.WorkingDirectory` — путь больше не попадает в командную строку.
+  - `CleaningService.ExecuteDockerDeleteAsync`: `docker rmi -f {imageId}` / `rm -f {containerId}` без экранирования — добавлен `IsSafeDockerIdentifier` (4–128 символов, только ASCII-буквы/цифры/`_`/`-`); недопустимые идентификаторы отклоняются с сообщением.
+  - `CleaningSchedulerService`: `--profile {name}` попадал в командную строку schtasks без кавычек — профиль проверяется по allowlist («Быстрая»/«Разработка»/«Полное») и экранируется кавычками.
+  - `App.RunElevatedCleanupAsync`: elevated-очистка хардкодила `Risk=PerformanceCache`, обходя правило защищённого периода для UserData. Теперь категория риска читается из подписанного запроса (`Enum.TryParse` с безопасным fallback); `ElevatedCleanRequestFile` дополнительно отклоняет запросы с невалидной строкой `Risk` (тест: валидная подпись, некорректный Risk).
+  - `SafetyService.RequiresElevation`: сравнение префиксов без разделителя — `C:\WindowsFoo` ложно требовал UAC. Заменено на `IsUnder` со сравнением по границе каталога.
+  - `SafetyService.IsWhitelisted`: паттерны вида `**\.git\**` защищали содержимое, но не саму папку — удаление папки `.git` снесло бы всё защищённое внутри. Существующая директория, чей ребёнок совпадает с паттерном (`path + "\*"`), теперь тоже защищена; логика матчинга вынесена в `MatchesAnyPattern`. Баг найден новым тестом.
+  - `PluginEngine` wildcard: шаблоны с `*` в середине пути (`%LOCALAPPDATA%\JetBrains\*\caches`) молча не резолвились — реализован рекурсивный резолв сегментов (`ResolveRuleTargets`/`EnumeratePatternMatches`, `*` в любом сегменте). Плагин JetBrains до фикса не чистил ничего.
+  - `PluginEngine` загрузка манифестов: хрупкий dev-only относительный путь (`BaseDirectory\..\..\..\..\SmartCleaner.Data\Plugins`) заменён на директорию приложения (встроенные плагины копируются сборкой через csproj) + пользовательские `%APPDATA%\SmartCleaner\Plugins`; манифесты с пустым `Id` отклоняются.
+  - `FileShredderService`: безвозвратное удаление шло без whitelist-проверки — добавлен `ISafetyService`-гейт (`ValidateForDeletion` на каждый файл: CanDelete/RequiresElevation); каталог удаляется только если ни один файл не заблокирован, иначе recursive-delete снёс бы и защищённые файлы внутри.
+- **Файлы:**
+  - `SmartCleaner.Core/Plugins/PluginEngine.cs`, `Uninstaller/LeftoverHunter.cs`, `Cleaning/CleaningService.cs`, `Scheduler/CleaningSchedulerService.cs`, `Safety/SafetyService.cs`, `Safety/FileShredderService.cs`, `Cleaning/ElevatedCleanRequestFile.cs`
+  - `SmartCleaner.App/ViewModels/PluginsViewModel.cs`, `LargeFilesViewModel.cs`, `DuplicatesViewModel.cs`, `CliInspectorViewModel.cs`
+  - `SmartCleaner.App/App.xaml.cs`
+- **Почему:** Приложение, чья единственная функция — безопасное удаление, не должно иметь ни одного пути удаления в обход центрального защитного контура; плагины — сторонний код и должны считаться потенциально враждебными.
 
-### 3. 🗑️ Вычистка мёртвого кода и мусора
+### 3. 🗑️ Вычистка мёртвого кода и мусора (140 МБ с диска + 136 МБ истории git)
 - **Что сделано:**
-  - Удалены мёртвые модули Core: `Mft/` (MftReader/MftScanner/MftEntry — зарегистрированы в DI, нигде не потребляются; заодно исчез нативный memory-leak), `WslShrinkService`, `Localization/`.
-  - Удалены `TraySentinelService` (недостижим), мёртвые DI-регистрации и дублирующие `ApplySystemTheme`/`IsSystemDarkTheme` в `App.xaml.cs`.
-  - Удалены 5 неиспользуемых JSON из `SmartCleaner.Data`; загрузка `Plugins/*.plugin.json` переведена с хрупкого dev-only относительного пути на директорию приложения.
-  - Из git и с диска удалены `publish/`, `release/`, scratch-файлы (~140 МБ устаревших сборок); `.gitignore` расширен.
-- **Почему:** Мёртвый код с нативными буферами — это утечки и ложная поверхность атаки; 140 МБ устаревших бинарников в репозитории — мусор.
+  - Удалены мёртвые модули Core (зарегистрированы в DI, нигде не потребляются): `Mft/` (`MftReader` с нативным memory-leak, `MftScanner`, `MftEntry`), `Services/WslShrinkService.cs`, `Localization/` (`LocalizationManager`, `Strings` — потреблялся только тестами).
+  - App: удалён недостижимый `Services/TraySentinelService.cs`; из `App.xaml.cs` убраны мёртвые DI-регистрации (`WslShrinkService`, `MftScanner`, `TraySentinelService`) и дублирующие ThemeManager методы `ApplySystemTheme`/`IsSystemDarkTheme` (+ неиспользуемый `using Microsoft.Win32`).
+  - `UninstallerEngine`: удалена неиспользуемая инъекция `LeftoverHunter` в конструктор.
+  - `SmartCleaner.Data`: удалены 5 JSON-файлов, которые никто не читает (`ai_agents.json`, `browsers.json`, `games.json`, `system.json`, `whitelist.json`); оставлены только `Plugins/*.plugin.json`.
+  - Из git и с диска удалены `publish/`, `release/` (~140 МБ устаревших сборок) и scratch-файлы `_AGENTS_MEMORY.md`, `_SCRATCHPAD.md`.
+  - `.gitignore`: `release/` → `[Rr]elease/`; добавлены `TestResults/`, `*.binlog`, `artifacts/`, `.idea/`, `.zcode/` (состояние сессий агента).
+  - `git reflog expire --expire=now --all && git gc --prune=now`: `.git` 136 МБ → 0.55 МБ (единый пакет 394 КБ), `git fsck` — без повреждений.
+- **Файлы:** перечисленные удаления, `.gitignore`.
+- **Почему:** Мёртвый код с нативными буферами — это утечки и ложная поверхность атаки; 140 МБ устаревших бинарников и 136 МБ раздутой истории — мусор.
 
-### 4. ✅ Тесты: 124 → 214
+### 4. ✅ Тесты: 124 → 214 (все зелёные)
 - **Что сделано:**
-  - Починены таутологические тесты (всегда-true), удалены дублирующие группы, приватные фейки консолидированы в `TestSupport.cs`.
-  - Новые suites с нулевого покрытия: `SafetyServiceTests` (whitelist, защищённый период, elevation), `ConfigServiceTests` (portable/installed), `CleaningStatsServiceTests`, `PluginEngineTests` (multi-segment wildcard + safety-gate), `LeftoverHunterTests` (включая регрессию блокировки `.git`), `StartupEngineTests` (ParseCommand), проверка `Risk` в `ElevatedCleanRequestFileTests`.
-  - Machine-зависимые тесты помечены `[Trait("Category","Integration")]`.
-  - Тестами найден и пофикшен реальный баг whitelist-защиты папок (см. п. 2).
-- **Почему:** У protective-логики без тестов нет доверия; два реальных бага безопасности были найдены именно новыми тестами.
+  - Таутологические тесты (истинны при любом коде) удалены/заменены реальными: `PathHealthItem_CorrectlyDetectsDeadPath` (проверял объект, сконструированный самим тестом) → `CliInspectorEngine_ScanAsync_MarksDeadPathAsDeadAndLivePathAsActive` (живой и мёртвый PATH в temp-каталогах, проверка `DeadPathsCount`); `PluginEngine_LoadPluginsAsync_LoadsManifests` (`Assert.True(plugins.Count >= 0)` — истина по определению) и `LeftoverItem_ModelProperties_AssignCorrectly` (проверял присваивание свойств POCO) — удалены; дублирующая группа NLQ-теорий из `TierFeaturesTests` удалена.
+  - Приватные фейки из `DiskUsageScannerTests` (`InMemoryConfigService`, `AllowAllSafetyService`, `NoopKnowledgeBase`) консолидированы в общий `TestSupport.cs`.
+  - Тестируемость Core без изменения поведения: `PathEnvironmentService.GetUserPathEntries/GetSystemPathEntries` → `virtual`; `CleaningStatsService` получил internal-конструктор с каталогом статистики (изоляция от реального `%LOCALAPPDATA%`); `StartupEngine.ParseCommand` → `internal`; новый `SmartCleaner.Core/Properties/AssemblyInfo.cs` — `InternalsVisibleTo("SmartCleaner.Core.Tests")`.
+  - Новые suites для модулей с нулевым покрытием: `SafetyServiceTests` (17: whitelist, защита самой папки, защищённый период, elevation, регрессия `C:\WindowsFoo`), `ConfigServiceTests` (6: portable/installed режимы), `CleaningStatsServiceTests` (7: сессии и накопление статистики), `PluginEngineTests` (6: multi-segment wildcard, safety-гейт с fake-сервисом), `LeftoverHunterTests` (9: keyword-матчинг, гейт, регрессия блокировки `.git`), `StartupEngineTests` (4: `ParseCommand`), плюс `ReadValidatedAsync_RejectsInvalidRiskEnumValue` в `ElevatedCleanRequestFileTests`.
+  - Machine-зависимые тесты (CliInspector-скан реального PATH и т.п.) помечены `[Trait("Category","Integration")]`.
+  - Новыми тестами найдены и пофикшены два реальных бага: whitelist-защита самой папки (п. 2) и занижение статистики пакетов (п. 1).
+- **Файлы:**
+  - `SmartCleaner.Core.Tests/SafetyServiceTests.cs` (новый), `ConfigServiceTests.cs` (новый), `CleaningStatsServiceTests.cs` (новый), `PluginEngineTests.cs` (новый), `LeftoverHunterTests.cs` (новый), `StartupEngineTests.cs` (новый), `TestSupport.cs`, `CliInspectorTests.cs`, `DiskUsageScannerTests.cs`, `ElevatedCleanRequestFileTests.cs`, `TierFeaturesTests.cs`
+  - `SmartCleaner.Core/Properties/AssemblyInfo.cs` (новый)
+- **Почему:** У protective-логики без тестов нет доверия; оба реальных бага нашлись именно новыми тестами, а не чтением кода.
 
 ### 5. 🎨 Консистентность UI/доков/сборки
 - **Что сделано:**
-  - Версия UI (заголовок окна, бейджи) теперь читается из сборки через `AppInfo` — XAML не дрейфует относительно csproj.
-  - `DashboardPage`: захардкоженный `LimeGreen` заменён на `SafeBrush` темы; overlay-скримы вынесены в ресурс `OverlayScrimBrush` обеих тем.
-  - README: убрано ложное «очистка теневых копий VSS» (кода нет), счётчик сканеров исправлен на 16, добавлен отсутствующий сканер «Разработка», тесты запускаются из решения; создан `LICENSE` (MIT).
-  - CHANGELOG: удалены 22 локальные `file:///`-ссылки, исправлено противоречие 21/19 представлений.
-  - `build.bat`: починены ANSI-цвета, Clean-режим охватывает тесты и `release/`, добавлен пункт запуска тестов, убран фейковый «Installer»-режим; `publish_portable.bat` проверяет код возврата publish.
-- **Почему:** Документация, обещающая несуществующие функции, подрывает доверие ко всем остальным заявлениям продукта.
+  - Версия 2.7.2 в `SmartCleaner.App.csproj` (`Version`/`AssemblyVersion`/`FileVersion`); UI читает её из сборки через новый `Helpers/AppInfo.cs` и `x:Static` — заголовок окна и бейджи в `MainWindow.xaml`/`AboutWindow.xaml` больше не могут дрейфовать относительно csproj (было захардкожено «v2.7»); в `AboutWindow` счётчик сканеров исправлен на 16.
+  - `SmartCleaner.App.csproj`: `Plugins/*.plugin.json` копируются в `output\Plugins` (`PreserveNewest`) — плагины работают из любой директории (пара к смене путей загрузки в п. 2).
+  - `DashboardPage.xaml`: захардкоженный `LimeGreen` → `SafeBrush` темы; overlay-скримы `#B3000000` в `MainWindow.xaml` вынесены в ресурс `OverlayScrimBrush` (добавлен в DarkTheme и LightTheme).
+  - README: убрано ложное «очистка теневых копий VSS» (такого кода в проекте нет), счётчик сканеров честный — 16 (было «18+» и «14»), добавлена отсутствовавшая строка «Разработка» (WSL2/Rust/Gradle/Maven/Go/Android SDK/Unity), тесты запускаются из решения, добавлена ссылка на LICENSE.
+  - Создан `LICENSE` (MIT, © 2026 SmartCleaner Team).
+  - CHANGELOG: удалены 22 локальные `file:///e:/...`-ссылки (не переносимы на другие машины), противоречие 21/19 XAML-файлов исправлено (фактически 21 представление).
+  - `build.bat`: ANSI-цвета починены (ESC-байт вычисляется в рантайме через forfiles — литеральный ESC в .bat выедается редакторами/git; проверено живым запуском), CRLF + `chcp 65001`; сборка полного решения вместо одного проекта; новый пункт меню «Запустить тесты»; Clean охватывает Core.Tests, `release/`, `TestResults/`, логи сборки; убран фейковый «Installer»-режим (публиковал тот же portable под ложным описанием).
+  - `publish_portable.bat`: `if errorlevel` после publish (раньше печатал «Build Successful!» даже при провале), тихий xcopy, корректные коды возврата.
+- **Файлы:**
+  - `SmartCleaner.App/SmartCleaner.App.csproj`, `SmartCleaner.App/Helpers/AppInfo.cs` (новый), `MainWindow.xaml`, `Views/AboutWindow.xaml`, `Views/DashboardPage.xaml`, `Themes/DarkTheme.xaml`, `Themes/LightTheme.xaml`
+  - `README.md`, `LICENSE` (новый), `CHANGELOG.md`, `build.bat`, `publish_portable.bat`
+- **Почему:** Документация, обещающая несуществующие функции, и меню сборки с мусором вместо цветов подрывают доверие ко всем остальным заявлениям продукта.
+
+### 6. 🔍 Диагностика: логирование пустых catch в критичных путях
+- **Что сделано:** 15 молча проглатываемых исключений получили логирование в Debug-выход с тегами: `ElevatedCleanRequestFile` (7: валидация запроса, чтение/удаление файла и результата, подпись, nonce, очистка просроченных nonce), `QuarantineService` (4: создание хранилища, чтение манифеста, перемещение в карантин, purge), `PrivacyDebloatService` (3: apply/revert твика, сохранение бэкапа), `App.LogCrash` (1). Намеренно оставлены без логов: `IsSafeRequestPath` (malformed path = false — ожидаемое поведение), `IOException` в `TryConsumeNonce` (повторное использование nonce — ожидаемая защита от replay), пробы чтения с поясняющими комментариями.
+- **Файлы:** `SmartCleaner.Core/Cleaning/ElevatedCleanRequestFile.cs`, `SmartCleaner.Core/Safety/QuarantineService.cs`, `SmartCleaner.Core/Privacy/PrivacyDebloatService.cs`, `SmartCleaner.App/App.xaml.cs`.
+- **Почему:** Отрицательный результат без следа («почему карантин пуст?», «почему elevated-очистка не сработала?») — неразрешимая загадка в поддержке; лог в Debug-выход не стоит ничего.
+
+### 7. ✅ Финальная верификация и инфраструктура репозитория
+- **Что сделано:** `dotnet build SmartCleaner.sln` — 0 ошибок / 0 предупреждений; `dotnet test` — 214/214 зелёные; `git fsck` — репозиторий цел; рабочее дерево чистое. Seal-коммит `55aaa0c` «chore: seal v2.7.2 — full audit, critical UI fixes, security hardening, dead code purge» (67 файлов, +2149/−1759); `git gc --prune=now` — `.git` 136 МБ → 0.55 МБ.
+- **Почему:** Аудит без финального прогона и фиксации состояния — не аудит.
 
 ---
 
