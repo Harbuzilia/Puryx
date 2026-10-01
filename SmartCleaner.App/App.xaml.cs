@@ -74,7 +74,7 @@ public partial class App : Application
         catch (Exception ex)
         {
             MessageBox.Show($"Ошибка запуска:\n\n{ex}\n\nInner: {ex.InnerException}",
-                "Smart Cleaner - Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                "Puryx - Error", MessageBoxButton.OK, MessageBoxImage.Error);
             Shutdown(1);
         }
     }
@@ -87,7 +87,7 @@ public partial class App : Application
         LogCrash(e.Exception);
         MessageBox.Show(
             $"Произошла непредвиденная ошибка:\n\n{e.Exception.Message}\n\nПодробности сохранены в crash.log",
-            "Smart Cleaner — Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            "Puryx — Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
         e.Handled = true;
     }
 

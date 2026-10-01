@@ -2,7 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:helpers="clr-namespace:SmartCleaner.App.Helpers"
-        Title="О программе — Smart System Cleaner" 
+        Title="О программе — Puryx" 
         Height="360" Width="440"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
@@ -26,7 +26,7 @@
                 
                 <!-- Title & Badge -->
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                    <TextBlock Text="Smart System Cleaner" 
+                    <TextBlock Text="Puryx"
                                FontSize="20" 
                                FontWeight="Bold"
                                Foreground="{DynamicResource TextPrimaryBrush}"/>
@@ -36,7 +36,7 @@
                 </StackPanel>
                 
                 <!-- Subtitle -->
-                <TextBlock Text="CHISTilka — Ультимативный комплекс очистки и тюнинга Windows" 
+                <TextBlock Text="Puryx — Ультимативный комплекс очистки и тюнинга Windows" 
                            FontSize="12"
                            Foreground="{DynamicResource TextSecondaryBrush}"
                            HorizontalAlignment="Center"
@@ -54,7 +54,7 @@
                 </Border>
 
                 <!-- Copyright -->
-                <TextBlock Text="© 2026 SmartCleaner Team. Высокая производительность и полная безопасность." 
+                <TextBlock Text="© 2026 Puryx Team. Высокая производительность и полная безопасность." 
                            FontSize="10.5"
                            Foreground="{DynamicResource TextDisabledBrush}"
                            HorizontalAlignment="Center"

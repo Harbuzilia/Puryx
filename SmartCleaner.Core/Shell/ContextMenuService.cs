@@ -5,7 +5,7 @@ namespace SmartCleaner.Core.Shell;
 
 /// <summary>
 /// Сервис интеграции с контекстным меню Windows Explorer.
-/// Регистрирует/удаляет пункт «Сканировать в SmartCleaner» для папок через реестр.
+/// Регистрирует/удаляет пункт «Сканировать в Puryx» для папок через реестр.
 /// Работает в HKCU (не требует прав администратора).
 /// </summary>
 public sealed class ContextMenuService
@@ -46,7 +46,7 @@ public sealed class ContextMenuService
             // Для папок (ПКМ по папке)
             using (var key = Registry.CurrentUser.CreateSubKey(MenuKeyPath))
             {
-                key.SetValue("", "Сканировать в SmartCleaner");
+                key.SetValue("", "Сканировать в Puryx");
                 key.SetValue("Icon", iconValue);
             }
             using (var key = Registry.CurrentUser.CreateSubKey(CommandKeyPath))
@@ -57,7 +57,7 @@ public sealed class ContextMenuService
             // Для фона папки (ПКМ по пустому месту)
             using (var key = Registry.CurrentUser.CreateSubKey(BgMenuKeyPath))
             {
-                key.SetValue("", "Сканировать текущую папку в SmartCleaner");
+                key.SetValue("", "Сканировать текущую папку в Puryx");
                 key.SetValue("Icon", iconValue);
             }
             using (var key = Registry.CurrentUser.CreateSubKey(BgCommandKeyPath))

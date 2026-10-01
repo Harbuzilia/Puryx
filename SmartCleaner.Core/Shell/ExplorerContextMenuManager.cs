@@ -36,13 +36,13 @@ public class ExplorerContextMenuManager
         {
             var exe = GetAppExePath();
             using var key = Registry.CurrentUser.CreateSubKey(@"Software\Classes\Directory\shell\SmartCleanerAnalyze");
-            key.SetValue("", "⚡ Анализировать в SmartCleaner");
+            key.SetValue("", "⚡ Анализировать в Puryx");
             key.SetValue("Icon", $"\"{exe}\",0");
 
             using var cmdKey = key.CreateSubKey("command");
             cmdKey.SetValue("", $"\"{exe}\" --scan-path \"%1\"");
 
-            return (true, "Пункт «⚡ Анализировать в SmartCleaner» успешно добавлен в контекстное меню папок!");
+            return (true, "Пункт «⚡ Анализировать в Puryx» успешно добавлен в контекстное меню папок!");
         }
         catch (Exception ex)
         {

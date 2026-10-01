@@ -10,5 +10,5 @@ public static class AppInfo
 
     public static string VersionBadge { get; } = $"v{Version} FULL SUITE";
 
-    public static string ProductTitle { get; } = $"Smart System Cleaner — Full Suite v{Version}";
+    public static string ProductTitle { get; } = $"Puryx — Full Suite v{Version}";
 }

@@ -25,7 +25,8 @@
     <Version>2.7.2</Version>
     <AssemblyVersion>2.7.2.0</AssemblyVersion>
     <FileVersion>2.7.2.0</FileVersion>
-    <Product>Smart System Cleaner — Full Suite</Product>
+    <Product>Puryx</Product>
+    <ApplicationIcon>app.ico</ApplicationIcon>
   </PropertyGroup>
 
 </Project>

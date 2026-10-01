@@ -164,7 +164,7 @@ public partial class CliInspectorViewModel : ObservableObject
     {
         if (string.IsNullOrWhiteSpace(path) || (!Directory.Exists(path) && !File.Exists(path)))
         {
-            MessageBox.Show($"Путь не найден: {path}", "Smart Cleaner", MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show($"Путь не найден: {path}", "Puryx", MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
 
@@ -328,7 +328,7 @@ public partial class CliInspectorViewModel : ObservableObject
     {
         if (item == null || item.Scope != "User")
         {
-            MessageBox.Show("Удаление возможно только для пользовательских записей PATH (User).", "Smart Cleaner", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show("Удаление возможно только для пользовательских записей PATH (User).", "Puryx", MessageBoxButton.OK, MessageBoxImage.Information);
             return;
         }
 

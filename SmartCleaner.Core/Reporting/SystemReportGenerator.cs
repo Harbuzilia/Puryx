@@ -53,7 +53,7 @@ public class SystemReportGenerator
         sb.AppendLine("<head>");
         sb.AppendLine("<meta charset=\"UTF-8\">");
         sb.AppendLine("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">");
-        sb.AppendLine("<title>Паспорт системы и отчет SmartCleaner</title>");
+        sb.AppendLine("<title>Паспорт системы и отчет Puryx</title>");
         sb.AppendLine("<style>");
         sb.AppendLine("body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #0f172a; color: #f8fafc; margin: 0; padding: 40px 20px; }");
         sb.AppendLine(".container { max-width: 900px; margin: 0 auto; background: #1e293b; border-radius: 16px; padding: 32px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); border: 1px solid #334155; }");
@@ -79,7 +79,7 @@ public class SystemReportGenerator
         // Header
         sb.AppendLine("<div class=\"header\">");
         sb.AppendLine("<div>");
-        sb.AppendLine("<div class=\"title\">🛡️ Smart System Cleaner (CHISTilka)</div>");
+        sb.AppendLine("<div class=\"title\">🛡️ Puryx</div>");
         sb.AppendLine($"<div style=\"color: #94a3b8; margin-top: 4px;\">Паспорт системы и отчет об оптимизации • {data.GeneratedAt:dd.MM.yyyy HH:mm}</div>");
         sb.AppendLine("</div>");
         sb.AppendLine("<div class=\"badge\">ОТЧЕТ СИСТЕМЫ</div>");
