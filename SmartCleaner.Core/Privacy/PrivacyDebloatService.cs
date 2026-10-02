@@ -198,7 +198,7 @@ public class PrivacyDebloatService
         var tweak = _tweakDefinitions.FirstOrDefault(t => t.Id == tweakId);
         if (tweak == null) return false;
 
-        return await Task.Run(() =>
+        return await Task.Run(async () =>
         {
             try
             {
@@ -206,7 +206,12 @@ public class PrivacyDebloatService
 
                 if (!string.IsNullOrEmpty(tweak.ServiceName))
                 {
-                    ConfigureService(tweak.ServiceName, disabled: true);
+                    var (serviceOk, serviceReason) = await ConfigureServiceAsync(tweak.ServiceName, disabled: true);
+                    if (!serviceOk)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"[PrivacyDebloat] Service disable failed for {tweakId}: {serviceReason}");
+                        return false;
+                    }
                 }
 
                 if (!string.IsNullOrEmpty(tweak.RegistryRoot) && !string.IsNullOrEmpty(tweak.SubKeyPath) && !string.IsNullOrEmpty(tweak.ValueName))
@@ -229,13 +234,18 @@ public class PrivacyDebloatService
         var tweak = _tweakDefinitions.FirstOrDefault(t => t.Id == tweakId);
         if (tweak == null) return false;
 
-        return await Task.Run(() =>
+        return await Task.Run(async () =>
         {
             try
             {
                 if (!string.IsNullOrEmpty(tweak.ServiceName))
                 {
-                    ConfigureService(tweak.ServiceName, disabled: false);
+                    var (serviceOk, serviceReason) = await ConfigureServiceAsync(tweak.ServiceName, disabled: false);
+                    if (!serviceOk)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"[PrivacyDebloat] Service restore failed for {tweakId}: {serviceReason}");
+                        return false;
+                    }
                 }
 
                 if (!string.IsNullOrEmpty(tweak.RegistryRoot) && !string.IsNullOrEmpty(tweak.SubKeyPath) && !string.IsNullOrEmpty(tweak.ValueName))
@@ -339,37 +349,129 @@ public class PrivacyDebloatService
         }
     }
 
-    private static void ConfigureService(string serviceName, bool disabled)
+    private static async Task<(bool Success, string Reason)> ConfigureServiceAsync(string serviceName, bool disabled)
     {
-        try
+        string startArg = disabled ? "disabled" : "demand";
+        var psiConfig = new ProcessStartInfo
         {
-            string startArg = disabled ? "disabled" : "demand";
-            var psiConfig = new ProcessStartInfo
+            FileName = "sc.exe",
+            Arguments = $"config {serviceName} start= {startArg}",
+            CreateNoWindow = true,
+            UseShellExecute = false
+        };
+        var config = await RunToolAsync(psiConfig, 3000);
+        if (config.ExitCode != 0)
+        {
+            return (false, $"sc config '{serviceName}' (код {config.ExitCode}): {config.Output}");
+        }
+
+        if (disabled)
+        {
+            var psiStop = new ProcessStartInfo
             {
-                FileName = "sc.exe",
-                Arguments = $"config {serviceName} start= {startArg}",
+                FileName = "net.exe",
+                Arguments = $"stop {serviceName} /y",
                 CreateNoWindow = true,
                 UseShellExecute = false
             };
-            using var p1 = Process.Start(psiConfig);
-            p1?.WaitForExit(3000);
-
-            if (disabled)
+            var stop = await RunToolAsync(psiStop, 10000);
+            if (stop.ExitCode != 0)
             {
-                var psiStop = new ProcessStartInfo
+                // net stop завершается ошибкой и для незапущенной службы — это не сбой,
+                // если служба подтверждённо не работает (цель «остановлена» достигнута)
+                var stillRunning = await IsServiceRunningAsync(serviceName);
+                if (stillRunning != false)
                 {
-                    FileName = "net.exe",
-                    Arguments = $"stop {serviceName} /y",
-                    CreateNoWindow = true,
-                    UseShellExecute = false
-                };
-                using var p2 = Process.Start(psiStop);
-                p2?.WaitForExit(3000);
+                    return (false, $"net stop '{serviceName}' (код {stop.ExitCode}): {stop.Output}");
+                }
             }
         }
-        catch
+
+        return (true, string.Empty);
+    }
+
+    // Запускает системную утилиту и возвращает фактический код возврата и вывод
+    // (stderr приоритетнее: sc.exe пишет ошибки в stdout, net.exe — в stderr).
+    // Таймаут — тоже отказ: никакого «успеха по молчанию».
+    private static async Task<(int ExitCode, bool TimedOut, string Output)> RunToolAsync(ProcessStartInfo psi, int timeoutMs)
+    {
+        psi.CreateNoWindow = true;
+        psi.UseShellExecute = false;
+        psi.RedirectStandardOutput = true;
+        psi.RedirectStandardError = true;
+
+        try
         {
-            // Ignore service start/stop exceptions
+            using var process = new Process { StartInfo = psi };
+            if (!process.Start())
+            {
+                return (-1, false, $"не удалось запустить «{psi.FileName}»");
+            }
+
+            // Потоки читаем до ожидания выхода, чтобы заполненный буфер не заблокировал утилиту
+            var stdoutTask = process.StandardOutput.ReadToEndAsync();
+            var stderrTask = process.StandardError.ReadToEndAsync();
+
+            try
+            {
+                await process.WaitForExitAsync().WaitAsync(TimeSpan.FromMilliseconds(timeoutMs));
+            }
+            catch (TimeoutException)
+            {
+                KillProcessTree(process);
+                return (-1, true, $"«{psi.FileName}» не завершилась за {timeoutMs} мс");
+            }
+
+            var stdout = await stdoutTask;
+            var stderr = await stderrTask;
+            var output = string.IsNullOrWhiteSpace(stderr) ? stdout : stderr;
+            return (process.ExitCode, false, output.Trim());
+        }
+        catch (Exception ex)
+        {
+            return (-1, false, $"«{psi.FileName}»: {ex.Message}");
+        }
+    }
+
+    private static void KillProcessTree(Process process)
+    {
+        try
+        {
+            if (!process.HasExited)
+            {
+                process.Kill(entireProcessTree: true);
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[PrivacyDebloat] Kill timed-out process failed: {ex.Message}");
+        }
+    }
+
+    // Определяет по «sc query», запущена ли служба. null — состояние неизвестно (ошибка запроса).
+    private static async Task<bool?> IsServiceRunningAsync(string serviceName)
+    {
+        try
+        {
+            var psi = new ProcessStartInfo
+            {
+                FileName = "sc.exe",
+                Arguments = $"query {serviceName}",
+                CreateNoWindow = true,
+                UseShellExecute = false
+            };
+            var query = await RunToolAsync(psi, 3000);
+            if (query.ExitCode != 0)
+            {
+                return null;
+            }
+
+            return query.Output.Contains("RUNNING", StringComparison.OrdinalIgnoreCase);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[PrivacyDebloat] sc query '{serviceName}' failed: {ex.Message}");
+            return null;
         }
     }
 
