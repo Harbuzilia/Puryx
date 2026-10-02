@@ -11,6 +11,9 @@ public partial class SystemDeepCleanViewModel : ObservableObject
     private readonly WinSxSEngine _winsxs;
     private readonly DriverStoreCleaner _drivers;
 
+    /// <summary>Последний результат анализа DISM — для честного текста подтверждения очистки.</summary>
+    private WinSxSAnalysisResult? _lastWinSxSAnalysis;
+
     [ObservableProperty]
     private bool _isBusy;
 
@@ -49,6 +52,7 @@ public partial class SystemDeepCleanViewModel : ObservableObject
         {
             var sxsProgress = new Progress<string>(s => StatusText = s);
             var sxsResult = await _winsxs.AnalyzeComponentStoreAsync(sxsProgress);
+            _lastWinSxSAnalysis = sxsResult;
 
             WinSxSActualSize = sxsResult.ActualSizeFormatted;
             WinSxSReclaimable = sxsResult.ReclaimablePackagesFormatted;
@@ -65,7 +69,10 @@ public partial class SystemDeepCleanViewModel : ObservableObject
             }
             OldDriversCount = OldDrivers.Count;
 
-            StatusText = $"Аудит завершен! В WinSxS можно освободить {WinSxSReclaimable}. Найдено {OldDriversCount} старых драйверов.";
+            var winSxSSummary = sxsResult.AnalysisAvailable
+                ? $"В WinSxS можно освободить {WinSxSReclaimable}"
+                : $"анализ WinSxS недоступен: {sxsResult.AnalysisUnavailableReason}";
+            StatusText = $"Аудит завершен! {winSxSSummary}. Найдено {OldDriversCount} старых драйверов.";
         }
         catch (Exception ex)
         {
@@ -82,10 +89,16 @@ public partial class SystemDeepCleanViewModel : ObservableObject
     {
         if (IsBusy) return;
 
+        // Честная оценка объёма: из последнего анализа DISM; без анализа — «неизвестно»,
+        // а не выдуманный диапазон «от 2 до 10+ ГБ» (аудит H4).
+        var reclaimLine = _lastWinSxSAnalysis is { AnalysisAvailable: true, ReclaimablePackagesBytes: > 0 }
+            ? $"• По последнему анализу DISM можно освободить до {_lastWinSxSAnalysis.ReclaimablePackagesFormatted}."
+            : "• Объем освобождения заранее неизвестен (анализ DISM не выполнен или недоступен); фактический результат покажет только очистка.";
+
         var result = MessageBox.Show(
             "Запустить консолидацию и очистку хранилища компонентов Windows (WinSxS /StartComponentCleanup /ResetBase)?\n\n" +
             "• Будут удалены устаревшие резервные копии предыдущих версий обновлений Windows.\n" +
-            "• Будет освобождено от 2 до 10+ ГБ на системном диске C:.\n" +
+            reclaimLine + "\n" +
             "• Процесс может занять 3-10 минут.",
             "Очистка WinSxS",
             MessageBoxButton.YesNo,
