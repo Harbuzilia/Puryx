@@ -132,7 +132,7 @@ public class UninstallerEngine
         catch (Exception ex) { Debug.WriteLine($"[UninstallerEngine] Registry uninstall key scan error: {ex.Message}"); }
     }
 
-    private (string FileName, string Arguments) ParseCommand(string commandLine)
+    internal static (string FileName, string Arguments) ParseCommand(string commandLine)
     {
         var trimmed = commandLine.Trim();
         if (trimmed.StartsWith("\""))
