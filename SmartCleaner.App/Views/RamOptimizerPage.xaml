@@ -132,8 +132,8 @@
                                 <DataGridTextColumn Binding="{Binding BusType}" Header="Шина" Width="100"/>
                                 <DataGridTextColumn Binding="{Binding SizeFormatted}" Header="Общий объем" Width="120"/>
                                 <DataGridTextColumn Binding="{Binding HealthStatus}" Header="Состояние" Width="120" Foreground="{DynamicResource SafeBrush}"/>
-                                <DataGridTextColumn Binding="{Binding RemainingLifePercentage, StringFormat='{}{0}%'}" Header="Остаток ресурса" Width="130"/>
-                                <DataGridTextColumn Binding="{Binding TemperatureCelsius, StringFormat='{}{0} °C'}" Header="Температура" Width="110"/>
+                                <DataGridTextColumn Binding="{Binding RemainingLifeFormatted}" Header="Остаток ресурса" Width="130"/>
+                                <DataGridTextColumn Binding="{Binding TemperatureFormatted}" Header="Температура" Width="110"/>
                             </DataGrid.Columns>
                         </DataGrid>
                     </Border>

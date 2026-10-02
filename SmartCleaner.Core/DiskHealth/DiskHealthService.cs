@@ -11,8 +11,19 @@ public class PhysicalDiskInfo
     public string MediaType { get; set; } = "SSD";
     public string BusType { get; set; } = "NVMe";
     public string HealthStatus { get; set; } = "Healthy";
-    public int RemainingLifePercentage { get; set; } = 100;
-    public int TemperatureCelsius { get; set; } = 35;
+
+    /// <summary>
+    /// Остаток ресурса, %. null — телеметрия недоступна, UI показывает «н/д».
+    /// Вычисляется из счётчика износа WMI: 100 − Wear (Wear: 0 = новый, 100 = ресурс исчерпан).
+    /// </summary>
+    public int? RemainingLifePercentage { get; set; }
+
+    /// <summary>Температура, °C. null — телеметрия недоступна, UI показывает «н/д».</summary>
+    public int? TemperatureCelsius { get; set; }
+
+    public string RemainingLifeFormatted => RemainingLifePercentage.HasValue ? $"{RemainingLifePercentage.Value}%" : "н/д";
+    public string TemperatureFormatted => TemperatureCelsius.HasValue ? $"{TemperatureCelsius.Value} °C" : "н/д";
+
     public long SizeBytes { get; set; }
     public string SizeFormatted => SizeFormatter.Format(SizeBytes);
     public string TotalBytesWrittenFormatted { get; set; } = "N/A";
@@ -29,8 +40,17 @@ public class DiskHealthService
         {
             try
             {
-                // Query via PowerShell Get-PhysicalDisk in JSON
-                var script = "Get-PhysicalDisk | Select-Object DeviceId, FriendlyName, MediaType, BusType, HealthStatus, OperationalStatus, Size | ConvertTo-Json -Compress";
+                // Телеметрия S.M.A.R.T. через PowerShell: Get-PhysicalDisk + счётчики надёжности
+                // (Wear/Temperature из MSFT_StorageReliabilityCounter). Отсутствующие счётчики
+                // остаются null — UI показывает «н/д», никаких выдуманных процентов/градусов.
+                var script =
+                    "Get-PhysicalDisk | ForEach-Object { " +
+                    "$c = $null; " +
+                    "try { $c = $_ | Get-StorageReliabilityCounter -ErrorAction Stop } catch {} " +
+                    "$w = $null; $t = $null; " +
+                    "if ($c) { $w = $c.Wear; $t = $c.Temperature } " +
+                    "[pscustomobject]@{ DeviceId = $_.DeviceId; FriendlyName = $_.FriendlyName; MediaType = $_.MediaType; BusType = $_.BusType; HealthStatus = $_.HealthStatus; Size = $_.Size; Wear = $w; Temperature = $t } " +
+                    "} | ConvertTo-Json -Compress";
                 var psi = new ProcessStartInfo
                 {
                     FileName = "powershell.exe",
@@ -69,6 +89,7 @@ public class DiskHealthService
             // Fallback if empty
             if (list.Count == 0)
             {
+                // Только факт существования тома; телеметрия износа/температуры недоступна (null → «н/д»)
                 var drives = DriveInfo.GetDrives().Where(d => d.IsReady && d.DriveType == DriveType.Fixed);
                 foreach (var d in drives)
                 {
@@ -79,8 +100,6 @@ public class DiskHealthService
                         MediaType = "SSD / HDD",
                         BusType = "SATA/NVMe",
                         HealthStatus = "Healthy",
-                        RemainingLifePercentage = 99,
-                        TemperatureCelsius = 36,
                         SizeBytes = d.TotalSize
                     });
                 }
@@ -106,9 +125,38 @@ public class DiskHealthService
             MediaType = string.IsNullOrWhiteSpace(media) ? "SSD" : media,
             BusType = string.IsNullOrWhiteSpace(bus) ? "NVMe" : bus,
             HealthStatus = health,
-            RemainingLifePercentage = 98,
-            TemperatureCelsius = 38,
+            RemainingLifePercentage = ParseRemainingLife(el),
+            TemperatureCelsius = ParseTemperature(el),
             SizeBytes = size
         };
+    }
+
+    // Wear — счётчик износа WMI в процентах (0 = новый, 100 = ресурс исчерпан;
+    // MSFT_StorageReliabilityCounter.Wear). Отсутствует или вне диапазона — null («н/д»).
+    private static int? ParseRemainingLife(JsonElement el)
+    {
+        if (!TryGetInt(el, "Wear", out var wear) || wear < 0 || wear > 100)
+            return null;
+
+        return 100 - wear;
+    }
+
+    // Temperature — градусы Цельсия (MSFT_StorageReliabilityCounter.Temperature, UInt8).
+    // Нулевое значение трактуем как «датчик не отдал данные» (известный сценарий,
+    // когда WMI возвращает нули вместо температур) — честнее «н/д», чем «0 °C».
+    private static int? ParseTemperature(JsonElement el)
+    {
+        if (!TryGetInt(el, "Temperature", out var temperature) || temperature <= 0)
+            return null;
+
+        return temperature;
+    }
+
+    private static bool TryGetInt(JsonElement el, string name, out int value)
+    {
+        value = 0;
+        return el.TryGetProperty(name, out var property)
+            && property.ValueKind == JsonValueKind.Number
+            && property.TryGetInt32(out value);
     }
 }

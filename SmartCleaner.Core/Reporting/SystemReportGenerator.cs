@@ -102,7 +102,7 @@ public class SystemReportGenerator
             sb.AppendLine("<tbody>");
             foreach (var d in data.Disks)
             {
-                sb.AppendLine($"<tr><td><strong>{d.FriendlyName}</strong></td><td>{d.MediaType}</td><td>{d.BusType}</td><td>{d.SizeFormatted}</td><td class=\"success\">{d.HealthStatus}</td><td>{d.RemainingLifePercentage}%</td><td>{d.TemperatureCelsius} °C</td></tr>");
+                sb.AppendLine($"<tr><td><strong>{d.FriendlyName}</strong></td><td>{d.MediaType}</td><td>{d.BusType}</td><td>{d.SizeFormatted}</td><td class=\"success\">{d.HealthStatus}</td><td>{d.RemainingLifeFormatted}</td><td>{d.TemperatureFormatted}</td></tr>");
             }
             sb.AppendLine("</tbody></table>");
         }
