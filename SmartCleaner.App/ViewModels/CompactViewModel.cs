@@ -94,7 +94,9 @@ public partial class CompactViewModel : ObservableObject
             if (success)
             {
                 target.IsCompressed = true;
-                target.Status = $"Сжато ({SizeFormatter.Format(saved)} сэкономлено)";
+                target.Status = saved > 0
+                    ? $"Сжато ({SizeFormatter.Format(saved)} сэкономлено)"
+                    : "Сжато (экономия: н/д)";
                 StatusText = msg;
                 MessageBox.Show(msg, "Сжатие завершено", MessageBoxButton.OK, MessageBoxImage.Information);
             }

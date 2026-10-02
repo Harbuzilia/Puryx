@@ -1,6 +1,7 @@
 ﻿using SmartCleaner.Core.Helpers;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace SmartCleaner.Core.Compression;
@@ -119,7 +120,9 @@ public class CompactEngine
         if (!Directory.Exists(directoryPath))
             return (false, "Директория не найдена", 0);
 
-        var initialSize = CalculateSize(directoryPath);
+        // Экономия считается только по факту: размер на диске ДО запуска compact.exe
+        // и ПОСЛЕ (GetCompressedFileSizeW). Никаких оценочных коэффициентов.
+        var sizeOnDiskBefore = GetCompressedSizeOnDisk(directoryPath);
         progress?.Report($"Сжатие '{Path.GetFileName(directoryPath)}' алгоритмом {algorithm}...");
 
         var algoArg = algorithm.ToLowerInvariant() switch
@@ -149,11 +152,16 @@ public class CompactEngine
             if (exitCode != 0)
                 return (false, CompactFailureMessage("сжатия", exitCode, output), 0);
 
-            // Re-check size on disk
-            var compressedSize = GetCompressedSizeOnDisk(directoryPath);
-            var saved = Math.Max(0, initialSize - compressedSize);
+            // Фактическая экономия: разница размера на диске до/после сжатия.
+            // Измерить не удалось — честное «н/д», а не подставное число.
+            var sizeOnDiskAfter = GetCompressedSizeOnDisk(directoryPath);
+            if (sizeOnDiskBefore is long before && sizeOnDiskAfter is long after)
+            {
+                var saved = Math.Max(0, before - after);
+                return (true, $"Сжатие завершено! Сэкономлено: {SizeFormatter.Format(saved)}", saved);
+            }
 
-            return (true, $"Сжатие завершено! Сэкономлено: {SizeFormatter.Format(saved)}", saved);
+            return (true, "Сжатие завершено! Экономия: н/д (не удалось измерить размер на диске)", 0);
         }
         catch (Exception ex)
         {
@@ -387,9 +395,44 @@ public class CompactEngine
         catch (Exception ex) { Debug.WriteLine($"[CompactEngine] CalculateSize error: {ex.Message}"); return 0; }
     }
 
-    private long GetCompressedSizeOnDisk(string dir)
+    // Фактический размер файла на диске (учитывает NTFS-сжатие), в отличие от FileInfo.Length.
+    [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+    private static extern uint GetCompressedFileSizeW(string lpFileName, out uint lpFileSizeHigh);
+
+    private static long? GetFileCompressedSize(string path)
     {
-        // Simple estimation based on disk usage or compact query
-        return CalculateSize(dir) * 60 / 100; // ~40% average LZX savings
+        var low = GetCompressedFileSizeW(path, out var high);
+        if (low == uint.MaxValue && Marshal.GetLastWin32Error() != 0)
+            return null;
+
+        return ((long)high << 32) | low;
+    }
+
+    // Суммарный фактический размер каталога на диске; null — измерить не удалось
+    // (хоть один файл недоступен): тогда экономия честно «н/д», а не оценка «на глаз».
+    private static long? GetCompressedSizeOnDisk(string dir)
+    {
+        long total = 0;
+        try
+        {
+            foreach (var file in Directory.EnumerateFiles(dir, "*", SearchOption.AllDirectories))
+            {
+                var size = GetFileCompressedSize(file);
+                if (size is null)
+                {
+                    Debug.WriteLine($"[CompactEngine] On-disk size unavailable: {file}");
+                    return null;
+                }
+
+                total += size.Value;
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[CompactEngine] GetCompressedSizeOnDisk error: {ex.Message}");
+            return null;
+        }
+
+        return total;
     }
 }
