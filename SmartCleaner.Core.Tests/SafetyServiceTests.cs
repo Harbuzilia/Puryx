@@ -10,7 +10,8 @@ public class SafetyServiceTests
 {
     private static SafetyService CreateService()
     {
-        return new SafetyService(new InMemoryConfigService([]));
+        var config = new InMemoryConfigService([]);
+        return new SafetyService(config, new KnowledgeBase(config));
     }
 
     private static ScannedItem MakeItem(string path, RiskCategory risk = RiskCategory.PerformanceCache, bool isDirectory = false)

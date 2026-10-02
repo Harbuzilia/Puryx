@@ -13,6 +13,7 @@ namespace SmartCleaner.Core.Safety;
 public class SafetyService : ISafetyService
 {
     private readonly IConfigService _config;
+    private readonly IKnowledgeBase _knowledge;
     private readonly List<string> _builtInPatterns = [];
     private readonly List<string> _userPatterns = [];
     
@@ -20,20 +21,11 @@ public class SafetyService : ISafetyService
 
     public TimeSpan ProtectedPeriod { get; set; } = TimeSpan.FromHours(24);
 
-    public SafetyService(IConfigService config)
+    public SafetyService(IConfigService config, IKnowledgeBase knowledge)
     {
         _config = config;
+        _knowledge = knowledge;
         LoadWhitelist();
-    }
-
-    /// <summary>
-    /// Каркас RED-фазы (TDD): база знаний принимается, чтобы per-app тесты
-    /// компилировались и падали по assertion. Подключение per-app проверки
-    /// в ValidateForDeletion — следующим fix-коммитом.
-    /// </summary>
-    public SafetyService(IConfigService config, IKnowledgeBase? knowledge)
-        : this(config)
-    {
     }
 
     public bool IsWhitelisted(string path)
@@ -160,7 +152,22 @@ public class SafetyService : ISafetyService
             };
         }
 
-        // 2. Проверяем блокировку
+        // 2. Per-app защита: путь внутри известного приложения, совпавший с его
+        // ProtectedPatterns, блокируется. ClassifyPath помечает такое совпадение
+        // парой IsKnownApp + UserData. Эвристики для неизвестных приложений
+        // (IsKnownApp = false) здесь НЕ блокируют — глобального запрета
+        // *.db/config/settings, снятого в 2.7.2, не возвращаем.
+        var classification = _knowledge.ClassifyPath(item.Path);
+        if (classification.IsKnownApp && classification.SuggestedRisk == RiskCategory.UserData)
+        {
+            return new DeleteValidation
+            {
+                CanDelete = false,
+                BlockReason = $"Защищённые данные приложения {classification.AppName}: {classification.Reason}"
+            };
+        }
+
+        // 3. Проверяем блокировку
         if (item.IsLocked || (!item.IsDirectory && IsFileLocked(item.Path)))
         {
             return new DeleteValidation
@@ -170,7 +177,7 @@ public class SafetyService : ISafetyService
             };
         }
 
-        // 3. Проверяем период защиты — только для пользовательских данных.
+        // 4. Проверяем период защиты — только для пользовательских данных.
         // Кэши (SafeToDelete, PerformanceCache) обновляются постоянно, блокировка по времени бессмысленна.
         if (item.Risk == RiskCategory.UserData && IsWithinProtectedPeriod(item.Path))
         {
@@ -181,7 +188,7 @@ public class SafetyService : ISafetyService
             };
         }
 
-        // 4. Проверяем необходимость elevation
+        // 5. Проверяем необходимость elevation
         var requiresElevation = RequiresElevation(item.Path);
 
         return new DeleteValidation
@@ -250,9 +257,10 @@ public class SafetyService : ISafetyService
         @"**\.hg\**"
         
         // УБРАНО: **\*.db, **\*.sqlite*, **\config\**, **\settings\**
-        // Эти паттерны блокировали удаление легитимных кэшей (SQLite в браузерах,
-        // config-файлы внутри npm cache). Защита конкретных приложений — через
-        // KnowledgeBase.ProtectedPatterns для каждого приложения.
+        // Глобальные паттерны блокировали удаление легитимных кэшей (SQLite в
+        // браузерах, config-файлы внутри npm cache). Точечная защита файлов
+        // конкретных приложений выполняется в ValidateForDeletion через
+        // IKnowledgeBase.ClassifyPath (AppDefinition.ProtectedPatterns).
     ];
 
     /// <summary>

@@ -14,7 +14,7 @@ public class TierFeaturesTests
     {
         var config = new InMemoryConfigService([]);
         var knowledge = new KnowledgeBase(config);
-        var safety = new SafetyService(config);
+        var safety = new SafetyService(config, knowledge);
         var scanner = new DevSuperScanner(knowledge, safety);
 
         var result = await scanner.ScanAsync();
@@ -75,7 +75,7 @@ public class TierFeaturesTests
     public async Task FileShredderService_ShredFileAsync_WipesAndDeletesFile()
     {
         var config = new InMemoryConfigService([]);
-        var safety = new SafetyService(config);
+        var safety = new SafetyService(config, new KnowledgeBase(config));
         var shredder = new SmartCleaner.Core.Safety.FileShredderService(safety);
         var tempFile = Path.Combine(Path.GetTempPath(), $"shred_test_{Guid.NewGuid():N}.txt");
         await File.WriteAllTextAsync(tempFile, "Top secret content to shred 1234567890");
@@ -100,7 +100,7 @@ public class TierFeaturesTests
     {
         var config = new InMemoryConfigService([]);
         var knowledge = new KnowledgeBase(config);
-        var safety = new SafetyService(config);
+        var safety = new SafetyService(config, knowledge);
         var scanner = new SmartCleaner.Core.Scanning.Scanners.ShaderCacheScanner(knowledge, safety);
 
         var result = await scanner.ScanAsync();

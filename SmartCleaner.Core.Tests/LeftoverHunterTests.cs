@@ -1,3 +1,4 @@
+using SmartCleaner.Core.Knowledge;
 using SmartCleaner.Core.Safety;
 using SmartCleaner.Core.Uninstaller;
 using System.IO;
@@ -121,7 +122,8 @@ public class LeftoverHunterTests
     public async Task CleanLeftoversAsync_GitFolderBlockedByRealWhitelist_IsNotDeleted()
     {
         // Интеграционный сценарий: настоящий SafetyService + встроенный паттерн **\.git\**
-        var hunter = new LeftoverHunter(new SafetyService(new InMemoryConfigService([])));
+        var config = new InMemoryConfigService([]);
+        var hunter = new LeftoverHunter(new SafetyService(config, new KnowledgeBase(config)));
         var root = Path.Combine(Path.GetTempPath(), $"leftover-git-{Guid.NewGuid():N}");
         var gitDir = Path.Combine(root, ".git");
         Directory.CreateDirectory(gitDir);
