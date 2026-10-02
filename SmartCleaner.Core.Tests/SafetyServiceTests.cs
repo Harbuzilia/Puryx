@@ -1,3 +1,4 @@
+using SmartCleaner.Core.Knowledge;
 using SmartCleaner.Core.Models;
 using SmartCleaner.Core.Safety;
 using System.IO;
@@ -110,6 +111,43 @@ public class SafetyServiceTests
 
         Assert.False(validation.CanDelete);
         Assert.Equal("Файл в белом списке защиты", validation.BlockReason);
+    }
+
+    // ─── Per-app защита (KnowledgeBase.ProtectedPatterns) ──
+
+    [Fact]
+    public void ValidateForDeletion_PerAppProtectedPattern_BlocksDeletion()
+    {
+        // Интеграция с реальной базой знаний: Claude Desktop объявляет
+        // ProtectedPatterns ["claude_desktop_config.json", "*.db"] для корня
+        // %APPDATA%\Claude. Глобальные **\*.db сняты в 2.7.2 — per-app паттерн
+        // обязан блокировать удаление такого файла.
+        var config = new InMemoryConfigService([]);
+        var service = new SafetyService(config, new KnowledgeBase(config));
+
+        var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        var dbFile = Path.Combine(appData, "Claude", $"puryx-h3-{Guid.NewGuid():N}.db");
+
+        var validation = service.ValidateForDeletion(MakeItem(dbFile));
+
+        Assert.False(validation.CanDelete);
+        Assert.NotNull(validation.BlockReason);
+        Assert.Contains("Claude", validation.BlockReason);
+    }
+
+    [Fact]
+    public void ValidateForDeletion_UnknownDbPath_StillDeletable()
+    {
+        // Регресс-гард 2.7.2: глобальные **\*.db сняты, и per-app защита не
+        // должна вернуть глобальный запрет — неизвестный *.db вне корней
+        // известных приложений остаётся удаляемым.
+        var config = new InMemoryConfigService([]);
+        var service = new SafetyService(config, new KnowledgeBase(config));
+
+        var validation = service.ValidateForDeletion(MakeItem(@"C:\SomeUnknownApp\data\cache.db"));
+
+        Assert.True(validation.CanDelete);
+        Assert.False(validation.RequiresElevation);
     }
 
     // ─── Protected period (только UserData) ───────

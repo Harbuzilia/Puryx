@@ -1,6 +1,7 @@
 using System.IO;
 using System.Text.Json;
 using DotNet.Globbing;
+using SmartCleaner.Core.Knowledge;
 using SmartCleaner.Core.Models;
 using SmartCleaner.Core.Services;
 
@@ -23,6 +24,16 @@ public class SafetyService : ISafetyService
     {
         _config = config;
         LoadWhitelist();
+    }
+
+    /// <summary>
+    /// Каркас RED-фазы (TDD): база знаний принимается, чтобы per-app тесты
+    /// компилировались и падали по assertion. Подключение per-app проверки
+    /// в ValidateForDeletion — следующим fix-коммитом.
+    /// </summary>
+    public SafetyService(IConfigService config, IKnowledgeBase? knowledge)
+        : this(config)
+    {
     }
 
     public bool IsWhitelisted(string path)
