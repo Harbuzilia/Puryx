@@ -27,7 +27,7 @@ public class DriverStoreCleaner
         {
             var psi = new ProcessStartInfo
             {
-                FileName = "pnputil.exe",
+                FileName = SystemToolLocator.GetPnputilPath(),
                 Arguments = "/enum-drivers",
                 CreateNoWindow = true,
                 UseShellExecute = false,
@@ -103,7 +103,7 @@ public class DriverStoreCleaner
                 progress?.Report($"Удаление устаревшего драйвера {d.PublishedName} ({d.ProviderName})...");
                 var psi = new ProcessStartInfo
                 {
-                    FileName = "pnputil.exe",
+                    FileName = SystemToolLocator.GetPnputilPath(),
                     Arguments = $"/delete-driver {d.PublishedName} /uninstall /force",
                     CreateNoWindow = true,
                     UseShellExecute = true,
