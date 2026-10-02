@@ -147,7 +147,7 @@ public class WindowsServicesOptimizer
 
     public async Task<bool> SetServiceStartupAsync(string serviceName, ServiceStartupType startupType)
     {
-        return await Task.Run(() =>
+        return await Task.Run(async () =>
         {
             try
             {
@@ -168,8 +168,12 @@ public class WindowsServicesOptimizer
                     CreateNoWindow = true,
                     UseShellExecute = false
                 };
-                using var pConfig = Process.Start(psiConfig);
-                pConfig?.WaitForExit(3000);
+                var config = await RunToolAsync(psiConfig, 3000);
+                if (config.ExitCode != 0)
+                {
+                    Debug.WriteLine($"[WindowsServicesOptimizer] sc config '{serviceName}' failed (exit {config.ExitCode}): {config.Output}");
+                    return false;
+                }
 
                 if (startupType == ServiceStartupType.Disabled)
                 {
@@ -180,14 +184,25 @@ public class WindowsServicesOptimizer
                         CreateNoWindow = true,
                         UseShellExecute = false
                     };
-                    using var pStop = Process.Start(psiStop);
-                    pStop?.WaitForExit(3000);
+                    var stop = await RunToolAsync(psiStop, 10000);
+                    if (stop.ExitCode != 0)
+                    {
+                        // net stop завершается ошибкой и для незапущенной службы — это не сбой,
+                        // если служба подтверждённо не работает (цель «остановлена» достигнута)
+                        var stillRunning = await IsServiceRunningAsync(serviceName);
+                        if (stillRunning != false)
+                        {
+                            Debug.WriteLine($"[WindowsServicesOptimizer] net stop '{serviceName}' failed (exit {stop.ExitCode}): {stop.Output}");
+                            return false;
+                        }
+                    }
                 }
 
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
+                Debug.WriteLine($"[WindowsServicesOptimizer] SetServiceStartupAsync '{serviceName}' failed: {ex.Message}");
                 return false;
             }
         });
@@ -293,9 +308,94 @@ public class WindowsServicesOptimizer
                 item.IsRunning = output.Contains("RUNNING", StringComparison.OrdinalIgnoreCase);
             }
         }
-        catch
+        catch (Exception ex)
         {
-            // Ignore access errors
+            Debug.WriteLine($"[WindowsServicesOptimizer] ReadServiceState '{item.ServiceName}' failed: {ex.Message}");
+        }
+    }
+
+    // Запускает системную утилиту и возвращает фактический код возврата и вывод
+    // (stderr приоритетнее: sc.exe пишет ошибки в stdout, net.exe — в stderr).
+    // Таймаут — тоже отказ: никакого «успеха по молчанию».
+    private static async Task<(int ExitCode, bool TimedOut, string Output)> RunToolAsync(ProcessStartInfo psi, int timeoutMs)
+    {
+        psi.CreateNoWindow = true;
+        psi.UseShellExecute = false;
+        psi.RedirectStandardOutput = true;
+        psi.RedirectStandardError = true;
+
+        try
+        {
+            using var process = new Process { StartInfo = psi };
+            if (!process.Start())
+            {
+                return (-1, false, $"не удалось запустить «{psi.FileName}»");
+            }
+
+            // Потоки читаем до ожидания выхода, чтобы заполненный буфер не заблокировал утилиту
+            var stdoutTask = process.StandardOutput.ReadToEndAsync();
+            var stderrTask = process.StandardError.ReadToEndAsync();
+
+            try
+            {
+                await process.WaitForExitAsync().WaitAsync(TimeSpan.FromMilliseconds(timeoutMs));
+            }
+            catch (TimeoutException)
+            {
+                KillProcessTree(process);
+                return (-1, true, $"«{psi.FileName}» не завершилась за {timeoutMs} мс");
+            }
+
+            var stdout = await stdoutTask;
+            var stderr = await stderrTask;
+            var output = string.IsNullOrWhiteSpace(stderr) ? stdout : stderr;
+            return (process.ExitCode, false, output.Trim());
+        }
+        catch (Exception ex)
+        {
+            return (-1, false, $"«{psi.FileName}»: {ex.Message}");
+        }
+    }
+
+    private static void KillProcessTree(Process process)
+    {
+        try
+        {
+            if (!process.HasExited)
+            {
+                process.Kill(entireProcessTree: true);
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[WindowsServicesOptimizer] Kill timed-out process failed: {ex.Message}");
+        }
+    }
+
+    // Определяет по «sc query», запущена ли служба. null — состояние неизвестно (ошибка запроса).
+    private static async Task<bool?> IsServiceRunningAsync(string serviceName)
+    {
+        try
+        {
+            var psi = new ProcessStartInfo
+            {
+                FileName = "sc.exe",
+                Arguments = $"query {serviceName}",
+                CreateNoWindow = true,
+                UseShellExecute = false
+            };
+            var query = await RunToolAsync(psi, 3000);
+            if (query.ExitCode != 0)
+            {
+                return null;
+            }
+
+            return query.Output.Contains("RUNNING", StringComparison.OrdinalIgnoreCase);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[WindowsServicesOptimizer] sc query '{serviceName}' failed: {ex.Message}");
+            return null;
         }
     }
 
@@ -316,9 +416,10 @@ public class WindowsServicesOptimizer
                 }
             }
         }
-        catch
+        catch (Exception ex)
         {
-            // Backup should never block
+            // Backup should never block, но причина сбоя должна быть видна
+            Debug.WriteLine($"[WindowsServicesOptimizer] SaveBackupBeforeChange '{serviceName}' failed: {ex.Message}");
         }
     }
 
@@ -332,9 +433,9 @@ public class WindowsServicesOptimizer
                 return JsonSerializer.Deserialize<Dictionary<string, int>>(json) ?? [];
             }
         }
-        catch
+        catch (Exception ex)
         {
-            // Ignore
+            Debug.WriteLine($"[WindowsServicesOptimizer] LoadBackup failed: {ex.Message}");
         }
         return [];
     }
