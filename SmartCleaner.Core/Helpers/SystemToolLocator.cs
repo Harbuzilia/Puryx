@@ -16,4 +16,6 @@ internal static class SystemToolLocator
             : Environment.SystemDirectory;
 
     internal static string GetCompactPath() => Path.Combine(NativeSystemDirectory, "compact.exe");
+
+    internal static string GetDismPath() => Path.Combine(NativeSystemDirectory, "dism.exe");
 }

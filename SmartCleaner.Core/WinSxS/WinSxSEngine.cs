@@ -29,7 +29,7 @@ public class WinSxSEngine
         {
             var psi = new ProcessStartInfo
             {
-                FileName = "dism.exe",
+                FileName = SystemToolLocator.GetDismPath(),
                 Arguments = "/Online /Cleanup-Image /AnalyzeComponentStore",
                 CreateNoWindow = true,
                 UseShellExecute = false,
@@ -100,7 +100,7 @@ public class WinSxSEngine
         {
             var psi = new ProcessStartInfo
             {
-                FileName = "dism.exe",
+                FileName = SystemToolLocator.GetDismPath(),
                 Arguments = args,
                 UseShellExecute = true,
                 Verb = "runas" // elevated
