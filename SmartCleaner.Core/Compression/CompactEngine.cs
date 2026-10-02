@@ -1,6 +1,7 @@
 ﻿using SmartCleaner.Core.Helpers;
 using System.Diagnostics;
 using System.IO;
+using System.Text;
 
 namespace SmartCleaner.Core.Compression;
 
@@ -133,32 +134,20 @@ public class CompactEngine
         {
             var psi = new ProcessStartInfo
             {
-                FileName = "compact.exe",
+                FileName = SystemToolLocator.GetCompactPath(),
                 Arguments = $"/c /s:\"{directoryPath}\" /exe:{algoArg} /i /f",
                 CreateNoWindow = true,
-                UseShellExecute = false,
-                RedirectStandardOutput = true
+                UseShellExecute = false
             };
 
-            using var proc = Process.Start(psi);
-            if (proc == null) return (false, "Не удалось запустить compact.exe", 0);
+            var (exitCode, timedOut, cancelled, output) = await RunCompactAsync(psi, CompactToolTimeoutMs, progress, ct);
 
-            while (!proc.StandardOutput.EndOfStream)
-            {
-                if (ct.IsCancellationRequested)
-                {
-                    proc.Kill(true);
-                    return (false, "Операция отменена пользователем", 0);
-                }
-
-                var line = await proc.StandardOutput.ReadLineAsync(ct);
-                if (!string.IsNullOrWhiteSpace(line) && line.Contains("%"))
-                {
-                    progress?.Report(line.Trim());
-                }
-            }
-
-            await proc.WaitForExitAsync(ct);
+            if (cancelled)
+                return (false, "Операция отменена пользователем", 0);
+            if (timedOut)
+                return (false, output, 0);
+            if (exitCode != 0)
+                return (false, CompactFailureMessage("сжатия", exitCode, output), 0);
 
             // Re-check size on disk
             var compressedSize = GetCompressedSizeOnDisk(directoryPath);
@@ -186,24 +175,144 @@ public class CompactEngine
         {
             var psi = new ProcessStartInfo
             {
-                FileName = "compact.exe",
+                FileName = SystemToolLocator.GetCompactPath(),
                 Arguments = $"/u /s:\"{directoryPath}\" /i",
                 CreateNoWindow = true,
                 UseShellExecute = false
             };
 
-            using var proc = Process.Start(psi);
-            if (proc != null)
-            {
-                await proc.WaitForExitAsync(ct);
-                return (true, "Распаковка успешно завершена!");
-            }
-            return (false, "Не удалось запустить compact.exe");
+            var (exitCode, timedOut, cancelled, output) = await RunCompactAsync(psi, CompactToolTimeoutMs, progress, ct);
+
+            if (cancelled)
+                return (false, "Операция отменена пользователем");
+            if (timedOut)
+                return (false, output);
+            if (exitCode != 0)
+                return (false, CompactFailureMessage("распаковки", exitCode, output));
+
+            return (true, "Распаковка успешно завершена!");
         }
         catch (Exception ex)
         {
             return (false, $"Ошибка распаковки: {ex.Message}");
         }
+    }
+
+    // Таймаут для compact.exe: сжатие больших каталогов легитимно долгое, поэтому запас
+    // большой (час); раньше целиком — пользователь может отменить через CancellationToken.
+    private const int CompactToolTimeoutMs = 60 * 60 * 1000;
+
+    // Запускает compact.exe и возвращает фактический код возврата и вывод
+    // (stderr приоритетнее: утилиты Microsoft пишут ошибки в разные потоки).
+    // Таймаут и отмена — тоже отказ с kill-tree: никакого «успеха по молчанию».
+    private static async Task<(int ExitCode, bool TimedOut, bool Cancelled, string Output)> RunCompactAsync(
+        ProcessStartInfo psi,
+        int timeoutMs,
+        IProgress<string>? progress = null,
+        CancellationToken ct = default)
+    {
+        psi.CreateNoWindow = true;
+        psi.UseShellExecute = false;
+        psi.RedirectStandardOutput = true;
+        psi.RedirectStandardError = true;
+
+        try
+        {
+            using var process = new Process { StartInfo = psi };
+            if (!process.Start())
+            {
+                return (-1, false, false, $"не удалось запустить «{psi.FileName}»");
+            }
+
+            // Потоки читаем до ожидания выхода, чтобы заполненный буфер не заблокировал утилиту
+            Task<string> stdoutTask = progress == null
+                ? process.StandardOutput.ReadToEndAsync()
+                : PumpProgressLinesAsync(process, progress);
+            var stderrTask = process.StandardError.ReadToEndAsync();
+
+            try
+            {
+                await process.WaitForExitAsync().WaitAsync(TimeSpan.FromMilliseconds(timeoutMs), ct);
+            }
+            catch (TimeoutException)
+            {
+                KillProcessTree(process);
+                return (-1, true, false, $"«compact.exe» не завершилась за {timeoutMs / 60000} мин");
+            }
+            catch (OperationCanceledException)
+            {
+                KillProcessTree(process);
+                return (-1, false, true, "операция отменена пользователем");
+            }
+
+            var stdout = await SafeReadAsync(stdoutTask);
+            var stderr = await SafeReadAsync(stderrTask);
+            var output = string.IsNullOrWhiteSpace(stderr) ? stdout : stderr;
+            return (process.ExitCode, false, false, output.Trim());
+        }
+        catch (Exception ex)
+        {
+            return (-1, false, false, $"«{psi.FileName}»: {ex.Message}");
+        }
+    }
+
+    // Читает stdout построчно, транслируя строки с процентами в progress.
+    // Возвращает весь текст: он нужен как причина сбоя, если stderr пуст.
+    private static async Task<string> PumpProgressLinesAsync(Process process, IProgress<string> progress)
+    {
+        var all = new StringBuilder();
+        while (true)
+        {
+            var line = await process.StandardOutput.ReadLineAsync();
+            if (line == null) break;
+
+            all.AppendLine(line);
+            if (!string.IsNullOrWhiteSpace(line) && line.Contains('%'))
+                progress.Report(line.Trim());
+        }
+        return all.ToString();
+    }
+
+    // Дочитывает поток после завершения/kill процесса: сбой чтения не должен
+    // затирать настоящую причину (код возврата уже известен).
+    private static async Task<string> SafeReadAsync(Task<string> task)
+    {
+        try
+        {
+            return await task;
+        }
+        catch (Exception)
+        {
+            return string.Empty;
+        }
+    }
+
+    private static void KillProcessTree(Process process)
+    {
+        try
+        {
+            if (!process.HasExited)
+            {
+                process.Kill(entireProcessTree: true);
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[CompactEngine] Kill timed-out process failed: {ex.Message}");
+        }
+    }
+
+    // Первая непустая строка вывода как компактная причина сбоя
+    // (compact.exe печатает по строке на каждый файл — простыня не нужна).
+    private static string CompactFailureMessage(string operation, int exitCode, string output)
+    {
+        foreach (var raw in output.Split('\n'))
+        {
+            var line = raw.Trim('\r', ' ');
+            if (line.Length > 0)
+                return $"Ошибка {operation}: compact.exe завершилась с кодом {exitCode}: {line}";
+        }
+        return $"Ошибка {operation}: compact.exe завершилась с кодом {exitCode}";
     }
 
     private static List<string> GetFixedDriveRoots()
