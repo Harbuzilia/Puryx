@@ -56,8 +56,9 @@ public sealed class ProcessCommandExecutor : ICommandExecutor
                     process.Kill(entireProcessTree: true);
                 }
             }
-            catch
+            catch (Exception ex)
             {
+                Debug.WriteLine($"[ProcessCommandExecutor] Kill process tree on timeout failed: {ex.Message}");
             }
 
             return new CommandExecutionResult
