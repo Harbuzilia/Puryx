@@ -51,7 +51,7 @@ public class NetworkOptimizerService
     {
         progress?.Report("Сброс DNS-кэша и сокетов Winsock...");
 
-        return await Task.Run(() =>
+        return await Task.Run(async () =>
         {
             try
             {
@@ -63,7 +63,11 @@ public class NetworkOptimizerService
                     CreateNoWindow = true,
                     UseShellExecute = false
                 };
-                using (var p = Process.Start(psiDns)) p?.WaitForExit(2000);
+                var dns = await RunToolAsync(psiDns, 5000);
+                if (dns.ExitCode != 0)
+                {
+                    return (false, $"Не удалось очистить DNS-кэш (код {dns.ExitCode}): {dns.Output}");
+                }
 
                 // 2. Clear ARP
                 var psiArp = new ProcessStartInfo
@@ -73,7 +77,11 @@ public class NetworkOptimizerService
                     CreateNoWindow = true,
                     UseShellExecute = false
                 };
-                using (var p = Process.Start(psiArp)) p?.WaitForExit(2000);
+                var arp = await RunToolAsync(psiArp, 5000);
+                if (arp.ExitCode != 0)
+                {
+                    return (false, $"Не удалось сбросить ARP-таблицу (код {arp.ExitCode}): {arp.Output}");
+                }
 
                 return (true, "DNS-кэш успешно очищен, сетевые сокеты и ARP-таблица сброшены!");
             }
@@ -88,11 +96,15 @@ public class NetworkOptimizerService
     {
         progress?.Report($"Установка DNS ({primaryDns}, {secondaryDns})...");
 
-        return await Task.Run(() =>
+        return await Task.Run(async () =>
         {
             try
             {
-                var script = $"Get-NetAdapter | Where-Object {{ $_.Status -eq 'Up' }} | ForEach-Object {{ Set-DnsClientServerAddress -InterfaceIndex $_.ifIndex -ServerAddresses ('{primaryDns}','{secondaryDns}') }}";
+                // -ErrorAction Stop превращает сбой Set-DnsClientServerAddress в код возврата 1
+                // (иначе powershell вернул бы 0 даже при отказе); пустой список адаптеров — явный отказ
+                var script = $"$a = @(Get-NetAdapter | Where-Object {{ $_.Status -eq 'Up' }}); " +
+                             $"if ($a.Count -eq 0) {{ throw 'no active network adapters' }}; " +
+                             $"$a | ForEach-Object {{ Set-DnsClientServerAddress -InterfaceIndex $_.ifIndex -ServerAddresses ('{primaryDns}','{secondaryDns}') -ErrorAction Stop }}";
                 var psi = new ProcessStartInfo
                 {
                     FileName = "powershell.exe",
@@ -100,8 +112,11 @@ public class NetworkOptimizerService
                     CreateNoWindow = true,
                     UseShellExecute = false
                 };
-                using var p = Process.Start(psi);
-                p?.WaitForExit(4000);
+                var result = await RunToolAsync(psi, 15000);
+                if (result.ExitCode != 0)
+                {
+                    return (false, $"Не удалось изменить DNS (код {result.ExitCode}): {result.Output}");
+                }
 
                 return (true, $"DNS успешно изменен на {primaryDns} / {secondaryDns}!");
             }
@@ -116,11 +131,14 @@ public class NetworkOptimizerService
     {
         progress?.Report("Сброс DNS на автоматическое получение (DHCP)...");
 
-        return await Task.Run(() =>
+        return await Task.Run(async () =>
         {
             try
             {
-                var script = "Get-NetAdapter | Where-Object { $_.Status -eq 'Up' } | ForEach-Object { Set-DnsClientServerAddress -InterfaceIndex $_.ifIndex -ResetServerAddresses }";
+                // -ErrorAction Stop: сбой Set-DnsClientServerAddress = код возврата 1, а не молчаливый 0
+                var script = "$a = @(Get-NetAdapter | Where-Object { $_.Status -eq 'Up' }); " +
+                             "if ($a.Count -eq 0) { throw 'no active network adapters' }; " +
+                             "$a | ForEach-Object { Set-DnsClientServerAddress -InterfaceIndex $_.ifIndex -ResetServerAddresses -ErrorAction Stop }";
                 var psi = new ProcessStartInfo
                 {
                     FileName = "powershell.exe",
@@ -128,8 +146,11 @@ public class NetworkOptimizerService
                     CreateNoWindow = true,
                     UseShellExecute = false
                 };
-                using var p = Process.Start(psi);
-                p?.WaitForExit(4000);
+                var result = await RunToolAsync(psi, 15000);
+                if (result.ExitCode != 0)
+                {
+                    return (false, $"Не удалось сбросить DNS (код {result.ExitCode}): {result.Output}");
+                }
 
                 return (true, "DNS успешно сброшен на автоматический (DHCP)!");
             }
@@ -180,5 +201,63 @@ public class NetworkOptimizerService
                 return (false, $"Ошибка настройки реестра TCP: {ex.Message}");
             }
         });
+    }
+
+    // Запускает системную утилиту и возвращает фактический код возврата и вывод
+    // (stderr приоритетнее: ipconfig/netsh пишут сообщения в stdout, powershell — в stderr).
+    // Таймаут — тоже отказ: никакого «успеха по молчанию».
+    private static async Task<(int ExitCode, bool TimedOut, string Output)> RunToolAsync(ProcessStartInfo psi, int timeoutMs)
+    {
+        psi.CreateNoWindow = true;
+        psi.UseShellExecute = false;
+        psi.RedirectStandardOutput = true;
+        psi.RedirectStandardError = true;
+
+        try
+        {
+            using var process = new Process { StartInfo = psi };
+            if (!process.Start())
+            {
+                return (-1, false, $"не удалось запустить «{psi.FileName}»");
+            }
+
+            // Потоки читаем до ожидания выхода, чтобы заполненный буфер не заблокировал утилиту
+            var stdoutTask = process.StandardOutput.ReadToEndAsync();
+            var stderrTask = process.StandardError.ReadToEndAsync();
+
+            try
+            {
+                await process.WaitForExitAsync().WaitAsync(TimeSpan.FromMilliseconds(timeoutMs));
+            }
+            catch (TimeoutException)
+            {
+                KillProcessTree(process);
+                return (-1, true, $"«{psi.FileName}» не завершилась за {timeoutMs} мс");
+            }
+
+            var stdout = await stdoutTask;
+            var stderr = await stderrTask;
+            var output = string.IsNullOrWhiteSpace(stderr) ? stdout : stderr;
+            return (process.ExitCode, false, output.Trim());
+        }
+        catch (Exception ex)
+        {
+            return (-1, false, $"«{psi.FileName}»: {ex.Message}");
+        }
+    }
+
+    private static void KillProcessTree(Process process)
+    {
+        try
+        {
+            if (!process.HasExited)
+            {
+                process.Kill(entireProcessTree: true);
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[NetworkOptimizerService] Kill timed-out process failed: {ex.Message}");
+        }
     }
 }
