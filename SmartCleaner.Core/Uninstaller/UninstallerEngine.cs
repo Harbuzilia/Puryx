@@ -50,6 +50,17 @@ public class UninstallerEngine
         var (fileName, args) = ParseCommand(cmd);
         var exePath = UninstallTrustPolicy.ResolveExecutable(fileName);
 
+        // H1: тихий (batch) запуск команды из реестра — только для доверенных exe
+        // (Program Files/Windows или Authenticode-подпись). HKCU-ветку пишет любой
+        // процесс: молчаливый запуск недоверенного кода недопустим.
+        if (silent && !UninstallTrustPolicy.IsTrustedExecutable(exePath))
+        {
+            return (false,
+                $"Тихая деинсталляция отклонена: «{fileName}» не находится в доверенной зоне " +
+                "(Program Files / Windows) и не имеет Authenticode-подписи. " +
+                "Запустите деинсталляцию в интерактивном режиме.");
+        }
+
         try
         {
             // H1: runas не форсируем. Команда взята из реестра (HKCU-ветку Uninstall
