@@ -17,13 +17,7 @@ public class CompactEngine
         await Task.Run(() =>
         {
             // 1. Scan Steam Games
-            var steamRoots = new[]
-            {
-                Path.Combine(ProgramFilesX86, "Steam", "steamapps", "common"),
-                Path.Combine(ProgramFiles, "Steam", "steamapps", "common"),
-                @"D:\SteamLibrary\steamapps\common",
-                @"E:\SteamLibrary\steamapps\common"
-            };
+            var steamRoots = BuildSteamRoots();
 
             foreach (var sRoot in steamRoots)
             {
@@ -54,7 +48,7 @@ public class CompactEngine
             }
 
             // 2. Scan Epic Games & GOG
-            var epicRoots = new[] { Path.Combine(ProgramFiles, "Epic Games"), @"D:\Epic Games", @"E:\Epic Games" };
+            var epicRoots = BuildEpicRoots();
             foreach (var eRoot in epicRoots)
             {
                 if (!Directory.Exists(eRoot)) continue;
@@ -82,13 +76,7 @@ public class CompactEngine
             }
 
             // 3. Scan Developer Heavy Project Folders
-            var devRoots = new[]
-            {
-                Path.Combine(UserProfile, "source", "repos"),
-                Path.Combine(UserProfile, "Projects"),
-                @"E:\AllMyProject",
-                @"D:\Projects"
-            };
+            var devRoots = BuildDevRoots();
 
             foreach (var dRoot in devRoots)
             {
@@ -216,6 +204,68 @@ public class CompactEngine
         {
             return (false, $"Ошибка распаковки: {ex.Message}");
         }
+    }
+
+    private static List<string> GetFixedDriveRoots()
+    {
+        try
+        {
+            return DriveInfo.GetDrives()
+                .Where(d => d.IsReady && d.DriveType == DriveType.Fixed)
+                .Select(d => d.RootDirectory.FullName)
+                .ToList();
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[CompactEngine] Drive enumeration error: {ex.Message}");
+            return new List<string>();
+        }
+    }
+
+    private static List<string> BuildSteamRoots()
+    {
+        var roots = new List<string>
+        {
+            Path.Combine(ProgramFilesX86, "Steam", "steamapps", "common"),
+            Path.Combine(ProgramFiles, "Steam", "steamapps", "common")
+        };
+
+        // Кандидатные Steam-библиотеки на всех fixed-дисках (типичные имена)
+        foreach (var driveRoot in GetFixedDriveRoots())
+        {
+            roots.Add(Path.Combine(driveRoot, "SteamLibrary", "steamapps", "common"));
+            roots.Add(Path.Combine(driveRoot, "Steam", "steamapps", "common"));
+        }
+
+        return roots;
+    }
+
+    private static List<string> BuildEpicRoots()
+    {
+        var roots = new List<string> { Path.Combine(ProgramFiles, "Epic Games") };
+
+        foreach (var driveRoot in GetFixedDriveRoots())
+        {
+            roots.Add(Path.Combine(driveRoot, "Epic Games"));
+        }
+
+        return roots;
+    }
+
+    private static List<string> BuildDevRoots()
+    {
+        var roots = new List<string>
+        {
+            Path.Combine(UserProfile, "source", "repos"),
+            Path.Combine(UserProfile, "Projects")
+        };
+
+        foreach (var driveRoot in GetFixedDriveRoots())
+        {
+            roots.Add(Path.Combine(driveRoot, "Projects"));
+        }
+
+        return roots;
     }
 
     private long CalculateSize(string dir)
