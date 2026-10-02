@@ -193,15 +193,23 @@ public class UninstallerEngineTests
     }
 
     [Fact]
-    public void HasAuthenticodeSignature_SignedSystemBinary_ReturnsTrue()
+    public void HasAuthenticodeSignature_SignedBinary_ReturnsTrue()
     {
-        var notepad = Path.Combine(Environment.SystemDirectory, "notepad.exe");
-        if (!File.Exists(notepad))
+        // Системные файлы Windows подписаны каталогом (catalog signing), а не встроенной
+        // подписью — CreateFromSignedFile их не видит. Встроенно-подписанный бинарник,
+        // который есть на любой машине, собирающей это решение — dotnet.exe.
+        var candidates = new[]
         {
-            return; // окружение без подписанного notepad.exe — проверка неприменима
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "dotnet", "dotnet.exe"),
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "dotnet", "dotnet.exe")
+        };
+        var signed = candidates.FirstOrDefault(File.Exists);
+        if (signed is null)
+        {
+            return; // окружение без встроенно-подписанных бинарников — проверка неприменима
         }
 
-        Assert.True(UninstallTrustPolicy.HasAuthenticodeSignature(notepad));
+        Assert.True(UninstallTrustPolicy.HasAuthenticodeSignature(signed));
     }
 
     [Fact]

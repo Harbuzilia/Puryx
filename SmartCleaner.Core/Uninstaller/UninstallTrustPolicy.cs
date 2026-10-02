@@ -1,3 +1,5 @@
+using System.Security.Cryptography.X509Certificates;
+
 namespace SmartCleaner.Core.Uninstaller;
 
 /// <summary>
@@ -11,21 +13,75 @@ namespace SmartCleaner.Core.Uninstaller;
 /// </summary>
 internal static class UninstallTrustPolicy
 {
-    // Заглушки для RED-фиксации тестов (коммит 1); реализация — в fix-коммите 2 «не форсировать runas».
-
+    /// <summary>
+    /// Резолвит имя исполняемого файла в полный путь.
+    /// Известные системные утилиты без пути (MsiExec.exe и т.п.) резолвятся
+    /// из системного каталога — не из PATH и не из каталога приложения
+    /// (binary planting, см. M7). Остальные имена возвращаются как есть.
+    /// </summary>
     internal static string ResolveExecutable(string fileName)
     {
-        return fileName;
+        if (string.IsNullOrWhiteSpace(fileName) || Path.IsPathRooted(fileName))
+        {
+            return fileName;
+        }
+
+        var systemCandidate = Path.Combine(Environment.SystemDirectory, fileName);
+        return File.Exists(systemCandidate) ? systemCandidate : fileName;
     }
 
+    /// <summary>
+    /// Лексическая проверка: файл лежит в Program Files / Program Files (x86) / Windows.
+    /// Нормализует путь (GetFullPath), поэтому «..\..» за пределы доверенного корня не проходит.
+    /// </summary>
     internal static bool IsTrustedLocation(string filePath)
     {
-        return false;
+        if (string.IsNullOrWhiteSpace(filePath))
+        {
+            return false;
+        }
+
+        try
+        {
+            if (!Path.IsPathRooted(filePath))
+            {
+                return false;
+            }
+
+            var directory = Path.GetDirectoryName(Path.GetFullPath(filePath));
+            if (string.IsNullOrEmpty(directory))
+            {
+                return false;
+            }
+
+            return TrustedRoots().Any(root => !string.IsNullOrEmpty(root) && IsUnder(directory, root));
+        }
+        catch
+        {
+            // Недопустимые символы пути и прочие крайности — трактуем как недоверенные
+            return false;
+        }
     }
 
+    /// <summary>
+    /// Факт наличия Authenticode-подписи у файла (без проверки цепочки доверия).
+    /// </summary>
     internal static bool HasAuthenticodeSignature(string filePath)
     {
-        return false;
+        if (string.IsNullOrWhiteSpace(filePath) || !File.Exists(filePath))
+        {
+            return false;
+        }
+
+        try
+        {
+            _ = X509Certificate.CreateFromSignedFile(filePath);
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     /// <summary>
@@ -35,6 +91,33 @@ internal static class UninstallTrustPolicy
     /// </summary>
     internal static bool IsTrustedExecutable(string fileName, Func<string, bool>? hasSignature = null)
     {
-        return false;
+        if (string.IsNullOrWhiteSpace(fileName))
+        {
+            return false;
+        }
+
+        var resolved = ResolveExecutable(fileName);
+        if (IsTrustedLocation(resolved))
+        {
+            return true;
+        }
+
+        return (hasSignature ?? HasAuthenticodeSignature)(resolved);
+    }
+
+    private static IEnumerable<string> TrustedRoots()
+    {
+        yield return Environment.GetFolderPath(Environment.SpecialFolder.Windows);
+        yield return Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+        yield return Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
+    }
+
+    private static bool IsUnder(string path, string root)
+    {
+        var normalizedPath = path.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+        var normalizedRoot = root.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+
+        return string.Equals(normalizedPath, normalizedRoot, StringComparison.OrdinalIgnoreCase)
+            || normalizedPath.StartsWith(normalizedRoot + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase);
     }
 }

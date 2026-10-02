@@ -1,5 +1,6 @@
 ﻿using Microsoft.Win32;
 using SmartCleaner.Core.Helpers;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 
@@ -7,6 +8,9 @@ namespace SmartCleaner.Core.Uninstaller;
 
 public class UninstallerEngine
 {
+    private const int ErrorElevationRequired = 740; // ERROR_ELEVATION_REQUIRED
+    private const int ErrorCancelled = 1223;        // ERROR_CANCELLED
+
     public async Task<List<InstalledAppItem>> ScanInstalledAppsAsync(CancellationToken ct = default)
     {
         var apps = new List<InstalledAppItem>();
@@ -43,19 +47,16 @@ public class UninstallerEngine
             ? app.QuietUninstallString
             : app.UninstallString;
 
+        var (fileName, args) = ParseCommand(cmd);
+        var exePath = UninstallTrustPolicy.ResolveExecutable(fileName);
+
         try
         {
-            var (fileName, args) = ParseCommand(cmd);
-
-            var psi = new ProcessStartInfo
-            {
-                FileName = fileName,
-                Arguments = args,
-                UseShellExecute = true,
-                Verb = "runas" // elevated
-            };
-
-            var proc = Process.Start(psi);
+            // H1: runas не форсируем. Команда взята из реестра (HKCU-ветку Uninstall
+            // может записать любой процесс без прав), поэтому принудительное повышение
+            // недоверенной команды недопустимо. Честный деинсталлятор запросит права
+            // сам через манифест — увидим ERROR_ELEVATION_REQUIRED и решим по политике доверия.
+            var proc = Process.Start(BuildStartInfo(exePath, args));
             if (proc != null)
             {
                 await proc.WaitForExitAsync();
@@ -63,10 +64,57 @@ public class UninstallerEngine
             }
             return (false, "Не удалось запустить процесс деинсталлятора");
         }
+        catch (Win32Exception ex) when (ex.NativeErrorCode == ErrorElevationRequired)
+        {
+            // Деинсталлятору нужны права администратора (его манифест).
+            // Повторный запуск с runas — только после политики доверия:
+            // доверенная директория (Program Files/Windows) или Authenticode-подпись.
+            if (!UninstallTrustPolicy.IsTrustedExecutable(exePath))
+            {
+                return (false,
+                    $"Деинсталлятор требует повышения прав, но «{fileName}» не признан доверенным " +
+                    "(не находится в Program Files/Windows и не имеет Authenticode-подписи). " +
+                    "Автоматическое повышение прав команды из реестра отклонено из соображений безопасности.");
+            }
+
+            try
+            {
+                var proc = Process.Start(BuildStartInfo(exePath, args, elevate: true));
+                if (proc != null)
+                {
+                    await proc.WaitForExitAsync();
+                    return (proc.ExitCode == 0, $"Деинсталлятор завершил работу с кодом {proc.ExitCode}");
+                }
+                return (false, "Не удалось запустить процесс деинсталлятора с повышением прав");
+            }
+            catch (Win32Exception ex2) when (ex2.NativeErrorCode == ErrorCancelled)
+            {
+                return (false, "Повышение прав отменено пользователем");
+            }
+            catch (Exception ex2)
+            {
+                return (false, $"Ошибка запуска деинсталлятора с повышением прав: {ex2.Message}");
+            }
+        }
         catch (Exception ex)
         {
             return (false, $"Ошибка запуска деинсталлятора: {ex.Message}");
         }
+    }
+
+    private static ProcessStartInfo BuildStartInfo(string fileName, string args, bool elevate = false)
+    {
+        var psi = new ProcessStartInfo
+        {
+            FileName = fileName,
+            Arguments = args,
+            UseShellExecute = true
+        };
+
+        if (elevate)
+            psi.Verb = "runas"; // только осознанный повтор после политики доверия
+
+        return psi;
     }
 
     private void ScanRegistryUninstallKey(RegistryKey root, string subPath, List<InstalledAppItem> list)
@@ -144,6 +192,10 @@ public class UninstallerEngine
                 var args = trimmed.Substring(closingQuote + 1).Trim();
                 return (file, args);
             }
+
+            // Незакрытая кавычка (мусор в реестре вида «"C:\App\Un.exe /S»):
+            // убираем ведущую кавычку и парсим остаток как команду без кавычек
+            trimmed = trimmed.TrimStart('"').Trim();
         }
 
         var spaceIdx = trimmed.IndexOf(' ');

@@ -123,7 +123,13 @@ public partial class UninstallerViewModel : ObservableObject
             StatusText = $"Запуск деинсталлятора для {app.DisplayName}...";
             var (success, msg) = await _engine.UninstallAppAsync(app);
 
-            // Scan for leftovers regardless
+            if (!success)
+            {
+                // H1: честная причина отказа/кода завершения доходит до пользователя
+                MessageBox.Show(msg, "Деинсталляция", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+
+            // Scan for leftovers regardless: даже при ненулевом коде выхода часть файлов могла удалиться
             StatusText = $"Поиск остаточных файлов («хвостов») для {app.DisplayName}...";
             var leftovers = await _hunter.FindLeftoversAsync(app);
 
@@ -134,12 +140,17 @@ public partial class UninstallerViewModel : ObservableObject
                 IsLeftoversVisible = true;
                 StatusText = $"Найдено {leftovers.Count} остаточных файлов/ключей реестра для {app.DisplayName}";
             }
-            else
+            else if (success)
             {
                 StatusText = $"Деинсталляция завершена. Хвостов не обнаружено.";
                 AllApps.Remove(app);
                 FilteredApps.Remove(app);
                 TotalAppsCount = AllApps.Count;
+            }
+            else
+            {
+                // Деинсталляция не выполнена: приложение остаётся в списке, показываем причину
+                StatusText = msg;
             }
         }
         catch (Exception ex)
