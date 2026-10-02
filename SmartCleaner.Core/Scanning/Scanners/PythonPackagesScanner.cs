@@ -1,6 +1,5 @@
 using System.Text.Json;
 using SmartCleaner.Core.Cleaning;
-using SmartCleaner.Core.Knowledge;
 using SmartCleaner.Core.Models;
 using SmartCleaner.Core.Safety;
 using SmartCleaner.Core.Services;
@@ -21,19 +20,17 @@ public sealed class PythonPackagesScanner : ScannerBase
     public override int DisplayOrder => 8;
 
     public PythonPackagesScanner(
-        IKnowledgeBase knowledge,
         ISafetyService safety,
         IConfigService configService)
-        : this(knowledge, safety, configService, new ProcessCommandExecutor())
+        : this(safety, configService, new ProcessCommandExecutor())
     {
     }
 
     public PythonPackagesScanner(
-        IKnowledgeBase knowledge,
         ISafetyService safety,
         IConfigService configService,
         PackageCommandExecutor commandExecutor)
-        : base(knowledge, safety)
+        : base(safety)
     {
         _configService = configService;
         _commandExecutor = commandExecutor;

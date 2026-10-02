@@ -40,7 +40,6 @@ public class NpmPackagesScannerTests
             });
 
             var scanner = new NpmPackagesScanner(
-                new NoopKnowledgeBase(),
                 new AllowAllSafetyService(),
                 new InMemoryConfigService([root]),
                 executor);

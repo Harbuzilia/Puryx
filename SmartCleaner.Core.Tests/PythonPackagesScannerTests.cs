@@ -47,7 +47,6 @@ public class PythonPackagesScannerTests
             });
 
             var scanner = new PythonPackagesScanner(
-                new NoopKnowledgeBase(),
                 new AllowAllSafetyService(),
                 new InMemoryConfigService([root]),
                 executor);

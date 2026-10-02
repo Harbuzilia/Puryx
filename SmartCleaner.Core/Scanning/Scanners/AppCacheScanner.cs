@@ -1,4 +1,3 @@
-using SmartCleaner.Core.Knowledge;
 using SmartCleaner.Core.Models;
 using SmartCleaner.Core.Safety;
 
@@ -14,8 +13,8 @@ public class AppCacheScanner : ScannerBase
     public override string CategoryIcon => "\uE74C"; // Segoe MDL2: AllApps
     public override int DisplayOrder => 3;
 
-    public AppCacheScanner(IKnowledgeBase knowledge, ISafetyService safety) 
-        : base(knowledge, safety)
+    public AppCacheScanner(ISafetyService safety) 
+        : base(safety)
     {
     }
 

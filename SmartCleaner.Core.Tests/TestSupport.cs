@@ -1,5 +1,4 @@
 using SmartCleaner.Core.Cleaning;
-using SmartCleaner.Core.Knowledge;
 using SmartCleaner.Core.Models;
 using SmartCleaner.Core.Safety;
 using SmartCleaner.Core.Services;
@@ -77,26 +76,6 @@ internal sealed class BlockingSafetyService : ISafetyService
             BlockReason = "Заблокировано тестовым фейком"
         };
     }
-}
-
-internal sealed class NoopKnowledgeBase : IKnowledgeBase
-{
-    public IEnumerable<AppDefinition> GetBuiltInApps() => [];
-    public IEnumerable<AppDefinition> GetUserApps() => [];
-    public IEnumerable<AppDefinition> GetAllApps() => [];
-    public void AddUserApp(AppDefinition app) { }
-    public void UpdateUserApp(AppDefinition app) { }
-    public void RemoveUserApp(string appId) { }
-    public IEnumerable<DiscoveredApp> DiscoverUnknownApps(string rootPath) => [];
-    public PathClassification ClassifyPath(string path) => new()
-    {
-        IsKnownApp = false,
-        AppName = null,
-        SuggestedRisk = RiskCategory.PerformanceCache,
-        Reason = "test"
-    };
-    public void LoadExternalRules(string jsonPath) { }
-    public void SaveUserRules() { }
 }
 
 internal sealed class RecordingCommandExecutor : ICommandExecutor

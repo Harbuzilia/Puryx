@@ -120,7 +120,7 @@ public class DiskUsageScannerTests
 
     private static DiskUsageScanner CreateScanner(IReadOnlyList<string> roots)
     {
-        return new DiskUsageScanner(new NoopKnowledgeBase(), new AllowAllSafetyService(), new InMemoryConfigService(roots))
+        return new DiskUsageScanner(new AllowAllSafetyService(), new InMemoryConfigService(roots))
         {
             MinInsightBytes = 1,
             MaxDepth = 10,

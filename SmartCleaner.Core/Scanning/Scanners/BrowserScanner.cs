@@ -1,4 +1,3 @@
-using SmartCleaner.Core.Knowledge;
 using SmartCleaner.Core.Models;
 using SmartCleaner.Core.Safety;
 
@@ -39,8 +38,8 @@ public class BrowserScanner : ScannerBase
     /// <summary>Кэш имён запущенных процессов — заполняется один раз в ScanAsync</summary>
     private HashSet<string> _runningProcessNames = new(StringComparer.OrdinalIgnoreCase);
 
-    public BrowserScanner(IKnowledgeBase knowledge, ISafetyService safety) 
-        : base(knowledge, safety)
+    public BrowserScanner(ISafetyService safety) 
+        : base(safety)
     {
     }
 

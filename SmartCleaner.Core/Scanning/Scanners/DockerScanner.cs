@@ -1,4 +1,3 @@
-using SmartCleaner.Core.Knowledge;
 using SmartCleaner.Core.Models;
 using SmartCleaner.Core.Safety;
 
@@ -15,8 +14,8 @@ public class DockerScanner : ScannerBase
     public override int DisplayOrder => 11;
     public override bool IsEnabledByDefault => false; // По умолчанию выключен — не у всех есть Docker
 
-    public DockerScanner(IKnowledgeBase knowledge, ISafetyService safety)
-        : base(knowledge, safety) { }
+    public DockerScanner(ISafetyService safety)
+        : base(safety) { }
 
     public override async Task<ScanResult> ScanAsync(IProgress<string>? progress = null, CancellationToken ct = default)
     {

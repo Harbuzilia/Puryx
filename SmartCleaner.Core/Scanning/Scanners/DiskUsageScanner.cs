@@ -1,4 +1,3 @@
-using SmartCleaner.Core.Knowledge;
 using SmartCleaner.Core.Models;
 using SmartCleaner.Core.Safety;
 using SmartCleaner.Core.Services;
@@ -39,8 +38,8 @@ public class DiskUsageScanner : ScannerBase
     /// </summary>
     public int MaxItems { get; set; } = 30;
 
-    public DiskUsageScanner(IKnowledgeBase knowledge, ISafetyService safety, IConfigService configService)
-        : base(knowledge, safety)
+    public DiskUsageScanner(ISafetyService safety, IConfigService configService)
+        : base(safety)
     {
         _configService = configService;
     }

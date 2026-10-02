@@ -1,4 +1,3 @@
-using SmartCleaner.Core.Knowledge;
 using SmartCleaner.Core.Models;
 using SmartCleaner.Core.Safety;
 
@@ -13,8 +12,8 @@ public class SystemScanner : ScannerBase
     public override string CategoryIcon => "\uE770"; // Segoe MDL2: Settings
     public override int DisplayOrder => 1;
 
-    public SystemScanner(IKnowledgeBase knowledge, ISafetyService safety) 
-        : base(knowledge, safety)
+    public SystemScanner(ISafetyService safety) 
+        : base(safety)
     {
     }
 

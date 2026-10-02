@@ -1,6 +1,5 @@
 using System.Text.Json;
 using SmartCleaner.Core.Cleaning;
-using SmartCleaner.Core.Knowledge;
 using SmartCleaner.Core.Models;
 using SmartCleaner.Core.Safety;
 using SmartCleaner.Core.Services;
@@ -21,19 +20,17 @@ public sealed class NpmPackagesScanner : ScannerBase
     public override int DisplayOrder => 7;
 
     public NpmPackagesScanner(
-        IKnowledgeBase knowledge,
         ISafetyService safety,
         IConfigService configService)
-        : this(knowledge, safety, configService, new ProcessCommandExecutor())
+        : this(safety, configService, new ProcessCommandExecutor())
     {
     }
 
     public NpmPackagesScanner(
-        IKnowledgeBase knowledge,
         ISafetyService safety,
         IConfigService configService,
         PackageCommandExecutor commandExecutor)
-        : base(knowledge, safety)
+        : base(safety)
     {
         _configService = configService;
         _commandExecutor = commandExecutor;

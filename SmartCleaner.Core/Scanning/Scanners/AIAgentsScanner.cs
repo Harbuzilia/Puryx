@@ -1,4 +1,3 @@
-using SmartCleaner.Core.Knowledge;
 using SmartCleaner.Core.Models;
 using SmartCleaner.Core.Safety;
 
@@ -65,8 +64,8 @@ public class AIAgentsScanner : ScannerBase
         ["Kiro"] = [@"%USERPROFILE%\.kiro"]
     };
 
-    public AIAgentsScanner(IKnowledgeBase knowledge, ISafetyService safety) 
-        : base(knowledge, safety)
+    public AIAgentsScanner(ISafetyService safety) 
+        : base(safety)
     {
     }
 

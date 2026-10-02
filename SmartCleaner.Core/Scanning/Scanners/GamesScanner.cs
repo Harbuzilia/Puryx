@@ -1,4 +1,3 @@
-using SmartCleaner.Core.Knowledge;
 using SmartCleaner.Core.Models;
 using SmartCleaner.Core.Safety;
 
@@ -13,8 +12,8 @@ public class GamesScanner : ScannerBase
     public override string CategoryIcon => "\uE7FC"; // Segoe MDL2: Game
     public override int DisplayOrder => 3;
 
-    public GamesScanner(IKnowledgeBase knowledge, ISafetyService safety) 
-        : base(knowledge, safety)
+    public GamesScanner(ISafetyService safety) 
+        : base(safety)
     {
     }
 

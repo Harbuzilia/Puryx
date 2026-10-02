@@ -1,4 +1,3 @@
-using SmartCleaner.Core.Knowledge;
 using SmartCleaner.Core.Models;
 using SmartCleaner.Core.Safety;
 using SmartCleaner.Core.Services;
@@ -33,8 +32,8 @@ public class NodeModulesScanner : ScannerBase
     /// </summary>
     public List<string> ScanPaths { get; set; } = [];
 
-    public NodeModulesScanner(IKnowledgeBase knowledge, ISafetyService safety, IConfigService configService)
-        : base(knowledge, safety)
+    public NodeModulesScanner(ISafetyService safety, IConfigService configService)
+        : base(safety)
     {
         _configService = configService;
 

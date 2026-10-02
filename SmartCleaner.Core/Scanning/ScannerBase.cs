@@ -1,5 +1,4 @@
 using SmartCleaner.Core.Helpers;
-using SmartCleaner.Core.Knowledge;
 using SmartCleaner.Core.Models;
 using SmartCleaner.Core.Safety;
 using Microsoft.Extensions.Logging;
@@ -12,18 +11,16 @@ namespace SmartCleaner.Core.Scanning;
 /// </summary>
 public abstract class ScannerBase : IScannerStrategy
 {
-    protected readonly IKnowledgeBase _knowledge;
     protected readonly ISafetyService _safety;
     protected readonly ILogger _logger;
-    
+
     public abstract string CategoryName { get; }
     public abstract string CategoryIcon { get; }
     public abstract int DisplayOrder { get; }
     public virtual bool IsEnabledByDefault => true;
 
-    protected ScannerBase(IKnowledgeBase knowledge, ISafetyService safety, ILogger? logger = null)
+    protected ScannerBase(ISafetyService safety, ILogger? logger = null)
     {
-        _knowledge = knowledge;
         _safety = safety;
         _logger = logger ?? NullLogger.Instance;
     }

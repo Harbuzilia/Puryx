@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using SmartCleaner.Core.Helpers;
-using SmartCleaner.Core.Knowledge;
 using SmartCleaner.Core.Models;
 using SmartCleaner.Core.Safety;
 using System.IO;
@@ -17,8 +16,8 @@ public class DevSuperScanner : ScannerBase
     public override string CategoryIcon => "\uE7B8"; // Developer Tools icon
     public override int DisplayOrder => 5;
 
-    public DevSuperScanner(IKnowledgeBase knowledge, ISafetyService safety, ILogger<DevSuperScanner>? logger = null)
-        : base(knowledge, safety, logger)
+    public DevSuperScanner(ISafetyService safety, ILogger<DevSuperScanner>? logger = null)
+        : base(safety, logger)
     {
     }
 

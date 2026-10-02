@@ -1,4 +1,3 @@
-using SmartCleaner.Core.Knowledge;
 using SmartCleaner.Core.Models;
 using SmartCleaner.Core.Safety;
 
@@ -176,8 +175,8 @@ public class PackageCacheScanner : ScannerBase
         }
     ];
 
-    public PackageCacheScanner(IKnowledgeBase knowledge, ISafetyService safety)
-        : base(knowledge, safety) { }
+    public PackageCacheScanner(ISafetyService safety)
+        : base(safety) { }
 
     public override async Task<ScanResult> ScanAsync(
         IProgress<string>? progress = null,

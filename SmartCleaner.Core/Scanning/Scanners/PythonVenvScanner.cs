@@ -1,4 +1,3 @@
-using SmartCleaner.Core.Knowledge;
 using SmartCleaner.Core.Models;
 using SmartCleaner.Core.Safety;
 
@@ -40,8 +39,8 @@ public class PythonVenvScanner : ScannerBase
         "Windows", "$Recycle.Bin", "ProgramData", "bin", "obj"
     };
 
-    public PythonVenvScanner(IKnowledgeBase knowledge, ISafetyService safety)
-        : base(knowledge, safety) { }
+    public PythonVenvScanner(ISafetyService safety)
+        : base(safety) { }
 
     public override async Task<ScanResult> ScanAsync(IProgress<string>? progress = null, CancellationToken ct = default)
     {

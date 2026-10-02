@@ -15,7 +15,7 @@ public class TierFeaturesTests
         var config = new InMemoryConfigService([]);
         var knowledge = new KnowledgeBase(config);
         var safety = new SafetyService(config, knowledge);
-        var scanner = new DevSuperScanner(knowledge, safety);
+        var scanner = new DevSuperScanner(safety);
 
         var result = await scanner.ScanAsync();
 
@@ -101,7 +101,7 @@ public class TierFeaturesTests
         var config = new InMemoryConfigService([]);
         var knowledge = new KnowledgeBase(config);
         var safety = new SafetyService(config, knowledge);
-        var scanner = new SmartCleaner.Core.Scanning.Scanners.ShaderCacheScanner(knowledge, safety);
+        var scanner = new SmartCleaner.Core.Scanning.Scanners.ShaderCacheScanner(safety);
 
         var result = await scanner.ScanAsync();
 

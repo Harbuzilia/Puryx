@@ -1,4 +1,3 @@
-using SmartCleaner.Core.Knowledge;
 using SmartCleaner.Core.Models;
 using SmartCleaner.Core.Safety;
 
@@ -21,10 +20,9 @@ public class CustomFolderScanner : ScannerBase
     /// Конструктор с инъекцией зависимостей.
     /// </summary>
     /// <param name="config">Общая конфигурация сканирования с CustomScanPath</param>
-    /// <param name="knowledge">База знаний приложений</param>
     /// <param name="safety">Сервис безопасности</param>
-    public CustomFolderScanner(ScanConfiguration config, IKnowledgeBase knowledge, ISafetyService safety) 
-        : base(knowledge, safety)
+    public CustomFolderScanner(ScanConfiguration config, ISafetyService safety) 
+        : base(safety)
     {
         _config = config;
     }

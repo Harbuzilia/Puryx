@@ -1,4 +1,3 @@
-using SmartCleaner.Core.Knowledge;
 using SmartCleaner.Core.Models;
 using SmartCleaner.Core.Safety;
 
@@ -31,8 +30,8 @@ public class DotnetArtifactsScanner : ScannerBase
         "Windows", "$Recycle.Bin", "ProgramData"
     };
 
-    public DotnetArtifactsScanner(IKnowledgeBase knowledge, ISafetyService safety)
-        : base(knowledge, safety) { }
+    public DotnetArtifactsScanner(ISafetyService safety)
+        : base(safety) { }
 
     public override async Task<ScanResult> ScanAsync(IProgress<string>? progress = null, CancellationToken ct = default)
     {

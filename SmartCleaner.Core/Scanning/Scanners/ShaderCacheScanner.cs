@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using SmartCleaner.Core.Helpers;
-using SmartCleaner.Core.Knowledge;
 using SmartCleaner.Core.Models;
 using SmartCleaner.Core.Safety;
 using System.IO;
@@ -16,8 +15,8 @@ public class ShaderCacheScanner : ScannerBase
     public override string CategoryIcon => "\uE790"; // Graphics/Media icon
     public override int DisplayOrder => 6;
 
-    public ShaderCacheScanner(IKnowledgeBase knowledge, ISafetyService safety, ILogger<ShaderCacheScanner>? logger = null)
-        : base(knowledge, safety, logger)
+    public ShaderCacheScanner(ISafetyService safety, ILogger<ShaderCacheScanner>? logger = null)
+        : base(safety, logger)
     {
     }
 
