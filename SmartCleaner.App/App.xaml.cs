@@ -5,6 +5,7 @@ using SmartCleaner.Core.Cleaning;
 using SmartCleaner.Core.Knowledge;
 using SmartCleaner.Core.Models;
 using SmartCleaner.Core.Safety;
+using SmartCleaner.Core.Scheduler;
 using SmartCleaner.Core.Scanning;
 using SmartCleaner.Core.Scanning.Scanners;
 using SmartCleaner.Core.Services;
@@ -49,9 +50,9 @@ public partial class App : Application
             themeManager.Initialize();
 
             // Обработка --auto-clean (от планировщика): тихая очистка без GUI
-            if (TryGetAutoCleanArgs(e.Args, out var _profile))
+            if (TryGetAutoCleanArgs(e.Args, out var profile))
             {
-                await RunAutoCleanAsync();
+                await RunAutoCleanAsync(profile);
                 Shutdown(0);
                 return;
             }
@@ -474,16 +475,21 @@ public partial class App : Application
 
     /// <summary>
     /// Автоматическая очистка без GUI (вызывается планировщиком).
-    /// Сканирует и очищает безопасные элементы, записывает статистику.
+    /// Применяет профиль из аргументов (--profile) к набору сканеров,
+    /// сканирует и очищает безопасные элементы.
     /// </summary>
-    private async Task RunAutoCleanAsync()
+    private async Task RunAutoCleanAsync(string profile)
     {
         try
         {
             if (_serviceProvider == null) return;
 
             var vm = _serviceProvider.GetRequiredService<MainViewModel>();
-            // Быстрое сканирование
+
+            // Профиль из CLI выбирает набор сканеров ДО запуска сканирования
+            ApplyAutoCleanProfile(vm, profile);
+
+            // Сканирование выбранным профилем набором сканеров
             if (vm.ScanCommand.CanExecute(null))
                 await vm.ScanCommand.ExecuteAsync(null);
 
@@ -496,6 +502,29 @@ public partial class App : Application
         catch (Exception ex)
         {
             Debug.WriteLine($"[auto-clean] Error: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Применяет профиль очистки к чекбоксам сканеров (ScannerOptions) —
+    /// той же семантикой, что и MainViewModel.ApplyProfile в UI.
+    /// Неизвестный профиль заменяется безопасным дефолтом «Быстрая»
+    /// с предупреждением в лог.
+    /// </summary>
+    private static void ApplyAutoCleanProfile(MainViewModel vm, string profile)
+    {
+        if (!CleaningProfileMap.TryGetEnabledCategories(profile, out var enabledSet))
+        {
+            Debug.WriteLine($"[auto-clean] Неизвестный профиль '{profile}', используется '{CleaningProfileMap.Quick}'.");
+            profile = CleaningProfileMap.Quick;
+            // «Быстрая» всегда известна маппингу
+            CleaningProfileMap.TryGetEnabledCategories(profile, out enabledSet);
+        }
+
+        vm.SelectedProfile = profile;
+        foreach (var option in vm.ScannerOptions)
+        {
+            option.IsEnabled = enabledSet == null || enabledSet.Contains(option.CategoryName);
         }
     }
 

@@ -5,6 +5,7 @@ using SmartCleaner.Core.Helpers;
 using SmartCleaner.Core.Knowledge;
 using SmartCleaner.Core.Models;
 using SmartCleaner.Core.Safety;
+using SmartCleaner.Core.Scheduler;
 using SmartCleaner.Core.Scanning;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -295,15 +296,10 @@ public partial class MainViewModel : ObservableObject, IDisposable
     {
         SelectedProfile = profileName;
 
-        // Определяем какие категории включить для каждого профиля
-        HashSet<string>? enabledSet = profileName switch
-        {
-            "Быстрая" => ["Система", "Браузеры", "Приложения"],
-            "Разработка" => ["Кэши пакетов", "Node Modules", "npm пакеты", "Python пакеты", 
-                            "Python окружения", ".NET Артефакты", "Docker", "AI Агенты"],
-            "Полное" => null, // null = все включены
-            _ => null
-        };
+        // Набор категорий — из Core-маппинга (CleaningProfileMap), того же
+        // источника, что и для --profile при авто-очистке из CLI.
+        // Неизвестный профиль → все включены (как и раньше).
+        CleaningProfileMap.TryGetEnabledCategories(profileName, out var enabledSet);
 
         foreach (var option in ScannerOptions)
         {
