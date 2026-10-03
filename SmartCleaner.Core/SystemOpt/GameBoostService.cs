@@ -26,6 +26,16 @@ public class GameBoostPersistedState
     public string OwnerProcessName { get; set; } = string.Empty;
 }
 
+/// <summary>Результат восстановления системы после краша с активным бустом.</summary>
+public class GameBoostRecoveryResult
+{
+    /// <summary>Службы, запущенные восстановлением.</summary>
+    public List<string> RestoredServices { get; set; } = [];
+
+    /// <summary>GUID плана питания, фактически возвращённый восстановлением.</summary>
+    public string RestoredPowerSchemeGuid { get; set; } = string.Empty;
+}
+
 public class GameBoostService
 {
     private const string HighPerformanceSchemeGuid = "8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c";
@@ -125,17 +135,100 @@ public class GameBoostService
     }
 
     /// <summary>
+    /// Восстановление системы после краша: state-файл говорит, что буст был активен,
+    /// а процесс-владелец уже не жив. Запускает остановленные службы, возвращает
+    /// план питания и удаляет state-файл.
+    /// Возвращает null, если восстанавливать нечего: файла нет, буст не был активен
+    /// или владелец ещё жив (например, второй экземпляр приложения).
+    /// </summary>
+    public async Task<GameBoostRecoveryResult?> TryRecoverFromCrashAsync()
+    {
+        if (CurrentState.IsBoostActive) return null; // буст управляется этим процессом
+        if (!_configService.Exists(StateFileName)) return null;
+
+        var persisted = _configService.Load<GameBoostPersistedState>(StateFileName);
+        if (!persisted.IsBoostActive)
+        {
+            DeleteStateFile();
+            return null;
+        }
+
+        if (IsOwnerProcessAlive(persisted.OwnerProcessId, persisted.OwnerProcessName))
+        {
+            Debug.WriteLine($"[GameBoostService] Владелец буста (PID {persisted.OwnerProcessId}) жив — восстановление не требуется");
+            return null;
+        }
+
+        Debug.WriteLine($"[GameBoostService] Обнаружен буст, оставленный крашем (PID {persisted.OwnerProcessId}, активирован {persisted.ActivatedAtUtc:u}) — восстанавливаю систему");
+
+        var restoredServices = new List<string>();
+        var restoredSchemeGuid = string.Empty;
+
+        await Task.Run(() =>
+        {
+            foreach (var svcName in persisted.StoppedServices)
+            {
+                if (_systemOperations.StartService(svcName))
+                {
+                    restoredServices.Add(svcName);
+                }
+            }
+
+            restoredSchemeGuid = RestorePowerScheme(persisted.PreviousPowerSchemeGuid);
+        });
+
+        DeleteStateFile();
+
+        return new GameBoostRecoveryResult
+        {
+            RestoredServices = restoredServices,
+            RestoredPowerSchemeGuid = restoredSchemeGuid
+        };
+    }
+
+    /// <summary>
+    /// Жив ли процесс-владелец буста. PID ненадёжен (числа переиспользуются ОС),
+    /// поэтому имя процесса сверяется с записанным в state-файле.
+    /// Текущий процесс не считается владельцем: к моменту вызова буст в нём не активен,
+    /// значит state-файл мог остаться только от прошлого (крашнутого) запуска.
+    /// </summary>
+    private static bool IsOwnerProcessAlive(int ownerProcessId, string ownerProcessName)
+    {
+        if (ownerProcessId == Environment.ProcessId) return false;
+
+        try
+        {
+            var process = Process.GetProcessById(ownerProcessId);
+            var alive = string.Equals(process.ProcessName, ownerProcessName, StringComparison.OrdinalIgnoreCase);
+            process.Dispose();
+            return alive;
+        }
+        catch (ArgumentException)
+        {
+            return false; // PID больше не существует
+        }
+        catch (Exception ex)
+        {
+            // Не удалось подтвердить живость владельца: восстанавливаем —
+            // вернуть службы важнее, чем риск двойного net start (он безвреден)
+            Debug.WriteLine($"[GameBoostService] Owner process check failed: {ex.Message}");
+            return false;
+        }
+    }
+
+    /// <summary>
     /// Вернуть план питания: сохранённый GUID, если схема ещё существует;
     /// иначе — Balanced (с логом, чтобы потеря пользовательской схемы была видна).
+    /// Возвращает фактически установленный GUID.
     /// </summary>
-    private void RestorePowerScheme(string previousSchemeGuid)
+    private string RestorePowerScheme(string previousSchemeGuid)
     {
         if (!string.IsNullOrWhiteSpace(previousSchemeGuid))
         {
             if (_systemOperations.PowerSchemeExists(previousSchemeGuid) &&
                 _systemOperations.TrySetPowerScheme(previousSchemeGuid))
             {
-                return;
+                return previousSchemeGuid;
             }
 
             Debug.WriteLine(
@@ -147,6 +240,7 @@ public class GameBoostService
         }
 
         _systemOperations.TrySetPowerScheme(BalancedSchemeGuid);
+        return BalancedSchemeGuid;
     }
 
     /// <summary>

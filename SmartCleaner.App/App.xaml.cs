@@ -49,6 +49,18 @@ public partial class App : Application
             var themeManager = _serviceProvider.GetRequiredService<SmartCleaner.App.Services.ThemeManager>();
             themeManager.Initialize();
 
+            // M5: восстановление после краша с активным Game Boost —
+            // state-файл существует, а процесс-владелец мёртв => вернуть службы и план питания
+            try
+            {
+                await _serviceProvider.GetRequiredService<SmartCleaner.Core.SystemOpt.GameBoostService>()
+                    .TryRecoverFromCrashAsync();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[App] GameBoost crash recovery failed: {ex.Message}");
+            }
+
             // Обработка --auto-clean (от планировщика): тихая очистка без GUI
             if (TryGetAutoCleanArgs(e.Args, out var profile))
             {
