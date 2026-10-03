@@ -88,9 +88,10 @@ public sealed class CleaningSchedulerService
 
     /// <summary>
     /// Профиль очистки для аргумента --profile. Значение попадает в командную строку
-    /// schtasks, поэтому допускаются только заранее известные варианты.
+    /// schtasks, поэтому допускаются только заранее известные варианты
+    /// (единый источник — CleaningProfileMap.KnownProfiles).
     /// </summary>
-    private static readonly string[] AllowedProfiles = ["Быстрая", "Разработка", "Полное"];
+    private static readonly string[] AllowedProfiles = [.. CleaningProfileMap.KnownProfiles];
 
     /// <summary>
     /// Регистрирует или обновляет задачу в Windows Task Scheduler.
