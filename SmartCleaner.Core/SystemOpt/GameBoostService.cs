@@ -112,7 +112,7 @@ public class GameBoostService
                 _systemOperations.StartService(svcName);
             }
 
-            _systemOperations.TrySetPowerScheme(BalancedSchemeGuid);
+            RestorePowerScheme(CurrentState.PreviousPowerSchemeGuid);
         });
 
         CurrentState.StoppedServices.Clear();
@@ -122,6 +122,31 @@ public class GameBoostService
 
         progress?.Report("Стандартный режим системы восстановлен.");
         return CurrentState;
+    }
+
+    /// <summary>
+    /// Вернуть план питания: сохранённый GUID, если схема ещё существует;
+    /// иначе — Balanced (с логом, чтобы потеря пользовательской схемы была видна).
+    /// </summary>
+    private void RestorePowerScheme(string previousSchemeGuid)
+    {
+        if (!string.IsNullOrWhiteSpace(previousSchemeGuid))
+        {
+            if (_systemOperations.PowerSchemeExists(previousSchemeGuid) &&
+                _systemOperations.TrySetPowerScheme(previousSchemeGuid))
+            {
+                return;
+            }
+
+            Debug.WriteLine(
+                $"[GameBoostService] Предыдущая схема питания {previousSchemeGuid} не найдена или не активировалась — возврат к Balanced");
+        }
+        else
+        {
+            Debug.WriteLine("[GameBoostService] Предыдущая схема питания неизвестна (не удалось прочитать при включении буста) — возврат к Balanced");
+        }
+
+        _systemOperations.TrySetPowerScheme(BalancedSchemeGuid);
     }
 
     /// <summary>
