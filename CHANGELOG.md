@@ -6,6 +6,185 @@
 
 ---
 
+## [2.8.0] — 04.10.2026
+
+### 🎯 Тема релиза: Security and correctness — все High- (H1–H4) и Medium-дефекты (M1–M8) аудита закрыты, честные метрики и статусы, тесты 214 → 333
+
+Релиз по плану `docs/ROADMAP.md` (фазы P1 «High-фиксы безопасности» и P2 «Medium-фиксы», дни 3–15): каждый High закрыт отдельным днём-пушем, каждый Medium — тестом или явным критерием приёмки. Сквозные инварианты релиза: ни одного пути элевации/удаления в обход политики доверия; ни одного «успеха» внешней утилиты без её кода возврата; ни одной выдуманной метрики; junction не обходит whitelist. Попутно закрыты дефекты, найденные по ходу фазы (парсер schtasks /V, воскресная статистика, дрейф имён категорий профиля), и два быстрых Low-фикса дня 2. Итог: сборка 0 ошибок / 0 предупреждений; 333/333 теста зелёные (в 2.7.2 было 214; добавлено 11 новых тест-суитов). Первый релиз, собираемый под именем Puryx (ребрендинг — см. шапку журнала).
+
+---
+
+### 1. 🛡️ Деинсталлятор: элевация и тихий режим только для доверенных команд (H1, День 3)
+- **Что сделано:**
+  - `UninstallerEngine` больше не форсирует `Verb="runas"` для команды деинсталляции, прочитанной из реестра: HKCU-ветку Uninstall может записать любой процесс, и молчаливое UAC-повышение недоверенной команды недопустимо. Деинсталлятор запрашивает права сам через свой манифест; код возврата 740 (`ERROR_ELEVATION_REQUIRED`) обрабатывается повторным запуском с повышением — но только после проверки доверия (отмена повышения 1223 не считается ошибкой).
+  - Новый `UninstallTrustPolicy`: проверяемая политика доверия (доверенная зона Program Files/Windows либо Authenticode-подпись) и резолв исполняемого файла команды.
+  - Тихий (batch) режим деинсталляции разрешён только для доверенных exe — иначе явный отказ с сообщением пользователю.
+  - `ParseCommand` устойчив к мусору в реестре (незакрытая кавычка вида `"C:\App\Un.exe /S` разбирается, а не роняет движок).
+- **Файлы:**
+  - `SmartCleaner.Core/Uninstaller/UninstallerEngine.cs`, `SmartCleaner.Core/Uninstaller/UninstallTrustPolicy.cs` (новый)
+  - `SmartCleaner.App/ViewModels/UninstallerViewModel.cs`
+  - `SmartCleaner.Core.Tests/UninstallerEngineTests.cs` (новый): разбор команды с кавычками/аргументами и политика авто-элевации
+- **Почему:** Принудительный runas для строки, которую в HKCU мог записать любой процесс, — прямой путь к тихому выполнению произвольного кода с правами администратора (дефект H1 аудита).
+
+---
+
+### 2. ✅ Честный успех внешних утилит: результат по ExitCode (H2, Дни 4–5)
+- **Что сделано:**
+  - `WindowsServicesOptimizer`: `sc config` / `net stop` выполняются с проверкой кода возврата (раньше `WaitForExit(3000)` игнорировался и функция возвращала успех по таймауту); `net stop` для подтверждённо незапущенной службы не считается сбоем — цель «остановлена» достигнута; ошибки логируются в Debug-выход.
+  - `NetworkOptimizerService`: то же для `ipconfig`, `netsh` и операций DNS.
+  - `PrivacyDebloatService`: то же для твиков, выполняющих команды над службами.
+  - `CompactEngine`: успех `compact.exe` только при ExitCode=0.
+- **Файлы:**
+  - `SmartCleaner.Core/ServicesOpt/WindowsServicesOptimizer.cs`
+  - `SmartCleaner.Core/Network/NetworkOptimizerService.cs`
+  - `SmartCleaner.Core/Privacy/PrivacyDebloatService.cs`
+  - `SmartCleaner.Core/Compression/CompactEngine.cs`
+  - `SmartCleaner.Core.Tests/WindowsServicesOptimizerTests.cs` (новый)
+- **Почему:** `return true` сразу после `Process.Start` без проверки кода возврата сообщал «применено», когда операция провалилась или не успела завершиться (дефект H2 аудита: ложный успех).
+
+---
+
+### 3. 🔐 Системные утилиты запускаются только по абсолютному пути (M7, День 5)
+- **Что сделано:**
+  - Новый `SystemToolLocator`: резолв `compact.exe`/`dism.exe`/`pnputil.exe` из реального системного каталога (для 32-битного процесса на 64-битной ОС — через alias `SysNative`, а не SysWOW64); утилиты вызываются только по абсолютному пути.
+  - `WinSxSEngine`, `DriverStoreCleaner`, `CompactEngine` переведены на локатор — имя утилиты больше не ищется в текущем каталоге или каталоге приложения.
+- **Файлы:**
+  - `SmartCleaner.Core/Helpers/SystemToolLocator.cs` (новый)
+  - `SmartCleaner.Core/WinSxS/WinSxSEngine.cs`, `SmartCleaner.Core/WinSxS/DriverStoreCleaner.cs`, `SmartCleaner.Core/Compression/CompactEngine.cs`
+  - `SmartCleaner.Core.Tests/WinSxSSystemToolLocatorTests.cs` (новый): конструируемый путь утилит — всегда абсолютный из системного каталога
+- **Почему:** В portable-режиме каталог приложения доступен на запись пользователю — относительный запуск `dism.exe` позволял подложить подложный exe рядом с приложением (binary planting, дефект M7 аудита).
+
+---
+
+### 4. 🧠 Per-app паттерны KnowledgeBase реально защищают файлы (H3, День 6)
+- **Что сделано:**
+  - `SafetyService.ValidateForDeletion`: паттерны `KnowledgeBase.ProtectedPatterns` (per-app, например `%APPDATA%\Claude\**`) реально участвуют в валидации удаления — раньше код их не подключал, а комментарий утверждал обратное.
+  - Мёртвое поле `_knowledge` удалено из `ScannerBase` и всех 16 сканеров: сканеры больше не таскают неиспользуемую ссылку на базу знаний.
+- **Файлы:**
+  - `SmartCleaner.Core/Safety/SafetyService.cs`, `SmartCleaner.Core/Scanning/ScannerBase.cs`, `SmartCleaner.Core/Scanning/Scanners/*.cs` (16 сканеров)
+  - `SmartCleaner.Core.Tests/SafetyServiceTests.cs` (расширение: per-app паттерн блокирует удаление), `LeftoverHunterTests.cs`, `TierFeaturesTests.cs`, `TestSupport.cs`, `DiskUsageScannerTests.cs`, `NpmPackagesScannerTests.cs`, `PythonPackagesScannerTests.cs`
+- **Почему:** Защита, провозглашённая в комментариях, но не подключённая к конвейеру удаления, — это отсутствие защиты (дефект H3 аудита: файлы per-app-паттернов проходили удаление).
+
+---
+
+### 5. 📊 Честные метрики: WinSxS / SMART / Compact (H4, День 7)
+- **Что сделано:**
+  - `WinSxSEngine`: размер хранилища WinSxS парсится из фактического вывода `dism /Online /Cleanup-Image /AnalyzeComponentStore` (en- и ru-локализация); при недоступности — явное «нет данных» с причиной (например, DISM требует повышения прав — ошибка 740 показывается как есть). Никаких выдуманных «~7.5 ГБ».
+  - `DiskHealthService`: телеметрия S.M.A.R.T. запрашивается через `Get-PhysicalDisk` + `Get-StorageReliabilityCounter` (Wear, Temperature из MSFT_StorageReliabilityCounter; остаток ресурса = 100 − Wear); недоступные счётчики → null, UI показывает «н/д». Убраны значения-по-умолчанию (100% / 35°C), выдававшиеся за показания любого диска; fallback по `DriveInfo` честно не телеметрирует.
+  - `CompactEngine`: экономия места считается по факту «до/после» сжатия, при невозможности — «н/д»; убрана формула `size*0.6`. Решение о `/ResetBase` больше не принимается по выдуманным данным.
+- **Файлы:**
+  - `SmartCleaner.Core/WinSxS/WinSxSEngine.cs`, `SmartCleaner.Core/DiskHealth/DiskHealthService.cs`, `SmartCleaner.Core/Compression/CompactEngine.cs`, `SmartCleaner.Core/Reporting/SystemReportGenerator.cs`
+  - `SmartCleaner.App/ViewModels/CompactViewModel.cs`, `SmartCleaner.App/ViewModels/SystemDeepCleanViewModel.cs`, `SmartCleaner.App/Views/RamOptimizerPage.xaml`
+  - `SmartCleaner.Core.Tests/WinSxSEngineTests.cs` (новый): парсер вывода DISM на фикстурах
+- **Почему:** Выдуманная метрика хуже отсутствующей: по ней пользователь принимает решение об необратимых операциях (дефект H4 аудита).
+
+---
+
+### 6. 🚀 Автозагрузка: OEM-кодировка и корректный разбор /V CSV (M2 + 8б, День 8)
+- **Что сделано:**
+  - `StartupEngine` (schtasks): зарегистрирован `CodePagesEncodingProvider`; кодовая страница вывода берётся P/Invoke `GetOEMCP()` (OEM-страница консоли системы), а не хардкод 866. На русской Windows задачи планировщика больше не падают с `ArgumentException` при декодировании.
+  - Корректный разбор verbose-вывода `schtasks /query /fo CSV /NH /V` (28 колонок, порядок сверен по живому выводу): имя задачи — из колонки «Имя задачи» (путь вида `\Папка\Задача`), а не из «Имя узла»; системные задачи `\Microsoft\` фильтруются; кавычки RFC4180 (экранированные `""` внутри поля) разбираются корректно.
+- **Файлы:**
+  - `SmartCleaner.Core/Startup/StartupEngine.cs`
+  - `SmartCleaner.Core.Tests/StartupEngineTests.cs` (расширение): cp866-фикстура байтов; разбор /V CSV — колонки, фильтр Microsoft, экранированные кавычки
+- **Почему:** Автозагрузка на локализованной Windows показывала мусор или пустой список задач планировщика (дефект M2 аудита); чтение не той колонки прятало имена задач и фильтровало не то, что нужно.
+
+---
+
+### 7. ⚙️ CLI `--profile` реально выбирает набор сканеров (M3, День 9)
+- **Что сделано:**
+  - Новый `CleaningProfileMap`: маппинг имени профиля («Быстрая»/«Разработка»/«Полное») в набор включаемых категорий сканеров; имена категорий синхронизированы с фактическими `CategoryName` сканеров; неизвестный профиль распознаётся ошибкой (маппинг возвращает false), вызывающая сторона откатывается к поведению по умолчанию.
+  - `App.xaml.cs`: профиль из аргументов командной строки передаётся в движок сканирования — раньше разобранное значение `out var _profile` просто выбрасывалось.
+- **Файлы:**
+  - `SmartCleaner.Core/Scheduler/CleaningProfileMap.cs` (новый), `SmartCleaner.Core/Scheduler/CleaningSchedulerService.cs`
+  - `SmartCleaner.App/App.xaml.cs`, `SmartCleaner.App/ViewModels/MainViewModel.cs`
+  - `SmartCleaner.Core.Tests/SchedulerProfileTests.cs` (новый): профиль из CLI выбирает набор сканеров
+- **Почему:** Обещанная CLI-опция не влияла на сканирование — пользователь не мог отличить быструю очистку от полной (дефект M3 аудита).
+
+---
+
+### 8. ↩️ Настоящий бэкап и откат приватности (M4, День 10)
+- **Что сделано:**
+  - `PrivacyDebloatService`: бэкап перед применением твика пишет фактические значения реестра — раньше в снимок попадала константа.
+  - Восстановление ставит значения из бэкапа, а не `DefaultValue` из кода — откат возвращает исходное состояние системы, а не «представление разработчика о дефолте».
+  - Новый `RegistryValueStore`: чтение/запись значений реестра как изолируемая абстракция (тестируемость без реального реестра).
+- **Файлы:**
+  - `SmartCleaner.Core/Privacy/PrivacyDebloatService.cs`, `SmartCleaner.Core/Privacy/RegistryValueStore.cs` (новый)
+  - `SmartCleaner.Core.Tests/PrivacyDebloatTests.cs` (новый): roundtrip бэкап/восстановление значения реестра
+- **Почему:** Кнопка «Восстановить», пишущая в реестр не те значения, — способ незаметно поломать настройки пользователя (дефект M4 аудита).
+
+---
+
+### 9. 🎮 GameBoost переживает краш (M5, День 11)
+- **Что сделано:**
+  - `GameBoostService`: состояние буста (остановленные службы, `PreviousPowerSchemeGuid`, PID владельца, время активации) сохраняется в файл `gameboost_state.json` (app data / portable-режим).
+  - Схема электропитания при отключении буста восстанавливается из сохранённого `PreviousPowerSchemeGuid` — поле раньше записывалось, но не читалось.
+  - На старте приложения: если state-файл говорит «буст активен», а процесса-владельца (PID) больше нет — службы и схема питания восстанавливаются автоматически.
+  - Системные операции (план питания, службы) выделены в `GameBoostSystemOperations` — тестируемость без изменения поведения.
+- **Файлы:**
+  - `SmartCleaner.Core/SystemOpt/GameBoostService.cs`, `SmartCleaner.Core/SystemOpt/GameBoostSystemOperations.cs` (новый)
+  - `SmartCleaner.App/App.xaml.cs`
+  - `SmartCleaner.Core.Tests/GameBoostServiceTests.cs` (новый): roundtrip состояния и восстановление
+- **Почему:** Крах приложения в режиме буста навсегда оставлял остановленные службы и «чужую» схему электропитания (дефект M5 аудита).
+
+---
+
+### 10. 🔏 HMAC-подпись манифеста карантина (M6, День 12)
+- **Что сделано:**
+  - Новый `QuarantineManifestSigner`: `manifest.json` карантина подписывается HMAC-SHA256 на ключе per-install (32 случайных байта, файл ключа в ConfigDirectory через IConfigService, portable/installed-режим). Подписывается каноническая JSON-форма манифеста; сравнение — `CryptographicOperations.FixedTimeEquals` (защита от timing-атак). Правка любого поля (`OriginalPath`, `StoredPath`, …) после подписи ломает подпись.
+  - `QuarantineService`: подпись проставляется при записи манифеста; restore/purge проверяют подпись — подделанный или битый манифест отклоняется с сообщением; пути из user-writable файла без подписи не исполняются.
+- **Файлы:**
+  - `SmartCleaner.Core/Safety/QuarantineManifestSigner.cs` (новый), `SmartCleaner.Core/Safety/QuarantineService.cs`
+  - `SmartCleaner.App/App.xaml.cs` (DI-регистрация), `SmartCleaner.App/ViewModels/QuarantineViewModel.cs`
+  - `SmartCleaner.Core.Tests/QuarantineManifestTests.cs` (новый): подделанный манифест отклоняется; `TestSupport.cs`, `TierFeaturesTests.cs`
+- **Почему:** `manifest.json` лежит в user-writable каталоге: без подписи подмена путей заставляла бы restore копировать файлы в произвольное место (дефект M6 аудита).
+
+---
+
+### 11. 🧭 Junction не обходит whitelist: PathResolver (M1, Дни 13–14)
+- **Что сделано:**
+  - Новый `Safety/PathResolver` (`ResolveRealPath`): резолв реального пути через цепочки reparse-точек (junction/symlink) с двумя защитами от зацикливания — лимит переходов (`MaxReparseHops = 40`) и множество посещённых точек (OrdinalIgnoreCase). Fail-closed: неразрешимый путь (цикл, превышение глубины, отказ доступа) не проходит проверку, а не «пропускается как есть».
+  - `SafetyService.IsUnder`: сравнение границ каталога после резолва junction — ссылка `C:\Link → C:\Real\Protected` больше не выдаёт себя за путь вне защищённой зоны.
+  - `ElevatedCleanTargetPolicy.IsPathWithinRoot`: резолвит junction до проверки «путь внутри разрешённого корня».
+  - Сканеры: file-items, порождаемые через junction (`DevSuperScanner`/`ScannerBase`), резолвятся до гейта удаления; перечисление каталогов получает цикл-гвард вместо молчаливого зависания на циклических ссылках.
+- **Файлы:**
+  - `SmartCleaner.Core/Safety/PathResolver.cs` (новый), `SmartCleaner.Core/Safety/SafetyService.cs`, `SmartCleaner.Core/Cleaning/ElevatedCleanTargetPolicy.cs`, `SmartCleaner.Core/Scanning/ScannerBase.cs`, `SmartCleaner.Core/Scanning/Scanners/DevSuperScanner.cs`
+  - `SmartCleaner.Core.Tests/PathResolverTests.cs` (новый: junction резолвится; циклический junction завершается за конечное время), `SafetyServiceTests.cs`, `ElevatedCleanTargetPolicyTests.cs`, `DevSuperScannerTests.cs` (новый)
+- **Почему:** Лексическое сравнение путей без резолва junction — обход whitelist: `C:\Link` не совпадает с защищённым префиксом, хотя указывает внутрь него (дефект M1 аудита).
+
+---
+
+### 12. 🧹 Дедуп драйверов по версии и дате, осознанный /force (M8, День 15)
+- **Что сделано:**
+  - `DriverStoreCleaner`: пакеты драйверов группируются по имени+версии; в группе новейший пакет (сравнение `Version.TryParse` с тай-брейком по дате) защищён как «текущий», строго старшие помечаются устаревшими дублями и предвыбираются к удалению. Дедуп больше не решает судьбу пакета по позиции в выводе pnputil.
+  - Удаление по умолчанию идёт без `/force`: от драйверов, используемых системой, pnputil честно отказывается. `/force` — только вторым осознанным подтверждением и только для пакетов, от которых pnputil отказался; из списка уходят только реально удалённые записи, итог честно сообщает «удалено / не удалено».
+- **Файлы:**
+  - `SmartCleaner.Core/WinSxS/DriverStoreCleaner.cs`, `SmartCleaner.App/ViewModels/SystemDeepCleanViewModel.cs`
+  - `SmartCleaner.Core.Tests/DriverStoreCleanerTests.cs` (новый): фикстура pnputil-вывода с дублями — дедуп по версии и дате
+- **Почему:** «Дедуп по позиции» мог предложить к удалению новейший драйвер, оставив устаревший (дефект M8 аудита); безусловный `/force` поверх — способ оставить систему без рабочего драйвера.
+
+---
+
+### 13. 🔧 Сопутствующие фиксы фазы (вне дневного плана и День 2)
+- **Что сделано:**
+  - Воскресная статистика: `CleaningStatsService.GetWeeklyStats` — корректное начало недели. Из-за простого `(int)DayOfWeek` (Sun = 0) воскресенье относилось к «завтрашней» неделе; теперь смещение считается от понедельника: `(DayOfWeek + 6) % 7`.
+  - Дрейф имён категорий: `CleaningProfileMap` — имена категорий профиля «Разработка» синхронизированы с фактическими `CategoryName` сканеров (контроль в `SchedulerProfileTests`); до синка дрейф молча отключал часть сканеров профиля.
+  - День 2, L7: из `CompactEngine` убран хардкод путей разработки (`E:\AllMyProject`) — на любой другой машине сжатие падало с исключением. Контроль: grep `E:\AllMyProject` по `SmartCleaner.Core/**.cs` — пусто.
+  - День 2, L8: ошибка kill-tree в `ProcessCommandExecutor` логируется вместо молчаливого проглатывания пустым catch.
+- **Файлы:**
+  - `SmartCleaner.Core/Stats/CleaningStatsService.cs`, `SmartCleaner.Core.Tests/CleaningStatsServiceTests.cs`
+  - `SmartCleaner.Core/Scheduler/CleaningProfileMap.cs`, `SmartCleaner.Core.Tests/SchedulerProfileTests.cs`
+  - `SmartCleaner.Core/Compression/CompactEngine.cs`, `SmartCleaner.Core/Cleaning/ProcessCommandExecutor.cs`
+- **Почему:** Недельная статистика врёт ровно в воскресенье — самый частый день чистки; хардкод пути разработки — гарантированный отказ функции вне машины автора; проглоченная ошибка kill-tree — неразрешимая загадка в поддержке.
+
+---
+
+### 14. ✅ Верификация и релиз
+- **Что сделано:** `dotnet build SmartCleaner.sln -c Release` — 0 ошибок / 0 предупреждений; `dotnet test SmartCleaner.sln -c Release` — 333/333 зелёные (214 на момент 2.7.2). Версия 2.8.0 в `SmartCleaner.App.csproj` (Version/AssemblyVersion/FileVersion) и бейдже `README.md`; аннотированный тег `v2.8.0`; portable-артефакт собран `publish_portable.bat` (self-contained single-file, win-x64). Новые тест-суиты фазы (11): UninstallerEngine, WindowsServicesOptimizer, WinSxSSystemToolLocator, WinSxSEngine, SchedulerProfile, PrivacyDebloat, GameBoost, QuarantineManifest, PathResolver, DevSuperScanner, DriverStoreCleaner.
+- **Почему:** Релиз без прогона — не релиз (правило дневного гейта, `docs/RELEASE-CADENCE.md` §3).
+
+---
+
 ## [2.7.2] — 20.09.2026
 
 ### 🎯 Тема релиза: Полный аудит проекта — критические баги UI, закрытие всех путей удаления в обход защиты, вычистка мёртвого кода и мусора, тесты 124 → 214
