@@ -28,7 +28,12 @@ public abstract class ScannerBase : IScannerStrategy
     public abstract Task<ScanResult> ScanAsync(IProgress<string>? progress = null, CancellationToken ct = default);
 
     /// <summary>
-    /// Рассчитать размер директории рекурсивно
+    /// Рассчитать размер директории рекурсивно.
+    /// Перечисление с цикл-гвардом: reparse-точки не рекурсируются —
+    /// циклический junction не вешает подсчёт, содержимое за junction
+    /// в размер не входит (findings M1, День 14).
+    /// Работает на FileSystemInfo из перечисления: атрибуты и Length берутся
+    /// из find-данных без stat-системного вызова на каждый файл.
     /// </summary>
     protected long CalculateDirectorySize(string path)
     {
@@ -37,15 +42,50 @@ public abstract class ScannerBase : IScannerStrategy
 
         try
         {
-            return new DirectoryInfo(path)
-                .EnumerateFiles("*", SearchOption.AllDirectories)
-                .Sum(file => 
-                {
-                    try { return file.Length; }
-                    catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[ScannerBase] File size error: {ex.Message}"); return 0; }
-                });
+            return SumDirectorySize(new DirectoryInfo(path));
         }
         catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[ScannerBase] CalculateDirectorySize error: {ex.Message}"); return 0; }
+    }
+
+    /// <summary>Рекурсивная сумма размеров файлов с цикл-гвардом reparse-точек.</summary>
+    private long SumDirectorySize(DirectoryInfo directory)
+    {
+        long total = 0;
+
+        IEnumerable<FileSystemInfo> entries;
+        try
+        {
+            // Однопроходное перечисление (файлы и каталоги одним дескриптором).
+            entries = directory.EnumerateFileSystemInfos();
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[ScannerBase] Enumerate entries error: {ex.Message}");
+            return 0;
+        }
+
+        foreach (var entry in entries)
+        {
+            if (entry is FileInfo file)
+            {
+                try { total += file.Length; }
+                catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[ScannerBase] File size error: {ex.Message}"); }
+            }
+            else if (entry is DirectoryInfo subDirectory)
+            {
+                // Цикл-гвард: спуск в reparse-точку запрещён (атрибут — из find-данных).
+                bool isReparse;
+                try { isReparse = (subDirectory.Attributes & FileAttributes.ReparsePoint) != 0; }
+                catch { isReparse = true; } // непроверяемый каталог не рекурсируем (fail-closed)
+
+                if (!isReparse)
+                {
+                    total += SumDirectorySize(subDirectory);
+                }
+            }
+        }
+
+        return total;
     }
 
     /// <summary>
@@ -148,6 +188,113 @@ public abstract class ScannerBase : IScannerStrategy
                 yield return enumerator.Current;
             }
         }
+    }
+
+    /// <summary>
+    /// Рекурсивно перечисляет файлы с цикл-гвардом: reparse-точки (junction/symlink)
+    /// НЕ рекурсируются. BCL SearchOption.AllDirectories следует за junction —
+    /// циклический junction даёт неограниченный спуск до исчерпания длины пути
+    /// (findings M1, День 14); здесь спуск останавливается на reparse-точке,
+    /// поэтому перечисление гарантированно завершается. Ошибки доступа
+    /// логируются и каталог пропускается.
+    /// </summary>
+    /// <param name="path">Корневой каталог (сам может быть junction — его верхний уровень перечисляется)</param>
+    /// <param name="searchPattern">Паттерн поиска (по умолчанию "*")</param>
+    protected IEnumerable<string> SafeEnumerateFilesRecursive(string path, string searchPattern = "*")
+    {
+        if (!Directory.Exists(path))
+        {
+            yield break;
+        }
+
+        var pending = new Stack<string>();
+        pending.Push(path);
+
+        while (pending.Count > 0)
+        {
+            var current = pending.Pop();
+
+            foreach (var file in SafeEnumerateFiles(current, searchPattern))
+            {
+                yield return file;
+            }
+
+            foreach (var subDirectory in SafeEnumerateDirectories(current))
+            {
+                if (!IsReparseDirectory(subDirectory))
+                {
+                    pending.Push(subDirectory);
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Рекурсивно перечисляет каталоги с цикл-гвардом: reparse-точки
+    /// (junction/symlink) НЕ рекурсируются (findings M1, День 14), но сами
+    /// могут выдаваться в выдачу, если совпадают с паттерном. Ошибки доступа
+    /// логируются и каталог пропускается.
+    /// </summary>
+    /// <param name="path">Корневой каталог</param>
+    /// <param name="searchPattern">Паттерн имени каталога (по умолчанию "*")</param>
+    protected IEnumerable<string> SafeEnumerateDirectoriesRecursive(string path, string searchPattern = "*")
+    {
+        if (!Directory.Exists(path))
+        {
+            yield break;
+        }
+
+        var pending = new Stack<string>();
+        pending.Push(path);
+
+        while (pending.Count > 0)
+        {
+            var current = pending.Pop();
+
+            foreach (var directory in SafeEnumerateDirectories(current, searchPattern))
+            {
+                yield return directory;
+            }
+
+            foreach (var subDirectory in SafeEnumerateDirectories(current))
+            {
+                if (!IsReparseDirectory(subDirectory))
+                {
+                    pending.Push(subDirectory);
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Каталог — reparse-точка (junction/symlink): рекурсия в него запрещена
+    /// (цикл-гвард перечислений). Ошибка получения атрибутов трактуется как
+    /// reparse — непроверяемый каталог не рекурсируется (fail-closed).
+    /// </summary>
+    private static bool IsReparseDirectory(string path)
+    {
+        try
+        {
+            return (File.GetAttributes(path) & FileAttributes.ReparsePoint) != 0;
+        }
+        catch
+        {
+            return true;
+        }
+    }
+
+    /// <summary>
+    /// Гейт выдачи сканера (findings M1, День 14): путь item резолвится в
+    /// реальный (PathResolver.ResolveRealPath); защищённые по реальному пути
+    /// цели (whitelist) не попадают в выдачу — иначе junction в сканируемой
+    /// зоне отдаёт файлы из защищённых зон под видом чистимого кэша.
+    /// Неразрешимая reparse-цепочка (Resolved=false) — fail-closed: item
+    /// не выдаётся.
+    /// </summary>
+    protected bool IsProtectedScanTarget(string path)
+    {
+        var resolved = PathResolver.ResolveRealPath(path);
+        return !resolved.Resolved || _safety.IsWhitelisted(resolved.Path);
     }
 
     /// <summary>

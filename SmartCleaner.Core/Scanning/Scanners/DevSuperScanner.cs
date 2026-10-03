@@ -21,6 +21,20 @@ public class DevSuperScanner : ScannerBase
     {
     }
 
+    /// <summary>
+    /// Корень прямых установок WSL2 (%LOCALAPPDATA%\wsl). Virtual — шов для
+    /// тестов (скан temp-дерева с junction, День 14).
+    /// </summary>
+    protected virtual string DirectWslDirectory => Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "wsl");
+
+    /// <summary>
+    /// Корень AVD-эмуляторов Android (%USERPROFILE%\.android\avd). Virtual — шов
+    /// для тестов.
+    /// </summary>
+    protected virtual string AndroidAvdSnapshotsDirectory => Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".android", "avd");
+
     public override Task<ScanResult> ScanAsync(IProgress<string>? progress = null, CancellationToken ct = default)
     {
         var items = new List<ScannedItem>();
@@ -43,7 +57,7 @@ public class DevSuperScanner : ScannerBase
                 {
                     ct.ThrowIfCancellationRequested();
                     var vhdx = Path.Combine(dir, "LocalState", "ext4.vhdx");
-                    if (File.Exists(vhdx))
+                    if (File.Exists(vhdx) && !IsProtectedScanTarget(vhdx))
                     {
                         var fi = new FileInfo(vhdx);
                         items.Add(new ScannedItem
@@ -61,12 +75,15 @@ public class DevSuperScanner : ScannerBase
                 }
             }
 
-            var directWslDir = Path.Combine(localAppData, "wsl");
+            var directWslDir = DirectWslDirectory;
             if (Directory.Exists(directWslDir))
             {
-                foreach (var vhdx in Directory.EnumerateFiles(directWslDir, "ext4.vhdx", SearchOption.AllDirectories))
+                // Цикл-гвард: reparse-точки не рекурсируются; каждый item —
+                // через гейт реального пути (findings M1, День 14).
+                foreach (var vhdx in SafeEnumerateFilesRecursive(directWslDir, "ext4.vhdx"))
                 {
                     ct.ThrowIfCancellationRequested();
+                    if (IsProtectedScanTarget(vhdx)) continue;
                     var fi = new FileInfo(vhdx);
                     items.Add(new ScannedItem
                     {
@@ -118,12 +135,14 @@ public class DevSuperScanner : ScannerBase
         var androidTemp = Path.Combine(localAppData, "Android", "Sdk", ".temp");
         AddDirectoryIfFound(items, androidTemp, "Android SDK Temp", "Временные файлы загрузки компонентов Android SDK", "Удаление безопасно", RiskCategory.SafeToDelete);
 
-        var androidAvdSnapshots = Path.Combine(userHome, ".android", "avd");
+        var androidAvdSnapshots = AndroidAvdSnapshotsDirectory;
         if (Directory.Exists(androidAvdSnapshots))
         {
             try
             {
-                foreach (var snapDir in Directory.EnumerateDirectories(androidAvdSnapshots, "snapshots", SearchOption.AllDirectories))
+                // Цикл-гвард: reparse-точки не рекурсируются (findings M1, День 14) —
+                // циклический junction под корнем AVD не рывает перечисление снапшотов.
+                foreach (var snapDir in SafeEnumerateDirectoriesRecursive(androidAvdSnapshots, "snapshots"))
                 {
                     AddDirectoryIfFound(items, snapDir, "Android Emulator Snapshot", "Снимки состояния эмуляторов Android", "Снимок пересоздастся при закрытии эмулятора", RiskCategory.PerformanceCache);
                 }
@@ -155,6 +174,7 @@ public class DevSuperScanner : ScannerBase
     private void AddDirectoryIfFound(List<ScannedItem> items, string path, string name, string desc, string howToRestore, RiskCategory risk)
     {
         if (string.IsNullOrWhiteSpace(path) || !Directory.Exists(path)) return;
+        if (IsProtectedScanTarget(path)) return; // гейт выдачи по реальному пути (findings M1)
 
         try
         {
