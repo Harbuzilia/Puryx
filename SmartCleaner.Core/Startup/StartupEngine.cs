@@ -246,7 +246,7 @@ public sealed class StartupEngine
                 RedirectStandardOutput = true,
                 UseShellExecute = false,
                 CreateNoWindow = true,
-                StandardOutputEncoding = System.Text.Encoding.GetEncoding(866)
+                StandardOutputEncoding = GetSchtasksOutputEncoding()
             };
 
             using var process = Process.Start(psi);
@@ -297,6 +297,30 @@ public sealed class StartupEngine
             process.WaitForExit(3000);
         }
         catch (Exception ex) { /* schtasks not available or permission denied */ Debug.WriteLine($"[StartupEngine] Task scheduler scan error: {ex.Message}"); }
+    }
+
+    /// <summary>
+    /// Кодировка вывода schtasks: OEM-страница консоли (cp866 на русской Windows).
+    /// </summary>
+    internal static System.Text.Encoding GetSchtasksOutputEncoding()
+    {
+        return System.Text.Encoding.GetEncoding(866);
+    }
+
+    /// <summary>
+    /// Декодирует байты вывода schtasks в строки (чистая функция — тестируется без запуска процесса).
+    /// </summary>
+    internal static IReadOnlyList<string> DecodeSchtasksOutput(byte[] rawBytes)
+    {
+        var encoding = GetSchtasksOutputEncoding();
+        using var stream = new MemoryStream(rawBytes, writable: false);
+        using var reader = new StreamReader(stream, encoding);
+        var lines = new List<string>();
+        while (reader.ReadLine() is { } line)
+        {
+            lines.Add(line);
+        }
+        return lines;
     }
 
     // ─── Реестровые операции ────────────────────
