@@ -222,6 +222,7 @@ public partial class App : Application
         // God-Tier & Master Services
         services.AddSingleton<SmartCleaner.Core.Optimization.SqliteCompactorService>();
         services.AddSingleton<SmartCleaner.Core.SystemOpt.RamOptimizerService>();
+        services.AddSingleton<SmartCleaner.Core.SystemOpt.IGameBoostSystemOperations, SmartCleaner.Core.SystemOpt.StandardGameBoostSystemOperations>();
         services.AddSingleton<SmartCleaner.Core.SystemOpt.GameBoostService>();
         services.AddSingleton<SmartCleaner.Core.DiskHealth.DiskHealthService>();
         services.AddSingleton<SmartCleaner.Core.Safety.FileShredderService>();

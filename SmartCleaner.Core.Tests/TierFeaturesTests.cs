@@ -114,7 +114,7 @@ public class TierFeaturesTests
     public async Task GameBoostService_StateTransitions_WorkCorrectly()
     {
         var ram = new SmartCleaner.Core.SystemOpt.RamOptimizerService();
-        var boost = new SmartCleaner.Core.SystemOpt.GameBoostService(ram);
+        var boost = new SmartCleaner.Core.SystemOpt.GameBoostService(ram, new InMemoryConfigService([]));
 
         Assert.False(boost.CurrentState.IsBoostActive);
 
