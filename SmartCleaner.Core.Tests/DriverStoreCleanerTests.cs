@@ -178,6 +178,28 @@ public class DriverStoreCleanerTests
         Assert.False(items[1].IsOldDuplicate);
     }
 
+    [Fact]
+    public void BuildDeleteArguments_ByDefault_NoForce()
+    {
+        // День 15 — M8: по умолчанию /force нет — используемый системой драйвер
+        // pnputil обязан честно отказаться удалять, а не быть вырванным.
+        var item = New("oem9.inf", "nv_dispi.inf", "Display adapters", "30.0.14.7", "10/30/2021");
+
+        var args = DriverStoreCleaner.BuildDeleteArguments(item, forceConfirmed: false);
+
+        Assert.Equal("/delete-driver oem9.inf /uninstall", args);
+    }
+
+    [Fact]
+    public void BuildDeleteArguments_ExplicitConfirmationOnly_AddsForce()
+    {
+        var item = New("oem9.inf", "nv_dispi.inf", "Display adapters", "30.0.14.7", "10/30/2021");
+
+        var args = DriverStoreCleaner.BuildDeleteArguments(item, forceConfirmed: true);
+
+        Assert.Equal("/delete-driver oem9.inf /uninstall /force", args);
+    }
+
     private static DriverStoreItem New(
         string publishedName, string originalName, string className, string version, string date) => new()
     {

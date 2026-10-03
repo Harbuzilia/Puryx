@@ -133,8 +133,12 @@ public partial class SystemDeepCleanViewModel : ObservableObject
         var selected = OldDrivers.Where(d => d.IsSelected).ToList();
         if (selected.Count == 0) return;
 
+        // День 15 — M8: по умолчанию удаление БЕЗ /force — драйверы, используемые
+        // системой, pnputil откажется удалять (честный отказ), а не вырывает принудительно.
         var result = MessageBox.Show(
-            $"Удалить {selected.Count} устаревших дубликатов драйверов из DriverStore через PnPUtil?",
+            $"Удалить {selected.Count} устаревших дубликатов драйверов из DriverStore через PnPUtil?\n\n" +
+            "• Удаление выполняется без ключа /force: драйверы, которые используются системой, удалены НЕ будут.\n" +
+            "• Принудительное удаление (/force) — только по отдельному подтверждению, если что-то не удалится.",
             "Очистка DriverStore",
             MessageBoxButton.YesNo,
             MessageBoxImage.Question);
@@ -146,14 +150,53 @@ public partial class SystemDeepCleanViewModel : ObservableObject
 
         try
         {
-            var (removed, errors) = await _drivers.RemoveDriversAsync(selected, new Progress<string>(s => StatusText = s));
-            foreach (var item in selected)
+            var (removed, errors, removedItems) = await _drivers.RemoveDriversAsync(selected, new Progress<string>(s => StatusText = s));
+
+            // Список покидают только реально удалённые записи; неудалённые остаются видимыми.
+            foreach (var item in removedItems)
             {
                 OldDrivers.Remove(item);
             }
             OldDriversCount = OldDrivers.Count;
-            StatusText = $"Успешно удалено {removed} устаревших пакетов драйверов!";
-            MessageBox.Show($"Удалено драйверов: {removed}.", "Очистка завершена", MessageBoxButton.OK, MessageBoxImage.Information);
+
+            var totalRemoved = removed;
+
+            if (errors.Count > 0)
+            {
+                var failed = selected.Except(removedItems).ToList();
+                // Осознанное решение о /force: только для записей, от которых отказался pnputil
+                // (возможно, используются системой), и только по явному подтверждению пользователя.
+                var force = MessageBox.Show(
+                    $"Не удалено пакетов: {errors.Count}.\n{errors[0]}\n\n" +
+                    "Windows может использовать эти драйверы прямо сейчас.\n" +
+                    "Принудительно удалить их с ключом /force? Это может нарушить работу устройств.",
+                    "Очистка DriverStore",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Warning);
+
+                if (force == MessageBoxResult.Yes)
+                {
+                    var (forceRemoved, forceErrors, forceRemovedItems) = await _drivers.RemoveDriversAsync(
+                        failed, new Progress<string>(s => StatusText = s), forceConfirmed: true);
+
+                    totalRemoved += forceRemoved;
+                    foreach (var item in forceRemovedItems)
+                    {
+                        OldDrivers.Remove(item);
+                    }
+                    OldDriversCount = OldDrivers.Count;
+                    errors = forceErrors;
+                }
+            }
+
+            StatusText = errors.Count == 0
+                ? $"Успешно удалено {totalRemoved} устаревших пакетов драйверов!"
+                : $"Удалено {totalRemoved}; не удалено: {errors.Count} (драйверы могут использоваться системой).";
+            MessageBox.Show(
+                $"Удалено драйверов: {totalRemoved}. Не удалено: {errors.Count}.",
+                "Очистка завершена",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
         }
         catch (Exception ex)
         {

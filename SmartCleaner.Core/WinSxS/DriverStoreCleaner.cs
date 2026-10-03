@@ -214,10 +214,20 @@ public class DriverStoreCleaner
         return false;
     }
 
-    public async Task<(int RemovedCount, List<string> Errors)> RemoveDriversAsync(IEnumerable<DriverStoreItem> drivers, IProgress<string>? progress = null)
+    /// <summary>
+    /// День 15 — M8: удаление выбранных пакетов через «pnputil /delete-driver /uninstall».
+    /// По умолчанию БЕЗ ключа /force: драйвер, используемый системой, pnputil честно
+    /// откажется удалять (код возврата != 0 попадает в Errors, а не вырывается
+    /// принудительно). /force добавляется только при forceConfirmed = true —
+    /// явном подтверждении пользователя, что записи можно удалить принудительно.
+    /// Возвращает список реально удалённых записей: список UI покидают только они.
+    /// </summary>
+    public async Task<(int RemovedCount, List<string> Errors, List<DriverStoreItem> RemovedItems)> RemoveDriversAsync(
+        IEnumerable<DriverStoreItem> drivers, IProgress<string>? progress = null, bool forceConfirmed = false)
     {
         int count = 0;
         var errors = new List<string>();
+        var removedItems = new List<DriverStoreItem>();
 
         foreach (var d in drivers.Where(x => x.IsSelected))
         {
@@ -227,7 +237,7 @@ public class DriverStoreCleaner
                 var psi = new ProcessStartInfo
                 {
                     FileName = SystemToolLocator.GetPnputilPath(),
-                    Arguments = $"/delete-driver {d.PublishedName} /uninstall /force",
+                    Arguments = BuildDeleteArguments(d, forceConfirmed),
                     CreateNoWindow = true,
                     UseShellExecute = true,
                     Verb = "runas"
@@ -237,8 +247,15 @@ public class DriverStoreCleaner
                 if (proc != null)
                 {
                     await proc.WaitForExitAsync();
-                    if (proc.ExitCode == 0) count++;
-                    else errors.Add($"Не удалось удалить {d.PublishedName}: код {proc.ExitCode}");
+                    if (proc.ExitCode == 0)
+                    {
+                        count++;
+                        removedItems.Add(d);
+                    }
+                    else
+                    {
+                        errors.Add($"Не удалось удалить {d.PublishedName}: код {proc.ExitCode}");
+                    }
                 }
             }
             catch (Exception ex)
@@ -247,6 +264,16 @@ public class DriverStoreCleaner
             }
         }
 
-        return (count, errors);
+        return (count, errors, removedItems);
     }
+
+    /// <summary>
+    /// День 15 — M8: аргументы pnputil для удаления пакета. Ключ /force
+    /// (принудительное удаление даже используемого драйвера) добавляется
+    /// только при явном подтверждении пользователя, никогда по умолчанию.
+    /// </summary>
+    internal static string BuildDeleteArguments(DriverStoreItem driver, bool forceConfirmed) =>
+        forceConfirmed
+            ? $"/delete-driver {driver.PublishedName} /uninstall /force"
+            : $"/delete-driver {driver.PublishedName} /uninstall";
 }
