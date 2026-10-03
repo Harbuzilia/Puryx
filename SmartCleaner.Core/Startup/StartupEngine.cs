@@ -300,6 +300,53 @@ public sealed class StartupEngine
         catch (Exception ex) { /* schtasks not available or permission denied */ Debug.WriteLine($"[StartupEngine] Task scheduler scan error: {ex.Message}"); }
     }
 
+    /// <summary>
+    /// Разбирает строку вывода «schtasks /query /fo CSV /NH /V» в элемент автозагрузки;
+    /// null — если строка отфильтрована (системная задача, COM-обработчик, N/A, неактивный статус).
+    /// Выделено из ScanTaskScheduler для тестируемости построчного разбора.
+    /// </summary>
+    /// <remarks>
+    /// RED-этап TDD: тело временно переносит ТЕКУЩУЮ логику разбора из ScanTaskScheduler
+    /// как есть — новые тесты фиксируют её баги (имя задачи из колонки 0 «Имя узла»,
+    /// фильтр \Microsoft\ по HostName, Trim('"') вместо корректного разбора кавычек CSV).
+    /// Исправление — следующим коммитом (fix(startup)).
+    /// </remarks>
+    internal static StartupItem? TryParseTaskSchedulerCsvLine(string line)
+    {
+        var fields = ParseCsvLine(line);
+        if (fields.Length < 9) return null;
+
+        var taskName = fields[0].Trim('"');
+        var status = fields[3].Trim('"');
+        var taskToRun = fields[8].Trim('"');
+
+        // Фильтруем системные задачи Microsoft
+        if (taskName.StartsWith(@"\Microsoft\", StringComparison.OrdinalIgnoreCase)) return null;
+        if (taskToRun.Contains("COM handler", StringComparison.OrdinalIgnoreCase)) return null;
+        if (string.IsNullOrWhiteSpace(taskToRun) || taskToRun == "N/A") return null;
+
+        // Проверяем: логон-триггер = автозагрузка
+        if (status.Contains("Ready", StringComparison.OrdinalIgnoreCase)
+            || status.Contains("Running", StringComparison.OrdinalIgnoreCase)
+            || status.Contains("Готово", StringComparison.OrdinalIgnoreCase)
+            || status.Contains("Выполняется", StringComparison.OrdinalIgnoreCase))
+        {
+            var (filePath, arguments) = ParseCommand(taskToRun);
+
+            return new StartupItem
+            {
+                Name = Path.GetFileName(taskName),
+                FilePath = filePath,
+                Arguments = arguments,
+                Command = taskToRun,
+                Source = StartupSource.TaskScheduler,
+                IsEnabled = true
+            };
+        }
+
+        return null;
+    }
+
     private static int _oemEncodingProviderRegistered;
 
     /// <summary>
@@ -464,9 +511,9 @@ public sealed class StartupEngine
     }
 
     /// <summary>
-    /// Простой парсер CSV-строки.
+    /// Парсер CSV-строки вывода schtasks.
     /// </summary>
-    private static string[] ParseCsvLine(string line)
+    internal static string[] ParseCsvLine(string line)
     {
         var fields = new List<string>();
         bool inQuotes = false;
