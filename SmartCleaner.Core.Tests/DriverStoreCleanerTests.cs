@@ -82,10 +82,12 @@ public class DriverStoreCleanerTests
         Assert.Equal("07/08/2026", newest.DriverDate);
         Assert.False(newest.IsOldDuplicate);
         Assert.False(newest.IsSelected);
+        Assert.True(newest.IsCurrent);
 
         var older = Assert.Single(items, d => d.PublishedName == "oem2.inf");
         Assert.True(older.IsOldDuplicate);
         Assert.True(older.IsSelected);
+        Assert.False(older.IsCurrent);
 
         var oldest = Assert.Single(items, d => d.PublishedName == "oem9.inf");
         Assert.True(oldest.IsOldDuplicate);
@@ -103,10 +105,12 @@ public class DriverStoreCleanerTests
         Assert.Equal("07/08/2026", newest.DriverDate);
         Assert.False(newest.IsOldDuplicate);
         Assert.False(newest.IsSelected);
+        Assert.True(newest.IsCurrent);
 
         var older = Assert.Single(items, d => d.PublishedName == "oem94.inf");
         Assert.True(older.IsOldDuplicate);
         Assert.True(older.IsSelected);
+        Assert.False(older.IsCurrent);
     }
 
     [Fact]
