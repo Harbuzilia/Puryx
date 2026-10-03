@@ -30,9 +30,16 @@ public class QuarantineService
     private readonly string _storageDir;
 
     public QuarantineService()
+        : this(GetDefaultQuarantineRoot())
     {
-        var localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-        _quarantineDir = Path.Combine(localAppData, "SmartCleaner", "Quarantine");
+    }
+
+    /// <summary>
+    /// Конструктор с изолированным корнем карантина (для тестов: вместо %LOCALAPPDATA%).
+    /// </summary>
+    public QuarantineService(string quarantineRoot)
+    {
+        _quarantineDir = quarantineRoot;
         _storageDir = Path.Combine(_quarantineDir, "Storage");
         _manifestFile = Path.Combine(_quarantineDir, "manifest.json");
 
@@ -45,6 +52,12 @@ public class QuarantineService
             // Если не удалось создать директорию — карантин недоступен
             Debug.WriteLine($"[Quarantine] Storage directory unavailable: {ex.Message}");
         }
+    }
+
+    private static string GetDefaultQuarantineRoot()
+    {
+        var localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        return Path.Combine(localAppData, "SmartCleaner", "Quarantine");
     }
 
     public async Task<List<QuarantinedItem>> GetQuarantinedItemsAsync()
