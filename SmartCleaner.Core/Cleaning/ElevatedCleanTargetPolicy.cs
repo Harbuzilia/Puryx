@@ -1,3 +1,5 @@
+using SmartCleaner.Core.Safety;
+
 namespace SmartCleaner.Core.Cleaning;
 
 public static class ElevatedCleanTargetPolicy
@@ -45,8 +47,18 @@ public static class ElevatedCleanTargetPolicy
 
     public static bool IsAllowedTarget(string path)
     {
-        var fullPath = Path.GetFullPath(path);
-        return GetAllowedRoots().Any(root => IsPathWithinRoot(fullPath, root));
+        // Allowlist-корни проверяются по РЕАЛЬНОМУ пути (findings M1, День 14):
+        // junction внутри allowlist-корня, указывающий наружу, лексически проходит
+        // проверку границы корня. Неразрешимая reparse-цепочка (цикл, лимит
+        // переходов, неподдерживаемый тег — OneDrive-плейсхолдеры, — ошибка
+        // доступа) — fail-closed: цель не разрешена.
+        var resolved = PathResolver.ResolveRealPath(path);
+        if (!resolved.Resolved)
+        {
+            return false;
+        }
+
+        return GetAllowedRoots().Any(root => IsPathWithinRoot(resolved.Path, root));
     }
 
     private static IEnumerable<string> GetAllowedRoots()
@@ -67,6 +79,11 @@ public static class ElevatedCleanTargetPolicy
         };
     }
 
+    /// <summary>
+    /// Лексическая проверка границы корня. Честна только для пути, уже развёрнутого
+    /// из junction/symlink-цепочки (PathResolver.ResolveRealPath, День 14, findings M1):
+    /// вызывающий <see cref="IsAllowedTarget"/> резолвит путь до сравнения.
+    /// </summary>
     private static bool IsPathWithinRoot(string fullPath, string root)
     {
         var normalizedPath = fullPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
