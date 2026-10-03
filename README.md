@@ -12,7 +12,7 @@
   <a href="https://github.com/Harbuzilia/Puryx"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-2ea44f.svg"></a>
   <a href="https://github.com/Harbuzilia/Puryx"><img alt="Platform: Windows 10/11" src="https://img.shields.io/badge/platform-Windows%2010%2F11-0078D4?logo=windows&logoColor=white"></a>
   <a href="https://github.com/Harbuzilia/Puryx"><img alt=".NET 8" src="https://img.shields.io/badge/.NET-8.0-512BD4?logo=dotnet&logoColor=white"></a>
-  <a href="https://github.com/Harbuzilia/Puryx"><img alt="Version: 2.7.2" src="https://img.shields.io/badge/version-2.7.2-8a2be2.svg"></a>
+  <a href="https://github.com/Harbuzilia/Puryx"><img alt="Version: 2.8.0" src="https://img.shields.io/badge/version-2.8.0-8a2be2.svg"></a>
 </p>
 
 <p align="center">
