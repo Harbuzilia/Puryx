@@ -99,15 +99,16 @@ public sealed class CleaningStatsService
 
     /// <summary>
     /// Агрегация по неделям (для графика): последние N недель.
+    /// Параметр now позволяет детерминировать «сегодня» в тестах.
     /// </summary>
-    public List<(string Label, long TotalBytes, int TotalFiles)> GetWeeklyStats(int weeks = 12)
+    public List<(string Label, long TotalBytes, int TotalFiles)> GetWeeklyStats(int weeks = 12, DateTime? now = null)
     {
         var result = new List<(string, long, int)>();
-        var now = DateTime.Now.Date;
+        var today = (now ?? DateTime.Now).Date;
 
         for (int i = weeks - 1; i >= 0; i--)
         {
-            var weekStart = now.AddDays(-7 * i - (int)now.DayOfWeek + 1);
+            var weekStart = GetWeekStart(today, i);
             var weekEnd = weekStart.AddDays(7);
             var label = weekStart.ToString("dd.MM");
             var sessionsInWeek = _sessions.Where(s => s.Date >= weekStart && s.Date < weekEnd);
@@ -116,6 +117,17 @@ public sealed class CleaningStatsService
         }
 
         return result;
+    }
+
+    /// <summary>
+    /// Начало недели (понедельник) для заданной даты, смещённое на weeksAgo недель назад.
+    /// </summary>
+    internal static DateTime GetWeekStart(DateTime date, int weeksAgo)
+    {
+        // Дней с понедельника: Mon→0, Tue→1, ..., Sat→5, Sun→6
+        // (простое (int)DayOfWeek даёт Sun→0, и в воскресенье начало недели уезжает в «завтра»)
+        int daysSinceMonday = ((int)date.DayOfWeek + 6) % 7;
+        return date.Date.AddDays(-7 * weeksAgo - daysSinceMonday);
     }
 
     /// <summary>

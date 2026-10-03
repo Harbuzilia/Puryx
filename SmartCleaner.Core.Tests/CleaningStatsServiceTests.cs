@@ -142,6 +142,58 @@ public class CleaningStatsServiceTests
     }
 
     [Fact]
+    public void GetWeekStart_ReturnsMondayForEveryDayOfWeek()
+    {
+        // Неделя: пн 28.09.2026 — вс 04.10.2026
+        var monday = new DateTime(2026, 9, 28);
+        for (int day = 0; day < 7; day++)
+        {
+            var date = monday.AddDays(day);
+
+            var weekStart = CleaningStatsService.GetWeekStart(date, 0);
+
+            Assert.Equal(monday, weekStart);
+            Assert.Equal(DayOfWeek.Monday, weekStart.DayOfWeek);
+        }
+    }
+
+    [Fact]
+    public void GetWeekStart_StepsBackWholeWeeks()
+    {
+        // Воскресенье 04.10.2026: текущая неделя началась в пн 28.09
+        var sunday = new DateTime(2026, 10, 4);
+
+        Assert.Equal(new DateTime(2026, 9, 28), CleaningStatsService.GetWeekStart(sunday, 0));
+        Assert.Equal(new DateTime(2026, 9, 21), CleaningStatsService.GetWeekStart(sunday, 1));
+        Assert.Equal(new DateTime(2026, 9, 14), CleaningStatsService.GetWeekStart(sunday, 2));
+    }
+
+    [Fact]
+    public void GetWeeklyStats_SundaySessionCountedInCurrentWeek()
+    {
+        var dir = CreateStatsDir();
+        try
+        {
+            // Сессия, записанная в воскресенье 04.10.2026 в 15:00
+            var sessionJson = "[{\"Date\":\"2026-10-04T15:00:00\",\"FreedBytes\":700,\"FilesDeleted\":3,\"Profile\":\"Полное\"}]";
+            File.WriteAllText(Path.Combine(dir, "cleaning_stats.json"), sessionJson);
+
+            var service = new CleaningStatsService(dir);
+
+            // «Сегодня» — то же воскресенье, вечером после сессии
+            var stats = service.GetWeeklyStats(1, new DateTime(2026, 10, 4, 20, 0, 0));
+
+            var week = Assert.Single(stats);
+            Assert.Equal(700, week.TotalBytes);
+            Assert.Equal(3, week.TotalFiles);
+        }
+        finally
+        {
+            Directory.Delete(dir, recursive: true);
+        }
+    }
+
+    [Fact]
     public void Constructor_InvalidDirectory_DoesNotThrow()
     {
         // Директория на самом деле занята файлом — сервис должен работать без сохранения, а не падать
