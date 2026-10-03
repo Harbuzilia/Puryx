@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Text.Json;
 
@@ -12,6 +13,12 @@ public class PrivacyDebloatService
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
         "SmartCleaner",
         "privacy_backup.json");
+
+    private static readonly JsonSerializerOptions BackupJsonOptions = new()
+    {
+        WriteIndented = true,
+        PropertyNameCaseInsensitive = true
+    };
 
     private readonly IRegistryValueStore _registry;
     private readonly string _backupFilePath;
@@ -492,26 +499,73 @@ public class PrivacyDebloatService
     {
         try
         {
+            // Бэкапим только значения реестра: у сервисных твиков (ServiceName)
+            // нет значения для бэкапа — их откат восстанавливает службу через sc.exe
+            if (string.IsNullOrEmpty(tweak.RegistryRoot) || string.IsNullOrEmpty(tweak.SubKeyPath) || string.IsNullOrEmpty(tweak.ValueName))
+            {
+                return;
+            }
+
             Directory.CreateDirectory(Path.GetDirectoryName(_backupFilePath)!);
-            var backupMap = new Dictionary<string, string>();
+            var backupMap = LoadBackupMap();
 
-            if (File.Exists(_backupFilePath))
+            // Первый бэкап побеждает: храним исходное значение до ПЕРВОГО
+            // изменения — повторные apply не затирают его применённым значением
+            if (backupMap.ContainsKey(tweak.Id))
             {
-                var json = File.ReadAllText(_backupFilePath);
-                backupMap = JsonSerializer.Deserialize<Dictionary<string, string>>(json) ?? [];
+                return;
             }
 
-            if (!backupMap.ContainsKey(tweak.Id))
+            // Фактическое состояние значения до изменения, а не константа из кода:
+            // snapshot == null означает «значения не было» (откат = DeleteValue)
+            var snapshot = _registry.GetValue(tweak.RegistryRoot, tweak.SubKeyPath, tweak.ValueName);
+            backupMap[tweak.Id] = JsonSerializer.SerializeToElement(new PrivacyBackupEntry
             {
-                backupMap[tweak.Id] = tweak.DefaultValue?.ToString() ?? "1";
-                File.WriteAllText(_backupFilePath, JsonSerializer.Serialize(backupMap, new JsonSerializerOptions { WriteIndented = true }));
-            }
+                Existed = snapshot != null,
+                Kind = snapshot?.Kind.ToString(),
+                Value = snapshot == null ? null : FormatRegistryValueForBackup(snapshot.Value)
+            });
+            File.WriteAllText(_backupFilePath, JsonSerializer.Serialize(backupMap, BackupJsonOptions));
         }
         catch (Exception ex)
         {
             // Backup should never block user action, but its absence must be visible
             System.Diagnostics.Debug.WriteLine($"[PrivacyDebloat] Backup save failed for {tweak.Id}: {ex.Message}");
         }
+    }
+
+    /// <summary>
+    /// Загружает карту бэкапа: id твика → запись. Записи новой схемы (M4) —
+    /// объекты { Existed, Kind, Value }, записи старой схемы — плоские строки
+    /// (константы); при перезаписи файла сохраняются как есть.
+    /// Бросает исключение на повреждённом файле — вызывающий решает, что делать.
+    /// </summary>
+    private Dictionary<string, JsonElement> LoadBackupMap()
+    {
+        if (!File.Exists(_backupFilePath))
+        {
+            return [];
+        }
+
+        return JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(File.ReadAllText(_backupFilePath)) ?? [];
+    }
+
+    // Инвариантное строковое представление фактического значения реестра для бэкапа
+    private static string? FormatRegistryValueForBackup(object value) => value switch
+    {
+        int intValue => intValue.ToString(CultureInfo.InvariantCulture),
+        long longValue => longValue.ToString(CultureInfo.InvariantCulture),
+        string stringValue => stringValue,
+        _ => value.ToString()
+    };
+
+    // Запись бэкапа новой схемы (M4): фактическое состояние значения до изменения.
+    // Записи старой схемы (до M4) — плоские строки-константы, откат им не доверяет.
+    private sealed class PrivacyBackupEntry
+    {
+        public bool Existed { get; set; }
+        public string? Kind { get; set; }
+        public string? Value { get; set; }
     }
 
     private static PrivacyTweakItem CloneTweak(PrivacyTweakItem source) => new()
