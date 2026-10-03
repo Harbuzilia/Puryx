@@ -1,6 +1,7 @@
 using SmartCleaner.Core.Knowledge;
 using SmartCleaner.Core.Models;
 using SmartCleaner.Core.Safety;
+using System.Diagnostics;
 using System.IO;
 using Xunit;
 
@@ -304,5 +305,152 @@ public class SafetyServiceTests
 
         Assert.True(validation.CanDelete);
         Assert.False(validation.RequiresElevation);
+    }
+
+    // ─── Junction/reparse (findings M1, День 14 — M1 2/2) ──
+    // Все проверки путей обязаны видеть РЕАЛЬНЫЙ путь цели junction,
+    // а не лексический путь ссылки. Тесты создают настоящие junction
+    // через cmd mklink /J (права администратора не нужны) — Integration-трейт.
+
+    /// <summary>
+    /// Создаёт junction linkPath → targetPath (cmd mklink /J).
+    /// Цель может не существовать: «висячие» junction допустимы.
+    /// </summary>
+    private static void CreateJunction(string linkPath, string targetPath)
+    {
+        var psi = new ProcessStartInfo
+        {
+            FileName = "cmd.exe",
+            Arguments = $"/c mklink /J \"{linkPath}\" \"{targetPath}\"",
+            UseShellExecute = false,
+            CreateNoWindow = true
+        };
+        using var process = Process.Start(psi) ?? throw new InvalidOperationException("cmd.exe не запущен");
+        if (!process.WaitForExit(15_000))
+        {
+            process.Kill();
+            throw new InvalidOperationException($"mklink /J завис: {linkPath} -> {targetPath}");
+        }
+        Assert.True(Directory.Exists(linkPath),
+            $"junction не создан (mklink exit={process.ExitCode}): {linkPath} -> {targetPath}");
+    }
+
+    /// <summary>
+    /// Уборка тестового дерева с junction: рекурсивный Directory.Delete падает
+    /// на reparse-точках, поэтому ссылки снимаются поодиночке (нерекурсивное
+    /// удаление junction удаляет ссылку, не цель), затем удаляется дерево.
+    /// </summary>
+    private static void CleanupTree(string root)
+    {
+        try
+        {
+            foreach (var dir in Directory.EnumerateDirectories(root))
+            {
+                try
+                {
+                    if ((File.GetAttributes(dir) & FileAttributes.ReparsePoint) != 0)
+                    {
+                        Directory.Delete(dir);
+                    }
+                }
+                catch
+                {
+                    // best-effort: недоступная ссылка не должна ломать тест
+                }
+            }
+
+            Directory.Delete(root, recursive: true);
+        }
+        catch
+        {
+            // как в PathResolverTests: уборка best-effort
+        }
+    }
+
+    [Fact]
+    [Trait("Category", "Integration")]
+    public void ValidateForDeletion_JunctionIntoProtectedAppData_BlockedByRealPath()
+    {
+        // Whitelist-bypass на user-scope (findings M1): junction в temp-зоне
+        // указывает на %APPDATA%\Claude; лексический путь в зоне пользователя
+        // проходит все проверки, реальный путь — per-app защищён (*.db).
+        var service = CreateService();
+        var root = Path.Combine(Path.GetTempPath(), $"safety_junction_{Guid.NewGuid():N}");
+        Directory.CreateDirectory(root);
+        try
+        {
+            var claudeRoot = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Claude");
+            var junction = Path.Combine(root, "j");
+            CreateJunction(junction, claudeRoot);
+            var dbThroughJunction = Path.Combine(junction, $"puryx-d14-{Guid.NewGuid():N}.db");
+
+            var validation = service.ValidateForDeletion(MakeItem(dbThroughJunction));
+
+            Assert.False(validation.CanDelete,
+                $"файл через junction в защищённые данные приложения не должен быть удаляемым: {dbThroughJunction}");
+            Assert.NotNull(validation.BlockReason);
+            Assert.Contains("Claude", validation.BlockReason);
+        }
+        finally
+        {
+            CleanupTree(root);
+        }
+    }
+
+    [Fact]
+    [Trait("Category", "Integration")]
+    public void ValidateForDeletion_JunctionToWindows_RequiresElevationByRealPath()
+    {
+        // Junction в пользовательской зоне, указывающий на C:\Windows:
+        // лексически elevation не требуется, реальный путь — требует.
+        var service = CreateService();
+        var root = Path.Combine(Path.GetTempPath(), $"safety_junction_{Guid.NewGuid():N}");
+        Directory.CreateDirectory(root);
+        try
+        {
+            var windowsRoot = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
+            var junction = Path.Combine(root, "w");
+            CreateJunction(junction, windowsRoot);
+            var itemThroughJunction = Path.Combine(junction, "Temp", "file.tmp");
+
+            var validation = service.ValidateForDeletion(MakeItem(itemThroughJunction));
+
+            Assert.True(validation.CanDelete);
+            Assert.True(validation.RequiresElevation,
+                $"путь через junction в {windowsRoot} обязан требовать elevation: {itemThroughJunction}");
+        }
+        finally
+        {
+            CleanupTree(root);
+        }
+    }
+
+    [Fact]
+    [Trait("Category", "Integration")]
+    public void ValidateForDeletion_CyclicJunction_BlockedFailClosed()
+    {
+        // Циклический junction (a→b, b→a): резолв не завершается успешно —
+        // гейт обязан отказать (fail-closed), а не пропустить путь.
+        var service = CreateService();
+        var root = Path.Combine(Path.GetTempPath(), $"safety_junction_{Guid.NewGuid():N}");
+        Directory.CreateDirectory(root);
+        try
+        {
+            var a = Path.Combine(root, "a");
+            var b = Path.Combine(root, "b");
+            CreateJunction(a, b);
+            CreateJunction(b, a);
+
+            var validation = service.ValidateForDeletion(MakeItem(Path.Combine(a, "file.tmp")));
+
+            Assert.False(validation.CanDelete, "путь в циклическом junction должен блокироваться");
+            Assert.NotNull(validation.BlockReason);
+            Assert.Contains("не удалось проверить", validation.BlockReason);
+        }
+        finally
+        {
+            CleanupTree(root);
+        }
     }
 }

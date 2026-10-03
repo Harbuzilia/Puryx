@@ -142,8 +142,26 @@ public class SafetyService : ISafetyService
 
     public DeleteValidation ValidateForDeletion(ScannedItem item)
     {
+        // 0. Резолв реального пути: junction/symlink внутри разрешённой зоны, указывающий
+        // наружу, лексически проходит whitelist/per-app/elevation-проверки (findings M1,
+        // День 14). Все последующие сравнения выполняются по реальному пути.
+        // Resolved=false (цикл, превышение лимита переходов, неподдерживаемый reparse-тег —
+        // OneDrive-плейсхолдеры, — ошибка доступа) — осознанный fail-closed: операция
+        // по такому пути запрещена.
+        var resolved = PathResolver.ResolveRealPath(item.Path);
+        if (!resolved.Resolved)
+        {
+            return new DeleteValidation
+            {
+                CanDelete = false,
+                BlockReason = "Путь не удалось проверить: цепочка junction/reparse-точек не разрешается"
+            };
+        }
+
+        var realPath = resolved.Path;
+
         // 1. Проверяем whitelist
-        if (IsWhitelisted(item.Path))
+        if (IsWhitelisted(realPath))
         {
             return new DeleteValidation
             {
@@ -157,7 +175,7 @@ public class SafetyService : ISafetyService
         // парой IsKnownApp + UserData. Эвристики для неизвестных приложений
         // (IsKnownApp = false) здесь НЕ блокируют — глобального запрета
         // *.db/config/settings, снятого в 2.7.2, не возвращаем.
-        var classification = _knowledge.ClassifyPath(item.Path);
+        var classification = _knowledge.ClassifyPath(realPath);
         if (classification.IsKnownApp && classification.SuggestedRisk == RiskCategory.UserData)
         {
             return new DeleteValidation
@@ -168,7 +186,7 @@ public class SafetyService : ISafetyService
         }
 
         // 3. Проверяем блокировку
-        if (item.IsLocked || (!item.IsDirectory && IsFileLocked(item.Path)))
+        if (item.IsLocked || (!item.IsDirectory && IsFileLocked(realPath)))
         {
             return new DeleteValidation
             {
@@ -179,7 +197,7 @@ public class SafetyService : ISafetyService
 
         // 4. Проверяем период защиты — только для пользовательских данных.
         // Кэши (SafeToDelete, PerformanceCache) обновляются постоянно, блокировка по времени бессмысленна.
-        if (item.Risk == RiskCategory.UserData && IsWithinProtectedPeriod(item.Path))
+        if (item.Risk == RiskCategory.UserData && IsWithinProtectedPeriod(realPath))
         {
             return new DeleteValidation
             {
@@ -189,7 +207,7 @@ public class SafetyService : ISafetyService
         }
 
         // 5. Проверяем необходимость elevation
-        var requiresElevation = RequiresElevation(item.Path);
+        var requiresElevation = RequiresElevation(realPath);
 
         return new DeleteValidation
         {
@@ -278,6 +296,9 @@ public class SafetyService : ISafetyService
     /// <summary>
     /// Путь находится внутри root или совпадает с ним. Сравнение по границе каталога:
     /// «C:\WindowsFoo» не считается частью C:\Windows.
+    /// Сравнение лексическое и честное только для пути, уже развёрнутого из
+    /// junction/symlink-цепочки: вызывается с результатом PathResolver.ResolveRealPath
+    /// (День 14, findings M1) — иначе junction внутрь зоны обходит проверку.
     /// </summary>
     private static bool IsUnder(string path, string root)
     {
