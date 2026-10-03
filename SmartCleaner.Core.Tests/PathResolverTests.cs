@@ -94,4 +94,47 @@ public class PathResolverTests : IDisposable
         Assert.True(result.Resolved);
         Assert.Equal(Path.GetFullPath(Path.Combine(sub, "file.txt")), result.Path, StringComparer.OrdinalIgnoreCase);
     }
+
+    /// <summary>
+    /// Циклические junction (A→B, B→A) и самоссылка: резолв обязан завершаться
+    /// за конечное время с честным fail-closed-ответом, а не зависать — findings M1:
+    /// перечисление через лексический junction сегодня упирается в 60-с таймаут.
+    /// </summary>
+    [Fact]
+    public void ResolveRealPath_CyclicJunctions_TerminateFailClosed()
+    {
+        var a = Path.Combine(_root, "a");
+        var b = Path.Combine(_root, "b");
+        CreateJunction(a, b); // a → b (b ещё не существует: «висячая» цель допустима)
+        CreateJunction(b, a); // b → a — цикл замкнут
+
+        var deep = Path.Combine(a, "deep", "file.txt");
+        var stopwatch = Stopwatch.StartNew();
+        var result = PathResolver.ResolveRealPath(a);
+        var resultThroughPath = PathResolver.ResolveRealPath(deep);
+        stopwatch.Stop();
+
+        Assert.False(result.Resolved, "цикл reparse-точек не должен считаться резолвнутым");
+        Assert.Equal(a, result.Path, StringComparer.OrdinalIgnoreCase);
+        Assert.False(resultThroughPath.Resolved);
+        Assert.Equal(deep, resultThroughPath.Path, StringComparer.OrdinalIgnoreCase);
+        Assert.True(stopwatch.ElapsedMilliseconds < 5_000,
+            $"резолв циклических junction не завершается за конечное время: {stopwatch.ElapsedMilliseconds} мс");
+    }
+
+    [Fact]
+    public void ResolveRealPath_SelfReferencingJunction_TerminatesFailClosed()
+    {
+        var self = Path.Combine(_root, "self");
+        CreateJunction(self, self); // самоссылка
+
+        var stopwatch = Stopwatch.StartNew();
+        var result = PathResolver.ResolveRealPath(self);
+        stopwatch.Stop();
+
+        Assert.False(result.Resolved, "самоссылочный junction не должен считаться резолвнутым");
+        Assert.Equal(self, result.Path, StringComparer.OrdinalIgnoreCase);
+        Assert.True(stopwatch.ElapsedMilliseconds < 5_000,
+            $"резолв самоссылочного junction не завершается за конечное время: {stopwatch.ElapsedMilliseconds} мс");
+    }
 }
