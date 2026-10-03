@@ -51,10 +51,12 @@ public class SchedulerProfileTests
         Assert.True(CleaningProfileMap.TryGetEnabledCategories("Разработка", out var enabled));
         Assert.NotNull(enabled);
 
+        // Реальные CategoryName сканеров: профиль «Разработка» включает все 8
+        // dev-категорий (было: дрейф имён из MainViewModel.ApplyProfile).
         var expected = new HashSet<string>
         {
-            "Кэши пакетов", "Node Modules", "npm пакеты", "Python пакеты",
-            "Python окружения", ".NET Артефакты", "Docker", "AI Агенты"
+            "Кэши пакетов", "Node Modules", "NPM Packages", "Python Packages",
+            "Python Venv", "Сборка .NET", "Docker", "AI-агенты"
         };
         Assert.True(expected.SetEquals(enabled));
     }
@@ -62,11 +64,15 @@ public class SchedulerProfileTests
     [Fact]
     public void DevelopmentProfile_SelectsDevScannersFromFullUniverse()
     {
-        // Эффективный набор из полного списка категорий: в UI-наборе «Разработка»
-        // реально существуют «Кэши пакетов», «Node Modules», «Docker»; остальные
-        // имена не совпадают с CategoryName сканеров (дрейф имён в
-        // MainViewModel.ApplyProfile — пре-существующий, вне скоупа M3).
-        Assert.Equal(new[] { "Кэши пакетов", "Node Modules", "Docker" }, SelectEnabled("Разработка"));
+        // Эффективный набор из полного списка категорий: после синхронизации
+        // с реальными CategoryName сканеров профиль «Разработка» выбирает
+        // все 8 категорий (раньше совпадали только «Кэши пакетов»,
+        // «Node Modules», «Docker»).
+        Assert.Equal(new[]
+        {
+            "Кэши пакетов", "Node Modules", "NPM Packages", "Python Packages",
+            "Python Venv", "Сборка .NET", "Docker", "AI-агенты"
+        }, SelectEnabled("Разработка"));
     }
 
     [Fact]

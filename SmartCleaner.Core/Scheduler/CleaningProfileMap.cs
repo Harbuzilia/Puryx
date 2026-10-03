@@ -2,9 +2,10 @@ namespace SmartCleaner.Core.Scheduler;
 
 /// <summary>
 /// Маппинг имени профиля очистки в набор включаемых категорий сканеров.
-/// Наборы категорий 1-в-1 с MainViewModel.ApplyProfile (UI-семантика);
-/// вынесены в Core, чтобы --profile из CLI/планировщика применял профиль
-/// так же, как UI, и логика была тестируемой без App.
+/// Имена категорий синхронизированы с реальными CategoryName сканеров
+/// (SmartCleaner.Core/Scanning/Scanners); UI (MainViewModel.ApplyProfile)
+/// и CLI (--profile авто-очистки) используют этот маппинг как единый
+/// источник — логика тестируемая без App.
 /// </summary>
 public static class CleaningProfileMap
 {
@@ -26,8 +27,8 @@ public static class CleaningProfileMap
     private static readonly IReadOnlySet<string> DevelopmentCategories =
         new HashSet<string>(StringComparer.Ordinal)
         {
-            "Кэши пакетов", "Node Modules", "npm пакеты", "Python пакеты",
-            "Python окружения", ".NET Артефакты", "Docker", "AI Агенты"
+            "Кэши пакетов", "Node Modules", "NPM Packages", "Python Packages",
+            "Python Venv", "Сборка .NET", "Docker", "AI-агенты"
         };
 
     /// <summary>
