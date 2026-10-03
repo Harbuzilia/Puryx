@@ -2,6 +2,7 @@ using SmartCleaner.Core.Cleaning;
 using SmartCleaner.Core.Models;
 using SmartCleaner.Core.Safety;
 using SmartCleaner.Core.Services;
+using System.Text.Json;
 
 namespace SmartCleaner.Core.Tests;
 
@@ -30,6 +31,40 @@ internal sealed class InMemoryConfigService(IReadOnlyList<string> paths) : IConf
     }
 
     public bool Exists(string filename) => false;
+}
+
+/// <summary>
+/// Конфиг-сервис на реальных файлах в изолированном каталоге — для тестов,
+/// которым нужно RoundTrip-поведение Load/Save (ключи, состояние).
+/// </summary>
+internal sealed class FileBackedConfigService : IConfigService
+{
+    private readonly string _configDirectory;
+    private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true };
+
+    public FileBackedConfigService(string configDirectory)
+    {
+        _configDirectory = configDirectory;
+        // Как и реальный ConfigService — каталог обязан существовать
+        Directory.CreateDirectory(_configDirectory);
+    }
+
+    public string ConfigDirectory => _configDirectory;
+    public ConfigMode Mode => ConfigMode.Portable;
+    public string LogDirectory => _configDirectory;
+    public string UserRulesDirectory => _configDirectory;
+
+    public T Load<T>(string filename) where T : new()
+    {
+        var path = Path.Combine(_configDirectory, filename);
+        if (!File.Exists(path)) return new T();
+        return JsonSerializer.Deserialize<T>(File.ReadAllText(path), JsonOptions) ?? new T();
+    }
+
+    public void Save<T>(string filename, T data) =>
+        File.WriteAllText(Path.Combine(_configDirectory, filename), JsonSerializer.Serialize(data));
+
+    public bool Exists(string filename) => File.Exists(Path.Combine(_configDirectory, filename));
 }
 
 internal sealed class AllowAllSafetyService : ISafetyService

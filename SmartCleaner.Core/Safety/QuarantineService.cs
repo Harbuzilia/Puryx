@@ -1,4 +1,5 @@
 ﻿using SmartCleaner.Core.Helpers;
+using SmartCleaner.Core.Services;
 using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
@@ -21,6 +22,13 @@ public class QuarantinedItem
 public class QuarantineManifest
 {
     public List<QuarantinedItem> Items { get; set; } = new();
+
+    /// <summary>
+    /// Base64(HMAC-SHA256(per-install ключ, каноническая форма манифеста)).
+    /// Схема подписи — <see cref="QuarantineManifestSigner"/>. Пустая строка —
+    /// манифест формата до подписи (legacy).
+    /// </summary>
+    public string Signature { get; set; } = string.Empty;
 }
 
 public class QuarantineService
@@ -28,20 +36,35 @@ public class QuarantineService
     private readonly string _quarantineDir;
     private readonly string _manifestFile;
     private readonly string _storageDir;
+    private readonly IConfigService _configService;
 
+    private readonly object _keyLock = new();
+    private byte[]? _signingKey;
+
+    /// <summary>
+    /// Карантин в %LOCALAPPDATA%\SmartCleaner\Quarantine, ключ подписи —
+    /// через реальный ConfigService (portable/installed режим).
+    /// </summary>
     public QuarantineService()
-        : this(GetDefaultQuarantineRoot())
+        : this(GetDefaultQuarantineRoot(), new ConfigService())
+    {
+    }
+
+    public QuarantineService(IConfigService configService)
+        : this(GetDefaultQuarantineRoot(), configService)
     {
     }
 
     /// <summary>
-    /// Конструктор с изолированным корнем карантина (для тестов: вместо %LOCALAPPDATA%).
+    /// Конструктор с изолированным корнем карантина (для тестов: вместо %LOCALAPPDATA%)
+    /// и явным источником ключа подписи манифеста.
     /// </summary>
-    public QuarantineService(string quarantineRoot)
+    public QuarantineService(string quarantineRoot, IConfigService configService)
     {
         _quarantineDir = quarantineRoot;
         _storageDir = Path.Combine(_quarantineDir, "Storage");
         _manifestFile = Path.Combine(_quarantineDir, "manifest.json");
+        _configService = configService;
 
         try
         {
@@ -58,6 +81,19 @@ public class QuarantineService
     {
         var localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
         return Path.Combine(localAppData, "SmartCleaner", "Quarantine");
+    }
+
+    /// <summary>
+    /// Per-install ключ HMAC из ConfigDirectory (IConfigService); создаётся при
+    /// первом использовании. Схема подписи — <see cref="QuarantineManifestSigner"/>.
+    /// </summary>
+    private byte[] GetOrCreateSigningKey()
+    {
+        lock (_keyLock)
+        {
+            _signingKey ??= QuarantineManifestSigner.GetOrCreateSigningKey(_configService);
+            return _signingKey;
+        }
     }
 
     public async Task<List<QuarantinedItem>> GetQuarantinedItemsAsync()
@@ -193,10 +229,16 @@ public class QuarantineService
         }
     }
 
+    private static readonly JsonSerializerOptions ManifestWriteOptions = new() { WriteIndented = true };
+
     private async Task SaveManifestAsync(List<QuarantinedItem> items)
     {
         var manifest = new QuarantineManifest { Items = items };
-        var json = JsonSerializer.Serialize(manifest, new JsonSerializerOptions { WriteIndented = true });
+        // Каждая запись манифеста подписывается per-install ключом
+        // (схема — QuarantineManifestSigner): user-writable manifest.json,
+        // изменённый без доступа к ключу, будет отклонён при Restore/Purge.
+        manifest.Signature = QuarantineManifestSigner.ComputeSignature(manifest, GetOrCreateSigningKey());
+        var json = JsonSerializer.Serialize(manifest, ManifestWriteOptions);
         await File.WriteAllTextAsync(_manifestFile, json);
     }
 }

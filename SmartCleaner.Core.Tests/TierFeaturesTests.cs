@@ -27,28 +27,36 @@ public class TierFeaturesTests
     [Fact]
     public async Task QuarantineService_MoveAndRestore_WorksAccurately()
     {
-        var quarantine = new QuarantineService();
+        var root = Path.Combine(Path.GetTempPath(), $"quarantine_tier_{Guid.NewGuid():N}");
+        var configDir = Path.Combine(Path.GetTempPath(), $"quarantine_tier_config_{Guid.NewGuid():N}");
+        var quarantine = new QuarantineService(root, new FileBackedConfigService(configDir));
         var tempFile = Path.Combine(Path.GetTempPath(), $"quarantine_test_{Guid.NewGuid():N}.txt");
         await File.WriteAllTextAsync(tempFile, "Test quarantine content 12345");
 
-        // 1. Move to Quarantine
-        var moved = await quarantine.MoveToQuarantineAsync(tempFile, "TestCategory");
-        Assert.True(moved);
-        Assert.False(File.Exists(tempFile));
+        try
+        {
+            // 1. Move to Quarantine
+            var moved = await quarantine.MoveToQuarantineAsync(tempFile, "TestCategory");
+            Assert.True(moved);
+            Assert.False(File.Exists(tempFile));
 
-        var items = await quarantine.GetQuarantinedItemsAsync();
-        var item = items.FirstOrDefault(i => i.OriginalPath == tempFile);
-        Assert.NotNull(item);
+            var items = await quarantine.GetQuarantinedItemsAsync();
+            var item = items.FirstOrDefault(i => i.OriginalPath == tempFile);
+            Assert.NotNull(item);
 
-        // 2. Restore from Quarantine
-        var (success, msg) = await quarantine.RestoreItemAsync(item.Id);
-        Assert.True(success);
-        Assert.True(File.Exists(tempFile));
-        var content = await File.ReadAllTextAsync(tempFile);
-        Assert.Equal("Test quarantine content 12345", content);
-
-        // Cleanup
-        try { File.Delete(tempFile); } catch { }
+            // 2. Restore from Quarantine
+            var (success, msg) = await quarantine.RestoreItemAsync(item.Id);
+            Assert.True(success);
+            Assert.True(File.Exists(tempFile));
+            var content = await File.ReadAllTextAsync(tempFile);
+            Assert.Equal("Test quarantine content 12345", content);
+        }
+        finally
+        {
+            try { File.Delete(tempFile); } catch { }
+            try { Directory.Delete(root, recursive: true); } catch { }
+            try { Directory.Delete(configDir, recursive: true); } catch { }
+        }
     }
 
     [Fact]

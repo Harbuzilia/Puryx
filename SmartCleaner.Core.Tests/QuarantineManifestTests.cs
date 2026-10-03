@@ -1,5 +1,6 @@
 using SmartCleaner.Core.Safety;
 using System.IO;
+using System.Security.Cryptography;
 using System.Text.Json;
 using Xunit;
 
@@ -16,6 +17,11 @@ public class QuarantineManifestTests : IDisposable
     private readonly string _root;
     private readonly string _storageDir;
     private readonly string _manifestFile;
+    private readonly string _configDirectory;
+    private readonly FileBackedConfigService _config;
+
+    /// <summary>Известный тесту per-install ключ: сервис загрузит его из ConfigDirectory.</summary>
+    private readonly byte[] _key;
 
     public QuarantineManifestTests()
     {
@@ -23,14 +29,24 @@ public class QuarantineManifestTests : IDisposable
         _storageDir = Path.Combine(_root, "Storage");
         _manifestFile = Path.Combine(_root, "manifest.json");
         Directory.CreateDirectory(_storageDir);
+
+        _configDirectory = Path.Combine(Path.GetTempPath(), $"quarantine_manifest_config_{Guid.NewGuid():N}");
+        Directory.CreateDirectory(_configDirectory);
+        _key = RandomNumberGenerator.GetBytes(32);
+        _config = new FileBackedConfigService(_configDirectory);
+        _config.Save(QuarantineManifestSigner.KeyFileName, new QuarantineSigningKey
+        {
+            KeyBase64 = Convert.ToBase64String(_key)
+        });
     }
 
     public void Dispose()
     {
         try { Directory.Delete(_root, recursive: true); } catch { }
+        try { Directory.Delete(_configDirectory, recursive: true); } catch { }
     }
 
-    private QuarantineService CreateService() => new(_root);
+    private QuarantineService CreateService() => new(_root, _config);
 
     /// <summary>Создаёт файл внутри Storage карантина — «настоящее» хранилище для crafted-манифеста.</summary>
     private string CreateStoredFile(string id, string name)
@@ -73,6 +89,34 @@ public class QuarantineManifestTests : IDisposable
         Directory.CreateDirectory(dir);
         File.WriteAllText(file, "victim data");
         return (dir, file);
+    }
+
+    private QuarantineManifest ReadManifestFromDisk()
+    {
+        var json = File.ReadAllText(_manifestFile);
+        return JsonSerializer.Deserialize<QuarantineManifest>(json) ?? new QuarantineManifest();
+    }
+
+    [Fact]
+    public async Task MoveToQuarantine_WritesManifestSignedWithInstallKey()
+    {
+        var service = CreateService();
+        var source = Path.Combine(Path.GetTempPath(), $"quarantine_sign_{Guid.NewGuid():N}.txt");
+        await File.WriteAllTextAsync(source, "sign me");
+
+        try
+        {
+            Assert.True(await service.MoveToQuarantineAsync(source, "TestCategory"));
+
+            var manifest = ReadManifestFromDisk();
+            Assert.False(string.IsNullOrWhiteSpace(manifest.Signature));
+            Assert.True(QuarantineManifestSigner.ValidateSignature(manifest, _key),
+                "Манифест должен быть подписан per-install ключом из ConfigDirectory");
+        }
+        finally
+        {
+            try { File.Delete(source); } catch { }
+        }
     }
 
     [Fact]

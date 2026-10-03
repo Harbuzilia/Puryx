@@ -227,7 +227,8 @@ public partial class App : Application
         services.AddSingleton<SmartCleaner.Core.Compression.CompactEngine>();
         services.AddSingleton<SmartCleaner.Core.WinSxS.WinSxSEngine>();
         services.AddSingleton<SmartCleaner.Core.WinSxS.DriverStoreCleaner>();
-        services.AddSingleton<SmartCleaner.Core.Safety.QuarantineService>();
+        services.AddSingleton<SmartCleaner.Core.Safety.QuarantineService>(sp =>
+            new SmartCleaner.Core.Safety.QuarantineService(sp.GetRequiredService<IConfigService>()));
         services.AddSingleton<SmartCleaner.Core.Plugins.PluginEngine>();
         services.AddSingleton<SmartCleaner.Core.AiAssistant.NaturalLanguageQueryEngine>();
 
