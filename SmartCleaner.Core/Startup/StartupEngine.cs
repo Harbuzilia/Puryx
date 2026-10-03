@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using Microsoft.Win32;
 
 namespace SmartCleaner.Core.Startup;
@@ -299,13 +300,34 @@ public sealed class StartupEngine
         catch (Exception ex) { /* schtasks not available or permission denied */ Debug.WriteLine($"[StartupEngine] Task scheduler scan error: {ex.Message}"); }
     }
 
+    private static int _oemEncodingProviderRegistered;
+
     /// <summary>
-    /// Кодировка вывода schtasks: OEM-страница консоли (cp866 на русской Windows).
+    /// Кодировка вывода schtasks: OEM-страница консоли системы (GetOEMCP, а не хардкод 866 —
+    /// на нерусских Windows консольные утилиты выводят в другой OEM-странице).
     /// </summary>
     internal static System.Text.Encoding GetSchtasksOutputEncoding()
     {
-        return System.Text.Encoding.GetEncoding(866);
+        EnsureOemEncodingProvider();
+        return System.Text.Encoding.GetEncoding((int)GetOEMCP());
     }
+
+    /// <summary>
+    /// Регистрирует CodePagesEncodingProvider однократно (потокобезопасно):
+    /// на .NET 8 без провайдера OEM-кодировки (866 и др.) недоступны — NotSupportedException.
+    /// </summary>
+    private static void EnsureOemEncodingProvider()
+    {
+        if (Interlocked.Exchange(ref _oemEncodingProviderRegistered, 1) != 0) return;
+
+        System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+    }
+
+    /// <summary>
+    /// OEM-кодовая страница консоли системы (P/Invoke kernel32).
+    /// </summary>
+    [DllImport("kernel32.dll")]
+    private static extern uint GetOEMCP();
 
     /// <summary>
     /// Декодирует байты вывода schtasks в строки (чистая функция — тестируется без запуска процесса).
