@@ -96,22 +96,142 @@ public class QuarantineService
         }
     }
 
-    public async Task<List<QuarantinedItem>> GetQuarantinedItemsAsync()
+    /// <summary>Состояние доверия манифеста карантина при чтении.</summary>
+    private enum ManifestTrust
+    {
+        /// <summary>Файла манифеста нет — карантин пуст.</summary>
+        Missing,
+        /// <summary>Подпись корректна — операции над элементами разрешены.</summary>
+        Valid,
+        /// <summary>Signature отсутствует: формат до подписи (legacy) или crafted-манифест без подписи.</summary>
+        UnsignedLegacy,
+        /// <summary>Signature не сходится (манифест изменён) либо ключ подписи недоступен.</summary>
+        InvalidSignature,
+        /// <summary>Манифест не читается / не парсится.</summary>
+        Corrupt
+    }
+
+    private static readonly JsonSerializerOptions ManifestReadOptions = new() { PropertyNameCaseInsensitive = true };
+
+    /// <summary>
+    /// Читает манифест и классифицирует доверие. Элементы возвращаются даже для
+    /// недоверенного манифеста — только для отображения (пользователь видит, что
+    /// лежит в карантине, включая legacy); операции Restore/Purge требуют
+    /// <see cref="ManifestTrust.Valid"/> (см. <see cref="RefusalForTrust"/>).
+    /// </summary>
+    private async Task<(ManifestTrust Trust, List<QuarantinedItem> Items)> ReadManifestWithTrustAsync()
     {
         if (!File.Exists(_manifestFile))
-            return new List<QuarantinedItem>();
+        {
+            return (ManifestTrust.Missing, new List<QuarantinedItem>());
+        }
 
         try
         {
             var json = await File.ReadAllTextAsync(_manifestFile);
-            var manifest = JsonSerializer.Deserialize<QuarantineManifest>(json);
-            return manifest?.Items ?? new List<QuarantinedItem>();
+            var manifest = JsonSerializer.Deserialize<QuarantineManifest>(json, ManifestReadOptions);
+            if (manifest is null)
+            {
+                return (ManifestTrust.Corrupt, new List<QuarantinedItem>());
+            }
+
+            // Null-элементы (атакующий мог вписать "Items":[null]) отбрасываем
+            var items = manifest.Items?
+                .Where(i => i is not null)
+                .Select(i => i!)
+                .ToList() ?? new List<QuarantinedItem>();
+
+            if (string.IsNullOrEmpty(manifest.Signature))
+            {
+                return (ManifestTrust.UnsignedLegacy, items);
+            }
+
+            byte[]? key;
+            try
+            {
+                key = GetOrCreateSigningKey();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[Quarantine] Signing key unavailable: {ex.Message}");
+                key = null;
+            }
+
+            if (key is null || !QuarantineManifestSigner.ValidateSignature(manifest, key))
+            {
+                return (ManifestTrust.InvalidSignature, items);
+            }
+
+            return (ManifestTrust.Valid, items);
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"[Quarantine] Manifest read failed (treated as empty): {ex.Message}");
-            return new List<QuarantinedItem>();
+            Debug.WriteLine($"[Quarantine] Manifest read failed (treated as corrupt): {ex.Message}");
+            return (ManifestTrust.Corrupt, new List<QuarantinedItem>());
         }
+    }
+
+    /// <summary>
+    /// Политика отказа Restore/Purge по состоянию доверия манифеста: пути из
+    /// user-writable manifest.json исполняются только при валидной подписи (findings M6).
+    /// Манифесты старого формата (без подписи) НЕ исполняются молча — восстановление
+    /// вручную из папки карантина (ROADMAP День 12).
+    /// </summary>
+    private string? RefusalForTrust(ManifestTrust trust)
+    {
+        switch (trust)
+        {
+            case ManifestTrust.UnsignedLegacy:
+                return "Манифест карантина устаревшего формата (без подписи); " +
+                       $"восстановите файлы вручную из папки карантина: {_storageDir}";
+            case ManifestTrust.InvalidSignature:
+                return "Подпись манифеста карантина недействительна (манифест изменён " +
+                       "или ключ подписи недоступен). Операция отклонена из соображений безопасности.";
+            case ManifestTrust.Corrupt:
+                return "Манифест карантина повреждён и не может быть прочитан. " +
+                       "Операция отклонена из соображений безопасности.";
+            default:
+                return null; // Missing/Valid — операции разрешены (элемент может не найтись)
+        }
+    }
+
+    /// <summary>
+    /// Defence-in-depth: StoredPath обязан находиться строго под Storage карантина
+    /// — даже при валидной подписи. Иначе Restore/Purge отклоняются ( crafted-путь
+    /// не может указать рекурсивное удаление/перемещение вне карантина).
+    /// Сравнение лексическое (junction-атаки — отдельная работа, ROADMAP День 13-14).
+    /// </summary>
+    private bool IsStoredPathWithinStorage(string? storedPath)
+    {
+        if (string.IsNullOrWhiteSpace(storedPath))
+        {
+            return false;
+        }
+
+        try
+        {
+            var storageRoot = Path.GetFullPath(_storageDir)
+                .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
+                + Path.DirectorySeparatorChar;
+            var full = Path.GetFullPath(storedPath)
+                .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
+                + Path.DirectorySeparatorChar;
+
+            // Строго ниже корня Storage: совпадение с корнем и sibling-префиксы отвергаются
+            return full.Length > storageRoot.Length
+                && full.StartsWith(storageRoot, StringComparison.OrdinalIgnoreCase);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[Quarantine] StoredPath validation failed for {storedPath}: {ex.Message}");
+            return false;
+        }
+    }
+
+    public async Task<List<QuarantinedItem>> GetQuarantinedItemsAsync()
+    {
+        var (_, items) = await ReadManifestWithTrustAsync();
+        return items;
     }
 
     public async Task<bool> MoveToQuarantineAsync(string path, string category = "Очистка")
@@ -153,7 +273,18 @@ public class QuarantineService
                 Category = category
             };
 
-            var items = await GetQuarantinedItemsAsync();
+            // В новый подписанный манифест переносятся ТОЛЬКО элементы из валидно
+            // подписанного манифеста: crafted/legacy записи не «отмываются» подписью
+            // при следующей записи (fail-closed). Legacy-записи при этом пропадают из
+            // списка (файлы остаются в Storage, восстановление — вручную).
+            var (trust, existingItems) = await ReadManifestWithTrustAsync();
+            if (trust is ManifestTrust.UnsignedLegacy or ManifestTrust.InvalidSignature)
+            {
+                Debug.WriteLine($"[Quarantine] Manifest trust={trust}: existing entries dropped from new signed manifest");
+            }
+            var items = trust == ManifestTrust.Valid
+                ? existingItems
+                : new List<QuarantinedItem>();
             items.Add(item);
             await SaveManifestAsync(items);
 
@@ -168,9 +299,24 @@ public class QuarantineService
 
     public async Task<(bool Success, string Message)> RestoreItemAsync(string id)
     {
-        var items = await GetQuarantinedItemsAsync();
+        var (trust, items) = await ReadManifestWithTrustAsync();
+
+        // OriginalPath/StoredPath исполняются только из подписанного манифеста:
+        // crafted manifest.json не должен перемещать файлы по произвольным путям
+        var refusal = RefusalForTrust(trust);
+        if (refusal is not null)
+        {
+            return (false, refusal);
+        }
+
         var item = items.FirstOrDefault(i => i.Id == id);
         if (item == null) return (false, "Элемент не найден в манифесте");
+
+        if (!IsStoredPathWithinStorage(item.StoredPath))
+        {
+            return (false, "Путь хранения элемента находится вне каталога карантина — " +
+                           "операция отклонена из соображений безопасности.");
+        }
 
         if (!File.Exists(item.StoredPath) && !Directory.Exists(item.StoredPath))
             return (false, "Файл не найден в хранилище карантина");
@@ -207,11 +353,30 @@ public class QuarantineService
         }
     }
 
-    public async Task<bool> PurgeItemAsync(string id)
+    /// <summary>
+    /// Удаляет элемент из карантина навсегда. Рекурсивно удаляет только каталог
+    /// внутри Storage карантина; манифест обязан иметь валидную подпись.
+    /// </summary>
+    public async Task<(bool Success, string Message)> PurgeItemAsync(string id)
     {
-        var items = await GetQuarantinedItemsAsync();
+        var (trust, items) = await ReadManifestWithTrustAsync();
+
+        // Рекурсивный Directory.Delete исполняется только из подписанного манифеста:
+        // crafted StoredPath не должен удалять произвольные каталоги (findings M6)
+        var refusal = RefusalForTrust(trust);
+        if (refusal is not null)
+        {
+            return (false, refusal);
+        }
+
         var item = items.FirstOrDefault(i => i.Id == id);
-        if (item == null) return false;
+        if (item == null) return (false, "Элемент не найден в манифесте");
+
+        if (!IsStoredPathWithinStorage(item.StoredPath))
+        {
+            return (false, "Путь хранения элемента находится вне каталога карантина — " +
+                           "операция отклонена из соображений безопасности.");
+        }
 
         try
         {
@@ -220,12 +385,12 @@ public class QuarantineService
 
             items.Remove(item);
             await SaveManifestAsync(items);
-            return true;
+            return (true, $"Элемент '{item.Name}' удалён из карантина без возможности восстановления.");
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"[Quarantine] Purge failed for {id}: {ex.Message}");
-            return false;
+            return (false, $"Ошибка удаления: {ex.Message}");
         }
     }
 

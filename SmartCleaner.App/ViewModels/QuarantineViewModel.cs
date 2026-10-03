@@ -115,7 +115,7 @@ public partial class QuarantineViewModel : ObservableObject
         IsBusy = true;
         try
         {
-            var success = await _quarantine.PurgeItemAsync(item.Id);
+            var (success, message) = await _quarantine.PurgeItemAsync(item.Id);
 
             if (success)
             {
@@ -124,7 +124,7 @@ public partial class QuarantineViewModel : ObservableObject
             }
             else
             {
-                MessageBox.Show("Не удалось удалить элемент из карантина.", "Ошибка удаления",
+                MessageBox.Show(message, "Ошибка удаления",
                     MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }

@@ -148,7 +148,8 @@ public class QuarantineManifestTests : IDisposable
             Assert.True(await service.MoveToQuarantineAsync(source, "TestCategory"));
             var itemsAgain = await service.GetQuarantinedItemsAsync();
             var itemAgain = Assert.Single(itemsAgain);
-            Assert.True(await service.PurgeItemAsync(itemAgain.Id));
+            var (purged, purgeMessage) = await service.PurgeItemAsync(itemAgain.Id);
+            Assert.True(purged, purgeMessage);
             Assert.False(Directory.Exists(Path.GetDirectoryName(itemAgain.StoredPath)));
             Assert.Empty(await service.GetQuarantinedItemsAsync());
         }
@@ -170,7 +171,7 @@ public class QuarantineManifestTests : IDisposable
             WriteCraftedManifest(crafted);
             var service = CreateService();
 
-            var purged = await service.PurgeItemAsync("crafted0001");
+            var (purged, _) = await service.PurgeItemAsync("crafted0001");
 
             Assert.False(purged, "Purge по подделанному манифесту должен быть отклонён");
             Assert.True(Directory.Exists(victimDir), "Каталог жертвы не должен быть удалён");
@@ -226,7 +227,7 @@ public class QuarantineManifestTests : IDisposable
             WriteCraftedManifest(item, signature: "AAAAinvalid-signature");
             var service = CreateService();
 
-            var purged = await service.PurgeItemAsync("item0004");
+            var (purged, _) = await service.PurgeItemAsync("item0004");
 
             Assert.False(purged, "Purge по манифесту с битой подписью должен быть отклонён");
             Assert.True(Directory.Exists(victimDir), "Каталог жертвы не должен быть удалён");
@@ -255,5 +256,124 @@ public class QuarantineManifestTests : IDisposable
         Assert.Contains("устаревшего формата", message);
         Assert.Contains("вручную", message);
         Assert.True(File.Exists(storedPath), "Файл должен остаться в хранилище для восстановления вручную");
+    }
+
+    /// <summary>
+    /// Пишет crafted-манифест с ВАЛИДНОЙ подписью (подписан известным тесту ключом):
+    /// моделирует атаку, где подпись есть, но StoredPath указывает вне карантина.
+    /// </summary>
+    private void WriteSignedCraftedManifest(QuarantinedItem item)
+    {
+        var manifest = new QuarantineManifest { Items = new List<QuarantinedItem> { item } };
+        var signature = QuarantineManifestSigner.ComputeSignature(manifest, _key);
+        WriteCraftedManifest(item, signature);
+    }
+
+    [Fact]
+    public async Task PurgeItem_ForgedValidSignatureButStoredPathOutsideStorage_Refuses()
+    {
+        // Defence-in-depth: даже валидная подпись не даёт Purge удалить каталог
+        // вне Storage карантина.
+        var (victimDir, victimFile) = CreateVictim();
+        try
+        {
+            var item = MakeItem("forged0001", victimFile, victimFile);
+            WriteSignedCraftedManifest(item);
+            var service = CreateService();
+
+            var (success, message) = await service.PurgeItemAsync("forged0001");
+
+            Assert.False(success, "Purge обязан отклонять StoredPath вне Storage даже при валидной подписи");
+            Assert.Contains("вне каталога карантина", message);
+            Assert.True(Directory.Exists(victimDir), "Каталог жертвы не должен быть удалён");
+            Assert.True(File.Exists(victimFile), "Файл жертвы не должен быть удалён");
+        }
+        finally
+        {
+            try { Directory.Delete(victimDir, recursive: true); } catch { }
+        }
+    }
+
+    [Fact]
+    public async Task RestoreItem_ForgedValidSignatureButStoredPathOutsideStorage_Refuses()
+    {
+        var (victimDir, victimFile) = CreateVictim();
+        var craftedTarget = Path.Combine(victimDir, "moved_by_attack.txt");
+        try
+        {
+            var item = MakeItem("forged0002", victimFile, craftedTarget);
+            WriteSignedCraftedManifest(item);
+            var service = CreateService();
+
+            var (success, message) = await service.RestoreItemAsync("forged0002");
+
+            Assert.False(success, "Restore обязан отклонять StoredPath вне Storage даже при валидной подписи");
+            Assert.Contains("вне каталога карантина", message);
+            Assert.True(File.Exists(victimFile), "Файл жертвы не должен быть перемещён");
+            Assert.False(File.Exists(craftedTarget), "Файл не должен появиться по crafted OriginalPath");
+        }
+        finally
+        {
+            try { Directory.Delete(victimDir, recursive: true); } catch { }
+        }
+    }
+
+    [Fact]
+    public async Task MoveToQuarantine_TamperedManifest_DoesNotLaunderCraftedEntries()
+    {
+        // Подменённый манифест + новая легитимная запись: crafted-элементы не должны
+        // «отмываться» валидной подписью при следующей записи манифеста.
+        var (victimDir, victimFile) = CreateVictim();
+        var craftedTarget = Path.Combine(victimDir, "moved_by_attack.txt");
+        var source = Path.Combine(Path.GetTempPath(), $"quarantine_new_{Guid.NewGuid():N}.txt");
+        await File.WriteAllTextAsync(source, "new legit content");
+        try
+        {
+            var crafted = MakeItem("crafted9999", victimFile, craftedTarget);
+            WriteCraftedManifest(crafted);
+            var service = CreateService();
+
+            Assert.True(await service.MoveToQuarantineAsync(source, "NewCategory"));
+
+            var items = await service.GetQuarantinedItemsAsync();
+            Assert.DoesNotContain(items, i => i.Id == "crafted9999");
+            var newItem = Assert.Single(items);
+            Assert.Equal(source, newItem.OriginalPath);
+
+            // crafted id более не исполняется: в манифесте его нет
+            var (restored, _) = await service.RestoreItemAsync("crafted9999");
+            Assert.False(restored);
+            Assert.True(File.Exists(victimFile), "Файл жертвы не должен быть тронут");
+            Assert.False(File.Exists(craftedTarget), "Файл не должен появиться по crafted OriginalPath");
+        }
+        finally
+        {
+            try { File.Delete(source); } catch { }
+            try { Directory.Delete(victimDir, recursive: true); } catch { }
+        }
+    }
+
+    [Fact]
+    public async Task PurgeItem_LegacyUnsignedManifest_Refuses()
+    {
+        var (victimDir, victimFile) = CreateVictim();
+        try
+        {
+            var item = MakeItem("legacy0002", victimFile, victimFile);
+            // Манифест формата до внедрения подписи: только Items.
+            WriteCraftedManifest(item);
+            var service = CreateService();
+
+            var (success, message) = await service.PurgeItemAsync("legacy0002");
+
+            Assert.False(success, "Purge по манифесту без подписи должен быть отклонён");
+            Assert.Contains("устаревшего формата", message);
+            Assert.Contains("вручную", message);
+            Assert.True(Directory.Exists(victimDir), "Каталог жертвы не должен быть удалён");
+        }
+        finally
+        {
+            try { Directory.Delete(victimDir, recursive: true); } catch { }
+        }
     }
 }
