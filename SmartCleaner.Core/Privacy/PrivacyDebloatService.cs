@@ -277,7 +277,7 @@ public class PrivacyDebloatService
 
                 if (!string.IsNullOrEmpty(tweak.RegistryRoot) && !string.IsNullOrEmpty(tweak.SubKeyPath) && !string.IsNullOrEmpty(tweak.ValueName))
                 {
-                    SetRegistryValue(tweak.RegistryRoot, tweak.SubKeyPath, tweak.ValueName, tweak.DefaultValue ?? 1);
+                    RestoreRegistryValue(tweak);
                 }
 
                 return true;
@@ -314,6 +314,127 @@ public class PrivacyDebloatService
             }
         }
         return restoredCount;
+    }
+
+    // Откат значения реестра: восстанавливает СОХРАНЁННОЕ в бэкапе состояние
+    // (фактическое значение до первого изменения), а не DefaultValue из кода.
+    // «Отсутствовало» в бэкапе = DeleteValue. Legacy-записи старой схемы
+    // (константа вместо фактического значения) не доверяются: ставится
+    // DefaultValue из кода с честным сообщением о fallback.
+    private void RestoreRegistryValue(PrivacyTweakItem tweak)
+    {
+        var rootKeyName = tweak.RegistryRoot!;
+        var subKeyPath = tweak.SubKeyPath!;
+        var valueName = tweak.ValueName!;
+
+        Dictionary<string, JsonElement>? backupMap;
+        try
+        {
+            backupMap = LoadBackupMap();
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[PrivacyDebloat] Backup load failed for {tweak.Id}: {ex.Message}");
+            backupMap = null;
+        }
+
+        PrivacyBackupEntry? entry = null;
+        if (backupMap != null
+            && backupMap.TryGetValue(tweak.Id, out var element)
+            && element.ValueKind == JsonValueKind.Object)
+        {
+            entry = element.Deserialize<PrivacyBackupEntry>(BackupJsonOptions);
+        }
+
+        if (entry != null && TryRestoreFromBackupEntry(rootKeyName, subKeyPath, valueName, entry))
+        {
+            return; // исходное состояние восстановлено из бэкапа
+        }
+
+        // Бэкап не вернул исходное состояние: честно сообщаем причину
+        // и ставим значение по умолчанию из кода
+        string reason = entry != null
+            ? "запись бэкапа повреждена или тип значения не поддерживается"
+            : backupMap == null
+                ? "файл бэкапа не читается"
+                : backupMap.ContainsKey(tweak.Id)
+                    ? "запись бэкапа старой схемы (константа вместо фактического значения до изменения)"
+                    : "бэкапа для твика нет";
+        LogBackupFallback(tweak, reason);
+
+        SetRegistryValue(rootKeyName, subKeyPath, valueName, tweak.DefaultValue ?? 1);
+    }
+
+    private bool TryRestoreFromBackupEntry(string rootKeyName, string subKeyPath, string valueName, PrivacyBackupEntry entry)
+    {
+        if (!entry.Existed)
+        {
+            // Значения до изменения не было: восстановление «отсутствовало»
+            _registry.DeleteValue(rootKeyName, subKeyPath, valueName);
+            return true;
+        }
+
+        if (TryParseSavedRegistryValue(entry, out var value, out var kind))
+        {
+            _registry.SetValue(rootKeyName, subKeyPath, valueName, value, kind);
+            return true;
+        }
+
+        return false;
+    }
+
+    private static bool TryParseSavedRegistryValue(PrivacyBackupEntry entry, out object value, out RegistryValueKind kind)
+    {
+        value = 0;
+        kind = RegistryValueKind.Unknown;
+        if (string.IsNullOrEmpty(entry.Kind) || string.IsNullOrEmpty(entry.Value))
+        {
+            return false;
+        }
+
+        if (!Enum.TryParse(entry.Kind, out kind))
+        {
+            return false;
+        }
+
+        try
+        {
+            switch (kind)
+            {
+                case RegistryValueKind.DWord:
+                    value = int.Parse(entry.Value, CultureInfo.InvariantCulture);
+                    return true;
+                case RegistryValueKind.QWord:
+                    value = long.Parse(entry.Value, CultureInfo.InvariantCulture);
+                    return true;
+                case RegistryValueKind.String:
+                case RegistryValueKind.ExpandString:
+                    value = entry.Value;
+                    return true;
+                default:
+                    // MultiString/Binary и прочие типы не поддержаны:
+                    // честный отказ, вызывающий делает fallback на DefaultValue
+                    return false;
+            }
+        }
+        catch (FormatException)
+        {
+            return false;
+        }
+        catch (OverflowException)
+        {
+            return false;
+        }
+    }
+
+    // Честное сообщение о fallback-откате: исходное значение неизвестно,
+    // восстановлено значение по умолчанию из кода
+    private void LogBackupFallback(PrivacyTweakItem tweak, string reason)
+    {
+        var message = $"[PrivacyDebloat] Откат '{tweak.Id}': {reason} — исходное значение неизвестно, " +
+                      $"восстановлено значение по умолчанию из кода ({tweak.DefaultValue ?? 1}).";
+        Debug.WriteLine(message);
+        _logger?.LogWarning("{Message}", message);
     }
 
     private static bool CheckIsTweakApplied(PrivacyTweakItem tweak)
