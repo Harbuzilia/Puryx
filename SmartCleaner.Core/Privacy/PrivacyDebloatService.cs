@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 using System.Diagnostics;
 using System.IO;
@@ -7,10 +8,29 @@ namespace SmartCleaner.Core.Privacy;
 
 public class PrivacyDebloatService
 {
-    private static readonly string BackupFilePath = Path.Combine(
+    private static readonly string DefaultBackupFilePath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
         "SmartCleaner",
         "privacy_backup.json");
+
+    private readonly IRegistryValueStore _registry;
+    private readonly string _backupFilePath;
+    private readonly ILogger<PrivacyDebloatService>? _logger;
+
+    /// <summary>
+    /// Создаёт сервис поверх реального реестра и файла бэкапа в AppData.
+    /// Необязательные параметры — шов для детерминированных тестов:
+    /// фейковое хранилище значений, путь к файлу бэкапа и логгер.
+    /// </summary>
+    public PrivacyDebloatService(
+        IRegistryValueStore? registry = null,
+        string? backupFilePath = null,
+        ILogger<PrivacyDebloatService>? logger = null)
+    {
+        _registry = registry ?? new RegistryValueStore();
+        _backupFilePath = backupFilePath ?? DefaultBackupFilePath;
+        _logger = logger;
+    }
 
     private readonly List<PrivacyTweakItem> _tweakDefinitions =
     [
@@ -328,26 +348,19 @@ public class PrivacyDebloatService
         return false;
     }
 
-    private static void SetRegistryValue(string rootKeyName, string subKeyPath, string valueName, object value)
+    // Запись значения с прежней семантикой типов: int → DWord, string → String,
+    // прочие рантайм-типы — тип определяет реестр (RegistryValueKind.Unknown).
+    private void SetRegistryValue(string rootKeyName, string subKeyPath, string valueName, object value)
     {
-        using var root = rootKeyName == "HKLM" ? Registry.LocalMachine : Registry.CurrentUser;
-        using var key = root.CreateSubKey(subKeyPath, writable: true);
-        if (key != null)
-        {
-            if (value is int intVal)
-            {
-                key.SetValue(valueName, intVal, RegistryValueKind.DWord);
-            }
-            else if (value is string strVal)
-            {
-                key.SetValue(valueName, strVal, RegistryValueKind.String);
-            }
-            else
-            {
-                key.SetValue(valueName, value);
-            }
-        }
+        _registry.SetValue(rootKeyName, subKeyPath, valueName, value, InferRegistryValueKind(value));
     }
+
+    private static RegistryValueKind InferRegistryValueKind(object value) => value switch
+    {
+        int => RegistryValueKind.DWord,
+        string => RegistryValueKind.String,
+        _ => RegistryValueKind.Unknown
+    };
 
     private static async Task<(bool Success, string Reason)> ConfigureServiceAsync(string serviceName, bool disabled)
     {
@@ -475,23 +488,23 @@ public class PrivacyDebloatService
         }
     }
 
-    private static void SaveBackupBeforeChange(PrivacyTweakItem tweak)
+    private void SaveBackupBeforeChange(PrivacyTweakItem tweak)
     {
         try
         {
-            Directory.CreateDirectory(Path.GetDirectoryName(BackupFilePath)!);
+            Directory.CreateDirectory(Path.GetDirectoryName(_backupFilePath)!);
             var backupMap = new Dictionary<string, string>();
 
-            if (File.Exists(BackupFilePath))
+            if (File.Exists(_backupFilePath))
             {
-                var json = File.ReadAllText(BackupFilePath);
+                var json = File.ReadAllText(_backupFilePath);
                 backupMap = JsonSerializer.Deserialize<Dictionary<string, string>>(json) ?? [];
             }
 
             if (!backupMap.ContainsKey(tweak.Id))
             {
                 backupMap[tweak.Id] = tweak.DefaultValue?.ToString() ?? "1";
-                File.WriteAllText(BackupFilePath, JsonSerializer.Serialize(backupMap, new JsonSerializerOptions { WriteIndented = true }));
+                File.WriteAllText(_backupFilePath, JsonSerializer.Serialize(backupMap, new JsonSerializerOptions { WriteIndented = true }));
             }
         }
         catch (Exception ex)
