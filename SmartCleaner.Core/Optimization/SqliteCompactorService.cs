@@ -102,13 +102,31 @@ public class SqliteCompactorService
                     using var conn = new Microsoft.Data.Sqlite.SqliteConnection(connString);
                     conn.Open();
 
+                    // День 21, L6: проба занятости перед VACUUM — база, открытая
+                    // живым приложением-владельцем (браузер, мессенджер), не
+                    // вакуумируется, а пропускается с честным статусом вместо
+                    // сырой «database is locked» в UI
+                    if (!TryProbeWriteAccess(conn))
+                    {
+                        target.Status = "Пропущено: база занята другим процессом";
+                        continue;
+                    }
+
                     using var vacCmd = conn.CreateCommand();
                     vacCmd.CommandText = "VACUUM;";
                     vacCmd.ExecuteNonQuery();
 
-                    using var checkpointCmd = conn.CreateCommand();
-                    checkpointCmd.CommandText = "PRAGMA wal_checkpoint(TRUNCATE);";
-                    checkpointCmd.ExecuteNonQuery();
+                    try
+                    {
+                        using var checkpointCmd = conn.CreateCommand();
+                        checkpointCmd.CommandText = "PRAGMA wal_checkpoint(TRUNCATE);";
+                        checkpointCmd.ExecuteNonQuery();
+                    }
+                    catch (Microsoft.Data.Sqlite.SqliteException)
+                    {
+                        // WAL-checkpoint при занятой базе не критичен: VACUUM уже
+                        // выполнен, checkpoint дорежет автоматически позже
+                    }
 
                     var newSize = new FileInfo(target.Path).Length;
                     var saved = Math.Max(0, initialSize - newSize);
@@ -122,6 +140,13 @@ public class SqliteCompactorService
                     count++;
                     totalSaved += saved;
                 }
+                catch (Microsoft.Data.Sqlite.SqliteException ex) when (IsBusyError(ex))
+                {
+                    // Занятость, замеченная только на самом VACUUM (например,
+                    // читатель, которого проба IMMEDIATE не ловит): честный
+                    // пропуск, не «Ошибка: SQLite Error 5»
+                    target.Status = "Пропущено: база занята другим процессом";
+                }
                 catch (Exception ex)
                 {
                     System.Diagnostics.Debug.WriteLine($"[SqliteCompactor] Ошибка при сжатии {target.Path}: {ex.Message}");
@@ -132,4 +157,35 @@ public class SqliteCompactorService
 
         return (count, totalSaved);
     }
+
+    /// <summary>
+    /// Проба занятости БД перед VACUUM (День 21, L6): короткая IMMEDIATE-
+    /// транзакция берёт write-lock и сразу освобождает. Провайдер по умолчанию
+    /// ретраит занятость до 30 с (Default Timeout) — проба ставит команде
+    /// секундный CommandTimeout, чтобы занятая база пропускалась быстро, а не
+    /// подвешивала очистку на полминуты.
+    /// </summary>
+    private static bool TryProbeWriteAccess(Microsoft.Data.Sqlite.SqliteConnection conn)
+    {
+        try
+        {
+            using var begin = conn.CreateCommand();
+            begin.CommandTimeout = 1; // быстрый отказ вместо 30-с ретраев провайдера
+            begin.CommandText = "BEGIN IMMEDIATE;";
+            begin.ExecuteNonQuery();
+
+            using var rollback = conn.CreateCommand();
+            rollback.CommandText = "ROLLBACK;";
+            rollback.ExecuteNonQuery();
+            return true;
+        }
+        catch (Microsoft.Data.Sqlite.SqliteException)
+        {
+            return false;
+        }
+    }
+
+    /// <summary>SQLITE_BUSY (5) / SQLITE_LOCKED (6) — «база занята», не поломка.</summary>
+    private static bool IsBusyError(Microsoft.Data.Sqlite.SqliteException ex) =>
+        ex.SqliteErrorCode is 5 or 6;
 }
