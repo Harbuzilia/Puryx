@@ -272,7 +272,10 @@ public partial class App : Application
                 sp.GetRequiredService<IConfigService>(),
                 sp.GetRequiredService<SmartCleaner.Core.SystemOpt.IGameBoostSystemOperations>(),
                 LoggerFor(sp, typeof(SmartCleaner.Core.SystemOpt.GameBoostService))));
-        services.AddSingleton<SmartCleaner.Core.DiskHealth.DiskHealthService>();
+        services.AddSingleton<SmartCleaner.Core.DiskHealth.DiskHealthService>(sp =>
+            new SmartCleaner.Core.DiskHealth.DiskHealthService(
+                sp.GetRequiredService<SmartCleaner.Core.Cleaning.ICommandExecutor>(),
+                LoggerFor(sp, typeof(SmartCleaner.Core.DiskHealth.DiskHealthService))));
         services.AddSingleton<SmartCleaner.Core.Safety.FileShredderService>(sp =>
             new SmartCleaner.Core.Safety.FileShredderService(
                 sp.GetRequiredService<ISafetyService>(),

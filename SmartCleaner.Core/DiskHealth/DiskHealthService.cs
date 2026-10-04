@@ -1,6 +1,12 @@
-﻿using SmartCleaner.Core.Helpers;
-using System.Diagnostics;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using SmartCleaner.Core.Cleaning;
+using SmartCleaner.Core.Helpers;
+using System.Text;
 using System.Text.Json;
+// UseWindowsForms тянет System.Windows.Forms.ICommandExecutor — снимаем
+// неоднозначность в пользу контракта исполнителя команд
+using ICommandExecutor = SmartCleaner.Core.Cleaning.ICommandExecutor;
 
 namespace SmartCleaner.Core.DiskHealth;
 
@@ -32,84 +38,125 @@ public class PhysicalDiskInfo
 
 public class DiskHealthService
 {
+    // Телеметрия S.M.A.R.T. (Get-PhysicalDisk + Get-StorageReliabilityCounter)
+    // на реальном железе занимает секунды; 30 с — страховочный потолок.
+    // День 24 (reviewer P3): прежде ReadToEnd не был ограничен вовсе —
+    // WaitForExit(3000) после чтения не срабатывал никогда
+    private static readonly TimeSpan TelemetryTimeout = TimeSpan.FromSeconds(30);
+
+    // Телеметрия S.M.A.R.T. через PowerShell: Get-PhysicalDisk + счётчики надёжности
+    // (Wear/Temperature из MSFT_StorageReliabilityCounter). Отсутствующие счётчики
+    // остаются null — UI показывает «н/д», никаких выдуманных процентов/градусов.
+    // Пролог [Console]::OutputEncoding — UTF-8 в пайп при любой консоли хоста
+    // (День 19, срез C): JSON ASCII-safe по именам полей и значениям enum,
+    // не-ASCII FriendlyName декодируется корректно
+    private const string TelemetryScript =
+        "[Console]::OutputEncoding=[System.Text.Encoding]::UTF8; " +
+        "Get-PhysicalDisk | ForEach-Object { " +
+        "$c = $null; " +
+        "try { $c = $_ | Get-StorageReliabilityCounter -ErrorAction Stop } catch {} " +
+        "$w = $null; $t = $null; " +
+        "if ($c) { $w = $c.Wear; $t = $c.Temperature } " +
+        "[pscustomobject]@{ DeviceId = $_.DeviceId; FriendlyName = $_.FriendlyName; MediaType = $_.MediaType; BusType = $_.BusType; HealthStatus = $_.HealthStatus; Size = $_.Size; Wear = $w; Temperature = $t } " +
+        "} | ConvertTo-Json -Compress";
+
+    private readonly ICommandExecutor _commandExecutor;
+    private readonly ILogger _logger;
+
+    /// <summary>
+    /// День 24 (reviewer P3): телеметрия дисков исполняется через контракт
+    /// ICommandExecutor (bounded-таймаут, честный код возврата) с
+    /// ILogger-диагностикой вместо Debug.WriteLine. Необязательный
+    /// исполнитель — шов для детерминированных тестов (как срезы A-C дней 17-19);
+    /// DI-регистрация исполнителя «включает» шов.
+    /// </summary>
+    public DiskHealthService(ICommandExecutor? commandExecutor = null, ILogger? logger = null)
+    {
+        _commandExecutor = commandExecutor ?? new ProcessCommandExecutor();
+        _logger = logger ?? NullLogger.Instance;
+    }
+
     public async Task<List<PhysicalDiskInfo>> GetPhysicalDisksHealthAsync()
     {
         var list = new List<PhysicalDiskInfo>();
 
-        await Task.Run(() =>
+        try
         {
-            try
+            var execution = await _commandExecutor.ExecuteAsync(new CommandExecutionRequest
             {
-                // Телеметрия S.M.A.R.T. через PowerShell: Get-PhysicalDisk + счётчики надёжности
-                // (Wear/Temperature из MSFT_StorageReliabilityCounter). Отсутствующие счётчики
-                // остаются null — UI показывает «н/д», никаких выдуманных процентов/градусов.
-                var script =
-                    "Get-PhysicalDisk | ForEach-Object { " +
-                    "$c = $null; " +
-                    "try { $c = $_ | Get-StorageReliabilityCounter -ErrorAction Stop } catch {} " +
-                    "$w = $null; $t = $null; " +
-                    "if ($c) { $w = $c.Wear; $t = $c.Temperature } " +
-                    "[pscustomobject]@{ DeviceId = $_.DeviceId; FriendlyName = $_.FriendlyName; MediaType = $_.MediaType; BusType = $_.BusType; HealthStatus = $_.HealthStatus; Size = $_.Size; Wear = $w; Temperature = $t } " +
-                    "} | ConvertTo-Json -Compress";
-                var psi = new ProcessStartInfo
-                {
-                    // Системный Windows PowerShell по абсолютному пути (командлеты
-                    // Get-PhysicalDisk/Get-StorageReliabilityCounter — системная семантика):
-                    // неквалифицированное имя = binary planting (M7, День 16б)
-                    FileName = SystemToolLocator.GetWindowsPowerShellPath(),
-                    Arguments = $"-NoProfile -NonInteractive -Command \"{script}\"",
-                    RedirectStandardOutput = true,
-                    CreateNoWindow = true,
-                    UseShellExecute = false
-                };
+                // Системный Windows PowerShell по абсолютному пути (командлеты
+                // Get-PhysicalDisk/Get-StorageReliabilityCounter — системная
+                // семантика): неквалифицированное имя = binary planting (M7, День 16б)
+                FileName = SystemToolLocator.GetWindowsPowerShellPath(),
+                Arguments = ["-NoProfile", "-NonInteractive", "-Command", TelemetryScript],
+                WorkingDirectory = string.Empty,
+                Timeout = TelemetryTimeout,
+                StandardOutputEncoding = Encoding.UTF8
+            });
 
-                using var proc = Process.Start(psi);
-                if (proc != null)
-                {
-                    var output = proc.StandardOutput.ReadToEnd();
-                    proc.WaitForExit(3000);
-
-                    if (!string.IsNullOrWhiteSpace(output))
-                    {
-                        if (output.TrimStart().StartsWith("["))
-                        {
-                            using var doc = JsonDocument.Parse(output);
-                            foreach (var element in doc.RootElement.EnumerateArray())
-                            {
-                                list.Add(ParseDiskElement(element));
-                            }
-                        }
-                        else if (output.TrimStart().StartsWith("{"))
-                        {
-                            using var doc = JsonDocument.Parse(output);
-                            list.Add(ParseDiskElement(doc.RootElement));
-                        }
-                    }
-                }
-            }
-            catch (Exception ex) { Debug.WriteLine($"[DiskHealthService] WMIC disk info parse error: {ex.Message}"); }
-
-            // Fallback if empty
-            if (list.Count == 0)
+            if (execution.TimedOut || execution.ExitCode != 0)
             {
-                // Только факт существования тома; телеметрия износа/температуры недоступна (null → «н/д»)
-                var drives = DriveInfo.GetDrives().Where(d => d.IsReady && d.DriveType == DriveType.Fixed);
-                foreach (var d in drives)
-                {
-                    list.Add(new PhysicalDiskInfo
-                    {
-                        DeviceId = d.Name,
-                        FriendlyName = $"Локальный диск ({d.Name.TrimEnd('\\')})",
-                        MediaType = "SSD / HDD",
-                        BusType = "SATA/NVMe",
-                        HealthStatus = "Healthy",
-                        SizeBytes = d.TotalSize
-                    });
-                }
+                // Фейл/таймаут PowerShell — честная причина, а не «пусто» (день 22):
+                // телеметрия недоступна, fallback ниже честен
+                _logger.LogWarning(
+                    "Телеметрия S.M.A.R.T. недоступна: {Reason}",
+                    execution.TimedOut ? "таймаут PowerShell" : $"код возврата {execution.ExitCode}");
             }
-        });
+            else
+            {
+                ParseJsonOutput(execution.StandardOutput, list);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Телеметрия S.M.A.R.T. дисков недоступна: {Error}", ex.Message);
+        }
+
+        // Fallback if empty
+        if (list.Count == 0)
+        {
+            // Только факт существования тома; телеметрия износа/температуры недоступна (null → «н/д»)
+            var drives = DriveInfo.GetDrives().Where(d => d.IsReady && d.DriveType == DriveType.Fixed);
+            foreach (var d in drives)
+            {
+                list.Add(new PhysicalDiskInfo
+                {
+                    DeviceId = d.Name,
+                    FriendlyName = $"Локальный диск ({d.Name.TrimEnd('\\')})",
+                    MediaType = "SSD / HDD",
+                    BusType = "SATA/NVMe",
+                    HealthStatus = "Healthy",
+                    SizeBytes = d.TotalSize
+                });
+            }
+        }
 
         return list;
+    }
+
+    /// <summary>
+    /// Разбор JSON-вывода скрипта телеметрии: массив (несколько дисков) или
+    /// одиночный объект (один диск). Ничего не выдумывает: не-JSON или пустой
+    /// вывод — список остаётся пустым (fallback вызывающего кода).
+    /// </summary>
+    private static void ParseJsonOutput(string output, List<PhysicalDiskInfo> list)
+    {
+        if (string.IsNullOrWhiteSpace(output))
+            return;
+
+        if (output.TrimStart().StartsWith("["))
+        {
+            using var doc = JsonDocument.Parse(output);
+            foreach (var element in doc.RootElement.EnumerateArray())
+            {
+                list.Add(ParseDiskElement(element));
+            }
+        }
+        else if (output.TrimStart().StartsWith("{"))
+        {
+            using var doc = JsonDocument.Parse(output);
+            list.Add(ParseDiskElement(doc.RootElement));
+        }
     }
 
     private static PhysicalDiskInfo ParseDiskElement(JsonElement el)
