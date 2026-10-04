@@ -271,7 +271,7 @@ public abstract class ScannerBase : IScannerStrategy
     /// (цикл-гвард перечислений). Ошибка получения атрибутов трактуется как
     /// reparse — непроверяемый каталог не рекурсируется (fail-closed).
     /// </summary>
-    private static bool IsReparseDirectory(string path)
+    protected static bool IsReparseDirectory(string path)
     {
         try
         {

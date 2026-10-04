@@ -230,9 +230,13 @@ public class CustomFolderScanner : ScannerBase
                         });
                         // Не заходим внутрь найденной папки
                     }
-                    else
+                    else if (!IsReparseDirectory(subDir))
                     {
-                        // Не целевая — добавляем в стек для рекурсии
+                        // Не целевая и не reparse-точка (junction/symlink) — в стек
+                        // для рекурсии. Спуск в reparse-точки запрещён (цикл-гвард,
+                        // День 22): junction внутрь корня даёт бесконечный спуск и
+                        // фантомные копии целевых папок, junction наружу — чужое
+                        // содержимое; образец — SafeEnumerateDirectoriesRecursive (День 14)
                         stack.Push(subDir);
                     }
                 }
