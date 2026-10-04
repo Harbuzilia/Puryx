@@ -453,4 +453,65 @@ public class SafetyServiceTests
             CleanupTree(root);
         }
     }
+
+    // ==== День 22 — финализация: junction-сценарии обхода whitelist ====
+
+    [Fact]
+    [Trait("Category", "Integration")]
+    public void ValidateForDeletion_JunctionIntoGitDir_BlockedByWhitelistRealPath()
+    {
+        // Встроенный glob «**\.git\**»: junction в сканируемой зоне, указывающий
+        // на .git-каталог, лексически паттерн не содержит (путь junction без
+        // «.git») — защита обязана срабатывать по реальному пути
+        var service = CreateService();
+        var root = Path.Combine(Path.GetTempPath(), $"safety_git_{Guid.NewGuid():N}");
+        Directory.CreateDirectory(root);
+        try
+        {
+            var gitDir = Path.Combine(root, "repo", ".git");
+            Directory.CreateDirectory(gitDir);
+            File.WriteAllText(Path.Combine(gitDir, "config"), "git-config");
+            var junction = Path.Combine(root, "link");
+            CreateJunction(junction, gitDir);
+
+            var validation = service.ValidateForDeletion(MakeItem(Path.Combine(junction, "config")));
+
+            Assert.False(validation.CanDelete, "файл .git за junction обязан блокироваться whitelist по реальному пути");
+            Assert.NotNull(validation.BlockReason);
+            Assert.Contains("белом списке", validation.BlockReason);
+        }
+        finally
+        {
+            CleanupTree(root);
+        }
+    }
+
+    [Fact]
+    [Trait("Category", "Integration")]
+    public void ValidateForDeletion_UserPatternBehindJunction_BlockedByRealPath()
+    {
+        // Пользовательский whitelist-паттерн: junction из зоны сканирования
+        // наружу в защищённую пользователем папку лексически паттерн не
+        // матчит — блок по реальному пути
+        var service = CreateService();
+        var root = Path.Combine(Path.GetTempPath(), $"safety_user_{Guid.NewGuid():N}");
+        Directory.CreateDirectory(root);
+        try
+        {
+            var important = Path.Combine(root, "ImportantStuff");
+            Directory.CreateDirectory(important);
+            File.WriteAllText(Path.Combine(important, "notes.txt"), "user-data");
+            service.AddToWhitelist($@"{important}\**");
+            var junction = Path.Combine(root, "leak");
+            CreateJunction(junction, important);
+
+            var validation = service.ValidateForDeletion(MakeItem(Path.Combine(junction, "notes.txt")));
+
+            Assert.False(validation.CanDelete, "пользовательский паттерн за junction обязан срабатывать по реальному пути");
+        }
+        finally
+        {
+            CleanupTree(root);
+        }
+    }
 }
