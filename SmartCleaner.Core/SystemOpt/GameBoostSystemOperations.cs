@@ -99,8 +99,11 @@ public sealed class StandardGameBoostSystemOperations : IGameBoostSystemOperatio
             // Таймаут — тоже отказ: никакого «успеха по коду -1»
             return result.TimedOut ? -1 : result.ExitCode;
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not OperationCanceledException)
         {
+            // День 24: отмена по токену вызывающего (OCE от исполнителя) —
+            // исключение наружу, а не «-1 = утилита отказала»: буст обязан
+            // отличать отказ net/powercfg от отмены
             _logger.LogWarning(ex, "{FileName} {Arguments}: {Error}", fileName, string.Join(' ', arguments), ex.Message);
             return -1;
         }

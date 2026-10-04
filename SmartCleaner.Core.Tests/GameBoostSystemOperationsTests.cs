@@ -96,4 +96,20 @@ public class GameBoostSystemOperationsTests
         Assert.All(executor.Requests, r => Assert.Equal(new[] { "/list" }, r.Arguments));
         Assert.All(executor.Requests, r => Assert.Equal(SystemToolLocator.GetPowercfgPath(), r.FileName));
     }
+
+    // ==== День 24 — отмена не глотается как отказ утилиты (OCE-дисциплина, reviewer P3) ====
+
+    [Fact]
+    public async Task StopService_Cancellation_PropagatesOperationCanceled()
+    {
+        // День 24: отмена по токену вызывающего (OCE от исполнителя) —
+        // исключение наружу, а не «-1 = служба не остановлена»: буст обязан
+        // отличать отказ утилиты от отмены. Стаб эмулирует контракт реального
+        // исполнителя (ProcessCommandExecutor бросает OCE при отмене ct)
+        var executor = new RecordingCommandExecutor(_ => throw new OperationCanceledException());
+        var operations = new StandardGameBoostSystemOperations(executor);
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() =>
+            operations.StopServiceAsync("SysMain"));
+    }
 }

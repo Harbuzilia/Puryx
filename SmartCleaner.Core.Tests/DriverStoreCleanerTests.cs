@@ -313,6 +313,31 @@ public class DriverStoreCleanerTests
         Assert.DoesNotContain(drivers, d => string.IsNullOrEmpty(d.PublishedName));
     }
 
+    // ==== День 24 — отмена не глотается как ошибка (OCE-дисциплина, reviewer P3) ====
+
+    [Fact]
+    public async Task ScanDriversAsync_Cancellation_HonestCancelledProgressNotError()
+    {
+        // День 24: отмена пользователем — «сканирование отменено», а не
+        // «Ошибка сканирования драйверов». Стаб эмулирует контракт реального
+        // исполнителя: отмена по токену вызывающего — OperationCanceledException
+        var executor = new RecordingCommandExecutor(_ => throw new OperationCanceledException());
+        var cleaner = new DriverStoreCleaner(executor);
+        var lines = new List<string>();
+        var progress = new CollectingProgress(lines);
+
+        var drivers = await cleaner.ScanDriversAsync(progress);
+
+        Assert.Empty(drivers);
+        Assert.Contains(lines, l => l.Contains("отмен"));
+        Assert.DoesNotContain(lines, l => l.Contains("Ошибка"));
+    }
+
+    private sealed class CollectingProgress(List<string> lines) : IProgress<string>
+    {
+        public void Report(string value) => lines.Add(value);
+    }
+
     private static DriverStoreItem New(
         string publishedName, string originalName, string className, string version, string date) => new()
     {

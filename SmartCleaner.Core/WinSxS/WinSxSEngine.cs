@@ -78,6 +78,12 @@ public class WinSxSEngine
             else if (!result.AnalysisAvailable && execution.ExitCode != 0)
                 result.AnalysisUnavailableReason = $"{result.AnalysisUnavailableReason} (код возврата {execution.ExitCode})";
         }
+        catch (OperationCanceledException)
+        {
+            // День 24: отмена — честный статус «отменено», а не «ошибка DISM»
+            result.RawAnalysisOutput = "Анализ WinSxS отменён";
+            result.AnalysisUnavailableReason = "Анализ WinSxS отменён";
+        }
         catch (Exception ex)
         {
             result.RawAnalysisOutput = $"Ошибка анализа DISM: {ex.Message}";
@@ -187,8 +193,14 @@ public class WinSxSEngine
 
         var args = BuildComponentCleanupArguments(resetBase);
 
+        Process? proc = null;
         try
         {
+            // День 24: уже отменённый вызов не запускает DISM вовсе — отмена
+            // не должна успеть «проехать» UAC-диалог; OCE уходит в
+            // catch ниже как честный статус «отменено»
+            ct.ThrowIfCancellationRequested();
+
             // Обоснованное исключение (День 18, срез B): StartComponentCleanup
             // требует повышения прав — UseShellExecute=true + Verb="runas"
             // показывает UAC-диалог. Контракт ICommandExecutor исполняет команды
@@ -203,7 +215,7 @@ public class WinSxSEngine
                 Verb = "runas" // elevated
             };
 
-            var proc = Process.Start(psi);
+            proc = Process.Start(psi);
             if (proc != null)
             {
                 await proc.WaitForExitAsync(ct);
@@ -213,9 +225,38 @@ public class WinSxSEngine
             }
             return (false, "Не удалось запустить DISM");
         }
+        catch (OperationCanceledException)
+        {
+            // День 24: отмена — честный статус «отменено», а не «ошибка DISM».
+            // Elevated-процесс (runas) обязан останавливаться, иначе DISM
+            // продолжит очистку после «отмены»; kill с родителя без элевации
+            // ограничен (отказ доступа) — попытка best-effort, отказ глотается
+            TryKillOnCancel(proc);
+            return (false, "Очистка WinSxS отменена");
+        }
         catch (Exception ex)
         {
             return (false, $"Ошибка выполнения DISM: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// День 24: остановка DISM при отмене. Для runas-процесса kill ограничен:
+    /// неэлевированный родитель получает отказ доступа к elevated-процессу,
+    /// поэтому попытка — best-effort (успешна при равных правах родителя).
+    /// </summary>
+    private static void TryKillOnCancel(Process? proc)
+    {
+        if (proc is null || proc.HasExited)
+            return;
+
+        try
+        {
+            proc.Kill();
+        }
+        catch (Exception)
+        {
+            // runas-процесс: отказ доступа к kill ограничен правами родителя
         }
     }
 

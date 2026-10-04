@@ -261,6 +261,43 @@ public class WinSxSEngineTests
         Assert.Contains("код возврата 5", result.AnalysisUnavailableReason);
     }
 
+    // ==== День 24 — отмена не глотается как ошибка (OCE-дисциплина, reviewer P3) ====
+
+    [Fact]
+    public async Task AnalyzeComponentStoreAsync_Cancellation_HonestCancelledReasonNotError()
+    {
+        // День 24: отмена пользователем — честный статус «отменено», а не
+        // «Ошибка анализа DISM». Стаб эмулирует контракт реального
+        // исполнителя: отмена по токену вызывающего — OperationCanceledException
+        var executor = new RecordingCommandExecutor(_ => throw new OperationCanceledException());
+        var engine = new WinSxSEngine(executor);
+
+        var result = await engine.AnalyzeComponentStoreAsync();
+
+        Assert.False(result.AnalysisAvailable);
+        Assert.Contains("отмен", result.AnalysisUnavailableReason);
+        Assert.DoesNotContain("Ошибка", result.AnalysisUnavailableReason);
+    }
+
+    // Тест добавлен после реализации (осознанное отступление от RED-фазы):
+    // против прежнего кода пред-отменённый токен запускал бы elevated DISM
+    // (UAC-диалог в тестовом процессе) — RED-прогон небезопасен. Guard
+    // ct.ThrowIfCancellationRequested до Process.Start гарантирует, что
+    // DISM не запускается вовсе; сообщение — честное «отменено»
+    [Fact]
+    public async Task RunComponentCleanupAsync_AlreadyCancelledToken_HonestCancelledMessageWithoutDismLaunch()
+    {
+        using var cts = new CancellationTokenSource();
+        cts.Cancel();
+        var engine = new WinSxSEngine();
+
+        var (success, message) = await engine.RunComponentCleanupAsync(ct: cts.Token);
+
+        Assert.False(success);
+        Assert.Contains("отменен", message);
+        Assert.DoesNotContain("Ошибка", message);
+    }
+
     // Ожидание «8.12 ГБ» без дублирования логики форматирования в тесте
     private static string SizeFormatterExpectation(double gb) =>
         SmartCleaner.Core.Helpers.SizeFormatter.Format((long)(gb * Gb));

@@ -104,6 +104,12 @@ public class DriverStoreCleaner
             drivers = ParsePnputilOutput(execution.StandardOutput);
             MarkDuplicateGroups(drivers);
         }
+        catch (OperationCanceledException)
+        {
+            // День 24: отмена — честный прогресс «отменено», а не «ошибка
+            // сканирования»: вызывающий отличает отмену от отказа pnputil
+            progress?.Report("Сканирование драйверов отменено");
+        }
         catch (Exception ex)
         {
             progress?.Report($"Ошибка сканирования драйверов: {ex.Message}");
