@@ -1,3 +1,5 @@
+using SmartCleaner.Core.Cleaning;
+using SmartCleaner.Core.Helpers;
 using SmartCleaner.Core.WinSxS;
 using Xunit;
 
@@ -9,6 +11,9 @@ namespace SmartCleaner.Core.Tests;
 /// фактические значения (en/ru локали; ru использует запятую как десятичный разделитель
 /// и кириллические единицы) и никогда не подставлять выдуманные числа:
 /// битый/пустой вывод — «н/д», а не «~7.5 ГБ».
+/// День 18 — срез B: контрактные тесты команды DISM через стаб
+/// RecordingCommandExecutor — полное имя утилиты (SystemToolLocator),
+/// аргументы, таймаут; честные причины недоступности (740/таймаут).
 /// </summary>
 public class WinSxSEngineTests
 {
@@ -125,6 +130,61 @@ public class WinSxSEngineTests
         Assert.Equal("н/д", result.ActualSizeFormatted);
         Assert.Equal("н/д", result.ReclaimablePackagesFormatted);
         Assert.NotEmpty(result.AnalysisUnavailableReason);
+    }
+
+    // День 18 — срез B: вывод DISM для контракта через стаб — минимальный
+    // parseable-набор (en-локаль, без прогресс-строк).
+    private const string AnalyzeOutput = """
+        Actual Size of Component Store : 8.12 GB
+        Shared with Windows : 6.01 GB
+        Backups and Disabled Features : 1.28 GB
+        Component Store Cleanup Recommended : Yes
+        The operation completed successfully.
+        """;
+
+    [Fact]
+    public async Task AnalyzeComponentStoreAsync_IssuesDismThroughExecutor_WithArgumentsAndTimeout()
+    {
+        var executor = new RecordingCommandExecutor();
+        executor.EnqueueSuccess(AnalyzeOutput);
+        var engine = new WinSxSEngine(executor);
+
+        var result = await engine.AnalyzeComponentStoreAsync();
+
+        Assert.True(result.AnalysisAvailable);
+        var request = Assert.Single(executor.Requests);
+        Assert.Equal(SystemToolLocator.GetDismPath(), request.FileName);
+        Assert.Equal(new[] { "/Online", "/Cleanup-Image", "/AnalyzeComponentStore" }, request.Arguments);
+        Assert.Equal(TimeSpan.FromMinutes(10), request.Timeout);
+    }
+
+    [Fact]
+    public async Task AnalyzeComponentStoreAsync_ElevationFailure_HonestReasonWithExitCode()
+    {
+        // Без прав администратора DISM завершается ошибкой 740 — пользователь
+        // обязан видеть «нужны права», а не безликое «нет данных»
+        var executor = new RecordingCommandExecutor();
+        executor.EnqueueFailure(740, "Error: 740\r\nThe requested operation requires elevation.");
+        var engine = new WinSxSEngine(executor);
+
+        var result = await engine.AnalyzeComponentStoreAsync();
+
+        Assert.False(result.AnalysisAvailable);
+        Assert.Contains("права администратора", result.AnalysisUnavailableReason);
+        Assert.Contains("740", result.AnalysisUnavailableReason);
+    }
+
+    [Fact]
+    public async Task AnalyzeComponentStoreAsync_Timeout_HonestTimeoutReason()
+    {
+        var executor = new RecordingCommandExecutor();
+        executor.EnqueueResult(new CommandExecutionResult { ExitCode = -1, TimedOut = true });
+        var engine = new WinSxSEngine(executor);
+
+        var result = await engine.AnalyzeComponentStoreAsync();
+
+        Assert.False(result.AnalysisAvailable);
+        Assert.Contains("таймаут", result.AnalysisUnavailableReason);
     }
 
     // Ожидание «8.12 ГБ» без дублирования логики форматирования в тесте

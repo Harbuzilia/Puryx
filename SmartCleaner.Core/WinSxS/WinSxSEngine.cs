@@ -1,7 +1,11 @@
-﻿using SmartCleaner.Core.Helpers;
+﻿using SmartCleaner.Core.Cleaning;
+using SmartCleaner.Core.Helpers;
 using System.Diagnostics;
 using System.Globalization;
 using System.Text.RegularExpressions;
+// UseWindowsForms тянет System.Windows.Forms.ICommandExecutor — снимаем
+// неоднозначность в пользу контракта исполнителя команд
+using ICommandExecutor = SmartCleaner.Core.Cleaning.ICommandExecutor;
 
 namespace SmartCleaner.Core.WinSxS;
 
@@ -30,6 +34,24 @@ public class WinSxSAnalysisResult
 
 public class WinSxSEngine
 {
+    // Таймаут анализа DISM: /AnalyzeComponentStore легитимно долгий (на живой
+    // машине — десятки секунд и минуты на большом WinSxS); 10 минут — страховка
+    // от зависания, отмена пользователем — через CancellationToken
+    private static readonly TimeSpan DismAnalyzeTimeout = TimeSpan.FromMinutes(10);
+
+    private readonly ICommandExecutor _commandExecutor;
+
+    /// <summary>
+    /// Создаёт движок поверх реального исполнителя команд (День 18, срез B).
+    /// Необязательный исполнитель — шов для детерминированных тестов: стаб
+    /// фиксирует команду (полное имя утилиты, аргументы, таймаут).
+    /// DI-регистрация исполнителя — День 19.
+    /// </summary>
+    public WinSxSEngine(ICommandExecutor? commandExecutor = null)
+    {
+        _commandExecutor = commandExecutor ?? new ProcessCommandExecutor();
+    }
+
     public async Task<WinSxSAnalysisResult> AnalyzeComponentStoreAsync(IProgress<string>? progress = null, CancellationToken ct = default)
     {
         var result = new WinSxSAnalysisResult();
@@ -37,37 +59,24 @@ public class WinSxSEngine
 
         try
         {
-            var psi = new ProcessStartInfo
+            var execution = await _commandExecutor.ExecuteAsync(new CommandExecutionRequest
             {
+                // Абсолютный путь из системного каталога: запуск по неквалифицированному
+                // имени ищет exe в каталоге приложения — binary planting (M7, День 16б)
                 FileName = SystemToolLocator.GetDismPath(),
-                Arguments = "/Online /Cleanup-Image /AnalyzeComponentStore",
-                CreateNoWindow = true,
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true
-            };
-
-            using var proc = Process.Start(psi);
-            if (proc == null)
-            {
-                result.RawAnalysisOutput = "Не удалось запустить DISM";
-                result.AnalysisUnavailableReason = "Не удалось запустить DISM";
-                return result;
-            }
-
-            // Потоки читаем до ожидания выхода, чтобы заполненный буфер не заблокировал DISM
-            var stdoutTask = proc.StandardOutput.ReadToEndAsync(ct);
-            var stderrTask = proc.StandardError.ReadToEndAsync(ct);
-            await proc.WaitForExitAsync(ct);
-
-            var stdout = await stdoutTask;
-            var stderr = await stderrTask;
+                Arguments = ["/Online", "/Cleanup-Image", "/AnalyzeComponentStore"],
+                WorkingDirectory = string.Empty,
+                Timeout = DismAnalyzeTimeout
+            }, ct);
 
             // DISM печатает результат в stdout; при пустом stdout — пробуем stderr
-            result = ParseAnalyzeComponentStoreOutput(stdout.Length > 0 ? stdout : stderr);
+            var output = execution.StandardOutput.Length > 0 ? execution.StandardOutput : execution.StandardError;
+            result = ParseAnalyzeComponentStoreOutput(output);
 
-            if (!result.AnalysisAvailable && proc.ExitCode != 0)
-                result.AnalysisUnavailableReason = $"{result.AnalysisUnavailableReason} (код возврата {proc.ExitCode})";
+            if (!result.AnalysisAvailable && execution.TimedOut)
+                result.AnalysisUnavailableReason = "Анализ DISM прерван по таймауту (10 минут)";
+            else if (!result.AnalysisAvailable && execution.ExitCode != 0)
+                result.AnalysisUnavailableReason = $"{result.AnalysisUnavailableReason} (код возврата {execution.ExitCode})";
         }
         catch (Exception ex)
         {
@@ -171,6 +180,12 @@ public class WinSxSEngine
 
         try
         {
+            // Обоснованное исключение (День 18, срез B): StartComponentCleanup
+            // требует повышения прав — UseShellExecute=true + Verb="runas"
+            // показывает UAC-диалог. Контракт ICommandExecutor исполняет команды
+            // без элевации (UseShellExecute=false, редирект потоков), перевод
+            // этой ветки на исполнителя требует предварительного расширения
+            // контракта ролью «запуск с повышением» — вне скоупа среза.
             var psi = new ProcessStartInfo
             {
                 FileName = SystemToolLocator.GetDismPath(),
