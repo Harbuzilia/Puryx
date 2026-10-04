@@ -287,4 +287,105 @@ public class StartupEngineTests
         Assert.DoesNotContain(items, i => i.Source == StartupSource.TaskScheduler);
         Assert.Contains(items, i => i.Source != StartupSource.TaskScheduler);
     }
+
+    // ─── День 21 — L2 (ROADMAP): Disable/Enable/Delete для TaskScheduler ──
+    //
+    // Прежде источник «Планировщик заданий» в Disable/Enable/Delete попадал в
+    // default: return false — молча не поддержан. Теперь операции идут через
+    // schtasks: /Change /TN <путь> /DISABLE|/ENABLE, /Delete /TN <путь> /F.
+
+    /// <summary>Элемент планировщика как после сканирования: Name — последний сегмент, TaskName — полный путь.</summary>
+    private static StartupItem TaskSchedulerItem(string taskName) => new()
+    {
+        Name = Path.GetFileName(taskName),
+        TaskName = taskName,
+        Source = StartupSource.TaskScheduler,
+        IsEnabled = true,
+        FilePath = @"C:\Stub\tool.exe"
+    };
+
+    [Fact]
+    public async Task DisableItemAsync_TaskScheduler_IssuesSchtasksChangeDisable()
+    {
+        var executor = new RecordingCommandExecutor();
+        var engine = new StartupEngine(executor);
+        var item = TaskSchedulerItem(@"\Vendor\UpdateTask");
+
+        Assert.True(await engine.DisableItemAsync(item));
+        Assert.False(item.IsEnabled);
+
+        var request = Assert.Single(executor.Requests);
+        Assert.Equal(SystemToolLocator.GetSchtasksPath(), request.FileName);
+        Assert.Equal(new[] { "/Change", "/TN", @"\Vendor\UpdateTask", "/DISABLE" }, request.Arguments);
+        Assert.Equal(TimeSpan.FromSeconds(15), request.Timeout);
+    }
+
+    [Fact]
+    public async Task EnableItemAsync_TaskScheduler_IssuesSchtasksChangeEnable()
+    {
+        var executor = new RecordingCommandExecutor();
+        var engine = new StartupEngine(executor);
+        var item = TaskSchedulerItem(@"\Vendor\UpdateTask");
+        item.IsEnabled = false;
+
+        Assert.True(await engine.EnableItemAsync(item));
+        Assert.True(item.IsEnabled);
+
+        var request = Assert.Single(executor.Requests);
+        Assert.Equal(new[] { "/Change", "/TN", @"\Vendor\UpdateTask", "/ENABLE" }, request.Arguments);
+    }
+
+    [Fact]
+    public async Task DeleteItemAsync_TaskScheduler_IssuesSchtasksDeleteForce()
+    {
+        // /F обязателен: без него schtasks в неинтерактивном режиме спрашивает
+        // подтверждение на консоли и отказывает
+        var executor = new RecordingCommandExecutor();
+        var engine = new StartupEngine(executor);
+        var item = TaskSchedulerItem(@"\Vendor\OneTimeTask");
+
+        Assert.True(await engine.DeleteItemAsync(item));
+
+        var request = Assert.Single(executor.Requests);
+        Assert.Equal(SystemToolLocator.GetSchtasksPath(), request.FileName);
+        Assert.Equal(new[] { "/Delete", "/TN", @"\Vendor\OneTimeTask", "/F" }, request.Arguments);
+    }
+
+    [Fact]
+    public async Task DisableItemAsync_TaskSchedulerSchtasksFails_ReturnsFalseAndKeepsState()
+    {
+        // Отказ schtasks (права/нет задачи) — false, состояние элемента не врёт
+        var executor = new RecordingCommandExecutor();
+        executor.EnqueueFailure(1, "ERROR: Access is denied.");
+        var engine = new StartupEngine(executor);
+        var item = TaskSchedulerItem(@"\Vendor\UpdateTask");
+
+        Assert.False(await engine.DisableItemAsync(item));
+        Assert.True(item.IsEnabled);
+    }
+
+    [Fact]
+    public async Task DisableItemAsync_TaskSchedulerWithoutTaskPath_ReturnsFalse()
+    {
+        // Элемент планировщика без полного пути задачи (/TN по нему невозможен) —
+        // честный false, а не попытка schtasks с пустым именем
+        var executor = new RecordingCommandExecutor();
+        var engine = new StartupEngine(executor);
+        var item = new StartupItem { Name = "NoPath", Source = StartupSource.TaskScheduler, IsEnabled = true };
+
+        Assert.False(await engine.DisableItemAsync(item));
+        Assert.Empty(executor.Requests);
+    }
+
+    [Fact]
+    public void TryParseTaskSchedulerCsvLine_PreservesFullTaskPathForSchtasksOperations()
+    {
+        // Полный путь задачи (колонка 1 «Имя задачи») обязан сохраняться в TaskName:
+        // schtasks /Change /TN адресует задачу путём \Папка\Задача, а Name — лишь
+        // последний сегмент (для отображения)
+        var item = StartupEngine.TryParseTaskSchedulerCsvLine(AmdVerboseLine);
+
+        Assert.NotNull(item);
+        Assert.Equal(@"\AMD Install Manager - Check For Updates", item!.TaskName);
+    }
 }

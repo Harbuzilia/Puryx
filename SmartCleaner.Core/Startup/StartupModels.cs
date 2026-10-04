@@ -51,6 +51,13 @@ public sealed class StartupItem
     /// <summary>Издатель (из свойств файла).</summary>
     public string Publisher { get; set; } = "";
 
+    /// <summary>
+    /// Полный путь задачи планировщика вида «\Папка\Задача» (для источника
+    /// TaskScheduler): schtasks /Change /TN и /Delete /TN адресуют задачу
+    /// именно путём, <see cref="Name"/> — лишь последний сегмент для отображения.
+    /// </summary>
+    public string TaskName { get; set; } = "";
+
     /// <summary>Путь к реестровому ключу (для Registry-записей).</summary>
     public string RegistryPath { get; set; } = "";
 

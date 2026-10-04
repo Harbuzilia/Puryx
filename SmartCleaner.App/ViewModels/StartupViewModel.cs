@@ -64,15 +64,17 @@ public partial class StartupViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void ToggleItem(StartupItemViewModel? itemVm)
+    private async Task ToggleItemAsync(StartupItemViewModel? itemVm)
     {
         if (itemVm == null) return;
 
+        // День 21, L2: операции стали async — TaskScheduler требует запуска
+        // schtasks через исполнителя (sync-over-async запрещён)
         bool success;
         if (itemVm.IsEnabled)
-            success = _engine.DisableItem(itemVm.Item);
+            success = await _engine.DisableItemAsync(itemVm.Item);
         else
-            success = _engine.EnableItem(itemVm.Item);
+            success = await _engine.EnableItemAsync(itemVm.Item);
 
         if (success)
         {
@@ -87,11 +89,12 @@ public partial class StartupViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void DeleteItem(StartupItemViewModel? itemVm)
+    private async Task DeleteItemAsync(StartupItemViewModel? itemVm)
     {
         if (itemVm == null) return;
 
-        if (_engine.DeleteItem(itemVm.Item))
+        // День 21, L2: удаление задачи планировщика — через schtasks (async)
+        if (await _engine.DeleteItemAsync(itemVm.Item))
         {
             Items.Remove(itemVm);
             _allItems.Remove(itemVm.Item);

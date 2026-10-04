@@ -69,10 +69,12 @@ public sealed class StartupEngine
 
     /// <summary>
     /// Отключает элемент автозагрузки (для реестра — переименовывает с "!").
+    /// День 21, L2: источник TaskScheduler больше не молча не поддержан —
+    /// задача планировщика отключается через «schtasks /Change /TN … /DISABLE».
     /// </summary>
     /// <param name="item">Элемент для отключения.</param>
     /// <returns>true если успешно.</returns>
-    public bool DisableItem(StartupItem item)
+    public async Task<bool> DisableItemAsync(StartupItem item, CancellationToken ct = default)
     {
         try
         {
@@ -94,17 +96,26 @@ public sealed class StartupEngine
                     }
                     return false;
 
+                case StartupSource.TaskScheduler:
+                    if (await ChangeTaskSchedulerStateAsync(item, enable: false, ct))
+                    {
+                        item.IsEnabled = false;
+                        return true;
+                    }
+                    return false;
+
                 default:
                     return false;
             }
         }
-        catch (Exception ex) { Debug.WriteLine($"[StartupEngine] DisableItem error: {ex.Message}"); return false; }
+        catch (Exception ex) when (ex is not OperationCanceledException) { Debug.WriteLine($"[StartupEngine] DisableItem error: {ex.Message}"); return false; }
     }
 
     /// <summary>
-    /// Включает ранее отключённый элемент.
+    /// Включает ранее отключённый элемент. День 21, L2: для TaskScheduler —
+    /// «schtasks /Change /TN … /ENABLE».
     /// </summary>
-    public bool EnableItem(StartupItem item)
+    public async Task<bool> EnableItemAsync(StartupItem item, CancellationToken ct = default)
     {
         try
         {
@@ -126,17 +137,27 @@ public sealed class StartupEngine
                     }
                     return false;
 
+                case StartupSource.TaskScheduler:
+                    if (await ChangeTaskSchedulerStateAsync(item, enable: true, ct))
+                    {
+                        item.IsEnabled = true;
+                        return true;
+                    }
+                    return false;
+
                 default:
                     return false;
             }
         }
-        catch (Exception ex) { Debug.WriteLine($"[StartupEngine] EnableItem error: {ex.Message}"); return false; }
+        catch (Exception ex) when (ex is not OperationCanceledException) { Debug.WriteLine($"[StartupEngine] EnableItem error: {ex.Message}"); return false; }
     }
 
     /// <summary>
-    /// Удаляет элемент автозагрузки.
+    /// Удаляет элемент автозагрузки. День 21, L2: для TaskScheduler —
+    /// «schtasks /Delete /TN … /F» (/F подавляет консольный запрос подтверждения —
+    /// без него неинтерактивный вызов отказывает).
     /// </summary>
-    public bool DeleteItem(StartupItem item)
+    public async Task<bool> DeleteItemAsync(StartupItem item, CancellationToken ct = default)
     {
         try
         {
@@ -165,11 +186,67 @@ public sealed class StartupEngine
                         File.Delete(item.FilePath + ".disabled");
                     return true;
 
+                case StartupSource.TaskScheduler:
+                    return await DeleteTaskSchedulerTaskAsync(item, ct);
+
                 default:
                     return false;
             }
         }
-        catch (Exception ex) { Debug.WriteLine($"[StartupEngine] DeleteItem error: {ex.Message}"); return false; }
+        catch (Exception ex) when (ex is not OperationCanceledException) { Debug.WriteLine($"[StartupEngine] DeleteItem error: {ex.Message}"); return false; }
+    }
+
+    // ─── Планировщик заданий: операции через schtasks (День 21, L2) ──
+
+    /// <summary>Таймаут операций schtasks /Change и /Delete: bounded, выполнение быстрое.</summary>
+    private static readonly TimeSpan SchtasksChangeTimeout = TimeSpan.FromSeconds(15);
+
+    /// <summary>
+    /// Включает/отключает задачу планировщика через «schtasks /Change /TN … /ENABLE|/DISABLE».
+    /// Успех определяется фактическим ExitCode (дисциплина H2), а не фактом запуска.
+    /// </summary>
+    private async Task<bool> ChangeTaskSchedulerStateAsync(StartupItem item, bool enable, CancellationToken ct)
+    {
+        if (string.IsNullOrWhiteSpace(item.TaskName))
+        {
+            // Без полного пути задачи адресовать /TN невозможно — честный отказ
+            return false;
+        }
+
+        var stateSwitch = enable ? "/ENABLE" : "/DISABLE";
+        var execution = await _commandExecutor.ExecuteAsync(new CommandExecutionRequest
+        {
+            // Абсолютный путь из системного каталога — binary planting (M7, День 16б)
+            FileName = SystemToolLocator.GetSchtasksPath(),
+            Arguments = ["/Change", "/TN", item.TaskName, stateSwitch],
+            WorkingDirectory = string.Empty,
+            Timeout = SchtasksChangeTimeout
+        }, ct);
+
+        return execution.ExitCode == 0;
+    }
+
+    /// <summary>
+    /// Удаляет задачу планировщика через «schtasks /Delete /TN … /F».
+    /// /F обязателен: без него schtasks просит консольное подтверждение и
+    /// в неинтерактивном режиме отказывает.
+    /// </summary>
+    private async Task<bool> DeleteTaskSchedulerTaskAsync(StartupItem item, CancellationToken ct)
+    {
+        if (string.IsNullOrWhiteSpace(item.TaskName))
+        {
+            return false;
+        }
+
+        var execution = await _commandExecutor.ExecuteAsync(new CommandExecutionRequest
+        {
+            FileName = SystemToolLocator.GetSchtasksPath(),
+            Arguments = ["/Delete", "/TN", item.TaskName, "/F"],
+            WorkingDirectory = string.Empty,
+            Timeout = SchtasksChangeTimeout
+        }, ct);
+
+        return execution.ExitCode == 0;
     }
 
     // ─── Реестр ────────────────────────────────
@@ -358,6 +435,9 @@ public sealed class StartupEngine
             return new StartupItem
             {
                 Name = Path.GetFileName(taskName),
+                // Полный путь задачи: schtasks /Change /TN и /Delete /TN требуют
+                // «\Папка\Задача», последний сегмент (Name) для них недостаточен
+                TaskName = taskName,
                 FilePath = filePath,
                 Arguments = arguments,
                 Command = taskToRun,
