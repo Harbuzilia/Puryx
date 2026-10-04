@@ -61,12 +61,6 @@ public sealed class ProcessCommandExecutor : ICommandExecutor
         try
         {
             await process.WaitForExitAsync(linkedCts.Token);
-            return new CommandExecutionResult
-            {
-                ExitCode = process.ExitCode,
-                StandardOutput = await stdoutTask,
-                StandardError = await stderrTask
-            };
         }
         catch (OperationCanceledException)
         {
@@ -86,6 +80,12 @@ public sealed class ProcessCommandExecutor : ICommandExecutor
                 _logger.LogWarning(ex, "Kill process tree on timeout/cancellation failed: {Error}", ex.Message);
             }
 
+            // День 24: задачи потоков наблюдаются и в этой ветке: kill закрывает
+            // пайпы (EOF), насос без токена завершается сам; задачи на
+            // linkedCts.Token срываются в TaskCanceledException — наблюдение
+            // глотает её, иначе faulted-задачи остаются ненаблюдаемыми
+            await ObserveStreamTasksAsync(stdoutTask, stderrTask);
+
             // Отмена по токену вызывающего — не «результат», а исключение:
             // вызывающий код обязан отличить её от таймаута (TimedOut)
             if (ct.IsCancellationRequested)
@@ -97,6 +97,59 @@ public sealed class ProcessCommandExecutor : ICommandExecutor
                 TimedOut = true,
                 StandardError = "Превышен таймаут выполнения"
             };
+        }
+
+        // Процесс завершился сам: потоки дочитываются до EOF. Гонка границы
+        // таймаута (День 24, reviewer P3): linkedCts может выстрелить, пока
+        // вывод ещё дочитывается из пайпа — StreamReader бросает
+        // TaskCanceledException из await'ов задач потоков. Вызывающий не
+        // отменял (иначе исключение прошло бы мимо фильтра when) — это
+        // таймаут, а не сбой: честный TimedOut-результат без исключения наружу
+        try
+        {
+            return new CommandExecutionResult
+            {
+                ExitCode = process.ExitCode,
+                StandardOutput = await stdoutTask,
+                StandardError = await stderrTask
+            };
+        }
+        catch (OperationCanceledException) when (!ct.IsCancellationRequested)
+        {
+            return new CommandExecutionResult
+            {
+                ExitCode = -1,
+                TimedOut = true,
+                StandardError = "Превышен таймаут выполнения"
+            };
+        }
+    }
+
+    /// <summary>
+    /// День 24: наблюдение задач потоков в таймаут/отмен-ветке. После kill-tree
+    /// пайпы закрываются: насос без токена получает EOF и завершается, задачи
+    /// на linkedCts.Token срываются в TaskCanceledException. Каждая задача
+    /// наблюдается отдельно (вторая — даже если первая сорвалась), исключение
+    /// глотается: результат не используется, контракт таймаута — TimedOut без вывода.
+    /// </summary>
+    private static async Task ObserveStreamTasksAsync(Task<string> stdoutTask, Task<string> stderrTask)
+    {
+        try
+        {
+            await stdoutTask;
+        }
+        catch (Exception)
+        {
+            // наблюдение, не диагностика
+        }
+
+        try
+        {
+            await stderrTask;
+        }
+        catch (Exception)
+        {
+            // наблюдение, не диагностика
         }
     }
 

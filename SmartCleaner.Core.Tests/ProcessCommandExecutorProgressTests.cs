@@ -95,4 +95,30 @@ public class ProcessCommandExecutorProgressTests
                 Timeout = TimeSpan.FromMinutes(5)
             }, cts.Token));
     }
+
+    [Fact]
+    public async Task ExecuteAsync_StreamingOutputUnderTimeout_HonestTimedOutWithoutException()
+    {
+        // День 24 (reviewer P3): таймаут в середине потокового вывода — задачи
+        // чтения потоков стоят на linkedCts.Token, StreamReader может сорваться
+        // в TaskCanceledException; результат обязан быть честным TimedOut,
+        // а не исключение наружу. ping печатает строку в секунду — вывод
+        // гарантированно идёт в момент таймаута
+        var lines = new List<string>();
+        var executor = new ProcessCommandExecutor();
+
+        var result = await executor.ExecuteAsync(new CommandExecutionRequest
+        {
+            FileName = CmdPath,
+            Arguments = ["/c", "ping -n 30 127.0.0.1"],
+            WorkingDirectory = string.Empty,
+            Timeout = TimeSpan.FromSeconds(2),
+            StandardOutputLineProgress = new CollectingProgress(lines)
+        });
+
+        Assert.True(result.TimedOut);
+        Assert.Equal(-1, result.ExitCode);
+        Assert.Equal("Превышен таймаут выполнения", result.StandardError);
+        Assert.True(lines.Count > 0); // вывод действительно стримился — таймаут в середине
+    }
 }
