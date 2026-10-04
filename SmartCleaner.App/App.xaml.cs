@@ -174,6 +174,14 @@ public partial class App : Application
         services.AddSingleton<IPackageMaintenanceService, PackageMaintenanceService>();
         services.AddSingleton<LoggingService>();
 
+        // День 19 (ROADMAP 258): единый исполнитель команд в DI. Сервисы,
+        // переведённые на контракт ICommandExecutor в днях 17-19 (сервисы/сеть/
+        // приватность/буст/WinSxS/Compact/SQLite/uninstaller/startup/scheduler),
+        // принимают его необязательным ctor-параметром — регистрация «включает»
+        // шов: без неё сервисы создаются с собственным ProcessCommandExecutor,
+        // с ней — получают единый инстанс из контейнера
+        services.AddSingleton<SmartCleaner.Core.Cleaning.ICommandExecutor, SmartCleaner.Core.Cleaning.ProcessCommandExecutor>();
+
         services.AddSingleton<ScanConfiguration>();
 
         services.AddSingleton<IScannerStrategy, PackageCacheScanner>();
