@@ -1,7 +1,11 @@
-﻿using SmartCleaner.Core.Helpers;
+﻿using SmartCleaner.Core.Cleaning;
+using SmartCleaner.Core.Helpers;
 using System.Diagnostics;
 using System.Globalization;
 using System.Text.RegularExpressions;
+// UseWindowsForms тянет System.Windows.Forms.ICommandExecutor — снимаем
+// неоднозначность в пользу контракта исполнителя команд
+using ICommandExecutor = SmartCleaner.Core.Cleaning.ICommandExecutor;
 
 namespace SmartCleaner.Core.WinSxS;
 
@@ -25,6 +29,24 @@ public class DriverStoreItem
 
 public class DriverStoreCleaner
 {
+    // Таймаут опроса pnputil /enum-drivers: перечисление DriverStore — секунды
+    // даже на больших хранилищах; 1 минута — страховка от зависания,
+    // прежде WaitForExitAsync не имел таймаута вообще
+    private static readonly TimeSpan PnputilEnumTimeout = TimeSpan.FromMinutes(1);
+
+    private readonly ICommandExecutor _commandExecutor;
+
+    /// <summary>
+    /// Создаёт очиститель поверх реального исполнителя команд (День 18, срез B).
+    /// Необязательный исполнитель — шов для детерминированных тестов: стаб
+    /// фиксирует команду (полное имя утилиты, аргументы, таймаут).
+    /// DI-регистрация исполнителя — День 19.
+    /// </summary>
+    public DriverStoreCleaner(ICommandExecutor? commandExecutor = null)
+    {
+        _commandExecutor = commandExecutor ?? new ProcessCommandExecutor();
+    }
+
     public async Task<List<DriverStoreItem>> ScanDriversAsync(IProgress<string>? progress = null, CancellationToken ct = default)
     {
         var drivers = new List<DriverStoreItem>();
@@ -32,22 +54,17 @@ public class DriverStoreCleaner
 
         try
         {
-            var psi = new ProcessStartInfo
+            var execution = await _commandExecutor.ExecuteAsync(new CommandExecutionRequest
             {
+                // Абсолютный путь из системного каталога: запуск по неквалифицированному
+                // имени ищет exe в каталоге приложения — binary planting (M7, День 16б)
                 FileName = SystemToolLocator.GetPnputilPath(),
-                Arguments = "/enum-drivers",
-                CreateNoWindow = true,
-                UseShellExecute = false,
-                RedirectStandardOutput = true
-            };
+                Arguments = ["/enum-drivers"],
+                WorkingDirectory = string.Empty,
+                Timeout = PnputilEnumTimeout
+            }, ct);
 
-            using var proc = Process.Start(psi);
-            if (proc == null) return drivers;
-
-            var output = await proc.StandardOutput.ReadToEndAsync(ct);
-            await proc.WaitForExitAsync(ct);
-
-            drivers = ParsePnputilOutput(output);
+            drivers = ParsePnputilOutput(execution.StandardOutput);
             MarkDuplicateGroups(drivers);
         }
         catch (Exception ex)
@@ -234,6 +251,12 @@ public class DriverStoreCleaner
             try
             {
                 progress?.Report($"Удаление устаревшего драйвера {d.PublishedName} ({d.ProviderName})...");
+                // Обоснованное исключение (День 18, срез B): /delete-driver
+                // требует повышения прав — UseShellExecute=true + Verb="runas"
+                // показывает UAC-диалог. Контракт ICommandExecutor исполняет
+                // команды без элевации (UseShellExecute=false, редирект потоков),
+                // перевод этой ветки на исполнителя требует расширения контракта
+                // ролью «запуск с повышением» — вне скоупа среза.
                 var psi = new ProcessStartInfo
                 {
                     FileName = SystemToolLocator.GetPnputilPath(),

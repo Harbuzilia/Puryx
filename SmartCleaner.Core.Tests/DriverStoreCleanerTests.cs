@@ -1,3 +1,5 @@
+using SmartCleaner.Core.Cleaning;
+using SmartCleaner.Core.Helpers;
 using SmartCleaner.Core.WinSxS;
 using Xunit;
 
@@ -12,6 +14,9 @@ namespace SmartCleaner.Core.Tests;
 /// Win10/11: метка строки версии «Driver Version»/«Версия драйвера»
 /// (формат зафиксирован на реальной машине: ru-локаль, 129 пакетов),
 /// строка версии — «MM/DD/YYYY x.y.z.w».
+/// День 18 — срез B: контрактные тесты команды pnputil через стаб
+/// RecordingCommandExecutor — полное имя утилиты (SystemToolLocator),
+/// аргументы, таймаут; деградация при отказе исполнителя.
 /// </summary>
 public class DriverStoreCleanerTests
 {
@@ -198,6 +203,38 @@ public class DriverStoreCleanerTests
         var args = DriverStoreCleaner.BuildDeleteArguments(item, forceConfirmed: true);
 
         Assert.Equal("/delete-driver oem9.inf /uninstall /force", args);
+    }
+
+    // День 18 — срез B: контракт pnputil /enum-drivers через стаб исполнителя.
+    [Fact]
+    public async Task ScanDriversAsync_IssuesPnputilEnumThroughExecutor_WithTimeout()
+    {
+        var executor = new RecordingCommandExecutor();
+        executor.EnqueueSuccess(EnglishShuffledOutput);
+        var cleaner = new DriverStoreCleaner(executor);
+
+        var drivers = await cleaner.ScanDriversAsync();
+
+        // Стаб возвращает фикстуру: три пакета из EnglishShuffledOutput
+        Assert.Equal(3, drivers.Count);
+        var request = Assert.Single(executor.Requests);
+        Assert.Equal(SystemToolLocator.GetPnputilPath(), request.FileName);
+        Assert.Equal(new[] { "/enum-drivers" }, request.Arguments);
+        Assert.Equal(TimeSpan.FromMinutes(1), request.Timeout);
+    }
+
+    [Fact]
+    public async Task ScanDriversAsync_ExecutorFailure_ReturnsEmptyListWithoutThrow()
+    {
+        // Отказ запуска утилиты — пустой список, а не исключение наружу:
+        // сканирование в UI обязано деградировать честно
+        var executor = new RecordingCommandExecutor();
+        executor.EnqueueFailure(-1, "Не удалось запустить процесс");
+        var cleaner = new DriverStoreCleaner(executor);
+
+        var drivers = await cleaner.ScanDriversAsync();
+
+        Assert.Empty(drivers);
     }
 
     private static DriverStoreItem New(
