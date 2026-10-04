@@ -199,7 +199,10 @@ public class QuarantineService
     /// Defence-in-depth: StoredPath обязан находиться строго под Storage карантина
     /// — даже при валидной подписи. Иначе Restore/Purge отклоняются ( crafted-путь
     /// не может указать рекурсивное удаление/перемещение вне карантина).
-    /// Сравнение лексическое (junction-атаки — отдельная работа, ROADMAP День 13-14).
+    /// Сравнение по реальным путям (День 16б): обе стороны прогоняются через
+    /// PathResolver.ResolveRealPath — junction внутри Storage, указывающий наружу,
+    /// разворачивается до цели и отвергается; Resolved=false (цикл, лимит
+    /// переходов, ошибка ФС) — fail-closed: непроверяемый путь не исполняется.
     /// </summary>
     private bool IsStoredPathWithinStorage(string? storedPath)
     {
@@ -210,10 +213,19 @@ public class QuarantineService
 
         try
         {
-            var storageRoot = Path.GetFullPath(_storageDir)
+            var resolvedStorage = PathResolver.ResolveRealPath(_storageDir);
+            var resolvedStored = PathResolver.ResolveRealPath(storedPath);
+            if (!resolvedStorage.Resolved || !resolvedStored.Resolved)
+            {
+                // Fail-closed: цепочка reparse-точек не разрешается — путь
+                // непроверяем, операция по нему запрещена.
+                return false;
+            }
+
+            var storageRoot = resolvedStorage.Path
                 .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
                 + Path.DirectorySeparatorChar;
-            var full = Path.GetFullPath(storedPath)
+            var full = resolvedStored.Path
                 .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
                 + Path.DirectorySeparatorChar;
 
