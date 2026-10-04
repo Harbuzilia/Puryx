@@ -2,6 +2,7 @@
 using SmartCleaner.Core.Helpers;
 using System.Diagnostics;
 using System.Globalization;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 // UseWindowsForms тянет System.Windows.Forms.ICommandExecutor — снимаем
 // неоднозначность в пользу контракта исполнителя команд
@@ -34,6 +35,36 @@ public class DriverStoreCleaner
     // прежде WaitForExitAsync не имел таймаута вообще
     private static readonly TimeSpan PnputilEnumTimeout = TimeSpan.FromMinutes(1);
 
+    private static int _ansiEncodingProviderRegistered;
+
+    /// <summary>
+    /// Кодировка вывода pnputil: ANSI-страница системы (GetACP). Живой замер
+    /// Дня 19 на русской Win11: pnputil пишет CP1251, а не OEM — консольные
+    /// утилиты вроде schtasks пишут OEM (День 8), pnputil — исключение.
+    /// internal — для теста.
+    /// </summary>
+    internal static System.Text.Encoding GetPnputilOutputEncoding()
+    {
+        EnsureAnsiEncodingProvider();
+        return System.Text.Encoding.GetEncoding((int)GetACP());
+    }
+
+    /// <summary>
+    /// Регистрирует CodePagesEncodingProvider однократно (потокобезопасно):
+    /// на .NET 8 без провайдера ANSI-кодировки (1251 и др.) недоступны.
+    /// Повторная регистрация — no-op, паттерн StartupEngine.EnsureOemEncodingProvider.
+    /// </summary>
+    private static void EnsureAnsiEncodingProvider()
+    {
+        if (Interlocked.Exchange(ref _ansiEncodingProviderRegistered, 1) != 0) return;
+
+        System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+    }
+
+    /// <summary>ANSI-кодовая страница системы (P/Invoke kernel32).</summary>
+    [DllImport("kernel32.dll")]
+    private static extern uint GetACP();
+
     private readonly ICommandExecutor _commandExecutor;
 
     /// <summary>
@@ -61,7 +92,13 @@ public class DriverStoreCleaner
                 FileName = SystemToolLocator.GetPnputilPath(),
                 Arguments = ["/enum-drivers"],
                 WorkingDirectory = string.Empty,
-                Timeout = PnputilEnumTimeout
+                Timeout = PnputilEnumTimeout,
+                // День 19: pnputil пишет в ANSI-странице системы (живой замер на
+                // русской Win11: байты метки «Опубликованное имя» = CP1251), а дефолт
+                // декодирования .NET = Console.OutputEncoding хоста — в UTF-8-консоли
+                // метки не матчатся и список драйверов пустеет. Явная кодировка —
+                // как OEM для schtasks (День 8), но ANSI: pnputil ≠ консольная OEM-утилита
+                StandardOutputEncoding = GetPnputilOutputEncoding()
             }, ct);
 
             drivers = ParsePnputilOutput(execution.StandardOutput);

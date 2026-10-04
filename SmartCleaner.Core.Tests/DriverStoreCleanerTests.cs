@@ -224,6 +224,31 @@ public class DriverStoreCleanerTests
     }
 
     [Fact]
+    public async Task ScanDriversAsync_PnputilOutput_DecodedWithAnsiEncoding()
+    {
+        // День 19: живой замер на русской Win11 — pnputil /enum-drivers пишет
+        // CP1251 (сырые байты метки «Опубликованное имя» = CE EF F3 E1 …), а не
+        // OEM-866. Дефолтное декодирование исполнителя зависит от консоли хоста:
+        // UTF-8-консоль → mojibake → метки в ParsePnputilOutput не матчатся →
+        // пустой список драйверов. Запрос обязан нести явную ANSI-кодировку
+        // (GetACP), как schtasks несёт OEM (День 8).
+        System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+        if (System.Text.Encoding.GetEncoding(0).CodePage != 1251)
+            return; // ANSI-страница системы не 1251 — проверка неприменима
+
+        var executor = new RecordingCommandExecutor();
+        executor.EnqueueSuccess(RussianShuffledOutput);
+        var cleaner = new DriverStoreCleaner(executor);
+
+        var drivers = await cleaner.ScanDriversAsync();
+
+        Assert.Equal(2, drivers.Count);
+        var request = Assert.Single(executor.Requests);
+        Assert.NotNull(request.StandardOutputEncoding);
+        Assert.Equal(1251, request.StandardOutputEncoding!.CodePage);
+    }
+
+    [Fact]
     public async Task ScanDriversAsync_ExecutorFailure_ReturnsEmptyListWithoutThrow()
     {
         // Отказ запуска утилиты — пустой список, а не исключение наружу:
