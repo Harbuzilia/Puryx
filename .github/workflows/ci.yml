@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+jobs:
+  build-test:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.x
+
+      - name: Restore
+        run: dotnet restore SmartCleaner.sln
+        timeout-minutes: 5
+
+      - name: Build
+        run: dotnet build SmartCleaner.sln -c Release --no-restore
+        timeout-minutes: 15
+
+      # Integration-тесты машинозависимы: помечены [Trait("Category", "Integration")].
+      # Поведение на раннере windows-latest неизвестно до первого прогона — решение по факту.
+      # Если Integration флапают на раннере — включить фильтр, заменив run ниже на:
+      #   dotnet test SmartCleaner.sln -c Release --no-build --filter Category!=Integration
+      - name: Test
+        run: dotnet test SmartCleaner.sln -c Release --no-build
+        timeout-minutes: 15
