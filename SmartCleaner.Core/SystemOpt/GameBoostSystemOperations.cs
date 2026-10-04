@@ -1,6 +1,7 @@
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using SmartCleaner.Core.Cleaning;
 using SmartCleaner.Core.Helpers;
-using System.Diagnostics;
 using System.Text.RegularExpressions;
 // UseWindowsForms тянет System.Windows.Forms.ICommandExecutor — снимаем
 // неоднозначность в пользу контракта исполнителя команд
@@ -44,15 +45,18 @@ public sealed class StandardGameBoostSystemOperations : IGameBoostSystemOperatio
         RegexOptions.Compiled);
 
     private readonly ICommandExecutor _commandExecutor;
+    private readonly ILogger _logger;
 
     /// <summary>
     /// Создаёт операции поверх реального исполнителя команд. Необязательный
     /// исполнитель — шов для детерминированных тестов: стаб фиксирует команды
     /// (полное имя утилиты, аргументы, таймаут). DI-регистрация — День 19.
+    /// Необязательный ILogger — диагностика в Release (День 20).
     /// </summary>
-    public StandardGameBoostSystemOperations(ICommandExecutor? commandExecutor = null)
+    public StandardGameBoostSystemOperations(ICommandExecutor? commandExecutor = null, ILogger? logger = null)
     {
         _commandExecutor = commandExecutor ?? new ProcessCommandExecutor();
+        _logger = logger ?? NullLogger.Instance;
     }
 
     public async Task<bool> StopServiceAsync(string serviceName, CancellationToken ct = default) =>
@@ -97,7 +101,7 @@ public sealed class StandardGameBoostSystemOperations : IGameBoostSystemOperatio
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"[GameBoostSystemOperations] {fileName} {string.Join(' ', arguments)}: {ex.Message}");
+            _logger.LogWarning(ex, "{FileName} {Arguments}: {Error}", fileName, string.Join(' ', arguments), ex.Message);
             return -1;
         }
     }
@@ -122,7 +126,7 @@ public sealed class StandardGameBoostSystemOperations : IGameBoostSystemOperatio
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"[GameBoostSystemOperations] {fileName} {string.Join(' ', arguments)}: {ex.Message}");
+            _logger.LogWarning(ex, "{FileName} {Arguments}: {Error}", fileName, string.Join(' ', arguments), ex.Message);
             return null;
         }
     }

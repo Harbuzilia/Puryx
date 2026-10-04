@@ -1,4 +1,6 @@
-﻿using System.Diagnostics;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using System.Diagnostics;
 using SmartCleaner.Core.Services;
 
 namespace SmartCleaner.Core.SystemOpt;
@@ -47,6 +49,7 @@ public class GameBoostService
     private readonly RamOptimizerService _ramOptimizer;
     private readonly IConfigService _configService;
     private readonly IGameBoostSystemOperations _systemOperations;
+    private readonly ILogger _logger;
     private readonly List<string> _candidateServices =
     [
         "SysMain",     // Superfetch / Prefetch
@@ -61,11 +64,13 @@ public class GameBoostService
     public GameBoostService(
         RamOptimizerService ramOptimizer,
         IConfigService configService,
-        IGameBoostSystemOperations? systemOperations = null)
+        IGameBoostSystemOperations? systemOperations = null,
+        ILogger? logger = null)
     {
         _ramOptimizer = ramOptimizer;
         _configService = configService;
         _systemOperations = systemOperations ?? new StandardGameBoostSystemOperations();
+        _logger = logger ?? NullLogger.Instance;
     }
 
     public async Task<GameBoostState> EnableGameBoostAsync(IProgress<string>? progress = null)
@@ -149,11 +154,13 @@ public class GameBoostService
 
         if (IsOwnerProcessAlive(persisted.OwnerProcessId, persisted.OwnerProcessName))
         {
-            Debug.WriteLine($"[GameBoostService] Владелец буста (PID {persisted.OwnerProcessId}) жив — восстановление не требуется");
+            _logger.LogDebug("Владелец буста (PID {OwnerProcessId}) жив — восстановление не требуется", persisted.OwnerProcessId);
             return null;
         }
 
-        Debug.WriteLine($"[GameBoostService] Обнаружен буст, оставленный крашем (PID {persisted.OwnerProcessId}, активирован {persisted.ActivatedAtUtc:u}) — восстанавливаю систему");
+        _logger.LogWarning(
+            "Обнаружен буст, оставленный крашем (PID {OwnerProcessId}, активирован {ActivatedAtUtc:u}) — восстанавливаю систему",
+            persisted.OwnerProcessId, persisted.ActivatedAtUtc);
 
         var restoredServices = new List<string>();
         var restoredSchemeGuid = string.Empty;
@@ -183,7 +190,7 @@ public class GameBoostService
     /// Текущий процесс не считается владельцем: к моменту вызова буст в нём не активен,
     /// значит state-файл мог остаться только от прошлого (крашнутого) запуска.
     /// </summary>
-    private static bool IsOwnerProcessAlive(int ownerProcessId, string ownerProcessName)
+    private bool IsOwnerProcessAlive(int ownerProcessId, string ownerProcessName)
     {
         if (ownerProcessId == Environment.ProcessId) return false;
 
@@ -202,7 +209,7 @@ public class GameBoostService
         {
             // Не удалось подтвердить живость владельца: восстанавливаем —
             // вернуть службы важнее, чем риск двойного net start (он безвреден)
-            Debug.WriteLine($"[GameBoostService] Owner process check failed: {ex.Message}");
+            _logger.LogWarning(ex, "Owner process check failed: {Error}", ex.Message);
             return false;
         }
     }
@@ -222,12 +229,13 @@ public class GameBoostService
                 return previousSchemeGuid;
             }
 
-            Debug.WriteLine(
-                $"[GameBoostService] Предыдущая схема питания {previousSchemeGuid} не найдена или не активировалась — возврат к Balanced");
+            _logger.LogWarning(
+                "Предыдущая схема питания {PreviousSchemeGuid} не найдена или не активировалась — возврат к Balanced",
+                previousSchemeGuid);
         }
         else
         {
-            Debug.WriteLine("[GameBoostService] Предыдущая схема питания неизвестна (не удалось прочитать при включении буста) — возврат к Balanced");
+            _logger.LogWarning("Предыдущая схема питания неизвестна (не удалось прочитать при включении буста) — возврат к Balanced");
         }
 
         await _systemOperations.TrySetPowerSchemeAsync(BalancedSchemeGuid);
@@ -254,7 +262,7 @@ public class GameBoostService
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"[GameBoostService] Persist state failed: {ex.Message}");
+            _logger.LogWarning(ex, "Persist state failed: {Error}", ex.Message);
         }
     }
 
@@ -268,7 +276,7 @@ public class GameBoostService
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"[GameBoostService] Delete state file failed: {ex.Message}");
+            _logger.LogWarning(ex, "Delete state file failed: {Error}", ex.Message);
         }
     }
 }

@@ -1,7 +1,8 @@
 using SmartCleaner.Core.Cleaning;
 using SmartCleaner.Core.Helpers;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Win32;
-using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
 // UseWindowsForms тянет System.Windows.Forms.ICommandExecutor — снимаем
@@ -140,16 +141,19 @@ public class WindowsServicesOptimizer
     private static readonly TimeSpan NetStopTimeout = TimeSpan.FromMilliseconds(10000);
 
     private readonly ICommandExecutor _commandExecutor;
+    private readonly ILogger _logger;
 
     /// <summary>
     /// Создаёт оптимизатор поверх реального исполнителя команд (День 17, срез A).
     /// Необязательный исполнитель — шов для детерминированных тестов: стаб
     /// фиксирует команды (полное имя утилиты, аргументы, таймаут).
-    /// DI-регистрация исполнителя — День 19.
+    /// DI-регистрация исполнителя — День 19. Необязательный ILogger —
+    /// диагностика в Release (День 20).
     /// </summary>
-    public WindowsServicesOptimizer(ICommandExecutor? commandExecutor = null)
+    public WindowsServicesOptimizer(ICommandExecutor? commandExecutor = null, ILogger? logger = null)
     {
         _commandExecutor = commandExecutor ?? new ProcessCommandExecutor();
+        _logger = logger ?? NullLogger.Instance;
     }
 
     public IReadOnlyList<WindowsServiceItem> GetKnownServices() => _knownServices;
@@ -198,7 +202,8 @@ public class WindowsServicesOptimizer
                 });
                 if (config.ExitCode != 0)
                 {
-                    Debug.WriteLine($"[WindowsServicesOptimizer] sc config '{serviceName}' failed (exit {config.ExitCode}): {ToolOutput(config)}");
+                    _logger.LogWarning("sc config '{ServiceName}' failed (exit {ExitCode}): {Output}",
+                        serviceName, config.ExitCode, ToolOutput(config));
                     return false;
                 }
 
@@ -219,7 +224,8 @@ public class WindowsServicesOptimizer
                         var stillRunning = await IsServiceRunningAsync(serviceName);
                         if (stillRunning != false)
                         {
-                            Debug.WriteLine($"[WindowsServicesOptimizer] net stop '{serviceName}' failed (exit {stop.ExitCode}): {ToolOutput(stop)}");
+                            _logger.LogWarning("net stop '{ServiceName}' failed (exit {ExitCode}): {Output}",
+                                serviceName, stop.ExitCode, ToolOutput(stop));
                             return false;
                         }
                     }
@@ -229,7 +235,7 @@ public class WindowsServicesOptimizer
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[WindowsServicesOptimizer] SetServiceStartupAsync '{serviceName}' failed: {ex.Message}");
+                _logger.LogWarning(ex, "SetServiceStartupAsync '{ServiceName}' failed: {Error}", serviceName, ex.Message);
                 return false;
             }
         });
@@ -336,7 +342,7 @@ public class WindowsServicesOptimizer
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"[WindowsServicesOptimizer] ReadServiceState '{item.ServiceName}' failed: {ex.Message}");
+            _logger.LogWarning(ex, "ReadServiceState '{ServiceName}' failed: {Error}", item.ServiceName, ex.Message);
         }
     }
 
@@ -368,12 +374,12 @@ public class WindowsServicesOptimizer
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"[WindowsServicesOptimizer] sc query '{serviceName}' failed: {ex.Message}");
+            _logger.LogWarning(ex, "sc query '{ServiceName}' failed: {Error}", serviceName, ex.Message);
             return null;
         }
     }
 
-    private static void SaveBackupBeforeChange(string serviceName)
+    private void SaveBackupBeforeChange(string serviceName)
     {
         try
         {
@@ -393,11 +399,11 @@ public class WindowsServicesOptimizer
         catch (Exception ex)
         {
             // Backup should never block, но причина сбоя должна быть видна
-            Debug.WriteLine($"[WindowsServicesOptimizer] SaveBackupBeforeChange '{serviceName}' failed: {ex.Message}");
+            _logger.LogWarning(ex, "SaveBackupBeforeChange '{ServiceName}' failed: {Error}", serviceName, ex.Message);
         }
     }
 
-    private static Dictionary<string, int> LoadBackup()
+    private Dictionary<string, int> LoadBackup()
     {
         try
         {
@@ -409,7 +415,7 @@ public class WindowsServicesOptimizer
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"[WindowsServicesOptimizer] LoadBackup failed: {ex.Message}");
+            _logger.LogWarning(ex, "LoadBackup failed: {Error}", ex.Message);
         }
         return [];
     }

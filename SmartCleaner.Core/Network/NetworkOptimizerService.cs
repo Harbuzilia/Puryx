@@ -1,7 +1,8 @@
 ﻿using SmartCleaner.Core.Cleaning;
 using SmartCleaner.Core.Helpers;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Win32;
-using System.Diagnostics;
 using System.Net.NetworkInformation;
 // UseWindowsForms тянет System.Windows.Forms.ICommandExecutor — снимаем
 // неоднозначность в пользу контракта исполнителя команд
@@ -27,16 +28,19 @@ public class NetworkOptimizerService
     private static readonly TimeSpan DnsApplyTimeout = TimeSpan.FromMilliseconds(15000);
 
     private readonly ICommandExecutor _commandExecutor;
+    private readonly ILogger _logger;
 
     /// <summary>
     /// Создаёт сервис поверх реального исполнителя команд (День 17, срез A).
     /// Необязательный исполнитель — шов для детерминированных тестов: стаб
     /// фиксирует команды (полное имя утилиты, аргументы, таймаут).
-    /// DI-регистрация исполнителя — День 19.
+    /// DI-регистрация исполнителя — День 19. Необязательный ILogger —
+    /// диагностика в Release (День 20).
     /// </summary>
-    public NetworkOptimizerService(ICommandExecutor? commandExecutor = null)
+    public NetworkOptimizerService(ICommandExecutor? commandExecutor = null, ILogger? logger = null)
     {
         _commandExecutor = commandExecutor ?? new ProcessCommandExecutor();
+        _logger = logger ?? NullLogger.Instance;
     }
 
     public List<DnsPreset> Presets { get; } =
@@ -58,7 +62,7 @@ public class NetworkOptimizerService
                 return reply.RoundtripTime;
             }
         }
-        catch (Exception ex) { Debug.WriteLine($"[NetworkOptimizerService] Ping failed: {ex.Message}"); }
+        catch (Exception ex) { _logger.LogDebug(ex, "Ping failed: {Error}", ex.Message); }
 
         return -1;
     }
@@ -217,7 +221,7 @@ public class NetworkOptimizerService
                             }
                         }
                     }
-                    catch (Exception ex) { Debug.WriteLine($"[NetworkOptimizerService] TCP registry subkey error: {ex.Message}"); }
+                    catch (Exception ex) { _logger.LogWarning(ex, "TCP registry subkey error: {Error}", ex.Message); }
                     }
 
                 return (true, enable

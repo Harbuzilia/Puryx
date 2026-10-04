@@ -1,8 +1,8 @@
 using SmartCleaner.Core.Cleaning;
 using SmartCleaner.Core.Helpers;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Win32;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Text.Json;
@@ -27,7 +27,7 @@ public class PrivacyDebloatService
 
     private readonly IRegistryValueStore _registry;
     private readonly string _backupFilePath;
-    private readonly ILogger<PrivacyDebloatService>? _logger;
+    private readonly ILogger<PrivacyDebloatService> _logger;
     private readonly ICommandExecutor _commandExecutor;
 
     // Таймауты утилит (дисциплина дней 4-5): конфигурация и запрос состояния —
@@ -51,7 +51,7 @@ public class PrivacyDebloatService
     {
         _registry = registry ?? new RegistryValueStore();
         _backupFilePath = backupFilePath ?? DefaultBackupFilePath;
-        _logger = logger;
+        _logger = logger ?? NullLogger<PrivacyDebloatService>.Instance;
         _commandExecutor = commandExecutor ?? new ProcessCommandExecutor();
     }
 
@@ -252,7 +252,7 @@ public class PrivacyDebloatService
                     var (serviceOk, serviceReason) = await ConfigureServiceAsync(tweak.ServiceName, disabled: true);
                     if (!serviceOk)
                     {
-                        System.Diagnostics.Debug.WriteLine($"[PrivacyDebloat] Service disable failed for {tweakId}: {serviceReason}");
+                        _logger.LogWarning("Service disable failed for {TweakId}: {Reason}", tweakId, serviceReason);
                         return false;
                     }
                 }
@@ -266,7 +266,7 @@ public class PrivacyDebloatService
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"[PrivacyDebloat] Apply failed for {tweakId}: {ex.Message}");
+                _logger.LogWarning(ex, "Apply failed for {TweakId}: {Error}", tweakId, ex.Message);
                 return false;
             }
         });
@@ -286,7 +286,7 @@ public class PrivacyDebloatService
                     var (serviceOk, serviceReason) = await ConfigureServiceAsync(tweak.ServiceName, disabled: false);
                     if (!serviceOk)
                     {
-                        System.Diagnostics.Debug.WriteLine($"[PrivacyDebloat] Service restore failed for {tweakId}: {serviceReason}");
+                        _logger.LogWarning("Service restore failed for {TweakId}: {Reason}", tweakId, serviceReason);
                         return false;
                     }
                 }
@@ -300,7 +300,7 @@ public class PrivacyDebloatService
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"[PrivacyDebloat] Revert failed for {tweakId}: {ex.Message}");
+                _logger.LogWarning(ex, "Revert failed for {TweakId}: {Error}", tweakId, ex.Message);
                 return false;
             }
         });
@@ -350,7 +350,7 @@ public class PrivacyDebloatService
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"[PrivacyDebloat] Backup load failed for {tweak.Id}: {ex.Message}");
+            _logger.LogWarning(ex, "Backup load failed for {TweakId}: {Error}", tweak.Id, ex.Message);
             backupMap = null;
         }
 
@@ -447,10 +447,10 @@ public class PrivacyDebloatService
     // восстановлено значение по умолчанию из кода
     private void LogBackupFallback(PrivacyTweakItem tweak, string reason)
     {
-        var message = $"[PrivacyDebloat] Откат '{tweak.Id}': {reason} — исходное значение неизвестно, " +
-                      $"восстановлено значение по умолчанию из кода ({tweak.DefaultValue ?? 1}).";
-        Debug.WriteLine(message);
-        _logger?.LogWarning("{Message}", message);
+        _logger.LogWarning(
+            "Откат '{TweakId}': {Reason} — исходное значение неизвестно, " +
+            "восстановлено значение по умолчанию из кода ({DefaultValue}).",
+            tweak.Id, reason, tweak.DefaultValue ?? 1);
     }
 
     private static bool CheckIsTweakApplied(PrivacyTweakItem tweak)
@@ -579,7 +579,7 @@ public class PrivacyDebloatService
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"[PrivacyDebloat] sc query '{serviceName}' failed: {ex.Message}");
+            _logger.LogWarning(ex, "sc query '{ServiceName}' failed: {Error}", serviceName, ex.Message);
             return null;
         }
     }
@@ -619,7 +619,7 @@ public class PrivacyDebloatService
         catch (Exception ex)
         {
             // Backup should never block user action, but its absence must be visible
-            System.Diagnostics.Debug.WriteLine($"[PrivacyDebloat] Backup save failed for {tweak.Id}: {ex.Message}");
+            _logger.LogWarning(ex, "Backup save failed for {TweakId}: {Error}", tweak.Id, ex.Message);
         }
     }
 

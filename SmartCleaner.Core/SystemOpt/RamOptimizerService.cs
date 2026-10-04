@@ -1,4 +1,6 @@
-﻿using SmartCleaner.Core.Helpers;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using SmartCleaner.Core.Helpers;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
@@ -27,6 +29,18 @@ public class RamOptimizationResult
 
 public class RamOptimizerService
 {
+    private readonly ILogger _logger;
+
+    /// <summary>
+    /// Необязательный логгер — шов для диагностики в Release (День 20):
+    /// отказы EmptyWorkingSet рутинны (доступ к системным процессам),
+    /// поэтому пишутся уровнем Debug и не шумят на Warning.
+    /// </summary>
+    public RamOptimizerService(ILogger? logger = null)
+    {
+        _logger = logger ?? NullLogger.Instance;
+    }
+
     [DllImport("psapi.dll")]
     private static extern int EmptyWorkingSet(IntPtr hwProc);
 
@@ -93,10 +107,10 @@ public class RamOptimizerService
                         count++;
                     }
                 }
-                catch (Exception ex) { Debug.WriteLine($"[RamOptimizerService] EmptyWorkingSet error: {ex.Message}"); }
+                catch (Exception ex) { _logger.LogDebug(ex, "EmptyWorkingSet error: {Error}", ex.Message); }
                 finally
                 {
-                    try { proc.Dispose(); } catch (Exception ex) { Debug.WriteLine($"[RamOptimizerService] Process dispose error: {ex.Message}"); }
+                    try { proc.Dispose(); } catch (Exception ex) { _logger.LogDebug(ex, "Process dispose error: {Error}", ex.Message); }
                 }
             }
 
