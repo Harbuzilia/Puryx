@@ -113,20 +113,46 @@ internal sealed class BlockingSafetyService : ISafetyService
     }
 }
 
+/// <summary>
+/// Стаб ICommandExecutor для сервисных тестов (День 17): записывает каждый
+/// запрос — полное имя утилиты, аргументы, таймаут — и возвращает управляемые
+/// результаты. Результаты задаются либо сценарием-очередью (Enqueue* — по
+/// одному результату на вызов, для последовательностей вида
+/// sc config → net stop → sc query), либо функцией-обработчиком;
+/// очередь приоритетнее.
+/// </summary>
 internal sealed class RecordingCommandExecutor : ICommandExecutor
 {
     private readonly Func<CommandExecutionRequest, CommandExecutionResult> _handler;
+    private readonly Queue<CommandExecutionResult> _scriptedResults = new();
 
     public RecordingCommandExecutor(Func<CommandExecutionRequest, CommandExecutionResult>? handler = null)
     {
         _handler = handler ?? (_ => new CommandExecutionResult { ExitCode = 0 });
     }
 
+    /// <summary>Все выполненные запросы в порядке поступления.</summary>
     public List<CommandExecutionRequest> Requests { get; } = [];
+
+    /// <summary>Запланировать результат следующего ExecuteAsync (по одному на вызов).</summary>
+    public void EnqueueResult(CommandExecutionResult result) => _scriptedResults.Enqueue(result);
+
+    /// <summary>Запланировать успешный (exit 0) результат со stdout.</summary>
+    public void EnqueueSuccess(string standardOutput = "") =>
+        _scriptedResults.Enqueue(new CommandExecutionResult { ExitCode = 0, StandardOutput = standardOutput });
+
+    /// <summary>Запланировать неуспешный результат с exitCode и stderr.</summary>
+    public void EnqueueFailure(int exitCode, string standardError = "") =>
+        _scriptedResults.Enqueue(new CommandExecutionResult { ExitCode = exitCode, StandardError = standardError });
 
     public Task<CommandExecutionResult> ExecuteAsync(CommandExecutionRequest request, CancellationToken ct = default)
     {
         Requests.Add(request);
-        return Task.FromResult(_handler(request));
+        var result = _scriptedResults.Count > 0 ? _scriptedResults.Dequeue() : _handler(request);
+        return Task.FromResult(result);
     }
+
+    /// <summary>Человекочитаемая запись команды (полное имя, аргументы, таймаут) для вывода теста и сообщений ассертов.</summary>
+    public static string Describe(CommandExecutionRequest request) =>
+        $"{request.FileName} {string.Join(' ', request.Arguments)} (таймаут {request.Timeout.TotalMilliseconds:0} мс)";
 }
