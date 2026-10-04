@@ -1,8 +1,11 @@
-﻿using SmartCleaner.Core.Helpers;
+﻿using SmartCleaner.Core.Cleaning;
+using SmartCleaner.Core.Helpers;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Text;
+// UseWindowsForms тянет System.Windows.Forms.ICommandExecutor — снимаем
+// неоднозначность в пользу контракта исполнителя команд
+using ICommandExecutor = SmartCleaner.Core.Cleaning.ICommandExecutor;
 
 namespace SmartCleaner.Core.Compression;
 
@@ -11,6 +14,19 @@ public class CompactEngine
     private static readonly string ProgramFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
     private static readonly string ProgramFilesX86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
     private static readonly string UserProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
+    private readonly ICommandExecutor _commandExecutor;
+
+    /// <summary>
+    /// Создаёт движок поверх реального исполнителя команд (День 18, срез B).
+    /// Необязательный исполнитель — шов для детерминированных тестов: стаб
+    /// фиксирует команды (полное имя утилиты, аргументы, таймаут, прогресс-насос).
+    /// DI-регистрация исполнителя — День 19.
+    /// </summary>
+    public CompactEngine(ICommandExecutor? commandExecutor = null)
+    {
+        _commandExecutor = commandExecutor ?? new ProcessCommandExecutor();
+    }
 
     public async Task<List<CompactTargetItem>> DiscoverCompressibleTargetsAsync(CancellationToken ct = default)
     {
@@ -135,20 +151,13 @@ public class CompactEngine
 
         try
         {
-            var psi = new ProcessStartInfo
-            {
-                FileName = SystemToolLocator.GetCompactPath(),
-                Arguments = $"/c /s:\"{directoryPath}\" /exe:{algoArg} /i /f",
-                CreateNoWindow = true,
-                UseShellExecute = false
-            };
+            // «/s:<путь>» — один аргумент: ArgumentList квотует его при пробелах
+            // так же, как прежний Arguments с кавычками вокруг пути
+            var (exitCode, timedOut, output) = await RunCompactAsync(
+                ["/c", $"/s:{directoryPath}", $"/exe:{algoArg}", "/i", "/f"], progress, ct);
 
-            var (exitCode, timedOut, cancelled, output) = await RunCompactAsync(psi, CompactToolTimeoutMs, progress, ct);
-
-            if (cancelled)
-                return (false, "Операция отменена пользователем", 0);
             if (timedOut)
-                return (false, output, 0);
+                return (false, $"«compact.exe» не завершилась за {CompactToolTimeout.TotalMinutes:0} мин", 0);
             if (exitCode != 0)
                 return (false, CompactFailureMessage("сжатия", exitCode, output), 0);
 
@@ -162,6 +171,11 @@ public class CompactEngine
             }
 
             return (true, "Сжатие завершено! Экономия: н/д (не удалось измерить размер на диске)", 0);
+        }
+        catch (OperationCanceledException) when (ct.IsCancellationRequested)
+        {
+            // Отмена пользователем — не ошибка сжатия: честное сообщение
+            return (false, "Операция отменена пользователем", 0);
         }
         catch (Exception ex)
         {
@@ -181,24 +195,22 @@ public class CompactEngine
 
         try
         {
-            var psi = new ProcessStartInfo
-            {
-                FileName = SystemToolLocator.GetCompactPath(),
-                Arguments = $"/u /s:\"{directoryPath}\" /i",
-                CreateNoWindow = true,
-                UseShellExecute = false
-            };
+            // «/s:<путь>» — один аргумент: ArgumentList квотует его при пробелах
+            // так же, как прежний Arguments с кавычками вокруг пути
+            var (exitCode, timedOut, output) = await RunCompactAsync(
+                ["/u", $"/s:{directoryPath}", "/i"], progress, ct);
 
-            var (exitCode, timedOut, cancelled, output) = await RunCompactAsync(psi, CompactToolTimeoutMs, progress, ct);
-
-            if (cancelled)
-                return (false, "Операция отменена пользователем");
             if (timedOut)
-                return (false, output);
+                return (false, $"«compact.exe» не завершилась за {CompactToolTimeout.TotalMinutes:0} мин");
             if (exitCode != 0)
                 return (false, CompactFailureMessage("распаковки", exitCode, output));
 
             return (true, "Распаковка успешно завершена!");
+        }
+        catch (OperationCanceledException) when (ct.IsCancellationRequested)
+        {
+            // Отмена пользователем — не ошибка распаковки: честное сообщение
+            return (false, "Операция отменена пользователем");
         }
         catch (Exception ex)
         {
@@ -207,106 +219,46 @@ public class CompactEngine
     }
 
     // Таймаут для compact.exe: сжатие больших каталогов легитимно долгое, поэтому запас
-    // большой (час); раньше целиком — пользователь может отменить через CancellationToken.
-    private const int CompactToolTimeoutMs = 60 * 60 * 1000;
+    // большой (час); целиком — пользователь может отменить через CancellationToken.
+    private static readonly TimeSpan CompactToolTimeout = TimeSpan.FromHours(1);
 
-    // Запускает compact.exe и возвращает фактический код возврата и вывод
-    // (stderr приоритетнее: утилиты Microsoft пишут ошибки в разные потоки).
-    // Таймаут и отмена — тоже отказ с kill-tree: никакого «успеха по молчанию».
-    private static async Task<(int ExitCode, bool TimedOut, bool Cancelled, string Output)> RunCompactAsync(
-        ProcessStartInfo psi,
-        int timeoutMs,
-        IProgress<string>? progress = null,
-        CancellationToken ct = default)
+    // Запускает compact.exe через исполнителя и возвращает фактический код возврата
+    // и вывод (stderr приоритетнее: утилиты Microsoft пишут ошибки в разные потоки).
+    // Таймаут и отмена — внутри исполнителя с kill-tree: никакого «успеха по молчанию»;
+    // отмена пользователем возвращается исключением OperationCanceledException —
+    // вызывающий отличает её от таймаута (TimedOut).
+    private async Task<(int ExitCode, bool TimedOut, string Output)> RunCompactAsync(
+        IReadOnlyList<string> arguments, IProgress<string>? progress = null, CancellationToken ct = default)
     {
-        psi.CreateNoWindow = true;
-        psi.UseShellExecute = false;
-        psi.RedirectStandardOutput = true;
-        psi.RedirectStandardError = true;
-
-        try
+        var result = await _commandExecutor.ExecuteAsync(new CommandExecutionRequest
         {
-            using var process = new Process { StartInfo = psi };
-            if (!process.Start())
-            {
-                return (-1, false, false, $"не удалось запустить «{psi.FileName}»");
-            }
+            // Абсолютный путь из системного каталога: запуск по неквалифицированному
+            // имени ищет exe в каталоге приложения — binary planting (M7, День 16б)
+            FileName = SystemToolLocator.GetCompactPath(),
+            Arguments = arguments,
+            WorkingDirectory = string.Empty,
+            Timeout = CompactToolTimeout,
+            // Построчный стриминг stdout: compact.exe печатает строку на каждый
+            // файл — пользователь видит проценты по мере сжатия, а не после
+            StandardOutputLineProgress = progress is null ? null : new CompactProgressFilter(progress)
+        }, ct);
 
-            // Потоки читаем до ожидания выхода, чтобы заполненный буфер не заблокировал утилиту
-            Task<string> stdoutTask = progress == null
-                ? process.StandardOutput.ReadToEndAsync()
-                : PumpProgressLinesAsync(process, progress);
-            var stderrTask = process.StandardError.ReadToEndAsync();
-
-            try
-            {
-                await process.WaitForExitAsync().WaitAsync(TimeSpan.FromMilliseconds(timeoutMs), ct);
-            }
-            catch (TimeoutException)
-            {
-                KillProcessTree(process);
-                return (-1, true, false, $"«compact.exe» не завершилась за {timeoutMs / 60000} мин");
-            }
-            catch (OperationCanceledException)
-            {
-                KillProcessTree(process);
-                return (-1, false, true, "операция отменена пользователем");
-            }
-
-            var stdout = await SafeReadAsync(stdoutTask);
-            var stderr = await SafeReadAsync(stderrTask);
-            var output = string.IsNullOrWhiteSpace(stderr) ? stdout : stderr;
-            return (process.ExitCode, false, false, output.Trim());
-        }
-        catch (Exception ex)
-        {
-            return (-1, false, false, $"«{psi.FileName}»: {ex.Message}");
-        }
+        var output = string.IsNullOrWhiteSpace(result.StandardError) ? result.StandardOutput : result.StandardError;
+        return (result.ExitCode, result.TimedOut, output.Trim());
     }
 
-    // Читает stdout построчно, транслируя строки с процентами в progress.
-    // Возвращает весь текст: он нужен как причина сбоя, если stderr пуст.
-    private static async Task<string> PumpProgressLinesAsync(Process process, IProgress<string> progress)
+    /// <summary>
+    /// День 18 — срез B: фильтр прогресса compact.exe. Исполнитель транслирует
+    /// все непустые строки stdout, пользователю нужны только строки с процентами
+    /// (compact.exe печатает строку на каждый файл). Повторяет поведение прежнего
+    /// насоса PumpProgressLinesAsync. internal — для теста фильтра.
+    /// </summary>
+    internal sealed class CompactProgressFilter(IProgress<string> progress) : IProgress<string>
     {
-        var all = new StringBuilder();
-        while (true)
+        public void Report(string line)
         {
-            var line = await process.StandardOutput.ReadLineAsync();
-            if (line == null) break;
-
-            all.AppendLine(line);
             if (!string.IsNullOrWhiteSpace(line) && line.Contains('%'))
                 progress.Report(line.Trim());
-        }
-        return all.ToString();
-    }
-
-    // Дочитывает поток после завершения/kill процесса: сбой чтения не должен
-    // затирать настоящую причину (код возврата уже известен).
-    private static async Task<string> SafeReadAsync(Task<string> task)
-    {
-        try
-        {
-            return await task;
-        }
-        catch (Exception)
-        {
-            return string.Empty;
-        }
-    }
-
-    private static void KillProcessTree(Process process)
-    {
-        try
-        {
-            if (!process.HasExited)
-            {
-                process.Kill(entireProcessTree: true);
-            }
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"[CompactEngine] Kill timed-out process failed: {ex.Message}");
         }
     }
 

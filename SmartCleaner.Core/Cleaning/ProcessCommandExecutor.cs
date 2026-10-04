@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Text;
 
 namespace SmartCleaner.Core.Cleaning;
 
@@ -34,7 +35,12 @@ public sealed class ProcessCommandExecutor : ICommandExecutor
             };
         }
 
-        var stdoutTask = process.StandardOutput.ReadToEndAsync(linkedCts.Token);
+        // Построчный насос stdout включается только при запросе стриминга
+        // (День 18, срез B — compact.exe): без запроса — прежнее чтение
+        // целиком (срез A)
+        Task<string> stdoutTask = request.StandardOutputLineProgress is null
+            ? process.StandardOutput.ReadToEndAsync(linkedCts.Token)
+            : PumpStandardOutputLinesAsync(process, request.StandardOutputLineProgress);
         var stderrTask = process.StandardError.ReadToEndAsync(linkedCts.Token);
 
         try
@@ -47,8 +53,12 @@ public sealed class ProcessCommandExecutor : ICommandExecutor
                 StandardError = await stderrTask
             };
         }
-        catch (OperationCanceledException) when (!ct.IsCancellationRequested)
+        catch (OperationCanceledException)
         {
+            // Таймаут ИЛИ отмена вызывающего: в обоих случаях процесс обязан
+            // быть убит (kill-tree) — иначе долгая утилита (compact.exe до часа)
+            // продолжит работать в фоне после «отмены» (День 18, срез B —
+            // прежде при отмене вызывающего процесс оставался жить)
             try
             {
                 if (!process.HasExited)
@@ -58,8 +68,13 @@ public sealed class ProcessCommandExecutor : ICommandExecutor
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[ProcessCommandExecutor] Kill process tree on timeout failed: {ex.Message}");
+                Debug.WriteLine($"[ProcessCommandExecutor] Kill process tree on timeout/cancellation failed: {ex.Message}");
             }
+
+            // Отмена по токену вызывающего — не «результат», а исключение:
+            // вызывающий код обязан отличить её от таймаута (TimedOut)
+            if (ct.IsCancellationRequested)
+                throw;
 
             return new CommandExecutionResult
             {
@@ -68,5 +83,25 @@ public sealed class ProcessCommandExecutor : ICommandExecutor
                 StandardError = "Превышен таймаут выполнения"
             };
         }
+    }
+
+    // Читает stdout построчно, транслируя каждую непустую строку в progress
+    // и накапливая полный текст — он нужен в StandardOutput (потребители
+    // используют вывод как причину сбоя). Фильтрация строк — на потребителе.
+    // Насос без токена: завершение гарантирует kill-tree при таймауте/отмене
+    // (закрытие пайпа -> EOF -> null).
+    private static async Task<string> PumpStandardOutputLinesAsync(Process process, IProgress<string> progress)
+    {
+        var all = new StringBuilder();
+        while (true)
+        {
+            var line = await process.StandardOutput.ReadLineAsync();
+            if (line is null) break;
+
+            all.AppendLine(line);
+            if (line.Length > 0)
+                progress.Report(line);
+        }
+        return all.ToString();
     }
 }
