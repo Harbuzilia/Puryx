@@ -74,15 +74,17 @@ public class CliInspectorEngine
 
         await Task.WhenAll(taskDots, taskNpm, taskPip, taskPkg, taskPath, taskPs);
 
-        allTools.AddRange(taskDots.Result);
-        allTools.AddRange(taskNpm.Result);
-        allTools.AddRange(taskPip.Result);
-        allTools.AddRange(taskPkg.Result);
+        // Все задачи уже завершены (WhenAll выше) — await читает результаты
+        // без блокировки; прямой .Result запрещён стилем проекта (L1).
+        allTools.AddRange(await taskDots);
+        allTools.AddRange(await taskNpm);
+        allTools.AddRange(await taskPip);
+        allTools.AddRange(await taskPkg);
 
-        var (pathBins, health) = taskPath.Result;
+        var (pathBins, health) = await taskPath;
         allTools.AddRange(pathBins);
         pathHealth.AddRange(health);
-        psProfiles.AddRange(taskPs.Result);
+        psProfiles.AddRange(await taskPs);
 
         // Deduplicate tools by path
         var uniqueTools = new List<CliToolItem>();
