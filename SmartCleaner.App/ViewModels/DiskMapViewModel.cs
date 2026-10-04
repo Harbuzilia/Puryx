@@ -176,10 +176,11 @@ public partial class DiskMapViewModel : ObservableObject
             // Обоснованное исключение (День 19, срез C): explorer.exe —
             // естественный shell-запуск (показать элемент в Проводнике),
             // не исполнение команды: UseShellExecute=true и видимое окно —
-            // сам смысл операции; контракт исполнителя не применим
+            // сам смысл операции; контракт исполнителя не применим.
+            // День 24 (M7): абсолютный путь из Windows-корня — binary planting
             System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
             {
-                FileName = "explorer.exe",
+                FileName = SystemToolLocator.GetExplorerPath(),
                 Arguments = SelectedNode.IsFile
                     ? $"/select,\"{SelectedNode.FullPath}\""
                     : $"\"{path}\"",

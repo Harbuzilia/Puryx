@@ -97,10 +97,11 @@ public partial class LargeFilesViewModel : ObservableObject
             // Обоснованное исключение (День 19, срез C): explorer.exe —
             // естественный shell-запуск (показать файл в Проводнике), не
             // исполнение команды; контракт исполнителя (CreateNoWindow,
-            // редирект потоков, kill-tree) здесь не применим
+            // редирект потоков, kill-tree) здесь не применим.
+            // День 24 (M7): абсолютный путь из Windows-корня — binary planting
             Process.Start(new ProcessStartInfo
             {
-                FileName = "explorer.exe",
+                FileName = SystemToolLocator.GetExplorerPath(),
                 Arguments = $"/select,\"{file.Path}\"",
                 UseShellExecute = true
             });

@@ -28,8 +28,10 @@ public class SystemToolLocatorInvariantTests
 {
     // Детерминированный слой: литерал, равный имени утилиты С .exe, в коде
     // недопустим всегда — это гарантированно форма запуска/передачи имени.
+    // День 24: explorer — shell-запуски Проводника в App шли по
+    // неквалифицированному имени (reviewer P3)
     private static readonly Regex UnqualifiedToolNameWithExeRegex = new(
-        "\"(?<tool>sc|net|netsh|ipconfig|schtasks|dism|pnputil|compact|powercfg|powershell)\\.exe\"",
+        "\"(?<tool>sc|net|netsh|ipconfig|schtasks|dism|pnputil|compact|powercfg|powershell|explorer)\\.exe\"",
         RegexOptions.Compiled);
 
     // Эвристический слой: литерал БЕЗ .exe — только в launch-контексте (строка
@@ -40,7 +42,7 @@ public class SystemToolLocatorInvariantTests
         RegexOptions.Compiled);
 
     private static readonly Regex UnqualifiedToolBareNameRegex = new(
-        "\"(?<tool>sc|net|netsh|ipconfig|schtasks|dism|pnputil|compact|powercfg|powershell)\"",
+        "\"(?<tool>sc|net|netsh|ipconfig|schtasks|dism|pnputil|compact|powercfg|powershell|explorer)\"",
         RegexOptions.Compiled);
 
     [Fact]

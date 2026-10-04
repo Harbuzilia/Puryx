@@ -123,6 +123,18 @@ public class NetworkOptimizerService
 
     public async Task<(bool Success, string Message)> ApplyDnsAsync(string primaryDns, string secondaryDns, IProgress<string>? progress = null)
     {
+        // День 24 (reviewer P3, гвард публичного API): значения интерполируются
+        // в PowerShell-скрипт — формат обязан быть IP-адресом. Пресеты UI
+        // безопасны, но API публичный: произвольная строка до скрипта не доходит
+        if (!System.Net.IPAddress.TryParse(primaryDns, out _))
+        {
+            return (false, $"Недопустимый primary DNS: '{primaryDns}' (ожидается IP-адрес)");
+        }
+        if (!System.Net.IPAddress.TryParse(secondaryDns, out _))
+        {
+            return (false, $"Недопустимый secondary DNS: '{secondaryDns}' (ожидается IP-адрес)");
+        }
+
         progress?.Report($"Установка DNS ({primaryDns}, {secondaryDns})...");
 
         return await Task.Run(async () =>

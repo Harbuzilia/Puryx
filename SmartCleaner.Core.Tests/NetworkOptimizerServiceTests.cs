@@ -175,4 +175,52 @@ public class NetworkOptimizerServiceTests
         Assert.Contains("код 1", result.Message);
         Assert.Contains("no active network adapters", result.Message);
     }
+
+    // ==== День 24 — валидация формата DNS на входе публичного API (reviewer P3) ====
+
+    [Fact]
+    public async Task ApplyDnsAsync_InvalidPrimaryDnsFormat_RejectedBeforeScript()
+    {
+        // Пресеты UI безопасны, но API публичный: значения интерполируются в
+        // PowerShell-скрипт — формат обязан проверяться на входе, произвольная
+        // строка до скрипта не доходит
+        var executor = new RecordingCommandExecutor();
+        var service = new NetworkOptimizerService(executor);
+
+        var result = await service.ApplyDnsAsync("'; Remove-Item -Recurse C:", "1.0.0.1");
+
+        Assert.False(result.Success);
+        Assert.Contains("Недопустимый", result.Message);
+        Assert.Empty(executor.Requests); // команда не выполнялась вовсе
+    }
+
+    [Fact]
+    public async Task ApplyDnsAsync_InvalidSecondaryDnsFormat_RejectedBeforeScript()
+    {
+        var executor = new RecordingCommandExecutor();
+        var service = new NetworkOptimizerService(executor);
+
+        var result = await service.ApplyDnsAsync("1.1.1.1", "not-an-ip");
+
+        Assert.False(result.Success);
+        Assert.Contains("Недопустимый", result.Message);
+        Assert.Empty(executor.Requests);
+    }
+
+    [Theory]
+    [InlineData("8.8.8.8", "8.8.4.4")]
+    [InlineData("2001:4860:4860::8888", "2001:4860:4860::8844")]
+    public async Task ApplyDnsAsync_ValidAddresses_IssuedThroughExecutor(string primary, string secondary)
+    {
+        // Валидные IPv4/IPv6 проходят гвард и попадают в скрипт
+        var executor = new RecordingCommandExecutor();
+        var service = new NetworkOptimizerService(executor);
+
+        var result = await service.ApplyDnsAsync(primary, secondary);
+
+        Assert.True(result.Success);
+        var request = Assert.Single(executor.Requests);
+        Assert.Contains(primary, Assert.Single(request.Arguments.Skip(3)));
+        Assert.Contains(secondary, Assert.Single(request.Arguments.Skip(3)));
+    }
 }

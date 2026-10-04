@@ -558,8 +558,9 @@ public partial class MainViewModel : ObservableObject, IDisposable
         {
             // Обоснованное исключение (День 19, срез C): explorer.exe —
             // естественный shell-запуск (открыть папку в Проводнике), не
-            // исполнение команды; контракт исполнителя не применим
-            try { Process.Start(new ProcessStartInfo("explorer.exe", $"\"{folder}\"") { UseShellExecute = true }); }
+            // исполнение команды; контракт исполнителя не применим.
+            // День 24 (M7): абсолютный путь из Windows-корня — binary planting
+            try { Process.Start(new ProcessStartInfo(SystemToolLocator.GetExplorerPath(), $"\"{folder}\"") { UseShellExecute = true }); }
             catch (Exception ex) { /* Не критично */ Debug.WriteLine($"[MainViewModel] OpenFolder error: {ex.Message}"); }
         }
     }

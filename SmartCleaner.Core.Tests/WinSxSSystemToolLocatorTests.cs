@@ -79,4 +79,24 @@ public class WinSxSSystemToolLocatorTests
             StringComparison.OrdinalIgnoreCase);
         Assert.True(File.Exists(path), $"утилита должна существовать: {path}");
     }
+
+    // День 24 (reviewer P3): explorer.exe живёт в корне каталога Windows —
+    // в System32 его нет (живой замер), резолв из Windows-корня; абсолютный
+    // путь — binary planting (M7)
+    [Fact]
+    public void Explorer_ResolvedByAbsolutePathFromWindowsDirectory()
+    {
+        var path = SystemToolLocator.GetExplorerPath();
+
+        Assert.True(Path.IsPathRooted(path), $"путь должен быть абсолютным: {path}");
+        Assert.Equal("explorer.exe", Path.GetFileName(path), ignoreCase: true);
+
+        var directory = Path.GetDirectoryName(path);
+        Assert.NotNull(directory);
+        Assert.Equal(
+            Environment.GetFolderPath(Environment.SpecialFolder.Windows),
+            directory,
+            ignoreCase: true);
+        Assert.True(File.Exists(path), $"утилита должна существовать: {path}");
+    }
 }

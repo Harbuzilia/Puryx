@@ -51,4 +51,14 @@ internal static class SystemToolLocator
     /// </summary>
     internal static string GetWindowsPowerShellPath() =>
         Path.Combine(NativeSystemDirectory, "WindowsPowerShell", "v1.0", "powershell.exe");
+
+    /// <summary>
+    /// explorer.exe — Проводник (День 24, reviewer P3). Живёт в корне каталога
+    /// Windows: в System32 explorer.exe отсутствует (живой замер), поэтому
+    /// резолв из Windows-корня, а не из NativeSystemDirectory. Абсолютный путь
+    /// обязателен: запуск по неквалифицированному имени ищет exe в каталоге
+    /// приложения — binary planting (M7).
+    /// </summary>
+    internal static string GetExplorerPath() =>
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "explorer.exe");
 }

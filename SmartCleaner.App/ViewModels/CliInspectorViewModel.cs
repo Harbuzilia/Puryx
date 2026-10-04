@@ -175,14 +175,15 @@ public partial class CliInspectorViewModel : ObservableObject
             // Проводнике), не исполнение команды: UseShellExecute=true и
             // видимое окно — сам смысл операции; контракт исполнителя
             // (CreateNoWindow, редирект потоков, таймаут с kill-tree) здесь
-            // не применим
+            // не применим.
+            // День 24 (M7): абсолютный путь из Windows-корня — binary planting
             if (File.Exists(path))
             {
-                Process.Start("explorer.exe", $"/select,\"{path}\"");
+                Process.Start(SystemToolLocator.GetExplorerPath(), $"/select,\"{path}\"");
             }
             else
             {
-                Process.Start("explorer.exe", $"\"{path}\"");
+                Process.Start(SystemToolLocator.GetExplorerPath(), $"\"{path}\"");
             }
         }
         catch (Exception ex)

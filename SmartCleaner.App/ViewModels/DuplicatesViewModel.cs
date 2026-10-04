@@ -528,10 +528,11 @@ public partial class DuplicatesViewModel : ObservableObject
         {
             // Обоснованное исключение (День 19, срез C): explorer.exe со
             // shell:-моникером — естественный shell-запуск (открыть корзину),
-            // не исполнение команды; контракт исполнителя не применим
+            // не исполнение команды; контракт исполнителя не применим.
+            // День 24 (M7): абсолютный путь из Windows-корня — binary planting
             Process.Start(new ProcessStartInfo
             {
-                FileName = "explorer.exe",
+                FileName = SystemToolLocator.GetExplorerPath(),
                 Arguments = "shell:RecycleBinFolder",
                 UseShellExecute = true
             });
