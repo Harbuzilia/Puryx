@@ -1,8 +1,12 @@
 ﻿using Microsoft.Win32;
+using SmartCleaner.Core.Cleaning;
 using SmartCleaner.Core.Helpers;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+// UseWindowsForms тянет System.Windows.Forms.ICommandExecutor — снимаем
+// неоднозначность в пользу контракта исполнителя команд
+using ICommandExecutor = SmartCleaner.Core.Cleaning.ICommandExecutor;
 
 namespace SmartCleaner.Core.Uninstaller;
 
@@ -10,6 +14,18 @@ public class UninstallerEngine
 {
     private const int ErrorElevationRequired = 740; // ERROR_ELEVATION_REQUIRED
     private const int ErrorCancelled = 1223;        // ERROR_CANCELLED
+
+    private readonly ICommandExecutor _commandExecutor;
+
+    /// <summary>
+    /// Создаёт движок поверх реального исполнителя команд (День 19, срез C).
+    /// Необязательный исполнитель — шов для детерминированных тестов: стаб
+    /// фиксирует команду (полное имя утилиты, argv-аргументы, таймаут).
+    /// </summary>
+    public UninstallerEngine(ICommandExecutor? commandExecutor = null)
+    {
+        _commandExecutor = commandExecutor ?? new ProcessCommandExecutor();
+    }
 
     public async Task<List<InstalledAppItem>> ScanInstalledAppsAsync(CancellationToken ct = default)
     {
@@ -63,17 +79,22 @@ public class UninstallerEngine
 
         try
         {
-            // H1: runas не форсируем. Команда взята из реестра (HKCU-ветку Uninstall
-            // может записать любой процесс без прав), поэтому принудительное повышение
-            // недоверенной команды недопустимо. Честный деинсталлятор запросит права
-            // сам через манифест — увидим ERROR_ELEVATION_REQUIRED и решим по политике доверия.
-            var proc = Process.Start(BuildStartInfo(exePath, args));
-            if (proc != null)
+            // День 19, срез C: основной запуск деинсталлятора — через контракт
+            // ICommandExecutor. Аргументная часть строки реестра разбирается в
+            // argv (SplitArguments, правила CommandLineToArgvW) и едет списком
+            // ArgumentList — квотинг воспроизводит прежнюю командную строку.
+            // Таймаут Infinite: интерактивный деинсталлятор может ждать пользователя
+            // неограниченно долго, kill-tree по таймеру недопустим (полудеинсталляция).
+            // Контракт исполняет без элевации: манифест requireAdministrator
+            // проявляется как ERROR_ELEVATION_REQUIRED — решается политикой доверия ниже.
+            var execution = await _commandExecutor.ExecuteAsync(new CommandExecutionRequest
             {
-                await proc.WaitForExitAsync();
-                return (proc.ExitCode == 0, $"Деинсталлятор завершил работу с кодом {proc.ExitCode}");
-            }
-            return (false, "Не удалось запустить процесс деинсталлятора");
+                FileName = exePath,
+                Arguments = SplitArguments(args),
+                WorkingDirectory = string.Empty,
+                Timeout = Timeout.InfiniteTimeSpan
+            });
+            return (execution.ExitCode == 0, $"Деинсталлятор завершил работу с кодом {execution.ExitCode}");
         }
         catch (Win32Exception ex) when (ex.NativeErrorCode == ErrorElevationRequired)
         {
@@ -90,6 +111,11 @@ public class UninstallerEngine
 
             try
             {
+                // Обоснованное исключение (День 19, срез C): ретрай 740 требует
+                // Verb="runas" + UseShellExecute=true (UAC-диалог), контракт
+                // исполнителя исполняет команды без элевации (UseShellExecute=false,
+                // редирект потоков) — тот же класс исключения, что WinSxS/DriverStore
+                // (День 18). Аргументы — исходная строка реестра как есть.
                 var proc = Process.Start(BuildStartInfo(exePath, args, elevate: true));
                 if (proc != null)
                 {
@@ -189,6 +215,83 @@ public class UninstallerEngine
             }
         }
         catch (Exception ex) { Debug.WriteLine($"[UninstallerEngine] Registry uninstall key scan error: {ex.Message}"); }
+    }
+
+    /// <summary>
+    /// День 19, срез C: argv-разбор аргументной части команды из реестра —
+    /// правила CommandLineToArgvW (2n бэкслэшей + кавычка = n бэкслэшей и переключение
+    /// кавычек; 2n+1 бэкслэшей + кавычка = n бэкслэшей и литеральная кавычка;
+    /// бэкслэши не перед кавычкой — литералы; кавычки группируют токен с пробелами;
+    /// незакрытая кавычка поглощает остаток строки). Контракт ICommandExecutor
+    /// принимает ArgumentList — строка реестра обязана быть разобрана в argv,
+    /// иначе ArgumentList заквотует её одним токеном и командная строка изменится.
+    /// internal — для тестов.
+    /// </summary>
+    internal static string[] SplitArguments(string arguments)
+    {
+        var tokens = new List<string>();
+        var current = new System.Text.StringBuilder();
+        var inQuotes = false;
+        var i = 0;
+
+        while (i < arguments.Length)
+        {
+            var c = arguments[i];
+
+            if (c == '\\')
+            {
+                // Серия бэкслэшей значима только перед кавычкой (правила выше)
+                var backslashes = 0;
+                while (i + backslashes < arguments.Length && arguments[i + backslashes] == '\\')
+                    backslashes++;
+
+                if (i + backslashes < arguments.Length && arguments[i + backslashes] == '"')
+                {
+                    current.Append('\\', backslashes / 2);
+                    if (backslashes % 2 == 1)
+                    {
+                        current.Append('"'); // литеральная кавычка
+                    }
+                    else
+                    {
+                        inQuotes = !inQuotes; // кавычка-разделитель
+                    }
+                    i += backslashes + 1; // бэкслэши и кавычка поглощены
+                }
+                else
+                {
+                    current.Append('\\', backslashes);
+                    i += backslashes;
+                }
+                continue;
+            }
+
+            if (c == '"')
+            {
+                inQuotes = !inQuotes;
+                i++;
+                continue;
+            }
+
+            if (!inQuotes && (c == ' ' || c == '\t'))
+            {
+                if (current.Length > 0)
+                {
+                    tokens.Add(current.ToString());
+                    current.Clear();
+                }
+                i++;
+                continue;
+            }
+
+            current.Append(c);
+            i++;
+        }
+
+        if (current.Length > 0)
+            tokens.Add(current.ToString());
+
+        return tokens.ToArray();
     }
 
     internal static (string FileName, string Arguments) ParseCommand(string commandLine)
