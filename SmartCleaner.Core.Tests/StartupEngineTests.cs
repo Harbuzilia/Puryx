@@ -1,3 +1,5 @@
+using SmartCleaner.Core.Cleaning;
+using SmartCleaner.Core.Helpers;
 using SmartCleaner.Core.Startup;
 using Xunit;
 
@@ -236,5 +238,53 @@ public class StartupEngineTests
 
         Assert.Equal(@"C:\Tools\app.exe", filePath);
         Assert.Equal("-run --now", arguments);
+    }
+
+    // ─── ScanAllAsync: контракт ICommandExecutor (День 19, срез C) ───────────
+
+    [Fact]
+    public async Task ScanAllAsync_SchtasksQuery_GoesThroughCommandExecutor()
+    {
+        // День 19: опрос планировщика через контракт исполнителя. Запрос обязан
+        // нести абсолютный путь schtasks (SystemToolLocator), argv-аргументы,
+        // явную OEM-кодировку декодирования (День 8: дефолт .NET зависит от
+        // консоли хоста и в UTF-8-консоли/WPF-контексте ломает русский вывод) и
+        // ограниченный таймаут. Реестр/папки сканируются как прежде.
+        var executor = new RecordingCommandExecutor(_ => new CommandExecutionResult
+        {
+            ExitCode = 0,
+            StandardOutput = "\"H\",\"\\TaskFromStub\",\"xx\",\"Готово\",\"a\",\"b\",\"c\",\"d\",\"C:\\Tool\\tool.exe /run\"\r\n"
+        });
+        var engine = new StartupEngine(executor);
+
+        var items = await engine.ScanAllAsync();
+
+        var request = Assert.Single(executor.Requests);
+        Assert.Equal(SystemToolLocator.GetSchtasksPath(), request.FileName);
+        Assert.Equal(new[] { "/query", "/fo", "CSV", "/NH", "/V" }, request.Arguments);
+        Assert.Equal(StartupEngine.GetSchtasksOutputEncoding(), request.StandardOutputEncoding);
+        Assert.Equal(TimeSpan.FromSeconds(30), request.Timeout);
+
+        // Строка из стаба распарсена в элемент планировщика (реестровые элементы
+        // машины не мешают: проверяем конкретный элемент по источнику и имени)
+        var stubItem = Assert.Single(items, i => i.Source == StartupSource.TaskScheduler);
+        Assert.Equal("TaskFromStub", stubItem.Name);
+        Assert.Equal(@"C:\Tool\tool.exe", stubItem.FilePath);
+        Assert.Equal("/run", stubItem.Arguments);
+    }
+
+    [Fact]
+    public async Task ScanAllAsync_SchtasksFailure_RegistryItemsStillReturned()
+    {
+        // schtasks недоступен (ненулевой exit) — источник планировщика пуст,
+        // остальное сканирование не ломается (прежняя семантика catch-all).
+        var executor = new RecordingCommandExecutor(_ => new CommandExecutionResult { ExitCode = 1 });
+        var engine = new StartupEngine(executor);
+
+        var items = await engine.ScanAllAsync();
+
+        Assert.Single(executor.Requests);
+        Assert.DoesNotContain(items, i => i.Source == StartupSource.TaskScheduler);
+        Assert.Contains(items, i => i.Source != StartupSource.TaskScheduler);
     }
 }

@@ -43,7 +43,9 @@ public partial class StartupViewModel : ObservableObject
 
         try
         {
-            _allItems = await Task.Run(() => _engine.ScanAll());
+            // День 19: ScanAllAsync — реестр/папки синхронны, schtasks асинхронен
+            // через исполнителя; Task.Run держит скан вне UI-потока как прежде
+            _allItems = await Task.Run(() => _engine.ScanAllAsync());
 
             TotalCount = _allItems.Count;
             EnabledCount = _allItems.Count(i => i.IsEnabled);

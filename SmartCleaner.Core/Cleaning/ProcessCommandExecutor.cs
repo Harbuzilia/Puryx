@@ -17,7 +17,10 @@ public sealed class ProcessCommandExecutor : ICommandExecutor
             UseShellExecute = false,
             RedirectStandardOutput = true,
             RedirectStandardError = true,
-            CreateNoWindow = true
+            CreateNoWindow = true,
+            // Явная кодировка запроса (День 19, срез C) побеждает неопределённый
+            // дефолт .NET; null — прежнее поведение срезов A/B
+            StandardOutputEncoding = request.StandardOutputEncoding
         };
 
         foreach (var argument in request.Arguments)

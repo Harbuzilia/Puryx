@@ -1,7 +1,11 @@
+using SmartCleaner.Core.Cleaning;
 using SmartCleaner.Core.Helpers;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Microsoft.Win32;
+// UseWindowsForms тянет System.Windows.Forms.ICommandExecutor — снимаем
+// неоднозначность в пользу контракта исполнителя команд
+using ICommandExecutor = SmartCleaner.Core.Cleaning.ICommandExecutor;
 
 namespace SmartCleaner.Core.Startup;
 
@@ -17,10 +21,24 @@ public sealed class StartupEngine
     private const string RunKeyHKLM = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Run";
     private const string RunKeyWow = @"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run";
 
+    private readonly ICommandExecutor _commandExecutor;
+
+    /// <summary>
+    /// Создаёт движок поверх реального исполнителя команд (День 19, срез C).
+    /// Необязательный исполнитель — шов для детерминированных тестов: стаб
+    /// фиксирует команду (полное имя утилиты, аргументы, кодировку, таймаут).
+    /// </summary>
+    public StartupEngine(ICommandExecutor? commandExecutor = null)
+    {
+        _commandExecutor = commandExecutor ?? new ProcessCommandExecutor();
+    }
+
     /// <summary>
     /// Сканирует все источники автозагрузки и возвращает список элементов.
+    /// День 19: опрос планировщика (schtasks) — асинхронный через контракт
+    /// исполнителя (исполнитель асинхронен, sync-over-async запрещён).
     /// </summary>
-    public List<StartupItem> ScanAll()
+    public async Task<List<StartupItem>> ScanAllAsync(CancellationToken ct = default)
     {
         var items = new List<StartupItem>();
 
@@ -44,7 +62,7 @@ public sealed class StartupEngine
             StartupSource.CommonStartupFolder, items);
 
         // 6. Планировщик заданий (основные)
-        ScanTaskScheduler(items);
+        await ScanTaskSchedulerAsync(items, ct);
 
         return items;
     }
@@ -235,39 +253,43 @@ public sealed class StartupEngine
     }
 
     /// <summary>
-    /// Сканирует планировщик заданий (через schtasks).
+    /// Сканирует планировщик заданий (через schtasks, День 19 — контракт
+    /// ICommandExecutor).
     /// </summary>
-    private static void ScanTaskScheduler(List<StartupItem> items)
+    private async Task ScanTaskSchedulerAsync(List<StartupItem> items, CancellationToken ct)
     {
         try
         {
-            var psi = new ProcessStartInfo
+            // Таймаут 30 с: прежнее чтение до EOF без ограничения могло зависнуть
+            // навсегда; kill-tree исполнителя снимает зависший schtasks.
+            var execution = await _commandExecutor.ExecuteAsync(new CommandExecutionRequest
             {
                 // Абсолютный путь из системного каталога: запуск по неквалифицированному
                 // имени ищет exe в каталоге приложения — binary planting (M7, День 16б)
                 FileName = SystemToolLocator.GetSchtasksPath(),
-                Arguments = "/query /fo CSV /NH /V",
-                RedirectStandardOutput = true,
-                UseShellExecute = false,
-                CreateNoWindow = true,
+                Arguments = ["/query", "/fo", "CSV", "/NH", "/V"],
+                WorkingDirectory = string.Empty,
+                Timeout = SchtasksQueryTimeout,
+                // День 8: schtasks пишет в OEM-странице консоли. Дефолтное
+                // декодирование .NET = Console.OutputEncoding хоста — в UTF-8-
+                // консоли/WPF-контексте «Готово»/«Выполняется» ломаются и задачи
+                // отфильтровываются; явная OEM-кодировка обязательна (замер Дня 19)
                 StandardOutputEncoding = GetSchtasksOutputEncoding()
-            };
+            }, ct);
 
-            using var process = Process.Start(psi);
-            if (process == null) return;
-
-            using var reader = process.StandardOutput;
             int count = 0;
 
-            // Поток читаем до конца (не блокируем канал schtasks), но ограничиваем число
-            // элементов: после рабочего фильтра \Microsoft\ на типичной машине остаются
-            // единицы-десятки сторонних задач (на машине разработки — 38 из 402), поэтому
-            // прежний лимит 50 забивался системными задачами и обрезал реальные записи.
+            // Полный вывод уже в памяти (исполнитель прочитал поток до конца) —
+            // ограничиваем число разбираемых элементов: после рабочего фильтра
+            // \Microsoft\ на типичной машине остаются единицы-десятки сторонних
+            // задач (на машине разработки — 38 из 402), поэтому прежний лимит 50
+            // забивался системными задачами и обрезал реальные записи.
             // 200 — запас против затопления списка (например, генераторы задач),
             // реальное множество задач автозагрузки не обрезает.
+            using var reader = new System.IO.StringReader(execution.StandardOutput);
             while (reader.ReadLine() is { } line)
             {
-                if (count >= MaxTaskSchedulerItems) continue; // дренаж остатка вывода
+                if (count >= MaxTaskSchedulerItems) break;
 
                 var item = TryParseTaskSchedulerCsvLine(line);
                 if (item == null) continue;
@@ -276,11 +298,12 @@ public sealed class StartupEngine
                 items.Add(item);
                 count++;
             }
-
-            process.WaitForExit(3000);
         }
         catch (Exception ex) { /* schtasks not available or permission denied */ Debug.WriteLine($"[StartupEngine] Task scheduler scan error: {ex.Message}"); }
     }
+
+    /// <summary>Таймаут опроса schtasks (День 19): bounded, прежде чтение могло зависнуть навсегда.</summary>
+    private static readonly TimeSpan SchtasksQueryTimeout = TimeSpan.FromSeconds(30);
 
     /// <summary>Колонки вывода «schtasks /query /fo CSV /NH /V»: «Имя узла» (HostName).</summary>
     private const int SchtaskColumnHostName = 0;

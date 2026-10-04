@@ -1,3 +1,5 @@
+using System.Text;
+
 namespace SmartCleaner.Core.Cleaning;
 
 public record CommandExecutionRequest
@@ -15,6 +17,17 @@ public record CommandExecutionRequest
     /// вывода в любом случае возвращается в StandardOutput.
     /// </summary>
     public IProgress<string>? StandardOutputLineProgress { get; init; }
+
+    /// <summary>
+    /// Явная кодировка декодирования stdout (День 19, срез C — расширение по
+    /// образцу стриминга Дня 18). Консольные утилиты Windows пишут в OEM/ANSI-
+    /// странице, а дефолт .NET не определён: он равен Console.OutputEncoding
+    /// хоста — в UTF-8-консоли OEM-вывод превращается в mojibake, GUI-процесс
+    /// без консоли получает «Codepage 0» = ANSI (живой замер, День 19). null —
+    /// дефолт .NET (поведение срезов A/B, сайты без локализованного парсинга).
+    /// Потребители: schtasks (OEM — День 8), pnputil (ANSI).
+    /// </summary>
+    public Encoding? StandardOutputEncoding { get; init; }
 }
 
 public record CommandExecutionResult
