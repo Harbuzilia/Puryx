@@ -1,6 +1,7 @@
-﻿using SmartCleaner.Core.Helpers;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using SmartCleaner.Core.Helpers;
 using SmartCleaner.Core.Services;
-using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
 
@@ -37,6 +38,7 @@ public class QuarantineService
     private readonly string _manifestFile;
     private readonly string _storageDir;
     private readonly IConfigService _configService;
+    private readonly ILogger _logger;
 
     private readonly object _keyLock = new();
     private byte[]? _signingKey;
@@ -45,26 +47,28 @@ public class QuarantineService
     /// Карантин в %LOCALAPPDATA%\SmartCleaner\Quarantine, ключ подписи —
     /// через реальный ConfigService (portable/installed режим).
     /// </summary>
-    public QuarantineService()
-        : this(GetDefaultQuarantineRoot(), new ConfigService())
+    public QuarantineService(ILogger? logger = null)
+        : this(GetDefaultQuarantineRoot(), new ConfigService(), logger)
     {
     }
 
-    public QuarantineService(IConfigService configService)
-        : this(GetDefaultQuarantineRoot(), configService)
+    public QuarantineService(IConfigService configService, ILogger? logger = null)
+        : this(GetDefaultQuarantineRoot(), configService, logger)
     {
     }
 
     /// <summary>
     /// Конструктор с изолированным корнем карантина (для тестов: вместо %LOCALAPPDATA%)
-    /// и явным источником ключа подписи манифеста.
+    /// и явным источником ключа подписи манифеста. Необязательный ILogger — шов
+    /// для диагностики в Release (День 20): NullLogger по умолчанию.
     /// </summary>
-    public QuarantineService(string quarantineRoot, IConfigService configService)
+    public QuarantineService(string quarantineRoot, IConfigService configService, ILogger? logger = null)
     {
         _quarantineDir = quarantineRoot;
         _storageDir = Path.Combine(_quarantineDir, "Storage");
         _manifestFile = Path.Combine(_quarantineDir, "manifest.json");
         _configService = configService;
+        _logger = logger ?? NullLogger.Instance;
 
         try
         {
@@ -73,7 +77,7 @@ public class QuarantineService
         catch (Exception ex)
         {
             // Если не удалось создать директорию — карантин недоступен
-            Debug.WriteLine($"[Quarantine] Storage directory unavailable: {ex.Message}");
+            _logger.LogError(ex, "Storage directory unavailable: {Error}", ex.Message);
         }
     }
 
@@ -153,7 +157,7 @@ public class QuarantineService
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[Quarantine] Signing key unavailable: {ex.Message}");
+                _logger.LogWarning(ex, "Signing key unavailable: {Error}", ex.Message);
                 key = null;
             }
 
@@ -166,7 +170,7 @@ public class QuarantineService
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"[Quarantine] Manifest read failed (treated as corrupt): {ex.Message}");
+            _logger.LogWarning(ex, "Manifest read failed (treated as corrupt): {Error}", ex.Message);
             return (ManifestTrust.Corrupt, new List<QuarantinedItem>());
         }
     }
@@ -235,7 +239,7 @@ public class QuarantineService
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"[Quarantine] StoredPath validation failed for {storedPath}: {ex.Message}");
+            _logger.LogWarning(ex, "StoredPath validation failed for {StoredPath}: {Error}", storedPath, ex.Message);
             return false;
         }
     }
@@ -292,7 +296,7 @@ public class QuarantineService
             var (trust, existingItems) = await ReadManifestWithTrustAsync();
             if (trust is ManifestTrust.UnsignedLegacy or ManifestTrust.InvalidSignature)
             {
-                Debug.WriteLine($"[Quarantine] Manifest trust={trust}: existing entries dropped from new signed manifest");
+                _logger.LogWarning("Manifest trust={Trust}: existing entries dropped from new signed manifest", trust);
             }
             var items = trust == ManifestTrust.Valid
                 ? existingItems
@@ -304,7 +308,7 @@ public class QuarantineService
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"[Quarantine] Move to quarantine failed for {path}: {ex.Message}");
+            _logger.LogWarning(ex, "Move to quarantine failed for {Path}: {Error}", path, ex.Message);
             return false;
         }
     }
@@ -401,7 +405,7 @@ public class QuarantineService
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"[Quarantine] Purge failed for {id}: {ex.Message}");
+            _logger.LogWarning(ex, "Purge failed for {Id}: {Error}", id, ex.Message);
             return (false, $"Ошибка удаления: {ex.Message}");
         }
     }

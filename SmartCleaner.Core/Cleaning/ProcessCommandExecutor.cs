@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using System.Diagnostics;
 using System.Text;
 
@@ -5,6 +7,16 @@ namespace SmartCleaner.Core.Cleaning;
 
 public sealed class ProcessCommandExecutor : ICommandExecutor
 {
+    private readonly ILogger _logger;
+
+    /// <summary>
+    /// Необязательный логгер — шов для диагностики в Release (День 20).
+    /// </summary>
+    public ProcessCommandExecutor(ILogger? logger = null)
+    {
+        _logger = logger ?? NullLogger.Instance;
+    }
+
     public async Task<CommandExecutionResult> ExecuteAsync(CommandExecutionRequest request, CancellationToken ct = default)
     {
         using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
@@ -71,7 +83,7 @@ public sealed class ProcessCommandExecutor : ICommandExecutor
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[ProcessCommandExecutor] Kill process tree on timeout/cancellation failed: {ex.Message}");
+                _logger.LogWarning(ex, "Kill process tree on timeout/cancellation failed: {Error}", ex.Message);
             }
 
             // Отмена по токену вызывающего — не «результат», а исключение:

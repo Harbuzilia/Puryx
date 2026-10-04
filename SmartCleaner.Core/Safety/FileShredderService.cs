@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using System.IO;
 using System.Security.Cryptography;
 using SmartCleaner.Core.Models;
@@ -14,10 +15,17 @@ public enum ShredMethod
 public class FileShredderService
 {
     private readonly ISafetyService _safety;
+    private readonly ILogger _logger;
 
-    public FileShredderService(ISafetyService safety)
+    /// <summary>
+    /// Необязательный логгер — шов для диагностики в Release (День 20):
+    /// диагностический вывод System.Diagnostics вырезается в Release,
+    /// ILogger жив в обеих конфигурациях.
+    /// </summary>
+    public FileShredderService(ISafetyService safety, ILogger? logger = null)
     {
         _safety = safety;
+        _logger = logger ?? NullLogger.Instance;
     }
 
     public async Task<(bool Success, string Message)> ShredFileAsync(string filePath, ShredMethod method = ShredMethod.DoD522022M3Pass, IProgress<string>? progress = null)
@@ -138,7 +146,7 @@ public class FileShredderService
             {
                 Directory.Delete(directoryPath, true);
             }
-            catch (Exception ex) { Debug.WriteLine($"[FileShredderService] ShredDirectory cleanup error: {ex.Message}"); }
+            catch (Exception ex) { _logger.LogWarning(ex, "ShredDirectory cleanup error: {Error}", ex.Message); }
         }
 
         return (count, errors);

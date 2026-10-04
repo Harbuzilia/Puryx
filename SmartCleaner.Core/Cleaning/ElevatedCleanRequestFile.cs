@@ -1,4 +1,5 @@
-using System.Diagnostics;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -99,12 +100,19 @@ public static class ElevatedCleanRequestFile
         };
     }
 
+    /// <summary>
+    /// Читает и валидирует подписанный запрос. Необязательный ILogger —
+    /// диагностика в Release (День 20): NullLogger по умолчанию.
+    /// </summary>
     public static async Task<ElevatedCleanRequest?> ReadValidatedAsync(
         string requestFile,
         string authToken,
         TimeSpan maxAge,
-        CancellationToken ct = default)
+        CancellationToken ct = default,
+        ILogger? logger = null)
     {
+        logger ??= NullLogger.Instance;
+
         if (!IsSafeRequestPath(requestFile) || !File.Exists(requestFile))
         {
             return null;
@@ -152,12 +160,12 @@ public static class ElevatedCleanRequestFile
                 return null;
             }
 
-            if (!ValidateSignature(request, authToken))
+            if (!ValidateSignature(request, authToken, logger))
             {
                 return null;
             }
 
-            if (!TryConsumeNonce(request.Nonce, request.ExpiresAtUtc))
+            if (!TryConsumeNonce(request.Nonce, request.ExpiresAtUtc, logger))
             {
                 return null;
             }
@@ -166,7 +174,7 @@ public static class ElevatedCleanRequestFile
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"[ElevatedClean] Request validation failed: {ex.Message}");
+            logger.LogWarning(ex, "Request validation failed: {Error}", ex.Message);
             return null;
         }
     }
@@ -194,8 +202,10 @@ public static class ElevatedCleanRequestFile
         }
     }
 
-    public static void TryDelete(string requestFile)
+    public static void TryDelete(string requestFile, ILogger? logger = null)
     {
+        logger ??= NullLogger.Instance;
+
         try
         {
             if (IsSafeRequestPath(requestFile) && File.Exists(requestFile))
@@ -205,7 +215,7 @@ public static class ElevatedCleanRequestFile
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"[ElevatedClean] Request file delete failed: {ex.Message}");
+            logger.LogWarning(ex, "Request file delete failed: {Error}", ex.Message);
         }
     }
 
@@ -220,8 +230,10 @@ public static class ElevatedCleanRequestFile
         await File.WriteAllTextAsync(GetResultFilePath(requestFile), payload, ct);
     }
 
-    public static async Task<ElevatedCleanExecutionResult?> ReadResultAsync(string requestFile, CancellationToken ct = default)
+    public static async Task<ElevatedCleanExecutionResult?> ReadResultAsync(string requestFile, CancellationToken ct = default, ILogger? logger = null)
     {
+        logger ??= NullLogger.Instance;
+
         var resultFile = GetResultFilePath(requestFile);
         if (!File.Exists(resultFile))
         {
@@ -235,13 +247,15 @@ public static class ElevatedCleanRequestFile
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"[ElevatedClean] Result read failed: {ex.Message}");
+            logger.LogWarning(ex, "Result read failed: {Error}", ex.Message);
             return null;
         }
     }
 
-    public static void TryDeleteResult(string requestFile)
+    public static void TryDeleteResult(string requestFile, ILogger? logger = null)
     {
+        logger ??= NullLogger.Instance;
+
         try
         {
             var resultFile = GetResultFilePath(requestFile);
@@ -252,7 +266,7 @@ public static class ElevatedCleanRequestFile
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"[ElevatedClean] Result file delete failed: {ex.Message}");
+            logger.LogWarning(ex, "Result file delete failed: {Error}", ex.Message);
         }
     }
 
@@ -266,7 +280,7 @@ public static class ElevatedCleanRequestFile
         return Convert.ToBase64String(signature);
     }
 
-    private static bool ValidateSignature(ElevatedCleanRequest request, string authToken)
+    private static bool ValidateSignature(ElevatedCleanRequest request, string authToken, ILogger logger)
     {
         try
         {
@@ -277,17 +291,17 @@ public static class ElevatedCleanRequestFile
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"[ElevatedClean] Signature validation failed: {ex.Message}");
+            logger.LogWarning(ex, "Signature validation failed: {Error}", ex.Message);
             return false;
         }
     }
 
-    private static bool TryConsumeNonce(string nonce, DateTime expiresAtUtc)
+    private static bool TryConsumeNonce(string nonce, DateTime expiresAtUtc, ILogger logger)
     {
         try
         {
             Directory.CreateDirectory(NonceStorePath);
-            CleanupExpiredNonceMarkers();
+            CleanupExpiredNonceMarkers(logger);
 
             var nonceFile = Path.Combine(NonceStorePath, nonce + ".nonce");
             using var stream = new FileStream(nonceFile, FileMode.CreateNew, FileAccess.Write, FileShare.None);
@@ -302,12 +316,12 @@ public static class ElevatedCleanRequestFile
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"[ElevatedClean] Nonce consume failed: {ex.Message}");
+            logger.LogWarning(ex, "Nonce consume failed: {Error}", ex.Message);
             return false;
         }
     }
 
-    private static void CleanupExpiredNonceMarkers()
+    private static void CleanupExpiredNonceMarkers(ILogger logger)
     {
         var now = DateTime.UtcNow;
         foreach (var file in Directory.EnumerateFiles(NonceStorePath, "*.nonce"))
@@ -322,7 +336,7 @@ public static class ElevatedCleanRequestFile
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[ElevatedClean] Expired nonce cleanup failed for {file}: {ex.Message}");
+                logger.LogWarning(ex, "Expired nonce cleanup failed for {File}: {Error}", file, ex.Message);
             }
         }
     }
