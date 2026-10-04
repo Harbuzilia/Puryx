@@ -148,11 +148,20 @@ public class KnowledgeBase : IKnowledgeBase
             foreach (var rootPath in app.RootPaths)
             {
                 var expandedRoot = Environment.ExpandEnvironmentVariables(rootPath).ToLowerInvariant();
-                
-                if (!expandedPath.StartsWith(expandedRoot))
+
+                // Граница каталога (День 16б): корень обязан совпадать с путём или
+                // быть его родительским каталогом — «%APPDATA%\Claude» не матчит
+                // «...\ClaudeFoo», иначе sibling-префикс получал паттерны (и защиту)
+                // чужого приложения — over-blocking. Аналог SafetyService.IsUnder.
+                var root = expandedRoot.TrimEnd('\\', '/');
+                var matchesAppRoot =
+                    expandedPath.Equals(root, StringComparison.Ordinal) ||
+                    expandedPath.StartsWith(root + "\\", StringComparison.Ordinal) ||
+                    expandedPath.StartsWith(root + "/", StringComparison.Ordinal);
+                if (!matchesAppRoot)
                     continue;
 
-                var relativePath = expandedPath[expandedRoot.Length..].TrimStart('\\', '/');
+                var relativePath = expandedPath[root.Length..].TrimStart('\\', '/');
 
                 // Проверяем защищённые паттерны
                 foreach (var pattern in app.ProtectedPatterns)
