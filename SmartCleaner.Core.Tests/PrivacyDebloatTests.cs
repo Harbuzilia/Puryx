@@ -1,5 +1,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
+using SmartCleaner.Core.Cleaning;
+using SmartCleaner.Core.Helpers;
 using SmartCleaner.Core.Privacy;
 using System.Text.Json;
 using Xunit;
@@ -31,8 +33,10 @@ public class PrivacyDebloatTests : IDisposable
         }
     }
 
-    private PrivacyDebloatService CreateService(ILogger<PrivacyDebloatService>? logger = null) =>
-        new(_registry, _backupPath, logger);
+    private PrivacyDebloatService CreateService(
+        ILogger<PrivacyDebloatService>? logger = null,
+        ICommandExecutor? commandExecutor = null) =>
+        new(_registry, _backupPath, logger, commandExecutor);
 
     [Fact]
     public async Task ApplyThenRevert_RestoresOriginalRegistryValue()
@@ -144,6 +148,69 @@ public class PrivacyDebloatTests : IDisposable
         Assert.NotNull(restored);
         Assert.IsType<int>(restored.Value);
         Assert.Equal(7, (int)restored.Value);
+    }
+
+    // ==== День 17, срез A: контракт ICommandExecutor для сервисных твиков ====
+
+    [Fact]
+    public async Task ApplyServiceTweak_IssuesScConfigAndNetStopThroughExecutor()
+    {
+        // «telemetry_diagtrack» — сервисный твик (без реестра): apply =
+        // sc config disabled + net stop
+        var executor = new RecordingCommandExecutor();
+        var service = CreateService(commandExecutor: executor);
+
+        Assert.True(await service.ApplyTweakAsync("telemetry_diagtrack"));
+
+        Assert.Equal(2, executor.Requests.Count);
+        Assert.Equal(SystemToolLocator.GetScPath(), executor.Requests[0].FileName);
+        Assert.Equal(new[] { "config", "DiagTrack", "start=", "disabled" }, executor.Requests[0].Arguments);
+        Assert.Equal(TimeSpan.FromMilliseconds(3000), executor.Requests[0].Timeout);
+        Assert.Equal(SystemToolLocator.GetNetPath(), executor.Requests[1].FileName);
+        Assert.Equal(new[] { "stop", "DiagTrack", "/y" }, executor.Requests[1].Arguments);
+        Assert.Equal(TimeSpan.FromMilliseconds(10000), executor.Requests[1].Timeout);
+    }
+
+    [Fact]
+    public async Task ApplyServiceTweak_ScConfigFails_ReturnsFalseWithoutNetStop()
+    {
+        // ExitCode-гвард: sc config 1060 — не успех, net stop не вызывается
+        var executor = new RecordingCommandExecutor();
+        executor.EnqueueFailure(1060, "FAILED 1060: The specified service does not exist");
+        var service = CreateService(commandExecutor: executor);
+
+        Assert.False(await service.ApplyTweakAsync("telemetry_diagtrack"));
+        Assert.Single(executor.Requests);
+    }
+
+    [Fact]
+    public async Task ApplyServiceTweak_NetStopFailsOnStoppedService_IsBenign()
+    {
+        // net stop незапущенной службы ≠ сбой (день 5): цель «остановлена» достигнута,
+        // если sc query подтверждает, что служба не работает
+        var executor = new RecordingCommandExecutor();
+        executor.EnqueueSuccess();
+        executor.EnqueueFailure(2, "The service is not started.");
+        executor.EnqueueSuccess("STATE            : 1  STOPPED");
+        var service = CreateService(commandExecutor: executor);
+
+        Assert.True(await service.ApplyTweakAsync("telemetry_diagtrack"));
+        Assert.Equal(3, executor.Requests.Count);
+    }
+
+    [Fact]
+    public async Task RevertServiceTweak_IssuesOnlyScConfigDemand()
+    {
+        var executor = new RecordingCommandExecutor();
+        var service = CreateService(commandExecutor: executor);
+
+        Assert.True(await service.RevertTweakAsync("telemetry_diagtrack"));
+
+        // Откат службы: sc config demand, без net stop
+        var request = Assert.Single(executor.Requests);
+        Assert.Equal(SystemToolLocator.GetScPath(), request.FileName);
+        Assert.Equal(new[] { "config", "DiagTrack", "start=", "demand" }, request.Arguments);
+        Assert.Equal(TimeSpan.FromMilliseconds(3000), request.Timeout);
     }
 
     /// <summary>

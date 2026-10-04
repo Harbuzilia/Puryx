@@ -285,37 +285,37 @@ public class GameBoostServiceTests : IDisposable
         public List<string> SetSchemeCalls { get; } = [];
         public List<string> CallLog { get; } = [];
 
-        public bool StopService(string serviceName)
+        public Task<bool> StopServiceAsync(string serviceName, CancellationToken ct = default)
         {
             CallLog.Add($"stopservice:{serviceName}");
             StoppedServices.Add(serviceName);
-            return StopServiceResult(serviceName);
+            return Task.FromResult(StopServiceResult(serviceName));
         }
 
-        public bool StartService(string serviceName)
+        public Task<bool> StartServiceAsync(string serviceName, CancellationToken ct = default)
         {
             CallLog.Add($"startservice:{serviceName}");
             StartedServices.Add(serviceName);
-            return StartServiceResult(serviceName);
+            return Task.FromResult(StartServiceResult(serviceName));
         }
 
-        public string? GetActivePowerSchemeGuid()
+        public Task<string?> GetActivePowerSchemeGuidAsync(CancellationToken ct = default)
         {
             CallLog.Add("getactivescheme");
-            return ActiveSchemeGuid;
+            return Task.FromResult(ActiveSchemeGuid);
         }
 
-        public bool TrySetPowerScheme(string schemeGuid)
+        public Task<bool> TrySetPowerSchemeAsync(string schemeGuid, CancellationToken ct = default)
         {
             CallLog.Add($"setscheme:{schemeGuid}");
             SetSchemeCalls.Add(schemeGuid);
-            return SetSchemeResult(schemeGuid);
+            return Task.FromResult(SetSchemeResult(schemeGuid));
         }
 
-        public bool PowerSchemeExists(string schemeGuid)
+        public Task<bool> PowerSchemeExistsAsync(string schemeGuid, CancellationToken ct = default)
         {
             CallLog.Add($"schemeexists:{schemeGuid}");
-            return SchemeExistsResult(schemeGuid);
+            return Task.FromResult(SchemeExistsResult(schemeGuid));
         }
     }
 }

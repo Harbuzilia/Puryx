@@ -83,22 +83,19 @@ public class GameBoostService
         progress?.Report("Приостановка фоновых служб (SysMain, Telemetry, Windows Update)...");
         CurrentState.StoppedServices.Clear();
 
-        await Task.Run(() =>
+        // Запомнить текущий план питания ДО переключения — единственный шанс
+        // вернуть пользователю его схему (в т.ч. после краша, через state-файл)
+        CurrentState.PreviousPowerSchemeGuid = await _systemOperations.GetActivePowerSchemeGuidAsync() ?? string.Empty;
+
+        foreach (var svcName in _candidateServices)
         {
-            // Запомнить текущий план питания ДО переключения — единственный шанс
-            // вернуть пользователю его схему (в т.ч. после краша, через state-файл)
-            CurrentState.PreviousPowerSchemeGuid = _systemOperations.GetActivePowerSchemeGuid() ?? string.Empty;
-
-            foreach (var svcName in _candidateServices)
+            if (await _systemOperations.StopServiceAsync(svcName))
             {
-                if (_systemOperations.StopService(svcName))
-                {
-                    CurrentState.StoppedServices.Add(svcName);
-                }
+                CurrentState.StoppedServices.Add(svcName);
             }
+        }
 
-            _systemOperations.TrySetPowerScheme(HighPerformanceSchemeGuid);
-        });
+        await _systemOperations.TrySetPowerSchemeAsync(HighPerformanceSchemeGuid);
 
         CurrentState.IsBoostActive = true;
 
@@ -114,16 +111,13 @@ public class GameBoostService
 
         progress?.Report("Восстановление стандартного режима системы...");
 
-        await Task.Run(() =>
+        // Resume stopped services
+        foreach (var svcName in CurrentState.StoppedServices)
         {
-            // Resume stopped services
-            foreach (var svcName in CurrentState.StoppedServices)
-            {
-                _systemOperations.StartService(svcName);
-            }
+            await _systemOperations.StartServiceAsync(svcName);
+        }
 
-            RestorePowerScheme(CurrentState.PreviousPowerSchemeGuid);
-        });
+        await RestorePowerSchemeAsync(CurrentState.PreviousPowerSchemeGuid);
 
         CurrentState.StoppedServices.Clear();
         CurrentState.IsBoostActive = false;
@@ -164,18 +158,15 @@ public class GameBoostService
         var restoredServices = new List<string>();
         var restoredSchemeGuid = string.Empty;
 
-        await Task.Run(() =>
+        foreach (var svcName in persisted.StoppedServices)
         {
-            foreach (var svcName in persisted.StoppedServices)
+            if (await _systemOperations.StartServiceAsync(svcName))
             {
-                if (_systemOperations.StartService(svcName))
-                {
-                    restoredServices.Add(svcName);
-                }
+                restoredServices.Add(svcName);
             }
+        }
 
-            restoredSchemeGuid = RestorePowerScheme(persisted.PreviousPowerSchemeGuid);
-        });
+        restoredSchemeGuid = await RestorePowerSchemeAsync(persisted.PreviousPowerSchemeGuid);
 
         DeleteStateFile();
 
@@ -221,12 +212,12 @@ public class GameBoostService
     /// иначе — Balanced (с логом, чтобы потеря пользовательской схемы была видна).
     /// Возвращает фактически установленный GUID.
     /// </summary>
-    private string RestorePowerScheme(string previousSchemeGuid)
+    private async Task<string> RestorePowerSchemeAsync(string previousSchemeGuid)
     {
         if (!string.IsNullOrWhiteSpace(previousSchemeGuid))
         {
-            if (_systemOperations.PowerSchemeExists(previousSchemeGuid) &&
-                _systemOperations.TrySetPowerScheme(previousSchemeGuid))
+            if (await _systemOperations.PowerSchemeExistsAsync(previousSchemeGuid) &&
+                await _systemOperations.TrySetPowerSchemeAsync(previousSchemeGuid))
             {
                 return previousSchemeGuid;
             }
@@ -239,7 +230,7 @@ public class GameBoostService
             Debug.WriteLine("[GameBoostService] Предыдущая схема питания неизвестна (не удалось прочитать при включении буста) — возврат к Balanced");
         }
 
-        _systemOperations.TrySetPowerScheme(BalancedSchemeGuid);
+        await _systemOperations.TrySetPowerSchemeAsync(BalancedSchemeGuid);
         return BalancedSchemeGuid;
     }
 

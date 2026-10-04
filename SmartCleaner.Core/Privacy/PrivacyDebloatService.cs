@@ -1,3 +1,4 @@
+using SmartCleaner.Core.Cleaning;
 using SmartCleaner.Core.Helpers;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
@@ -5,6 +6,9 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Text.Json;
+// UseWindowsForms тянет System.Windows.Forms.ICommandExecutor — снимаем
+// неоднозначность в пользу контракта исполнителя команд
+using ICommandExecutor = SmartCleaner.Core.Cleaning.ICommandExecutor;
 
 namespace SmartCleaner.Core.Privacy;
 
@@ -24,20 +28,31 @@ public class PrivacyDebloatService
     private readonly IRegistryValueStore _registry;
     private readonly string _backupFilePath;
     private readonly ILogger<PrivacyDebloatService>? _logger;
+    private readonly ICommandExecutor _commandExecutor;
+
+    // Таймауты утилит (дисциплина дней 4-5): конфигурация и запрос состояния —
+    // быстрые операции; остановка службы может тянуть зависимые — ей выделяется больше.
+    private static readonly TimeSpan ScConfigTimeout = TimeSpan.FromMilliseconds(3000);
+    private static readonly TimeSpan ScQueryTimeout = TimeSpan.FromMilliseconds(3000);
+    private static readonly TimeSpan NetStopTimeout = TimeSpan.FromMilliseconds(10000);
 
     /// <summary>
     /// Создаёт сервис поверх реального реестра и файла бэкапа в AppData.
-    /// Необязательные параметры — шов для детерминированных тестов:
-    /// фейковое хранилище значений, путь к файлу бэкапа и логгер.
+    /// Необязательные параметры — швы для детерминированных тестов:
+    /// фейковое хранилище значений, путь к файлу бэкапа, логгер и исполнитель
+    /// команд (День 17: стаб фиксирует команды sc/net — полное имя утилиты,
+    /// аргументы, таймаут). DI-регистрация исполнителя — День 19.
     /// </summary>
     public PrivacyDebloatService(
         IRegistryValueStore? registry = null,
         string? backupFilePath = null,
-        ILogger<PrivacyDebloatService>? logger = null)
+        ILogger<PrivacyDebloatService>? logger = null,
+        ICommandExecutor? commandExecutor = null)
     {
         _registry = registry ?? new RegistryValueStore();
         _backupFilePath = backupFilePath ?? DefaultBackupFilePath;
         _logger = logger;
+        _commandExecutor = commandExecutor ?? new ProcessCommandExecutor();
     }
 
     private readonly List<PrivacyTweakItem> _tweakDefinitions =
@@ -491,36 +506,36 @@ public class PrivacyDebloatService
         _ => RegistryValueKind.Unknown
     };
 
-    private static async Task<(bool Success, string Reason)> ConfigureServiceAsync(string serviceName, bool disabled)
+    private async Task<(bool Success, string Reason)> ConfigureServiceAsync(string serviceName, bool disabled)
     {
         string startArg = disabled ? "disabled" : "demand";
-        var psiConfig = new ProcessStartInfo
+        // «start=» — отдельный аргумент: у sc.exe между «start=» и значением
+        // обязан быть пробел; ArgumentList воспроизводит прежнюю командную строку
+        var config = await _commandExecutor.ExecuteAsync(new CommandExecutionRequest
         {
             // Абсолютный путь из системного каталога: запуск по неквалифицированному
             // имени ищет exe в каталоге приложения — binary planting (M7, День 16б)
             FileName = SystemToolLocator.GetScPath(),
-            Arguments = $"config {serviceName} start= {startArg}",
-            CreateNoWindow = true,
-            UseShellExecute = false
-        };
-        var config = await RunToolAsync(psiConfig, 3000);
+            Arguments = ["config", serviceName, "start=", startArg],
+            WorkingDirectory = string.Empty,
+            Timeout = ScConfigTimeout
+        });
         if (config.ExitCode != 0)
         {
-            return (false, $"sc config '{serviceName}' (код {config.ExitCode}): {config.Output}");
+            return (false, $"sc config '{serviceName}' (код {config.ExitCode}): {ToolOutput(config)}");
         }
 
         if (disabled)
         {
-            var psiStop = new ProcessStartInfo
+            var stop = await _commandExecutor.ExecuteAsync(new CommandExecutionRequest
             {
                 // Абсолютный путь из системного каталога — binary planting (M7),
-                // см. psiConfig выше
+                // см. sc config выше
                 FileName = SystemToolLocator.GetNetPath(),
-                Arguments = $"stop {serviceName} /y",
-                CreateNoWindow = true,
-                UseShellExecute = false
-            };
-            var stop = await RunToolAsync(psiStop, 10000);
+                Arguments = ["stop", serviceName, "/y"],
+                WorkingDirectory = string.Empty,
+                Timeout = NetStopTimeout
+            });
             if (stop.ExitCode != 0)
             {
                 // net stop завершается ошибкой и для незапущенной службы — это не сбой,
@@ -528,7 +543,7 @@ public class PrivacyDebloatService
                 var stillRunning = await IsServiceRunningAsync(serviceName);
                 if (stillRunning != false)
                 {
-                    return (false, $"net stop '{serviceName}' (код {stop.ExitCode}): {stop.Output}");
+                    return (false, $"net stop '{serviceName}' (код {stop.ExitCode}): {ToolOutput(stop)}");
                 }
             }
         }
@@ -536,84 +551,31 @@ public class PrivacyDebloatService
         return (true, string.Empty);
     }
 
-    // Запускает системную утилиту и возвращает фактический код возврата и вывод
-    // (stderr приоритетнее: sc.exe пишет ошибки в stdout, net.exe — в stderr).
-    // Таймаут — тоже отказ: никакого «успеха по молчанию».
-    private static async Task<(int ExitCode, bool TimedOut, string Output)> RunToolAsync(ProcessStartInfo psi, int timeoutMs)
-    {
-        psi.CreateNoWindow = true;
-        psi.UseShellExecute = false;
-        psi.RedirectStandardOutput = true;
-        psi.RedirectStandardError = true;
-
-        try
-        {
-            using var process = new Process { StartInfo = psi };
-            if (!process.Start())
-            {
-                return (-1, false, $"не удалось запустить «{psi.FileName}»");
-            }
-
-            // Потоки читаем до ожидания выхода, чтобы заполненный буфер не заблокировал утилиту
-            var stdoutTask = process.StandardOutput.ReadToEndAsync();
-            var stderrTask = process.StandardError.ReadToEndAsync();
-
-            try
-            {
-                await process.WaitForExitAsync().WaitAsync(TimeSpan.FromMilliseconds(timeoutMs));
-            }
-            catch (TimeoutException)
-            {
-                KillProcessTree(process);
-                return (-1, true, $"«{psi.FileName}» не завершилась за {timeoutMs} мс");
-            }
-
-            var stdout = await stdoutTask;
-            var stderr = await stderrTask;
-            var output = string.IsNullOrWhiteSpace(stderr) ? stdout : stderr;
-            return (process.ExitCode, false, output.Trim());
-        }
-        catch (Exception ex)
-        {
-            return (-1, false, $"«{psi.FileName}»: {ex.Message}");
-        }
-    }
-
-    private static void KillProcessTree(Process process)
-    {
-        try
-        {
-            if (!process.HasExited)
-            {
-                process.Kill(entireProcessTree: true);
-            }
-        }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"[PrivacyDebloat] Kill timed-out process failed: {ex.Message}");
-        }
-    }
+    // Вывод утилиты для диагностики: stderr приоритетнее — sc.exe пишет ошибки
+    // в stdout, net.exe — в stderr (дисциплина дней 4-5, сохранённая поверх
+    // результатов исполнителя команд).
+    private static string ToolOutput(CommandExecutionResult result) =>
+        string.IsNullOrWhiteSpace(result.StandardError) ? result.StandardOutput.Trim() : result.StandardError.Trim();
 
     // Определяет по «sc query», запущена ли служба. null — состояние неизвестно (ошибка запроса).
-    private static async Task<bool?> IsServiceRunningAsync(string serviceName)
+    private async Task<bool?> IsServiceRunningAsync(string serviceName)
     {
         try
         {
-            var psi = new ProcessStartInfo
+            var query = await _commandExecutor.ExecuteAsync(new CommandExecutionRequest
             {
                 // Абсолютный путь из системного каталога — binary planting (M7)
                 FileName = SystemToolLocator.GetScPath(),
-                Arguments = $"query {serviceName}",
-                CreateNoWindow = true,
-                UseShellExecute = false
-            };
-            var query = await RunToolAsync(psi, 3000);
+                Arguments = ["query", serviceName],
+                WorkingDirectory = string.Empty,
+                Timeout = ScQueryTimeout
+            });
             if (query.ExitCode != 0)
             {
                 return null;
             }
 
-            return query.Output.Contains("RUNNING", StringComparison.OrdinalIgnoreCase);
+            return ToolOutput(query).Contains("RUNNING", StringComparison.OrdinalIgnoreCase);
         }
         catch (Exception ex)
         {
