@@ -262,6 +262,57 @@ public class DriverStoreCleanerTests
         Assert.Empty(drivers);
     }
 
+    // ==== День 22 — финализация: источник истины pnputil — вывод, фейл ≠ успех ====
+
+    // Полный блок + битый блок без строки «Published Name» (обрезанный вывод):
+    // pubMatch-гвард обязан пропускать битый блок без фантома с пустым именем
+    private const string PartialBlockOutput = """
+        Microsoft PnP Utility (Microsoft)
+
+        Published Name:     oem10.inf
+        Original Name:      nv_dispi.inf
+        Provider Name:      NVIDIA
+        Class Name:         Display adapters
+        Driver Version:     10/30/2021 30.0.14.7
+
+        Original Name:      half.inf
+        Provider Name:      NVIDIA
+        Class Name:         Display adapters
+        """;
+
+    [Fact]
+    public async Task ScanDriversAsync_NonZeroExitWithErrorInStdout_EmptyListWithoutPhantoms()
+    {
+        // ExitCode намеренно не гвардится (e7a3b01): источник истины — вывод.
+        // Текст ошибки не похож на блоки pnputil — парсер даёт пустой список,
+        // фантомных драйверов из текста ошибки не появляется
+        var executor = new RecordingCommandExecutor();
+        executor.EnqueueResult(new CommandExecutionResult
+        {
+            ExitCode = 5,
+            StandardOutput = "Access is denied.\r\nНе удалось перечислить пакеты драйверов.\r\n"
+        });
+        var cleaner = new DriverStoreCleaner(executor);
+
+        var drivers = await cleaner.ScanDriversAsync();
+
+        Assert.Empty(drivers);
+    }
+
+    [Fact]
+    public async Task ScanDriversAsync_PartialBlockWithoutPublishedName_SkippedNoPhantom()
+    {
+        var executor = new RecordingCommandExecutor();
+        executor.EnqueueSuccess(PartialBlockOutput);
+        var cleaner = new DriverStoreCleaner(executor);
+
+        var drivers = await cleaner.ScanDriversAsync();
+
+        var real = Assert.Single(drivers);
+        Assert.Equal("oem10.inf", real.PublishedName);
+        Assert.DoesNotContain(drivers, d => string.IsNullOrEmpty(d.PublishedName));
+    }
+
     private static DriverStoreItem New(
         string publishedName, string originalName, string className, string version, string date) => new()
     {

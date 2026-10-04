@@ -222,6 +222,45 @@ public class WinSxSEngineTests
         Assert.Equal("/Online /Cleanup-Image /StartComponentCleanup /ResetBase", args);
     }
 
+    // ==== День 22 — финализация: ненулевой exit DISM с непарсящимся выводом ≠ успех ====
+
+    [Fact]
+    public async Task AnalyzeComponentStoreAsync_NonZeroExitWithUnparsableStdout_HonestReasonWithExitCode()
+    {
+        // Код возврата 5 + текст, не похожий на отчёт DISM: данных нет, причина
+        // обязана нести фактический код возврата, а не безликое «нет данных»
+        var executor = new RecordingCommandExecutor();
+        executor.EnqueueResult(new CommandExecutionResult
+        {
+            ExitCode = 5,
+            StandardOutput = "Отказано в доступе.\r\n"
+        });
+        var engine = new WinSxSEngine(executor);
+
+        var result = await engine.AnalyzeComponentStoreAsync();
+
+        Assert.False(result.AnalysisAvailable);
+        Assert.Equal(0, result.ActualSizeBytes);
+        Assert.Equal(0, result.ReclaimablePackagesBytes);
+        Assert.Contains("код возврата 5", result.AnalysisUnavailableReason);
+    }
+
+    [Fact]
+    public async Task AnalyzeComponentStoreAsync_NonZeroExitWithEmptyOutput_ReasonCarriesExitCode()
+    {
+        // Пустой stdout/stderr + код 5: «DISM не вернул данных» с кодом
+        // возврата — без выдуманных чисел
+        var executor = new RecordingCommandExecutor();
+        executor.EnqueueFailure(5, "");
+        var engine = new WinSxSEngine(executor);
+
+        var result = await engine.AnalyzeComponentStoreAsync();
+
+        Assert.False(result.AnalysisAvailable);
+        Assert.Contains("DISM не вернул данных", result.AnalysisUnavailableReason);
+        Assert.Contains("код возврата 5", result.AnalysisUnavailableReason);
+    }
+
     // Ожидание «8.12 ГБ» без дублирования логики форматирования в тесте
     private static string SizeFormatterExpectation(double gb) =>
         SmartCleaner.Core.Helpers.SizeFormatter.Format((long)(gb * Gb));

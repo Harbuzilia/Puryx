@@ -186,4 +186,57 @@ public class CompactEngineTests
         var line = Assert.Single(forwarded);
         Assert.Equal("12345 : 100%", line);
     }
+
+    // ==== День 22 — финализация: фейл compact ≠ успех ====
+
+    [Fact]
+    public async Task CompressDirectoryAsync_NonZeroExit_StdoutErrorInMessage()
+    {
+        // compact.exe печатает ошибки в stdout (stderr пуст): причина обязана
+        // нести фактический вывод и код возврата
+        var dir = CreateTempDirectory();
+        try
+        {
+            var executor = new RecordingCommandExecutor();
+            executor.EnqueueResult(new CommandExecutionResult
+            {
+                ExitCode = 1,
+                StandardOutput = "file1.dat : отказано в доступе"
+            });
+            var engine = new CompactEngine(executor);
+
+            var result = await engine.CompressDirectoryAsync(dir, "LZX");
+
+            Assert.False(result.Success);
+            Assert.Equal(0, result.SavedBytes);
+            Assert.Contains("кодом 1", result.Message);
+            Assert.Contains("отказано в доступе", result.Message);
+        }
+        finally
+        {
+            Directory.Delete(dir);
+        }
+    }
+
+    [Fact]
+    public async Task DecompressDirectoryAsync_NonZeroExit_FailureWithCodeAndOutput()
+    {
+        var dir = CreateTempDirectory();
+        try
+        {
+            var executor = new RecordingCommandExecutor();
+            executor.EnqueueFailure(2, "file2.dat : отказано в доступе");
+            var engine = new CompactEngine(executor);
+
+            var result = await engine.DecompressDirectoryAsync(dir);
+
+            Assert.False(result.Success);
+            Assert.Contains("кодом 2", result.Message);
+            Assert.Contains("отказано в доступе", result.Message);
+        }
+        finally
+        {
+            Directory.Delete(dir);
+        }
+    }
 }

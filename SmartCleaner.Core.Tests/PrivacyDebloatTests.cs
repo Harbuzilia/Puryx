@@ -299,6 +299,56 @@ public class PrivacyDebloatTests : IDisposable
             _values.Remove(Key(rootKeyName, subKeyPath, valueName));
     }
 
+    // ==== День 22 — финализация: фейл sc ≠ успех (сервисные твики) ====
+
+    [Fact]
+    public async Task ApplyTweakAsync_ServiceTweak_ScConfigFails_ReturnsFalse()
+    {
+        // Твик с ServiceName (DiagTrack): отказ sc config — отказ твика,
+        // net stop после отказа конфигурации не вызывается
+        var executor = new RecordingCommandExecutor();
+        executor.EnqueueFailure(1060, "FAILED 1060: The specified service does not exist");
+        var service = CreateService(commandExecutor: executor);
+
+        var result = await service.ApplyTweakAsync("telemetry_diagtrack");
+
+        Assert.False(result);
+        Assert.Single(executor.Requests);
+    }
+
+    [Fact]
+    public async Task ApplyTweakAsync_ServiceTweak_NetStopFails_QueryFails_ReturnsFalse()
+    {
+        // Отказ net stop + отказ sc query (состояние неизвестно): «цель
+        // остановлена» не подтверждена — честный false
+        var executor = new RecordingCommandExecutor();
+        executor.EnqueueSuccess();
+        executor.EnqueueFailure(2, "The service did not respond to the control function.");
+        executor.EnqueueFailure(1722, "FAILED 1722: The RPC server is unavailable");
+        var service = CreateService(commandExecutor: executor);
+
+        var result = await service.ApplyTweakAsync("telemetry_diagtrack");
+
+        Assert.False(result);
+        Assert.Equal(3, executor.Requests.Count);
+        Assert.Equal(new[] { "query", "DiagTrack" }, executor.Requests[2].Arguments);
+    }
+
+    [Fact]
+    public async Task RevertTweakAsync_ServiceTweak_ScConfigFails_ReturnsFalse()
+    {
+        // Откат включает службу («demand»): отказ sc config — отказ отката
+        var executor = new RecordingCommandExecutor();
+        executor.EnqueueFailure(5, "FAILED 5: Access is denied");
+        var service = CreateService(commandExecutor: executor);
+
+        var result = await service.RevertTweakAsync("telemetry_dmwappush");
+
+        Assert.False(result);
+        Assert.Single(executor.Requests);
+        Assert.Equal(new[] { "config", "dmwappushservice", "start=", "demand" }, executor.Requests[0].Arguments);
+    }
+
     /// <summary>Логгер, запоминающий отформатированные сообщения.</summary>
     private sealed class RecordingLogger : ILogger<PrivacyDebloatService>
     {

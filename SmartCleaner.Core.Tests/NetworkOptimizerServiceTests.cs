@@ -117,4 +117,62 @@ public class NetworkOptimizerServiceTests
         Assert.Contains("-ErrorAction Stop", script);
         Assert.Equal(TimeSpan.FromMilliseconds(15000), request.Timeout);
     }
+
+    // ==== День 22 — финализация: фейл ipconfig/netsh/powershell ≠ успех ====
+
+    [Fact]
+    public async Task FlushDnsAndResetWinsockAsync_ArpResetFails_ReturnsFalseWithHonestMessage()
+    {
+        // Очистка DNS прошла, сброс ARP-таблицы — нет: успех всей операции
+        // невозможен, причина — в сообщении
+        var executor = new RecordingCommandExecutor();
+        executor.EnqueueSuccess();
+        executor.EnqueueFailure(1, "arp reset failed");
+        var service = new NetworkOptimizerService(executor);
+
+        var result = await service.FlushDnsAndResetWinsockAsync();
+
+        Assert.False(result.Success);
+        Assert.Contains("код 1", result.Message);
+        Assert.Contains("ARP", result.Message);
+        Assert.Contains("arp reset failed", result.Message);
+        Assert.Equal(2, executor.Requests.Count);
+    }
+
+    [Fact]
+    public async Task FlushDnsAndResetWinsockAsync_FlushdnsFailsWithStdoutOnlyError_StdoutInMessage()
+    {
+        // Утилита с текстом ошибки в stdout (пустой stderr): ToolOutput обязан
+        // показать фактический вывод, а не пустую причину
+        var executor = new RecordingCommandExecutor();
+        executor.EnqueueResult(new CommandExecutionResult
+        {
+            ExitCode = 1,
+            StandardOutput = "Access is denied (stdout)"
+        });
+        var service = new NetworkOptimizerService(executor);
+
+        var result = await service.FlushDnsAndResetWinsockAsync();
+
+        Assert.False(result.Success);
+        Assert.Contains("код 1", result.Message);
+        Assert.Contains("Access is denied (stdout)", result.Message);
+        Assert.Single(executor.Requests);
+    }
+
+    [Fact]
+    public async Task ResetDnsToDhcpAsync_PowerShellFails_ReturnsFalseWithHonestMessage()
+    {
+        // -ErrorAction Stop: отказ Set-DnsClientServerAddress = ненулевой код;
+        // сброс на DHCP обязан честно провалиться
+        var executor = new RecordingCommandExecutor();
+        executor.EnqueueFailure(1, "no active network adapters");
+        var service = new NetworkOptimizerService(executor);
+
+        var result = await service.ResetDnsToDhcpAsync();
+
+        Assert.False(result.Success);
+        Assert.Contains("код 1", result.Message);
+        Assert.Contains("no active network adapters", result.Message);
+    }
 }

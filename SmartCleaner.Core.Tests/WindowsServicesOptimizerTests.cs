@@ -185,4 +185,40 @@ public class WindowsServicesOptimizerTests
         Assert.Equal(new[] { "config", "SysMain", "start=", "disabled" }, executor.Requests[0].Arguments);
         Assert.Equal(new[] { "stop", "SysMain", "/y" }, executor.Requests[1].Arguments);
     }
+
+    // ==== День 22 — финализация: фейл sc ≠ успех (мутационный сюит P3) ====
+
+    [Fact]
+    public async Task SetServiceStartupAsync_ManualType_ScConfigFails_ReturnsFalseWithoutNetStop()
+    {
+        // ExitCode-гвард не зависит от типа запуска: для Manual после отказа
+        // конфигурации net stop не вызывается вовсе (его и не должно быть)
+        var executor = new RecordingCommandExecutor();
+        executor.EnqueueFailure(1060, "FAILED 1060: The specified service does not exist");
+        var optimizer = new WindowsServicesOptimizer(executor);
+
+        var result = await optimizer.SetServiceStartupAsync("PuryxStubService", ServiceStartupType.Manual);
+
+        Assert.False(result);
+        Assert.Single(executor.Requests);
+        Assert.Equal(new[] { "config", "PuryxStubService", "start=", "demand" }, executor.Requests[0].Arguments);
+    }
+
+    [Fact]
+    public async Task SetServiceStartupAsync_NetStopFails_QueryFails_ReturnsFalseOnUnknownState()
+    {
+        // Отказ net stop + отказ sc query (состояние неизвестно): «цель
+        // остановлена» не подтверждена — честный false, а не оптимистичный true
+        var executor = new RecordingCommandExecutor();
+        executor.EnqueueSuccess();
+        executor.EnqueueFailure(2, "The service did not respond to the control function.");
+        executor.EnqueueFailure(1060, "FAILED 1060: The specified service does not exist");
+        var optimizer = new WindowsServicesOptimizer(executor);
+
+        var result = await optimizer.SetServiceStartupAsync("PuryxStubService", ServiceStartupType.Disabled);
+
+        Assert.False(result);
+        Assert.Equal(3, executor.Requests.Count);
+        Assert.Equal(new[] { "query", "PuryxStubService" }, executor.Requests[2].Arguments);
+    }
 }
