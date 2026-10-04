@@ -84,6 +84,9 @@ public class StartupEngineTests
     ];
 
     [Fact]
+    [Trait("Category", "Integration")] // машинозависим: фикстура — cp866-байты, а декодер
+                                        // берёт OEM-страницу машины (GetOEMCP) — на en-US-раннере
+                                        // CI (cp437/850) кириллица не восстановится
     public void DecodeSchtasksOutput_Cp866Fixture_DecodesReadableCyrillicLines()
     {
         var lines = StartupEngine.DecodeSchtasksOutput(SchtasksCp866Fixture);
@@ -414,6 +417,9 @@ public class StartupEngineTests
     }
 
     [Fact]
+    [Trait("Category", "Integration")] // машинозависим: фикстура кодируется OEM-страницей
+                                        // машины (GetOEMCP) — на en-US-раннере кириллица
+                                        // превращается в «?» уже при GetBytes
     public void DecodeSchtasksOutput_LfOnlyLineEndings_SplitsLines()
     {
         // schtasks при перенаправлении/pipe может отдавать LF-only строки:
