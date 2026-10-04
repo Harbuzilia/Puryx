@@ -94,6 +94,10 @@ public partial class LargeFilesViewModel : ObservableObject
         if (file == null) return;
         try
         {
+            // Обоснованное исключение (День 19, срез C): explorer.exe —
+            // естественный shell-запуск (показать файл в Проводнике), не
+            // исполнение команды; контракт исполнителя (CreateNoWindow,
+            // редирект потоков, kill-tree) здесь не применим
             Process.Start(new ProcessStartInfo
             {
                 FileName = "explorer.exe",

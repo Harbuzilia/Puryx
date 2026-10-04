@@ -526,6 +526,9 @@ public partial class DuplicatesViewModel : ObservableObject
     {
         try
         {
+            // Обоснованное исключение (День 19, срез C): explorer.exe со
+            // shell:-моникером — естественный shell-запуск (открыть корзину),
+            // не исполнение команды; контракт исполнителя не применим
             Process.Start(new ProcessStartInfo
             {
                 FileName = "explorer.exe",

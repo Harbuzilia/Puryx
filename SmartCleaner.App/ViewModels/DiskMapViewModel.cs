@@ -173,6 +173,10 @@ public partial class DiskMapViewModel : ObservableObject
                 ? System.IO.Path.GetDirectoryName(SelectedNode.FullPath) ?? SelectedNode.FullPath
                 : SelectedNode.FullPath;
 
+            // Обоснованное исключение (День 19, срез C): explorer.exe —
+            // естественный shell-запуск (показать элемент в Проводнике),
+            // не исполнение команды: UseShellExecute=true и видимое окно —
+            // сам смысл операции; контракт исполнителя не применим
             System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
             {
                 FileName = "explorer.exe",

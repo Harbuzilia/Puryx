@@ -170,6 +170,12 @@ public partial class CliInspectorViewModel : ObservableObject
 
         try
         {
+            // Обоснованное исключение (День 19, срез C): explorer.exe —
+            // естественный shell-запуск для пользователя (показать файл в
+            // Проводнике), не исполнение команды: UseShellExecute=true и
+            // видимое окно — сам смысл операции; контракт исполнителя
+            // (CreateNoWindow, редирект потоков, таймаут с kill-tree) здесь
+            // не применим
             if (File.Exists(path))
             {
                 Process.Start("explorer.exe", $"/select,\"{path}\"");
@@ -197,7 +203,12 @@ public partial class CliInspectorViewModel : ObservableObject
 
         try
         {
-            // Рабочая директория задаётся через ProcessStartInfo — никакой
+            // Обоснованное исключение (День 19, срез C): интерактивный терминал
+            // для пользователя — видимое окно (UseShellExecute=true) и есть
+            // смысл операции; контракт исполнителя (CreateNoWindow, редирект
+            // потоков, таймаут с kill-tree) превратил бы терминал в невидимый
+            // подвешенный процесс. Рабочая директория задаётся через
+            // ProcessStartInfo — никакой
             // инъекции пути в командную строку PowerShell (апостроф в имени папки)
             var startInfo = new ProcessStartInfo
             {

@@ -556,6 +556,9 @@ public partial class MainViewModel : ObservableObject, IDisposable
         var folder = item.Item.IsDirectory ? item.Path : System.IO.Path.GetDirectoryName(item.Path);
         if (!string.IsNullOrEmpty(folder) && Directory.Exists(folder))
         {
+            // Обоснованное исключение (День 19, срез C): explorer.exe —
+            // естественный shell-запуск (открыть папку в Проводнике), не
+            // исполнение команды; контракт исполнителя не применим
             try { Process.Start(new ProcessStartInfo("explorer.exe", $"\"{folder}\"") { UseShellExecute = true }); }
             catch (Exception ex) { /* Не критично */ Debug.WriteLine($"[MainViewModel] OpenFolder error: {ex.Message}"); }
         }
