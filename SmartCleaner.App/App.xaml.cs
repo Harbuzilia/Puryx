@@ -159,12 +159,24 @@ public partial class App : Application
 
     private void ConfigureServices(IServiceCollection services)
     {
-        // Logging
+        // Logging (День 20, ROADMAP 261-267): Debug-провайдер записывает логи
+        // ILogger туда, куда смотрит отладчик. Факт пакета 8.0.1: DebugLogger
+        // пишет только при подключённом отладчике (IsEnabled == Debugger.IsAttached)
+        // — в VS Output виден и в Release-сборке; без отладчика провайдер
+        // справедливо молчит. Файловый провайдер продакшен-контура — вне Дня 20.
         services.AddLogging(builder =>
         {
             builder.AddDebug();
             builder.SetMinimumLevel(LogLevel.Warning);
         });
+
+        // День 20 (ROADMAP 266): сервисы Core принимают ILogger необязательным
+        // ctor-параметром. AddLogging регистрирует открытый generic ILogger<>,
+        // поэтому PrivacyDebloatService получает ILogger<T> автоматически;
+        // для не-generic ILogger категория создаётся фабрикой по полному
+        // имени типа сервиса
+        static ILogger LoggerFor(IServiceProvider sp, Type serviceType) =>
+            sp.GetRequiredService<ILoggerFactory>().CreateLogger(serviceType.FullName ?? serviceType.Name);
 
         services.AddSingleton<IConfigService, ConfigService>();
         services.AddSingleton<SmartCleaner.App.Services.ThemeManager>();
@@ -179,8 +191,11 @@ public partial class App : Application
         // приватность/буст/WinSxS/Compact/SQLite/uninstaller/startup/scheduler),
         // принимают его необязательным ctor-параметром — регистрация «включает»
         // шов: без неё сервисы создаются с собственным ProcessCommandExecutor,
-        // с ней — получают единый инстанс из контейнера
-        services.AddSingleton<SmartCleaner.Core.Cleaning.ICommandExecutor, SmartCleaner.Core.Cleaning.ProcessCommandExecutor>();
+        // с ней — получают единый инстанс из контейнера. День 20: сюда же
+        // прокидывается ILogger для диагностики Release
+        services.AddSingleton<SmartCleaner.Core.Cleaning.ICommandExecutor>(sp =>
+            new SmartCleaner.Core.Cleaning.ProcessCommandExecutor(
+                LoggerFor(sp, typeof(SmartCleaner.Core.Cleaning.ProcessCommandExecutor))));
 
         services.AddSingleton<ScanConfiguration>();
 
@@ -236,23 +251,46 @@ public partial class App : Application
         services.AddSingleton<SmartCleaner.Core.WinSxS.WinSxSEngine>();
         services.AddSingleton<SmartCleaner.Core.WinSxS.DriverStoreCleaner>();
         services.AddSingleton<SmartCleaner.Core.Safety.QuarantineService>(sp =>
-            new SmartCleaner.Core.Safety.QuarantineService(sp.GetRequiredService<IConfigService>()));
+            new SmartCleaner.Core.Safety.QuarantineService(
+                sp.GetRequiredService<IConfigService>(),
+                LoggerFor(sp, typeof(SmartCleaner.Core.Safety.QuarantineService))));
         services.AddSingleton<SmartCleaner.Core.Plugins.PluginEngine>();
         services.AddSingleton<SmartCleaner.Core.AiAssistant.NaturalLanguageQueryEngine>();
 
         // God-Tier & Master Services
         services.AddSingleton<SmartCleaner.Core.Optimization.SqliteCompactorService>();
-        services.AddSingleton<SmartCleaner.Core.SystemOpt.RamOptimizerService>();
-        services.AddSingleton<SmartCleaner.Core.SystemOpt.IGameBoostSystemOperations, SmartCleaner.Core.SystemOpt.StandardGameBoostSystemOperations>();
-        services.AddSingleton<SmartCleaner.Core.SystemOpt.GameBoostService>();
+        services.AddSingleton<SmartCleaner.Core.SystemOpt.RamOptimizerService>(sp =>
+            new SmartCleaner.Core.SystemOpt.RamOptimizerService(
+                LoggerFor(sp, typeof(SmartCleaner.Core.SystemOpt.RamOptimizerService))));
+        services.AddSingleton<SmartCleaner.Core.SystemOpt.IGameBoostSystemOperations>(sp =>
+            new SmartCleaner.Core.SystemOpt.StandardGameBoostSystemOperations(
+                sp.GetRequiredService<SmartCleaner.Core.Cleaning.ICommandExecutor>(),
+                LoggerFor(sp, typeof(SmartCleaner.Core.SystemOpt.StandardGameBoostSystemOperations))));
+        services.AddSingleton<SmartCleaner.Core.SystemOpt.GameBoostService>(sp =>
+            new SmartCleaner.Core.SystemOpt.GameBoostService(
+                sp.GetRequiredService<SmartCleaner.Core.SystemOpt.RamOptimizerService>(),
+                sp.GetRequiredService<IConfigService>(),
+                sp.GetRequiredService<SmartCleaner.Core.SystemOpt.IGameBoostSystemOperations>(),
+                LoggerFor(sp, typeof(SmartCleaner.Core.SystemOpt.GameBoostService))));
         services.AddSingleton<SmartCleaner.Core.DiskHealth.DiskHealthService>();
-        services.AddSingleton<SmartCleaner.Core.Safety.FileShredderService>();
-        services.AddSingleton<SmartCleaner.Core.Network.NetworkOptimizerService>();
+        services.AddSingleton<SmartCleaner.Core.Safety.FileShredderService>(sp =>
+            new SmartCleaner.Core.Safety.FileShredderService(
+                sp.GetRequiredService<ISafetyService>(),
+                LoggerFor(sp, typeof(SmartCleaner.Core.Safety.FileShredderService))));
+        services.AddSingleton<SmartCleaner.Core.Network.NetworkOptimizerService>(sp =>
+            new SmartCleaner.Core.Network.NetworkOptimizerService(
+                sp.GetRequiredService<SmartCleaner.Core.Cleaning.ICommandExecutor>(),
+                LoggerFor(sp, typeof(SmartCleaner.Core.Network.NetworkOptimizerService))));
         services.AddSingleton<SmartCleaner.Core.Shell.ExplorerContextMenuManager>();
         services.AddSingleton<SmartCleaner.Core.Reporting.SystemReportGenerator>();
         services.AddSingleton<SmartCleaner.App.Services.AudioFeedbackService>();
+        // ILogger<PrivacyDebloatService> резолвится AddLogging автоматически
+        // (открытый generic) — фабрика не нужна
         services.AddSingleton<SmartCleaner.Core.Privacy.PrivacyDebloatService>();
-        services.AddSingleton<SmartCleaner.Core.ServicesOpt.WindowsServicesOptimizer>();
+        services.AddSingleton<SmartCleaner.Core.ServicesOpt.WindowsServicesOptimizer>(sp =>
+            new SmartCleaner.Core.ServicesOpt.WindowsServicesOptimizer(
+                sp.GetRequiredService<SmartCleaner.Core.Cleaning.ICommandExecutor>(),
+                LoggerFor(sp, typeof(SmartCleaner.Core.ServicesOpt.WindowsServicesOptimizer))));
 
         services.AddTransient<MainViewModel>();
         services.AddTransient<SettingsViewModel>();
@@ -306,11 +344,15 @@ public partial class App : Application
         ConfigureServices(services);
 
         using var provider = services.BuildServiceProvider();
+        // День 20: логгер для статического ElevatedCleanRequestFile — записи
+        // валидации/очистки запроса живы в Release (Diagnostic-вывод вырезан)
+        var elevatedLogger = provider.GetRequiredService<ILoggerFactory>()
+            .CreateLogger("SmartCleaner.App.ElevatedClean");
         var safetyService = provider.GetRequiredService<ISafetyService>();
 
         try
         {
-            var request = await ElevatedCleanRequestFile.ReadValidatedAsync(requestPath, authToken, ElevatedRequestMaxAge);
+            var request = await ElevatedCleanRequestFile.ReadValidatedAsync(requestPath, authToken, ElevatedRequestMaxAge, logger: elevatedLogger);
             if (request is null || !ElevatedCleanTargetPolicy.ValidateContract(request.Policy))
             {
                 var invalidResult = new ElevatedCleanExecutionResult
@@ -457,7 +499,7 @@ public partial class App : Application
         }
         finally
         {
-            ElevatedCleanRequestFile.TryDelete(requestPath);
+            ElevatedCleanRequestFile.TryDelete(requestPath, elevatedLogger);
         }
     }
 
