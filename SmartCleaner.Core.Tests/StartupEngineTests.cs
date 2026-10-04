@@ -388,4 +388,99 @@ public class StartupEngineTests
         Assert.NotNull(item);
         Assert.Equal(@"\AMD Install Manager - Check For Updates", item!.TaskName);
     }
+
+    // ==== День 22 — финализация: мутации вывода schtasks (0277b68, M2-регрессии) ====
+
+    [Fact]
+    public void ParseCsvLine_EmptyUnquotedFields_PreservedAsEmptyStrings()
+    {
+        // Пустые поля без кавычек: «a,,c» — три поля, среднее пустое
+        // (несуществующее поле = сдвиг колонок /v-формата)
+        var fields = StartupEngine.ParseCsvLine("a,,c");
+
+        Assert.Equal(new[] { "a", "", "c" }, fields);
+    }
+
+    [Fact]
+    public void ParseCsvLine_QuoteInsideFieldWithoutSeparator_StaysInContent()
+    {
+        // Задвоенная кавычка в середине поля (не перед разделителем и не в
+        // конце строки): по правилу wrap-aware парсера это контент — обе
+        // кавычки сохраняются как есть (не RFC-4180-свёртка «"" в «"»)
+        var fields = StartupEngine.ParseCsvLine(@"""a""""b""");
+
+        Assert.Single(fields);
+        Assert.Equal("a\"\"b", fields[0]);
+    }
+
+    [Fact]
+    public void DecodeSchtasksOutput_LfOnlyLineEndings_SplitsLines()
+    {
+        // schtasks при перенаправлении/pipe может отдавать LF-only строки:
+        // декодер обязан резать и по «\n», не только по «\r\n»
+        var text = "\"\\TaskA\",\"N/A\",\"Готово\"\n\"\\TaskB\",\"N/A\",\"Готово\"";
+        var bytes = StartupEngine.GetSchtasksOutputEncoding().GetBytes(text);
+
+        var lines = StartupEngine.DecodeSchtasksOutput(bytes);
+
+        Assert.Equal(2, lines.Count);
+        Assert.Equal("\"\\TaskA\",\"N/A\",\"Готово\"", lines[0]);
+        Assert.Equal("\"\\TaskB\",\"N/A\",\"Готово\"", lines[1]);
+    }
+
+    [Fact]
+    public void DecodeSchtasksOutput_StrayHighBytes_DoNotBreakLineSplitting()
+    {
+        // Битые/нестандартные байты OEM-вывода: декодер не падает (замена
+        // символов вместо исключения), разбиение строк сохраняется,
+        // ASCII-префикс не искажается
+        var bytes = new byte[]
+        {
+            0x22, 0x5C, 0x41, 0x0D, 0x0A,                          // «"\A» + CRLF
+            0x22, 0x5C, 0x42, 0x98, 0x99, 0x9B, 0xFF, 0x0D, 0x0A   // «"\B» + мусор + CRLF
+        };
+
+        var lines = StartupEngine.DecodeSchtasksOutput(bytes);
+
+        Assert.Equal(2, lines.Count);
+        Assert.Equal("\"\\A", lines[0]);
+        Assert.StartsWith("\"\\B", lines[1]);
+    }
+
+    [Fact]
+    public void TryParseTaskSchedulerCsvLine_MultilineNoteSplit_HeadParsesTailFiltered()
+    {
+        // Примечание задачи с переводом строки: ReadLine режет запись пополам
+        // (известное ограничение построчного CSV-разбора schtasks, 0277b68).
+        // Голова с целыми колонками 0-8 разбирается в элемент; хвост-продолжение
+        // обязан отфильтроваться (короткая строка), а не падать и не порождать
+        // фантомный элемент
+        const string head =
+            "\"HOST\",\"\\MyApp\",\"N/A\",\"Готово\",\"Интерактивный\"," +
+            "\"N/A\",\"0\",\"Author\",\"C:\\Tools\\app.exe -arg\",\"C:\\wd\",\"Начало примечания";
+        const string tail = "окончание примечания\",\"Включено\",\"Отключено\"";
+
+        var item = StartupEngine.TryParseTaskSchedulerCsvLine(head);
+        var tailItem = StartupEngine.TryParseTaskSchedulerCsvLine(tail);
+
+        Assert.NotNull(item);
+        Assert.Equal("MyApp", item!.Name);
+        Assert.Equal(@"C:\Tools\app.exe", item.FilePath);
+        Assert.Equal("-arg", item.Arguments);
+        Assert.Null(tailItem);
+    }
+
+    [Fact]
+    public void TryParseTaskSchedulerCsvLine_EmptyTaskToRun_IsFiltered()
+    {
+        // Пустая колонка «Задача для выполнения»: элемент не создаётся
+        // (фильтр пустой команды), а не элемент с FilePath из пустой строки
+        const string line =
+            "\"HOST\",\"\\MyApp\",\"N/A\",\"Готово\",\"Интерактивный\"," +
+            "\"N/A\",\"0\",\"Author\",\"\",\"C:\\wd\",\"Примечание\"";
+
+        var item = StartupEngine.TryParseTaskSchedulerCsvLine(line);
+
+        Assert.Null(item);
+    }
 }
