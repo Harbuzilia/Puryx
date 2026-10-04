@@ -170,13 +170,22 @@ public class WinSxSEngine
         _ => 1.0 // B / Б
     };
 
-    public async Task<(bool Success, string Message)> RunComponentCleanupAsync(bool resetBase = true, IProgress<string>? progress = null, CancellationToken ct = default)
+    /// <summary>
+    /// Запускает очистку хранилища компонентов «dism /Online /Cleanup-Image
+    /// /StartComponentCleanup».
+    /// </summary>
+    /// <param name="resetBase">
+    /// true добавляет /ResetBase — НЕОБРАТИМУЮ операцию: после неё удаление
+    /// установленных обновлений Windows становится невозможным. По умолчанию
+    /// выключена (День 21, L5): включение — только явный выбор пользователя
+    /// с подтверждением в UI. Без /ResetBase очистка консолидирует компоненты
+    /// обратимо.
+    /// </param>
+    public async Task<(bool Success, string Message)> RunComponentCleanupAsync(bool resetBase = false, IProgress<string>? progress = null, CancellationToken ct = default)
     {
         progress?.Report("Запуск очистки WinSxS (DISM StartComponentCleanup)...");
 
-        var args = resetBase
-            ? "/Online /Cleanup-Image /StartComponentCleanup /ResetBase"
-            : "/Online /Cleanup-Image /StartComponentCleanup";
+        var args = BuildComponentCleanupArguments(resetBase);
 
         try
         {
@@ -198,7 +207,9 @@ public class WinSxSEngine
             if (proc != null)
             {
                 await proc.WaitForExitAsync(ct);
-                return (proc.ExitCode == 0, $"Очистка WinSxS завершена с кодом {proc.ExitCode}");
+                // Честный итог: пользователь видит, выполнялся ли необратимый /ResetBase
+                var resetBaseNote = resetBase ? " (с необратимым /ResetBase)" : string.Empty;
+                return (proc.ExitCode == 0, $"Очистка WinSxS завершена с кодом {proc.ExitCode}{resetBaseNote}");
             }
             return (false, "Не удалось запустить DISM");
         }
@@ -207,4 +218,14 @@ public class WinSxSEngine
             return (false, $"Ошибка выполнения DISM: {ex.Message}");
         }
     }
+
+    /// <summary>
+    /// Аргументы DISM для очистки хранилища компонентов: /ResetBase (необратимо —
+    /// установленные обновления нельзя будет удалить) добавляется только при
+    /// явном opt-in. Чистая функция — тестируется без запуска процесса.
+    /// </summary>
+    internal static string BuildComponentCleanupArguments(bool resetBase) =>
+        resetBase
+            ? "/Online /Cleanup-Image /StartComponentCleanup /ResetBase"
+            : "/Online /Cleanup-Image /StartComponentCleanup";
 }

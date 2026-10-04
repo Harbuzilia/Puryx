@@ -95,9 +95,11 @@ public partial class SystemDeepCleanViewModel : ObservableObject
             ? $"• По последнему анализу DISM можно освободить до {_lastWinSxSAnalysis.ReclaimablePackagesFormatted}."
             : "• Объем освобождения заранее неизвестен (анализ DISM не выполнен или недоступен); фактический результат покажет только очистка.";
 
+        // День 21, L5: /ResetBase (необратимо) — только явный opt-in. Базовое
+        // подтверждение описывает обратимую очистку без /ResetBase
         var result = MessageBox.Show(
-            "Запустить консолидацию и очистку хранилища компонентов Windows (WinSxS /StartComponentCleanup /ResetBase)?\n\n" +
-            "• Будут удалены устаревшие резервные копии предыдущих версий обновлений Windows.\n" +
+            "Запустить консолидацию и очистку хранилища компонентов Windows (WinSxS /StartComponentCleanup)?\n\n" +
+            "• Будут удалены устаревшие версии компонентов; установленные обновления останутся удаляемыми.\n" +
             reclaimLine + "\n" +
             "• Процесс может занять 3-10 минут.",
             "Очистка WinSxS",
@@ -106,12 +108,24 @@ public partial class SystemDeepCleanViewModel : ObservableObject
 
         if (result != MessageBoxResult.Yes) return;
 
+        // Отдельный явный вопрос про необратимый режим — не часть базового потока
+        var useResetBase = MessageBox.Show(
+            "Дополнительно применить /ResetBase (НЕОБРАТИМО)?\n\n" +
+            "• Все superseded-компоненты обновлений будут удалены окончательно.\n" +
+            "• После /ResetBase установленные обновления Windows НЕЛЬЗЯ будет удалить — только полная переустановка Windows.\n" +
+            "• «Нет» — обычная обратимая очистка (рекомендуется).",
+            "Необратимая операция /ResetBase",
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Warning);
+
         IsBusy = true;
-        StatusText = "Выполняется глубокая очистка WinSxS (DISM)... Пожалуйста, подождите.";
+        StatusText = useResetBase == MessageBoxResult.Yes
+            ? "Выполняется глубокая очистка WinSxS (DISM + /ResetBase)... Пожалуйста, подождите."
+            : "Выполняется очистка WinSxS (DISM)... Пожалуйста, подождите.";
 
         try
         {
-            var (success, msg) = await _winsxs.RunComponentCleanupAsync(true);
+            var (success, msg) = await _winsxs.RunComponentCleanupAsync(useResetBase == MessageBoxResult.Yes);
             StatusText = msg;
             MessageBox.Show(msg, "Очистка WinSxS завершена", MessageBoxButton.OK, MessageBoxImage.Information);
             WinSxSReclaimable = "0 B (Очищено)";

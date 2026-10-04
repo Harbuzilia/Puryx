@@ -187,6 +187,41 @@ public class WinSxSEngineTests
         Assert.Contains("таймаут", result.AnalysisUnavailableReason);
     }
 
+    // ==== День 21 — L5 (ROADMAP): /ResetBase — только явный opt-in ====
+
+    [Fact]
+    public void RunComponentCleanupAsync_DefaultParameter_IsFalse()
+    {
+        // Контракт «необратимая операция выключена по умолчанию»: дефолт
+        // параметра resetBase обязан быть false — включение только явным
+        // выбором пользователя с подтверждением
+        var parameter = typeof(WinSxSEngine)
+            .GetMethod(nameof(WinSxSEngine.RunComponentCleanupAsync))!
+            .GetParameters()
+            .Single(p => p.Name == "resetBase");
+
+        Assert.NotNull(parameter.DefaultValue);
+        Assert.Equal(false, parameter.DefaultValue);
+    }
+
+    [Fact]
+    public void BuildComponentCleanupArguments_WithoutResetBase_OmitsResetBase()
+    {
+        // Без /ResetBase: консолидация компонентов — обратимая очистка
+        var args = WinSxSEngine.BuildComponentCleanupArguments(resetBase: false);
+
+        Assert.Equal("/Online /Cleanup-Image /StartComponentCleanup", args);
+        Assert.DoesNotContain("ResetBase", args, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void BuildComponentCleanupArguments_WithResetBase_AppendsResetBase()
+    {
+        var args = WinSxSEngine.BuildComponentCleanupArguments(resetBase: true);
+
+        Assert.Equal("/Online /Cleanup-Image /StartComponentCleanup /ResetBase", args);
+    }
+
     // Ожидание «8.12 ГБ» без дублирования логики форматирования в тесте
     private static string SizeFormatterExpectation(double gb) =>
         SmartCleaner.Core.Helpers.SizeFormatter.Format((long)(gb * Gb));
