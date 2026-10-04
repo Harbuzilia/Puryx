@@ -1,0 +1,17 @@
+# Winget-инсталлер-манифест Puryx 3.0.0: portable single-file exe (установка = копирование, silent-ключи не нужны).
+# InstallerUrl — прямая ссылка на ассет GitHub Release v3.0.0 (политика winget-pkgs 1.1.4: только release-локация издателя, без редиректов).
+# InstallerSha256 обязателен: подмена ассета без обновления манифеста даст Error-Hash-Mismatch.
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.installer.1.12.0.schema.json
+
+PackageIdentifier: Harbuzilia.Puryx
+PackageVersion: 3.0.0
+InstallerType: portable
+Commands:
+- puryx
+ReleaseDate: 2026-10-04
+Installers:
+- Architecture: x64
+  InstallerUrl: https://github.com/Harbuzilia/Puryx/releases/download/v3.0.0/Puryx-3.0.0-portable-win-x64.exe
+  InstallerSha256: 8693AFCBB70944EC9EB498743E5BB89DAB79139BA71A0994E565E7485B2A3D52
+ManifestType: installer
+ManifestVersion: 1.12.0

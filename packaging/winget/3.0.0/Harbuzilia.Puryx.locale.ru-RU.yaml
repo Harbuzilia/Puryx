@@ -1,0 +1,22 @@
+# Winget-манифест метаданных Puryx 3.0.0 в локали ru-RU (DefaultLocale пакета).
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.defaultLocale.1.12.0.schema.json
+
+PackageIdentifier: Harbuzilia.Puryx
+PackageVersion: 3.0.0
+PackageLocale: ru-RU
+Publisher: Harbuzilia
+PublisherUrl: https://github.com/Harbuzilia
+PublisherSupportUrl: https://github.com/Harbuzilia/Puryx/issues
+PackageName: Puryx
+PackageUrl: https://github.com/Harbuzilia/Puryx
+License: MIT
+LicenseUrl: https://github.com/Harbuzilia/Puryx/blob/master/LICENSE
+ShortDescription: Умная очистка и оптимизация Windows - 16 сканеров, безопасное удаление, NTFS Compact, приватность
+Moniker: puryx
+Tags:
+- cleaner
+- disk-cleanup
+- optimization
+- privacy
+ManifestType: defaultLocale
+ManifestVersion: 1.12.0

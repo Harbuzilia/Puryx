@@ -1,0 +1,9 @@
+# Winget-манифест версии Puryx 3.0.0 (multi-file, схема 1.12.0).
+# Путь при сабмите в microsoft/winget-pkgs: manifests/h/Harbuzilia/Puryx/3.0.0/
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.version.1.12.0.schema.json
+
+PackageIdentifier: Harbuzilia.Puryx
+PackageVersion: 3.0.0
+DefaultLocale: ru-RU
+ManifestType: version
+ManifestVersion: 1.12.0

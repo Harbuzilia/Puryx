@@ -118,7 +118,7 @@ Update: Publisher.Name to X.Y.Z
 
 1. Опубликованный GitHub Release **v3.0.0** с exe-ассетом со стабильным именем (например, `SmartCleaner.App.exe`) → прямой HTTPS URL вида `https://github.com/Harbuzilia/Puryx/releases/download/v3.0.0/SmartCleaner.App.exe`.
 2. SHA256 ассета (`winget hash SmartCleaner.App.exe`).
-3. Multi-file манифест (генерируется `wingetcreate new`; черновик-основа — `packaging/winget/Harbuzilia.Puryx.yaml`, singleton по схеме 1.12.0).
+3. Multi-file манифест — готов: `packaging/winget/3.0.0/` (version + installer + defaultLocale ru-RU, схема 1.12.0; singleton-черновик удалён — формат deprecated в winget-pkgs).
 4. Подписанный Microsoft CLA (одноразово, при первом PR).
 5. Локально: `winget validate --manifest` + `winget install --manifest` (желательно ещё SandboxTest.ps1).
 
