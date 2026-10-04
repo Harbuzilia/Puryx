@@ -6,6 +6,43 @@
 
 ---
 
+## [Unreleased]
+
+### Дни 17–23 — консолидация исполнения внешних команд: единый ICommandExecutor, ILogger, отменяемость
+
+Фаза по плану `docs/ROADMAP.md` после тега v2.8.0: все прямые запуски внешних утилит в Core переведены на единый контракт исполнителя `ICommandExecutor` (`SmartCleaner.Core/Cleaning/CommandExecution.cs`), диагностика Release переведена на `ILogger`, публичные операции получили честную отмену. Итог фазы: сборка 0 ошибок / 0 предупреждений; тесты 459 → 475 (вместе с Днём 24).
+
+#### Что сделано (консолидация исполнителя, Дни 17–19 — три среза + DI + расширения контракта)
+- Срез A (День 17): `sc`/`net` (WindowsServicesOptimizer, GameBoost), `ipconfig`/`netsh` (NetworkOptimizerService) — через контракт с честным кодом возврата и таймаутом.
+- Срез B (День 18): dism (WinSxS), pnputil (DriverStore), compact.exe (Compact), деинсталлятор — плюс построчный стриминг stdout (`StandardOutputLineProgress`): прогресс долгих операций виден пользователю, kill-tree при таймауте/отмене.
+- Срез C (День 19): приватность (PrivacyDebloat), ipconfig/netsh-остатки, schtasks (Startup), планировщик, SQLite, CLI; явная кодировка декодирования stdout (`StandardOutputEncoding`): schtasks — OEM (День 8), pnputil — ANSI по живому замеру на русской Win11.
+- DI (Дни 18–19): единый `ICommandExecutor` и `ILoggerFactory` зарегистрированы в App; сервисы принимают исполнителя/логгер необязательными ctor-параметрами — регистрация «включает» шов.
+- Стаб `RecordingCommandExecutor` (тесты): фиксирует полное имя утилиты, аргументы и таймаут — детерминированные контрактные тесты всех переведённых сервисов.
+- Аудит `Process.Start` в App (День 19): shell-запуски помечены комментариями «Обоснованное исключение».
+
+#### Что сделано (ILogger и отменяемость, Дни 20–21)
+- 44 записи `Debug.WriteLine` в Core заменены на `Microsoft.Extensions.Logging`: Safety/Cleaning/Quarantine, ServicesOpt/Network/Privacy/SystemOpt/WinSxS; в App зарегистрирована `ILoggerFactory`.
+- `CancellationToken` в профилях Privacy/ServicesOpt (День 21).
+- TaskScheduler-операции Disable/Enable/Delete — через `schtasks` исполнителем, а не прямые Process.
+- `/ResetBase` в WinSxS — только явный opt-in (необратимость документирована, по умолчанию выключен).
+- VACUUM в SQLite-компакторе — проба только при незанятой БД.
+
+#### Что сделано (тестирование и инварианты, Дни 22–23)
+- Мутационные тесты +27: мутации вывода schtasks, junction-сценарии обхода whitelist, «фейл sc/dism/pnputil ≠ успех».
+- CustomFolderScanner: reparse-гвард — junction/symlink не уводят сканер из корня пользователя.
+- Low-дефекты: hardlinks дубликатов через ISafetyService, `.bak`-сироты, `.Result` убран из CLI-терминала, powershell-терминал CliInspector по абсолютному пути (инвариант M7 распространён на исходники App).
+
+### День 24 — регресс фазы + сверка доков (находки reviewer'а P3)
+- OCE-дисциплина: отмена не глотается как ошибка — WinSxS (`guard` до запуска DISM, честный статус «отменено», best-effort kill elevated-процесса с документированным ограничением runas), DriverStore (честный прогресс «отменено»), GameBoost (отмена — исключение, не «−1»).
+- `ProcessCommandExecutor`: честный TimedOut при выводе в момент таймаута — TaskCanceledException StreamReader в граничной гонке даёт TimedOut-результат, а не исключение; задачи потоков наблюдаются в таймаут/отмен-ветке.
+- DiskHealthService: PowerShell телеметрии S.M.A.R.T. через `ICommandExecutor` — bounded-таймаут 30 с (прежде ReadToEnd был не ограничен вовсе) + `ILogger` + UTF-8-декодирование; фейл/таймаут — честный fallback по DriveInfo.
+- Маркеры обоснованных Process-исключений: elevated-clean (runas + auth-токен), docker (PATH-семантика), shell-open HTML-отчёта.
+- explorer.exe в App (6 сайтов) — абсолютный путь из корня Windows через `SystemToolLocator.GetExplorerPath()` (в System32 explorer отсутствует); инвариант M7 расширен на explorer.
+- `NetworkOptimizerService.ApplyDnsAsync`: гвард формата IP для primaryDns/secondaryDns до интерполяции в PowerShell-скрипт.
+- Тесты: +16 (отмена x4, исполнитель x1, DiskHealth x6, DNS x4, локатор/инвариант explorer x1). Итог: 475/475 зелёные.
+
+---
+
 ## [2.8.0] — 04.10.2026
 
 ### 🎯 Тема релиза: Security and correctness — все High- (H1–H4) и Medium-дефекты (M1–M8) аудита закрыты, честные метрики и статусы, тесты 214 → 333
