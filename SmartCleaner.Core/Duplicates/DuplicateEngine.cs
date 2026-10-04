@@ -1,6 +1,9 @@
 using System.Collections.Concurrent;
 using System.Security.Cryptography;
+using System.Text.RegularExpressions;
 using DotNet.Globbing;
+using SmartCleaner.Core.Models;
+using SmartCleaner.Core.Safety;
 
 namespace SmartCleaner.Core.Duplicates;
 
@@ -13,6 +16,36 @@ public sealed class DuplicateEngine
 {
     private const int BlockSize = 65536; // 64 KB
     private const int PartialSize = 65536; // 64 KB для turbo mode
+
+    /// <summary>
+    /// Мутабельные форматы: hardlink двух «копий» SQLite/почтового хранилища
+    /// объединяет их в один физический файл — запись через любой из путей
+    /// портит обе «копии» (L4). Такие дубликаты не хардлинкаются.
+    /// </summary>
+    private static readonly HashSet<string> MutableFormatExtensions = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ".db", ".db3", ".sqlite", ".sqlite3", ".mdb", ".accdb",
+        ".ost", ".pst", ".wal", ".shm"
+    };
+
+    /// <summary>
+    /// Шаблон временного бэкапа операции хардлинка: «{оригинальное имя}.{GUID N}.bak».
+    /// Опознаёт бэкапы-сироты после краша между File.Move и CreateHardLink (L4).
+    /// </summary>
+    private static readonly Regex OrphanBackupPattern = new(
+        @"^(?<target>.+)\.(?:[0-9a-f]{32})\.bak$",
+        RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+    private readonly ISafetyService _safety;
+
+    /// <summary>
+    /// Движок требует safety-сервис: операции над файлами (hardlink-дедупликация)
+    /// обязаны проходить whitelist/защищённые пути, как и остальная чистка (L4).
+    /// </summary>
+    public DuplicateEngine(ISafetyService safety)
+    {
+        _safety = safety;
+    }
 
     // ─────────────────────────────────────────────
     //  1. ПОИСК ДУБЛИКАТОВ
@@ -665,6 +698,9 @@ public sealed class DuplicateEngine
     /// <summary>
     /// SSS-Tier: Заменяет дубликаты на жесткие ссылки NTFS (Hardlink Zero-Byte Deduplication).
     /// Освобождает физическое пространство на диске, сохраняя файл по обоим путям.
+    /// Каждый заменяемый файл проходит safety-гейт (whitelist/защищённые пути,
+    /// блокировки — L4); мутабельные форматы (SQLite и т.п.) пропускаются;
+    /// бэкапы-сироты прошлых запусков восстанавливаются/подчищаются.
     /// </summary>
     public async Task<(int ReplacedCount, long SpaceSavedBytes, List<string> Errors)> ReplaceDuplicatesWithHardlinksAsync(
         IEnumerable<DuplicateGroup> groups,
@@ -677,6 +713,10 @@ public sealed class DuplicateEngine
 
         await Task.Run(() =>
         {
+            // 0. L4: подчистка бэкапов-сирот прошлых запусков — краш между
+            // File.Move и CreateHardLink оставлял «{имя}.{guid}.bak» без оригинала
+            SweepOrphanBackups(groups, errors, progress);
+
             foreach (var group in groups)
             {
                 ct.ThrowIfCancellationRequested();
@@ -685,6 +725,14 @@ public sealed class DuplicateEngine
                 // Первый файл выбираем как мастер-источник
                 var primary = group.Files[0];
                 if (!File.Exists(primary.Path)) continue;
+
+                // Мутабельный мастер-источник делает небезопасной всю группу:
+                // каждый hardlink на него — запись через дубликат портит мастер
+                if (IsMutableFormat(primary.Path))
+                {
+                    errors.Add($"Группа пропущена: мутабельный формат (hardlink портит обе копии): '{primary.Path}'");
+                    continue;
+                }
 
                 var primaryRoot = Path.GetPathRoot(primary.Path)?.ToUpperInvariant();
 
@@ -698,6 +746,29 @@ public sealed class DuplicateEngine
                     if (!string.Equals(primaryRoot, dupRoot, StringComparison.OrdinalIgnoreCase))
                     {
                         errors.Add($"Хардлинк невозможен между разными дисками: '{primary.Path}' и '{dup.Path}'");
+                        continue;
+                    }
+
+                    if (IsMutableFormat(dup.Path))
+                    {
+                        errors.Add($"Пропущен: мутабельный формат (hardlink портит обе копии): '{dup.Path}'");
+                        continue;
+                    }
+
+                    // L4: safety-гейт перед заменой файла — whitelist,
+                    // защищённые пути/период, блокировки, права
+                    var validation = _safety.ValidateForDeletion(new ScannedItem
+                    {
+                        Path = dup.Path,
+                        Size = dup.Size,
+                        Risk = RiskCategory.PerformanceCache,
+                        Description = "duplicate:hardlink"
+                    });
+                    if (!validation.CanDelete || validation.RequiresElevation)
+                    {
+                        var reason = validation.BlockReason
+                                     ?? (validation.RequiresElevation ? "требуются права администратора" : "заблокировано safety-сервисом");
+                        errors.Add($"Заблокировано safety-гейтом ({reason}): '{dup.Path}'");
                         continue;
                     }
 
@@ -728,5 +799,66 @@ public sealed class DuplicateEngine
         }, ct);
 
         return (replaced, saved, errors);
+    }
+
+    /// <summary>
+    /// L4: восстанавливает/удаляет бэкапы-сироты операции хардлинка в каталогах
+    /// текущих групп. Сирота без оригинала (краш между File.Move и CreateHardLink)
+    /// возвращается на оригинальный путь; сирота при живом оригинале (краш между
+    /// успешным CreateHardLink и File.Delete) удаляется как отработавший бэкап.
+    /// </summary>
+    private static void SweepOrphanBackups(
+        IEnumerable<DuplicateGroup> groups,
+        List<string> errors,
+        IProgress<string>? progress)
+    {
+        var directories = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var group in groups)
+        {
+            foreach (var file in group.Files)
+            {
+                var dir = Path.GetDirectoryName(file.Path);
+                if (!string.IsNullOrEmpty(dir)) directories.Add(dir);
+            }
+        }
+
+        foreach (var dir in directories)
+        {
+            try
+            {
+                if (!Directory.Exists(dir)) continue;
+                foreach (var orphan in Directory.EnumerateFiles(dir, "*.bak"))
+                {
+                    var match = OrphanBackupPattern.Match(Path.GetFileName(orphan));
+                    if (!match.Success) continue;
+
+                    var target = Path.Combine(dir, match.Groups["target"].Value);
+                    if (File.Exists(target))
+                    {
+                        File.Delete(orphan);
+                        progress?.Report($"Удалён остаточный бэкап: {Path.GetFileName(orphan)}");
+                    }
+                    else
+                    {
+                        File.Move(orphan, target);
+                        progress?.Report($"Восстановлен файл из бэкапа-сироты: {target}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                errors.Add($"Не удалось подчистить бэкапы-сироты в '{dir}': {ex.Message}");
+            }
+        }
+    }
+
+    /// <summary>
+    /// L4: мутабельный формат (базы данных, почтовые хранилища) — hardlink
+    /// двух «копий» объединяет их в один файл; запись через любой путь портит обе.
+    /// </summary>
+    private static bool IsMutableFormat(string path)
+    {
+        var ext = Path.GetExtension(path);
+        return !string.IsNullOrEmpty(ext) && MutableFormatExtensions.Contains(ext);
     }
 }
