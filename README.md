@@ -50,17 +50,16 @@
 
 ## 📸 Скриншоты
 
-<!-- ИНСТРУКЦИЯ ДЛЯ МЕЙНТЕЙНЕРА: скриншоты добавляются позже (день 26 ROADMAP готовит место, не контент).
-     1. Снимите скриншоты разделов приложения: Дашборд, Очистка диска, Карта диска, Дубликаты.
-     2. Сохраните PNG-файлы в docs/screenshots/ с именами ровно как в тегах ниже:
-        dashboard.png, cleanup.png, diskmap.png, duplicates.png.
-     3. Раскомментируйте соответствующие теги (снимите обрамление HTML-комментария).
-     4. Удалите docs/screenshots/.gitkeep и проверьте рендер README на GitHub. -->
+<!-- ИНСТРУКЦИЯ ДЛЯ МЕЙНТЕЙНЕРА: актуальные скриншоты лежат в docs/screenshots/
+     (тёмная тема, состояние до первого сканирования — без данных).
+     Для обновления: запустите приложение, откройте раздел (Дашборд / Обзор / Карта диска / Дубликаты),
+     снимите окно целиком и сохраните PNG с тем же именем, что и в тегах ниже:
+     dashboard.png, cleanup.png, diskmap.png, duplicates.png. -->
 
-<!-- ![Дашборд](docs/screenshots/dashboard.png) -->
-<!-- ![Очистка диска](docs/screenshots/cleanup.png) -->
-<!-- ![Карта диска](docs/screenshots/diskmap.png) -->
-<!-- ![Дубликаты](docs/screenshots/duplicates.png) -->
+![Дашборд](docs/screenshots/dashboard.png)
+![Очистка диска](docs/screenshots/cleanup.png)
+![Карта диска](docs/screenshots/diskmap.png)
+![Дубликаты](docs/screenshots/duplicates.png)
 
 ---
 
