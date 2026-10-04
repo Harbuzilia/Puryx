@@ -213,6 +213,71 @@ public class PrivacyDebloatTests : IDisposable
         Assert.Equal(TimeSpan.FromMilliseconds(3000), request.Timeout);
     }
 
+    // ==== День 21 — L3 (ROADMAP): отмена минутного профиля Privacy ====
+
+    [Fact]
+    public async Task ApplyAllRecommendedAsync_CancelledBeforeStart_ThrowsWithoutCommands()
+    {
+        // Токен уже отменён (пользователь нажал «Отмена» до старта) — профиль
+        // обязан прерваться немедленно, не запустив ни одной команды
+        var executor = new RecordingCommandExecutor();
+        var service = CreateService(commandExecutor: executor);
+        using var cts = new CancellationTokenSource();
+        cts.Cancel();
+
+        await Assert.ThrowsAsync<OperationCanceledException>(
+            () => service.ApplyAllRecommendedAsync(cts.Token));
+
+        Assert.Empty(executor.Requests);
+    }
+
+    [Fact]
+    public async Task ApplyAllRecommendedAsync_CancellationDuringCommand_PropagatesAndStopsProfile()
+    {
+        // Отмена во время команды первого сервисного твика: исполнитель бросает
+        // OperationCanceledException (как ProcessCommandExecutor на отменённом
+        // токене) — исключение обязано дойти до вызывающего, а не проглотиться
+        // catch(Exception) в ApplyTweakAsync и не продолжить профиль
+        using var cts = new CancellationTokenSource();
+        var executor = new RecordingCommandExecutor(_ =>
+        {
+            cts.Cancel(); // «Отмена» нажата во время sc config
+            throw new OperationCanceledException(cts.Token);
+        });
+        var service = CreateService(commandExecutor: executor);
+
+        await Assert.ThrowsAsync<OperationCanceledException>(
+            () => service.ApplyAllRecommendedAsync(cts.Token));
+
+        // Отменяется «за секунды»: после отмены не начата ни одна новая команда
+        Assert.Single(executor.Requests);
+        Assert.Equal(new[] { "config", "DiagTrack", "start=", "disabled" }, executor.Requests[0].Arguments);
+    }
+
+    [Fact]
+    public async Task ApplyAllRecommendedAsync_CancelledBetweenIterations_StopsProfile()
+    {
+        // Отмена между итерациями: первый сервисный твик успевает примениться
+        // (config + net stop), профиль останавливается на проверке токена
+        using var cts = new CancellationTokenSource();
+        var calls = 0;
+        var executor = new RecordingCommandExecutor(_ =>
+        {
+            calls++;
+            if (calls == 1) cts.Cancel(); // отмена после первой успешной команды
+            return new CommandExecutionResult { ExitCode = 0 };
+        });
+        var service = CreateService(commandExecutor: executor);
+
+        await Assert.ThrowsAsync<OperationCanceledException>(
+            () => service.ApplyAllRecommendedAsync(cts.Token));
+
+        // Твик DiagTrack применён полностью (2 команды), следующий не начат
+        Assert.Equal(2, executor.Requests.Count);
+        Assert.Equal(new[] { "config", "DiagTrack", "start=", "disabled" }, executor.Requests[0].Arguments);
+        Assert.Equal(new[] { "stop", "DiagTrack", "/y" }, executor.Requests[1].Arguments);
+    }
+
     /// <summary>
     /// Детерминированное хранилище значений реестра в памяти
     /// (ключ = root|subKey|valueName).

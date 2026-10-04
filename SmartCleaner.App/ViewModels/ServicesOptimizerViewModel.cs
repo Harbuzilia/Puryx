@@ -12,6 +12,9 @@ public partial class ServicesOptimizerViewModel : ObservableObject
     private readonly AudioFeedbackService _audioService;
     private List<WindowsServiceItem> _allServices = [];
 
+    /// <summary>CancellationSource минутного профиля (День 21, L3) — по образцу CompactViewModel.</summary>
+    private CancellationTokenSource? _cts;
+
     [ObservableProperty]
     private bool _isBusy;
 
@@ -130,15 +133,23 @@ public partial class ServicesOptimizerViewModel : ObservableObject
     {
         if (IsBusy) return;
         IsBusy = true;
+        _cts = new CancellationTokenSource();
         StatusText = "Восстановление служб по умолчанию из резервной копии...";
 
         try
         {
             var progress = new Progress<string>(msg => StatusText = msg);
-            int restored = await _servicesOptimizer.RestoreDefaultServicesAsync(progress);
+            int restored = await _servicesOptimizer.RestoreDefaultServicesAsync(progress, _cts.Token);
             _audioService.PlayBoostActivated();
             await ReloadServicesAsync();
             StatusText = $"Восстановлено {restored} служб в стандартное состояние Windows.";
+        }
+        catch (OperationCanceledException)
+        {
+            // Отмена длинного восстановления: часть служб могла быть настроена —
+            // перечитываем фактическое состояние
+            await ReloadServicesAsync();
+            StatusText = "Операция отменена. Показано фактическое состояние служб.";
         }
         catch (Exception ex)
         {
@@ -147,6 +158,8 @@ public partial class ServicesOptimizerViewModel : ObservableObject
         finally
         {
             IsBusy = false;
+            _cts?.Dispose();
+            _cts = null;
         }
     }
 
@@ -154,15 +167,21 @@ public partial class ServicesOptimizerViewModel : ObservableObject
     {
         if (IsBusy) return;
         IsBusy = true;
+        _cts = new CancellationTokenSource();
         StatusText = startMsg;
 
         try
         {
             var progress = new Progress<string>(msg => StatusText = msg);
-            int modified = await _servicesOptimizer.ApplyProfileAsync(profileType, progress);
+            int modified = await _servicesOptimizer.ApplyProfileAsync(profileType, progress, _cts.Token);
             _audioService.PlayCleanComplete();
             await ReloadServicesAsync();
             StatusText = $"Профиль применен. Настроено {modified} служб.";
+        }
+        catch (OperationCanceledException)
+        {
+            await ReloadServicesAsync();
+            StatusText = "Профиль отменен. Показано фактическое состояние служб.";
         }
         catch (Exception ex)
         {
@@ -171,7 +190,20 @@ public partial class ServicesOptimizerViewModel : ObservableObject
         finally
         {
             IsBusy = false;
+            _cts?.Dispose();
+            _cts = null;
         }
+    }
+
+    /// <summary>
+    /// Отменяет выполняемый профиль служб (День 21, L3) — паттерн CompactViewModel (2.7.2):
+    /// токен доходит до исполнителя команд, между итерациями профиль прерывается.
+    /// </summary>
+    [RelayCommand]
+    public void Cancel()
+    {
+        try { _cts?.Cancel(); }
+        catch (ObjectDisposedException) { }
     }
 
     partial void OnSelectedRiskFilterIndexChanged(int value)

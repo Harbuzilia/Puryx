@@ -173,7 +173,12 @@ public class WindowsServicesOptimizer
         });
     }
 
-    public async Task<bool> SetServiceStartupAsync(string serviceName, ServiceStartupType startupType)
+    /// <summary>
+    /// Настраивает тип запуска службы (sc config + net stop). <paramref name="ct"/> —
+    /// отмена (День 21, L3): токен доходит до исполнителя, OperationCanceledException
+    /// от исполнителя не глотается общим catch.
+    /// </summary>
+    public async Task<bool> SetServiceStartupAsync(string serviceName, ServiceStartupType startupType, CancellationToken ct = default)
     {
         return await Task.Run(async () =>
         {
@@ -199,7 +204,7 @@ public class WindowsServicesOptimizer
                     Arguments = ["config", serviceName, "start=", startArg],
                     WorkingDirectory = string.Empty,
                     Timeout = ScConfigTimeout
-                });
+                }, ct);
                 if (config.ExitCode != 0)
                 {
                     _logger.LogWarning("sc config '{ServiceName}' failed (exit {ExitCode}): {Output}",
@@ -216,12 +221,12 @@ public class WindowsServicesOptimizer
                         Arguments = ["stop", serviceName, "/y"],
                         WorkingDirectory = string.Empty,
                         Timeout = NetStopTimeout
-                    });
+                    }, ct);
                     if (stop.ExitCode != 0)
                     {
                         // net stop завершается ошибкой и для незапущенной службы — это не сбой,
                         // если служба подтверждённо не работает (цель «остановлена» достигнута)
-                        var stillRunning = await IsServiceRunningAsync(serviceName);
+                        var stillRunning = await IsServiceRunningAsync(serviceName, ct);
                         if (stillRunning != false)
                         {
                             _logger.LogWarning("net stop '{ServiceName}' failed (exit {ExitCode}): {Output}",
@@ -233,7 +238,9 @@ public class WindowsServicesOptimizer
 
                 return true;
             }
-            catch (Exception ex)
+            // Отмена — не «ошибка службы»: исключение обязано дойти до профиля,
+            // иначе ApplyProfileAsync проглотит отмену и продолжит настройку
+            catch (Exception ex) when (ex is not OperationCanceledException)
             {
                 _logger.LogWarning(ex, "SetServiceStartupAsync '{ServiceName}' failed: {Error}", serviceName, ex.Message);
                 return false;
@@ -241,15 +248,21 @@ public class WindowsServicesOptimizer
         });
     }
 
-    public async Task<int> ApplyProfileAsync(ServiceProfileType profileType, IProgress<string>? progress = null)
+    /// <summary>
+    /// Применяет профиль отключения служб. <paramref name="ct"/> — отмена
+    /// минутного профиля (День 21, L3): проверяется перед каждой службой,
+    /// токен доходит до исполнителя (sc/net) — профиль останавливается за секунды.
+    /// </summary>
+    public async Task<int> ApplyProfileAsync(ServiceProfileType profileType, IProgress<string>? progress = null, CancellationToken ct = default)
     {
         var targetServices = GetProfileTargetServices(profileType);
         int modifiedCount = 0;
 
         foreach (var svcName in targetServices)
         {
+            ct.ThrowIfCancellationRequested();
             progress?.Report($"Настройка службы {svcName}...");
-            if (await SetServiceStartupAsync(svcName, ServiceStartupType.Disabled))
+            if (await SetServiceStartupAsync(svcName, ServiceStartupType.Disabled, ct))
             {
                 modifiedCount++;
             }
@@ -258,13 +271,18 @@ public class WindowsServicesOptimizer
         return modifiedCount;
     }
 
-    public async Task<int> RestoreDefaultServicesAsync(IProgress<string>? progress = null)
+    /// <summary>
+    /// Восстанавливает службы из бэкапа. Отмена — как в
+    /// <see cref="ApplyProfileAsync"/>: полный проход идёт минутами.
+    /// </summary>
+    public async Task<int> RestoreDefaultServicesAsync(IProgress<string>? progress = null, CancellationToken ct = default)
     {
         int restoredCount = 0;
         var backup = LoadBackup();
 
         foreach (var svc in _knownServices)
         {
+            ct.ThrowIfCancellationRequested();
             progress?.Report($"Восстановление службы {svc.ServiceName}...");
             var targetType = ServiceStartupType.Manual;
 
@@ -278,7 +296,7 @@ public class WindowsServicesOptimizer
                 targetType = svc.RiskLevel == ServiceRiskLevel.SafeToDisable ? ServiceStartupType.Manual : ServiceStartupType.Automatic;
             }
 
-            if (await SetServiceStartupAsync(svc.ServiceName, targetType))
+            if (await SetServiceStartupAsync(svc.ServiceName, targetType, ct))
             {
                 restoredCount++;
             }
@@ -353,7 +371,7 @@ public class WindowsServicesOptimizer
         string.IsNullOrWhiteSpace(result.StandardError) ? result.StandardOutput.Trim() : result.StandardError.Trim();
 
     // Определяет по «sc query», запущена ли служба. null — состояние неизвестно (ошибка запроса).
-    private async Task<bool?> IsServiceRunningAsync(string serviceName)
+    private async Task<bool?> IsServiceRunningAsync(string serviceName, CancellationToken ct)
     {
         try
         {
@@ -364,7 +382,7 @@ public class WindowsServicesOptimizer
                 Arguments = ["query", serviceName],
                 WorkingDirectory = string.Empty,
                 Timeout = ScQueryTimeout
-            });
+            }, ct);
             if (query.ExitCode != 0)
             {
                 return null;
@@ -372,7 +390,7 @@ public class WindowsServicesOptimizer
 
             return ToolOutput(query).Contains("RUNNING", StringComparison.OrdinalIgnoreCase);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not OperationCanceledException)
         {
             _logger.LogWarning(ex, "sc query '{ServiceName}' failed: {Error}", serviceName, ex.Message);
             return null;

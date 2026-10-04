@@ -30,6 +30,17 @@
             </StackPanel>
 
             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                <!-- День 21, L3: отмена минутного профиля (паттерн CompactPage) -->
+                <Button Style="{StaticResource SecondaryButton}"
+                        Command="{Binding CancelCommand}"
+                        Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibilityConverter}}"
+                        Margin="0,0,8,0">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xE711;" FontFamily="Segoe MDL2 Assets" FontSize="13" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="Отмена" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+
                 <Button Command="{Binding ApplyAllRecommendedCommand}"
                         IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"
                         Style="{StaticResource PrimaryButton}" Margin="0,0,8,0">

@@ -236,7 +236,7 @@ public class PrivacyDebloatService
         });
     }
 
-    public async Task<bool> ApplyTweakAsync(string tweakId)
+    public async Task<bool> ApplyTweakAsync(string tweakId, CancellationToken ct = default)
     {
         var tweak = _tweakDefinitions.FirstOrDefault(t => t.Id == tweakId);
         if (tweak == null) return false;
@@ -249,7 +249,7 @@ public class PrivacyDebloatService
 
                 if (!string.IsNullOrEmpty(tweak.ServiceName))
                 {
-                    var (serviceOk, serviceReason) = await ConfigureServiceAsync(tweak.ServiceName, disabled: true);
+                    var (serviceOk, serviceReason) = await ConfigureServiceAsync(tweak.ServiceName, disabled: true, ct);
                     if (!serviceOk)
                     {
                         _logger.LogWarning("Service disable failed for {TweakId}: {Reason}", tweakId, serviceReason);
@@ -264,7 +264,9 @@ public class PrivacyDebloatService
 
                 return true;
             }
-            catch (Exception ex)
+            // Отмена — не «ошибка твика»: исключение обязано дойти до вызывающего,
+            // иначе минутный профиль проглотит отмену и продолжит выполняться
+            catch (Exception ex) when (ex is not OperationCanceledException)
             {
                 _logger.LogWarning(ex, "Apply failed for {TweakId}: {Error}", tweakId, ex.Message);
                 return false;
@@ -272,7 +274,7 @@ public class PrivacyDebloatService
         });
     }
 
-    public async Task<bool> RevertTweakAsync(string tweakId)
+    public async Task<bool> RevertTweakAsync(string tweakId, CancellationToken ct = default)
     {
         var tweak = _tweakDefinitions.FirstOrDefault(t => t.Id == tweakId);
         if (tweak == null) return false;
@@ -283,7 +285,7 @@ public class PrivacyDebloatService
             {
                 if (!string.IsNullOrEmpty(tweak.ServiceName))
                 {
-                    var (serviceOk, serviceReason) = await ConfigureServiceAsync(tweak.ServiceName, disabled: false);
+                    var (serviceOk, serviceReason) = await ConfigureServiceAsync(tweak.ServiceName, disabled: false, ct);
                     if (!serviceOk)
                     {
                         _logger.LogWarning("Service restore failed for {TweakId}: {Reason}", tweakId, serviceReason);
@@ -298,7 +300,8 @@ public class PrivacyDebloatService
 
                 return true;
             }
-            catch (Exception ex)
+            // Отмена не глотается: см. фильтр в ApplyTweakAsync
+            catch (Exception ex) when (ex is not OperationCanceledException)
             {
                 _logger.LogWarning(ex, "Revert failed for {TweakId}: {Error}", tweakId, ex.Message);
                 return false;
@@ -306,12 +309,19 @@ public class PrivacyDebloatService
         });
     }
 
-    public async Task<int> ApplyAllRecommendedAsync()
+    /// <summary>
+    /// Применяет все рекомендуемые твики. <paramref name="ct"/> — отмена
+    /// минутного профиля (День 21, L3): проверяется перед каждым твиком,
+    /// токен доходит до исполнителя команд (sc/net) — отмена останавливает
+    /// профиль за секунды, а не по завершении всех твиков.
+    /// </summary>
+    public async Task<int> ApplyAllRecommendedAsync(CancellationToken ct = default)
     {
         int appliedCount = 0;
         foreach (var tweak in _tweakDefinitions.Where(t => t.IsRecommended))
         {
-            if (await ApplyTweakAsync(tweak.Id))
+            ct.ThrowIfCancellationRequested();
+            if (await ApplyTweakAsync(tweak.Id, ct))
             {
                 appliedCount++;
             }
@@ -319,12 +329,17 @@ public class PrivacyDebloatService
         return appliedCount;
     }
 
-    public async Task<int> RestoreAllDefaultsAsync()
+    /// <summary>
+    /// Восстанавливает все твики по умолчанию. Отмена — как в
+    /// <see cref="ApplyAllRecommendedAsync"/>: полный профиль идёт минутами.
+    /// </summary>
+    public async Task<int> RestoreAllDefaultsAsync(CancellationToken ct = default)
     {
         int restoredCount = 0;
         foreach (var tweak in _tweakDefinitions)
         {
-            if (await RevertTweakAsync(tweak.Id))
+            ct.ThrowIfCancellationRequested();
+            if (await RevertTweakAsync(tweak.Id, ct))
             {
                 restoredCount++;
             }
@@ -506,7 +521,7 @@ public class PrivacyDebloatService
         _ => RegistryValueKind.Unknown
     };
 
-    private async Task<(bool Success, string Reason)> ConfigureServiceAsync(string serviceName, bool disabled)
+    private async Task<(bool Success, string Reason)> ConfigureServiceAsync(string serviceName, bool disabled, CancellationToken ct)
     {
         string startArg = disabled ? "disabled" : "demand";
         // «start=» — отдельный аргумент: у sc.exe между «start=» и значением
@@ -519,7 +534,7 @@ public class PrivacyDebloatService
             Arguments = ["config", serviceName, "start=", startArg],
             WorkingDirectory = string.Empty,
             Timeout = ScConfigTimeout
-        });
+        }, ct);
         if (config.ExitCode != 0)
         {
             return (false, $"sc config '{serviceName}' (код {config.ExitCode}): {ToolOutput(config)}");
@@ -535,12 +550,12 @@ public class PrivacyDebloatService
                 Arguments = ["stop", serviceName, "/y"],
                 WorkingDirectory = string.Empty,
                 Timeout = NetStopTimeout
-            });
+            }, ct);
             if (stop.ExitCode != 0)
             {
                 // net stop завершается ошибкой и для незапущенной службы — это не сбой,
                 // если служба подтверждённо не работает (цель «остановлена» достигнута)
-                var stillRunning = await IsServiceRunningAsync(serviceName);
+                var stillRunning = await IsServiceRunningAsync(serviceName, ct);
                 if (stillRunning != false)
                 {
                     return (false, $"net stop '{serviceName}' (код {stop.ExitCode}): {ToolOutput(stop)}");
@@ -558,7 +573,7 @@ public class PrivacyDebloatService
         string.IsNullOrWhiteSpace(result.StandardError) ? result.StandardOutput.Trim() : result.StandardError.Trim();
 
     // Определяет по «sc query», запущена ли служба. null — состояние неизвестно (ошибка запроса).
-    private async Task<bool?> IsServiceRunningAsync(string serviceName)
+    private async Task<bool?> IsServiceRunningAsync(string serviceName, CancellationToken ct)
     {
         try
         {
@@ -569,7 +584,7 @@ public class PrivacyDebloatService
                 Arguments = ["query", serviceName],
                 WorkingDirectory = string.Empty,
                 Timeout = ScQueryTimeout
-            });
+            }, ct);
             if (query.ExitCode != 0)
             {
                 return null;
@@ -577,7 +592,7 @@ public class PrivacyDebloatService
 
             return ToolOutput(query).Contains("RUNNING", StringComparison.OrdinalIgnoreCase);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not OperationCanceledException)
         {
             _logger.LogWarning(ex, "sc query '{ServiceName}' failed: {Error}", serviceName, ex.Message);
             return null;

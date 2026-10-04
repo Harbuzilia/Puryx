@@ -123,4 +123,66 @@ public class WindowsServicesOptimizerTests
         Assert.All(executor.Requests, r => Assert.Equal(SystemToolLocator.GetScPath(), r.FileName));
         Assert.Contains(executor.Requests, r => r.Arguments.SequenceEqual(new[] { "query", "DiagTrack" }));
     }
+
+    // ==== День 21 — L3 (ROADMAP): отмена минутного профиля служб ====
+
+    [Fact]
+    public async Task ApplyProfileAsync_CancelledBeforeStart_ThrowsWithoutCommands()
+    {
+        // Токен уже отменён — профиль не должен запустить ни одной команды
+        var executor = new RecordingCommandExecutor();
+        var optimizer = new WindowsServicesOptimizer(executor);
+        using var cts = new CancellationTokenSource();
+        cts.Cancel();
+
+        await Assert.ThrowsAsync<OperationCanceledException>(
+            () => optimizer.ApplyProfileAsync(ServiceProfileType.Gaming, null, cts.Token));
+
+        Assert.Empty(executor.Requests);
+    }
+
+    [Fact]
+    public async Task ApplyProfileAsync_CancellationDuringCommand_PropagatesAndStopsProfile()
+    {
+        // Отмена во время sc config первой службы: OperationCanceledException
+        // от исполнителя обязана дойти до вызывающего (не проглатываться
+        // catch(Exception) в SetServiceStartupAsync), профиль останавливается
+        using var cts = new CancellationTokenSource();
+        var executor = new RecordingCommandExecutor(_ =>
+        {
+            cts.Cancel();
+            throw new OperationCanceledException(cts.Token);
+        });
+        var optimizer = new WindowsServicesOptimizer(executor);
+
+        await Assert.ThrowsAsync<OperationCanceledException>(
+            () => optimizer.ApplyProfileAsync(ServiceProfileType.Gaming, null, cts.Token));
+
+        // Отменяется «за секунды»: одна команда, новых не начато
+        Assert.Single(executor.Requests);
+        Assert.Equal(new[] { "config", "SysMain", "start=", "disabled" }, executor.Requests[0].Arguments);
+    }
+
+    [Fact]
+    public async Task ApplyProfileAsync_CancelledBetweenIterations_StopsProfile()
+    {
+        // Отмена между итерациями: первая служба применена (config + net stop),
+        // вторая не начата — ThrowIfCancellationRequested на витке цикла
+        using var cts = new CancellationTokenSource();
+        var calls = 0;
+        var executor = new RecordingCommandExecutor(_ =>
+        {
+            calls++;
+            if (calls == 1) cts.Cancel();
+            return new CommandExecutionResult { ExitCode = 0 };
+        });
+        var optimizer = new WindowsServicesOptimizer(executor);
+
+        await Assert.ThrowsAsync<OperationCanceledException>(
+            () => optimizer.ApplyProfileAsync(ServiceProfileType.Gaming, null, cts.Token));
+
+        Assert.Equal(2, executor.Requests.Count);
+        Assert.Equal(new[] { "config", "SysMain", "start=", "disabled" }, executor.Requests[0].Arguments);
+        Assert.Equal(new[] { "stop", "SysMain", "/y" }, executor.Requests[1].Arguments);
+    }
 }

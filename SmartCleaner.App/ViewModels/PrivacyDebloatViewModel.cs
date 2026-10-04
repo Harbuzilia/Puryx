@@ -12,6 +12,9 @@ public partial class PrivacyDebloatViewModel : ObservableObject
     private readonly AudioFeedbackService _audioService;
     private List<PrivacyTweakItem> _allTweaks = [];
 
+    /// <summary>CancellationSource минутного профиля (День 21, L3) — по образцу CompactViewModel.</summary>
+    private CancellationTokenSource? _cts;
+
     [ObservableProperty]
     private bool _isBusy;
 
@@ -113,14 +116,22 @@ public partial class PrivacyDebloatViewModel : ObservableObject
     {
         if (IsBusy) return;
         IsBusy = true;
+        _cts = new CancellationTokenSource();
         StatusText = "Отключение всех рекомендуемых параметров телеметрии и рекламы...";
 
         try
         {
-            int applied = await _privacyService.ApplyAllRecommendedAsync();
+            int applied = await _privacyService.ApplyAllRecommendedAsync(_cts.Token);
             _audioService.PlayCleanComplete();
             await ReloadTweaksAsync();
             StatusText = $"Успешно отключено {applied} рекомендуемых параметров сбора данных и рекламы.";
+        }
+        catch (OperationCanceledException)
+        {
+            // Отмена длинного профиля: часть твиков могла примениться до нажатия —
+            // перечитываем фактическое состояние, а не показываем устаревший список
+            await ReloadTweaksAsync();
+            StatusText = "Операция отменена. Показано фактическое состояние параметров.";
         }
         catch (Exception ex)
         {
@@ -129,6 +140,8 @@ public partial class PrivacyDebloatViewModel : ObservableObject
         finally
         {
             IsBusy = false;
+            _cts?.Dispose();
+            _cts = null;
         }
     }
 
@@ -137,14 +150,20 @@ public partial class PrivacyDebloatViewModel : ObservableObject
     {
         if (IsBusy) return;
         IsBusy = true;
+        _cts = new CancellationTokenSource();
         StatusText = "Восстановление стандартных параметров Windows по умолчанию...";
 
         try
         {
-            int restored = await _privacyService.RestoreAllDefaultsAsync();
+            int restored = await _privacyService.RestoreAllDefaultsAsync(_cts.Token);
             _audioService.PlayBoostActivated();
             await ReloadTweaksAsync();
             StatusText = $"Восстановлено {restored} параметров в исходное состояние Windows.";
+        }
+        catch (OperationCanceledException)
+        {
+            await ReloadTweaksAsync();
+            StatusText = "Операция отменена. Показано фактическое состояние параметров.";
         }
         catch (Exception ex)
         {
@@ -153,7 +172,20 @@ public partial class PrivacyDebloatViewModel : ObservableObject
         finally
         {
             IsBusy = false;
+            _cts?.Dispose();
+            _cts = null;
         }
+    }
+
+    /// <summary>
+    /// Отменяет выполняемый профиль (День 21, L3) — паттерн CompactViewModel (2.7.2):
+    /// токен доходит до исполнителя команд, между итерациями профиль прерывается.
+    /// </summary>
+    [RelayCommand]
+    public void Cancel()
+    {
+        try { _cts?.Cancel(); }
+        catch (ObjectDisposedException) { }
     }
 
     partial void OnSelectedCategoryIndexChanged(int value)
