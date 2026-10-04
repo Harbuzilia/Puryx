@@ -1,8 +1,12 @@
+using SmartCleaner.Core.Cleaning;
 using SmartCleaner.Core.Helpers;
 using Microsoft.Win32;
 using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
+// UseWindowsForms тянет System.Windows.Forms.ICommandExecutor — снимаем
+// неоднозначность в пользу контракта исполнителя команд
+using ICommandExecutor = SmartCleaner.Core.Cleaning.ICommandExecutor;
 
 namespace SmartCleaner.Core.ServicesOpt;
 
@@ -129,17 +133,36 @@ public class WindowsServicesOptimizer
         }
     ];
 
+    // Таймауты утилит (дисциплина дней 4-5): конфигурация и запрос состояния —
+    // быстрые операции; остановка службы может тянуть зависимые — ей выделяется больше.
+    private static readonly TimeSpan ScConfigTimeout = TimeSpan.FromMilliseconds(3000);
+    private static readonly TimeSpan ScQueryTimeout = TimeSpan.FromMilliseconds(3000);
+    private static readonly TimeSpan NetStopTimeout = TimeSpan.FromMilliseconds(10000);
+
+    private readonly ICommandExecutor _commandExecutor;
+
+    /// <summary>
+    /// Создаёт оптимизатор поверх реального исполнителя команд (День 17, срез A).
+    /// Необязательный исполнитель — шов для детерминированных тестов: стаб
+    /// фиксирует команды (полное имя утилиты, аргументы, таймаут).
+    /// DI-регистрация исполнителя — День 19.
+    /// </summary>
+    public WindowsServicesOptimizer(ICommandExecutor? commandExecutor = null)
+    {
+        _commandExecutor = commandExecutor ?? new ProcessCommandExecutor();
+    }
+
     public IReadOnlyList<WindowsServiceItem> GetKnownServices() => _knownServices;
 
     public async Task<List<WindowsServiceItem>> ScanServicesAsync()
     {
-        return await Task.Run(() =>
+        return await Task.Run(async () =>
         {
             var result = new List<WindowsServiceItem>();
             foreach (var item in _knownServices)
             {
                 var clone = CloneService(item);
-                ReadServiceState(clone);
+                await ReadServiceStateAsync(clone);
                 result.Add(clone);
             }
             return result;
@@ -162,33 +185,33 @@ public class WindowsServicesOptimizer
                     _ => "demand"
                 };
 
-                var psiConfig = new ProcessStartInfo
+                // «start=» — отдельный аргумент: у sc.exe между «start=» и значением
+                // обязан быть пробел; ArgumentList воспроизводит прежнюю командную строку
+                var config = await _commandExecutor.ExecuteAsync(new CommandExecutionRequest
                 {
                     // Абсолютный путь из системного каталога: запуск по неквалифицированному
                     // имени ищет exe в каталоге приложения — binary planting (M7, День 16б)
                     FileName = SystemToolLocator.GetScPath(),
-                    Arguments = $"config {serviceName} start= {startArg}",
-                    CreateNoWindow = true,
-                    UseShellExecute = false
-                };
-                var config = await RunToolAsync(psiConfig, 3000);
+                    Arguments = ["config", serviceName, "start=", startArg],
+                    WorkingDirectory = string.Empty,
+                    Timeout = ScConfigTimeout
+                });
                 if (config.ExitCode != 0)
                 {
-                    Debug.WriteLine($"[WindowsServicesOptimizer] sc config '{serviceName}' failed (exit {config.ExitCode}): {config.Output}");
+                    Debug.WriteLine($"[WindowsServicesOptimizer] sc config '{serviceName}' failed (exit {config.ExitCode}): {ToolOutput(config)}");
                     return false;
                 }
 
                 if (startupType == ServiceStartupType.Disabled)
                 {
-                    var psiStop = new ProcessStartInfo
+                    var stop = await _commandExecutor.ExecuteAsync(new CommandExecutionRequest
                     {
-                        // Абсолютный путь (binary planting, M7): см. psiConfig выше
+                        // Абсолютный путь (binary planting, M7): см. sc config выше
                         FileName = SystemToolLocator.GetNetPath(),
-                        Arguments = $"stop {serviceName} /y",
-                        CreateNoWindow = true,
-                        UseShellExecute = false
-                    };
-                    var stop = await RunToolAsync(psiStop, 10000);
+                        Arguments = ["stop", serviceName, "/y"],
+                        WorkingDirectory = string.Empty,
+                        Timeout = NetStopTimeout
+                    });
                     if (stop.ExitCode != 0)
                     {
                         // net stop завершается ошибкой и для незапущенной службы — это не сбой,
@@ -196,7 +219,7 @@ public class WindowsServicesOptimizer
                         var stillRunning = await IsServiceRunningAsync(serviceName);
                         if (stillRunning != false)
                         {
-                            Debug.WriteLine($"[WindowsServicesOptimizer] net stop '{serviceName}' failed (exit {stop.ExitCode}): {stop.Output}");
+                            Debug.WriteLine($"[WindowsServicesOptimizer] net stop '{serviceName}' failed (exit {stop.ExitCode}): {ToolOutput(stop)}");
                             return false;
                         }
                     }
@@ -276,7 +299,7 @@ public class WindowsServicesOptimizer
         _ => []
     };
 
-    private static void ReadServiceState(WindowsServiceItem item)
+    private async Task ReadServiceStateAsync(WindowsServiceItem item)
     {
         try
         {
@@ -296,21 +319,19 @@ public class WindowsServicesOptimizer
                 }
             }
 
-            // Check running status via sc query
-            var psi = new ProcessStartInfo
+            // Check running status via sc query — теперь через исполнителя,
+            // с таймаутом: прежнее ReadToEnd без таймаута мог зависнуть навсегда
+            var query = await _commandExecutor.ExecuteAsync(new CommandExecutionRequest
             {
                 // Абсолютный путь из системного каталога — binary planting (M7)
                 FileName = SystemToolLocator.GetScPath(),
-                Arguments = $"query {item.ServiceName}",
-                CreateNoWindow = true,
-                UseShellExecute = false,
-                RedirectStandardOutput = true
-            };
-            using var proc = Process.Start(psi);
-            if (proc != null)
+                Arguments = ["query", item.ServiceName],
+                WorkingDirectory = string.Empty,
+                Timeout = ScQueryTimeout
+            });
+            if (query.ExitCode == 0)
             {
-                var output = proc.StandardOutput.ReadToEnd();
-                item.IsRunning = output.Contains("RUNNING", StringComparison.OrdinalIgnoreCase);
+                item.IsRunning = query.StandardOutput.Contains("RUNNING", StringComparison.OrdinalIgnoreCase);
             }
         }
         catch (Exception ex)
@@ -319,84 +340,31 @@ public class WindowsServicesOptimizer
         }
     }
 
-    // Запускает системную утилиту и возвращает фактический код возврата и вывод
-    // (stderr приоритетнее: sc.exe пишет ошибки в stdout, net.exe — в stderr).
-    // Таймаут — тоже отказ: никакого «успеха по молчанию».
-    private static async Task<(int ExitCode, bool TimedOut, string Output)> RunToolAsync(ProcessStartInfo psi, int timeoutMs)
-    {
-        psi.CreateNoWindow = true;
-        psi.UseShellExecute = false;
-        psi.RedirectStandardOutput = true;
-        psi.RedirectStandardError = true;
-
-        try
-        {
-            using var process = new Process { StartInfo = psi };
-            if (!process.Start())
-            {
-                return (-1, false, $"не удалось запустить «{psi.FileName}»");
-            }
-
-            // Потоки читаем до ожидания выхода, чтобы заполненный буфер не заблокировал утилиту
-            var stdoutTask = process.StandardOutput.ReadToEndAsync();
-            var stderrTask = process.StandardError.ReadToEndAsync();
-
-            try
-            {
-                await process.WaitForExitAsync().WaitAsync(TimeSpan.FromMilliseconds(timeoutMs));
-            }
-            catch (TimeoutException)
-            {
-                KillProcessTree(process);
-                return (-1, true, $"«{psi.FileName}» не завершилась за {timeoutMs} мс");
-            }
-
-            var stdout = await stdoutTask;
-            var stderr = await stderrTask;
-            var output = string.IsNullOrWhiteSpace(stderr) ? stdout : stderr;
-            return (process.ExitCode, false, output.Trim());
-        }
-        catch (Exception ex)
-        {
-            return (-1, false, $"«{psi.FileName}»: {ex.Message}");
-        }
-    }
-
-    private static void KillProcessTree(Process process)
-    {
-        try
-        {
-            if (!process.HasExited)
-            {
-                process.Kill(entireProcessTree: true);
-            }
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"[WindowsServicesOptimizer] Kill timed-out process failed: {ex.Message}");
-        }
-    }
+    // Вывод утилиты для диагностики: stderr приоритетнее — sc.exe пишет ошибки
+    // в stdout, net.exe — в stderr (дисциплина дней 4-5, сохранённая поверх
+    // результатов исполнителя команд).
+    private static string ToolOutput(CommandExecutionResult result) =>
+        string.IsNullOrWhiteSpace(result.StandardError) ? result.StandardOutput.Trim() : result.StandardError.Trim();
 
     // Определяет по «sc query», запущена ли служба. null — состояние неизвестно (ошибка запроса).
-    private static async Task<bool?> IsServiceRunningAsync(string serviceName)
+    private async Task<bool?> IsServiceRunningAsync(string serviceName)
     {
         try
         {
-            var psi = new ProcessStartInfo
+            var query = await _commandExecutor.ExecuteAsync(new CommandExecutionRequest
             {
                 // Абсолютный путь из системного каталога — binary planting (M7)
                 FileName = SystemToolLocator.GetScPath(),
-                Arguments = $"query {serviceName}",
-                CreateNoWindow = true,
-                UseShellExecute = false
-            };
-            var query = await RunToolAsync(psi, 3000);
+                Arguments = ["query", serviceName],
+                WorkingDirectory = string.Empty,
+                Timeout = ScQueryTimeout
+            });
             if (query.ExitCode != 0)
             {
                 return null;
             }
 
-            return query.Output.Contains("RUNNING", StringComparison.OrdinalIgnoreCase);
+            return ToolOutput(query).Contains("RUNNING", StringComparison.OrdinalIgnoreCase);
         }
         catch (Exception ex)
         {
