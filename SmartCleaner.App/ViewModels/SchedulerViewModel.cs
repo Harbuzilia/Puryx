@@ -15,9 +15,7 @@ public partial class SchedulerViewModel : ObservableObject
     {
         _scheduler = scheduler;
         LoadSettings();
-    }
-
-    [ObservableProperty] private bool _isEnabled;
+    }    [ObservableProperty] private bool _isEnabled;
     [ObservableProperty] private int _selectedIntervalIndex; // 0=Daily, 1=Weekly, 2=Monthly
     [ObservableProperty] private int _selectedDayOfWeek; // 0=Mon..6=Sun (index)
     [ObservableProperty] private int _hour = 3;
@@ -51,6 +49,8 @@ public partial class SchedulerViewModel : ObservableObject
 
     /// <summary>
     /// Загружает настройки из файла и обновляет UI.
+    /// День 19: опрос планировщика (schtasks) асинхронен через исполнителя —
+    /// статус регистрации обновляется по готовности, конструктор не блокируется.
     /// </summary>
     private void LoadSettings()
     {
@@ -62,15 +62,27 @@ public partial class SchedulerViewModel : ObservableObject
         Minute = s.Minute;
         SelectedProfileIndex = s.Profile switch { "Разработка" => 1, "Полное" => 2, _ => 0 };
         LastRunText = s.LastRun?.ToString("dd.MM.yyyy HH:mm") ?? "Нет данных";
-        IsTaskRegistered = _scheduler.IsTaskRegistered();
-        StatusText = IsTaskRegistered ? "✅ Задача зарегистрирована в планировщике" : "Задача не зарегистрирована";
+        _ = RefreshRegistrationStatusAsync();
+    }
+
+    private async Task RefreshRegistrationStatusAsync()
+    {
+        try
+        {
+            IsTaskRegistered = await _scheduler.IsTaskRegisteredAsync();
+            StatusText = IsTaskRegistered ? "✅ Задача зарегистрирована в планировщике" : "Задача не зарегистрирована";
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[SchedulerViewModel] Registration status error: {ex.Message}");
+        }
     }
 
     /// <summary>
     /// Сохраняет настройки и регистрирует/убирает задачу.
     /// </summary>
     [RelayCommand]
-    private void Save()
+    private async Task Save()
     {
         var settings = new ScheduleSettings
         {
@@ -84,7 +96,7 @@ public partial class SchedulerViewModel : ObservableObject
 
         _scheduler.SaveSettings(settings);
 
-        if (_scheduler.RegisterTask(settings))
+        if (await _scheduler.RegisterTaskAsync(settings))
         {
             IsTaskRegistered = IsEnabled;
             StatusText = IsEnabled
@@ -101,10 +113,10 @@ public partial class SchedulerViewModel : ObservableObject
     /// Удаляет задачу из планировщика.
     /// </summary>
     [RelayCommand]
-    private void RemoveTask()
+    private async Task RemoveTask()
     {
         IsEnabled = false;
-        _scheduler.UnregisterTask();
+        await _scheduler.UnregisterTaskAsync();
         _scheduler.SaveSettings(new ScheduleSettings { IsEnabled = false });
         IsTaskRegistered = false;
         StatusText = "🗑️ Задача удалена из планировщика.";

@@ -1,6 +1,10 @@
+using SmartCleaner.Core.Cleaning;
 using SmartCleaner.Core.Helpers;
 using System.Diagnostics;
 using System.Text.Json;
+// UseWindowsForms тянет System.Windows.Forms.ICommandExecutor — снимаем
+// неоднозначность в пользу контракта исполнителя команд
+using ICommandExecutor = SmartCleaner.Core.Cleaning.ICommandExecutor;
 
 namespace SmartCleaner.Core.Scheduler;
 
@@ -34,14 +38,19 @@ public sealed class ScheduleSettings
 /// <summary>
 /// Сервис планирования автоматической очистки через Windows Task Scheduler.
 /// Создаёт/обновляет/удаляет задачу в планировщике Windows.
+/// День 19, срез C: операции с планировщиком (schtasks) — через контракт
+/// ICommandExecutor; методы асинхронны (исполнитель асинхронен, sync-over-async
+/// запрещён — паттерн Дня 17).
 /// </summary>
 public sealed class CleaningSchedulerService
 {
     private const string TaskName = "SmartCleaner_AutoClean";
     private readonly string _settingsPath;
+    private readonly ICommandExecutor _commandExecutor;
 
-    public CleaningSchedulerService()
+    public CleaningSchedulerService(ICommandExecutor? commandExecutor = null)
     {
+        _commandExecutor = commandExecutor ?? new ProcessCommandExecutor();
         var appData = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
             "SmartCleaner");
@@ -98,12 +107,12 @@ public sealed class CleaningSchedulerService
     /// Регистрирует или обновляет задачу в Windows Task Scheduler.
     /// Возвращает true при успехе.
     /// </summary>
-    public bool RegisterTask(ScheduleSettings settings)
+    public async Task<bool> RegisterTaskAsync(ScheduleSettings settings)
     {
         try
         {
             // Сначала удалим существующую задачу
-            UnregisterTask();
+            await UnregisterTaskAsync();
 
             if (!settings.IsEnabled) return true;
 
@@ -122,27 +131,33 @@ public sealed class CleaningSchedulerService
 
             var startTime = $"{settings.Hour:D2}:{settings.Minute:D2}";
 
-            var args = $"/Create /TN \"{TaskName}\" /TR \"\\\"{exePath}\\\" --auto-clean --profile \\\"{profile}\\\"\" " +
-                       $"/SC {scheduleType} /ST {startTime} /F /RL LIMITED";
+            // /TR несёт встроенные кавычки (команда задачи) — один элемент
+            // ArgumentList: исполнитель квотует его с экранированием, фактическая
+            // командная строка прежняя («"exe" --auto-clean --profile "…"»)
+            var arguments = new List<string>
+            {
+                "/Create", "/TN", TaskName,
+                "/TR", $"\"{exePath}\" --auto-clean --profile \"{profile}\"",
+                "/SC", scheduleType, "/ST", startTime,
+                "/F", "/RL", "LIMITED"
+            };
 
             if (scheduleType == "WEEKLY")
-                args += $" /D {GetDayName(settings.DayOfWeek)}";
+            {
+                arguments.Add("/D");
+                arguments.Add(GetDayName(settings.DayOfWeek));
+            }
 
-            var psi = new ProcessStartInfo
+            var result = await _commandExecutor.ExecuteAsync(new CommandExecutionRequest
             {
                 // Абсолютный путь из системного каталога: запуск по неквалифицированному
                 // имени ищет exe в каталоге приложения — binary planting (M7, День 16б)
                 FileName = SystemToolLocator.GetSchtasksPath(),
-                Arguments = args,
-                CreateNoWindow = true,
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true
-            };
-
-            using var proc = Process.Start(psi);
-            proc?.WaitForExit(10000);
-            return proc?.ExitCode == 0;
+                Arguments = arguments,
+                WorkingDirectory = string.Empty,
+                Timeout = RegisterTimeout
+            });
+            return result.ExitCode == 0;
         }
         catch (Exception ex) { Debug.WriteLine($"[Scheduler] Register error: {ex.Message}"); return false; }
     }
@@ -150,24 +165,19 @@ public sealed class CleaningSchedulerService
     /// <summary>
     /// Удаляет задачу из Windows Task Scheduler.
     /// </summary>
-    public bool UnregisterTask()
+    public async Task<bool> UnregisterTaskAsync()
     {
         try
         {
-            var psi = new ProcessStartInfo
+            await _commandExecutor.ExecuteAsync(new CommandExecutionRequest
             {
                 // Абсолютный путь из системного каталога — binary planting (M7)
                 FileName = SystemToolLocator.GetSchtasksPath(),
-                Arguments = $"/Delete /TN \"{TaskName}\" /F",
-                CreateNoWindow = true,
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true
-            };
-
-            using var proc = Process.Start(psi);
-            proc?.WaitForExit(5000);
-            return true; // OK даже если задачи не было
+                Arguments = ["/Delete", "/TN", TaskName, "/F"],
+                WorkingDirectory = string.Empty,
+                Timeout = UnregisterTimeout
+            });
+            return true; // OK даже если задачи не было (exit не проверяем — прежняя семантика)
         }
         catch (Exception ex) { Debug.WriteLine($"[Scheduler] Unregister error: {ex.Message}"); return false; }
     }
@@ -175,27 +185,29 @@ public sealed class CleaningSchedulerService
     /// <summary>
     /// Проверяет, зарегистрирована ли задача.
     /// </summary>
-    public bool IsTaskRegistered()
+    public async Task<bool> IsTaskRegisteredAsync()
     {
         try
         {
-            var psi = new ProcessStartInfo
+            var result = await _commandExecutor.ExecuteAsync(new CommandExecutionRequest
             {
                 // Абсолютный путь из системного каталога — binary planting (M7)
                 FileName = SystemToolLocator.GetSchtasksPath(),
-                Arguments = $"/Query /TN \"{TaskName}\"",
-                CreateNoWindow = true,
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true
-            };
-
-            using var proc = Process.Start(psi);
-            proc?.WaitForExit(5000);
-            return proc?.ExitCode == 0;
+                Arguments = ["/Query", "/TN", TaskName],
+                WorkingDirectory = string.Empty,
+                Timeout = QueryTimeout
+            });
+            return result.ExitCode == 0;
         }
         catch (Exception ex) { Debug.WriteLine($"[Scheduler] Query error: {ex.Message}"); return false; }
     }
+
+    // Таймауты schtasks-операций (День 19) — как в прежнем коде
+    // (WaitForExit 10 с / 5 с / 5 с), но теперь bounded честно: kill-tree
+    // исполнителя снимает зависший schtasks
+    private static readonly TimeSpan RegisterTimeout = TimeSpan.FromSeconds(10);
+    private static readonly TimeSpan UnregisterTimeout = TimeSpan.FromSeconds(5);
+    private static readonly TimeSpan QueryTimeout = TimeSpan.FromSeconds(5);
 
     /// <summary>
     /// Конвертирует номер дня недели в аббревиатуру для schtasks.
