@@ -1,7 +1,11 @@
-﻿using SmartCleaner.Core.Helpers;
+﻿using SmartCleaner.Core.Cleaning;
+using SmartCleaner.Core.Helpers;
 using Microsoft.Win32;
 using System.Diagnostics;
 using System.Net.NetworkInformation;
+// UseWindowsForms тянет System.Windows.Forms.ICommandExecutor — снимаем
+// неоднозначность в пользу контракта исполнителя команд
+using ICommandExecutor = SmartCleaner.Core.Cleaning.ICommandExecutor;
 
 namespace SmartCleaner.Core.Network;
 
@@ -16,6 +20,25 @@ public class DnsPreset
 
 public class NetworkOptimizerService
 {
+    // Таймауты утилит (дисциплина дней 4-5): сброс кэша/ARP — быстрые операции,
+    // PowerShell с Get-NetAdapter по всем адаптерам — дольше
+    private static readonly TimeSpan FlushDnsTimeout = TimeSpan.FromMilliseconds(5000);
+    private static readonly TimeSpan ArpResetTimeout = TimeSpan.FromMilliseconds(5000);
+    private static readonly TimeSpan DnsApplyTimeout = TimeSpan.FromMilliseconds(15000);
+
+    private readonly ICommandExecutor _commandExecutor;
+
+    /// <summary>
+    /// Создаёт сервис поверх реального исполнителя команд (День 17, срез A).
+    /// Необязательный исполнитель — шов для детерминированных тестов: стаб
+    /// фиксирует команды (полное имя утилиты, аргументы, таймаут).
+    /// DI-регистрация исполнителя — День 19.
+    /// </summary>
+    public NetworkOptimizerService(ICommandExecutor? commandExecutor = null)
+    {
+        _commandExecutor = commandExecutor ?? new ProcessCommandExecutor();
+    }
+
     public List<DnsPreset> Presets { get; } =
     [
         new DnsPreset { Name = "Cloudflare (1.1.1.1) — Быстрый и приватный", Primary = "1.1.1.1", Secondary = "1.0.0.1" },
@@ -57,34 +80,32 @@ public class NetworkOptimizerService
             try
             {
                 // 1. Flush DNS
-                var psiDns = new ProcessStartInfo
+                var dns = await _commandExecutor.ExecuteAsync(new CommandExecutionRequest
                 {
                     // Абсолютный путь из системного каталога: запуск по неквалифицированному
                     // имени ищет exe в каталоге приложения — binary planting (M7, День 16б)
                     FileName = SystemToolLocator.GetIpconfigPath(),
-                    Arguments = "/flushdns",
-                    CreateNoWindow = true,
-                    UseShellExecute = false
-                };
-                var dns = await RunToolAsync(psiDns, 5000);
+                    Arguments = ["/flushdns"],
+                    WorkingDirectory = string.Empty,
+                    Timeout = FlushDnsTimeout
+                });
                 if (dns.ExitCode != 0)
                 {
-                    return (false, $"Не удалось очистить DNS-кэш (код {dns.ExitCode}): {dns.Output}");
+                    return (false, $"Не удалось очистить DNS-кэш (код {dns.ExitCode}): {ToolOutput(dns)}");
                 }
 
                 // 2. Clear ARP
-                var psiArp = new ProcessStartInfo
+                var arp = await _commandExecutor.ExecuteAsync(new CommandExecutionRequest
                 {
                     // Абсолютный путь из системного каталога — binary planting (M7)
                     FileName = SystemToolLocator.GetNetshPath(),
-                    Arguments = "interface ip delete arpcache",
-                    CreateNoWindow = true,
-                    UseShellExecute = false
-                };
-                var arp = await RunToolAsync(psiArp, 5000);
+                    Arguments = ["interface", "ip", "delete", "arpcache"],
+                    WorkingDirectory = string.Empty,
+                    Timeout = ArpResetTimeout
+                });
                 if (arp.ExitCode != 0)
                 {
-                    return (false, $"Не удалось сбросить ARP-таблицу (код {arp.ExitCode}): {arp.Output}");
+                    return (false, $"Не удалось сбросить ARP-таблицу (код {arp.ExitCode}): {ToolOutput(arp)}");
                 }
 
                 return (true, "DNS-кэш успешно очищен, сетевые сокеты и ARP-таблица сброшены!");
@@ -109,20 +130,19 @@ public class NetworkOptimizerService
                 var script = $"$a = @(Get-NetAdapter | Where-Object {{ $_.Status -eq 'Up' }}); " +
                              $"if ($a.Count -eq 0) {{ throw 'no active network adapters' }}; " +
                              $"$a | ForEach-Object {{ Set-DnsClientServerAddress -InterfaceIndex $_.ifIndex -ServerAddresses ('{primaryDns}','{secondaryDns}') -ErrorAction Stop }}";
-                var psi = new ProcessStartInfo
+                var result = await _commandExecutor.ExecuteAsync(new CommandExecutionRequest
                 {
                     // Системный Windows PowerShell по абсолютному пути: командлеты
                     // Get-NetAdapter/Set-DnsClientServerAddress — системная семантика;
                     // неквалифицированное имя = binary planting (M7, День 16б)
                     FileName = SystemToolLocator.GetWindowsPowerShellPath(),
-                    Arguments = $"-NoProfile -NonInteractive -Command \"{script}\"",
-                    CreateNoWindow = true,
-                    UseShellExecute = false
-                };
-                var result = await RunToolAsync(psi, 15000);
+                    Arguments = ["-NoProfile", "-NonInteractive", "-Command", script],
+                    WorkingDirectory = string.Empty,
+                    Timeout = DnsApplyTimeout
+                });
                 if (result.ExitCode != 0)
                 {
-                    return (false, $"Не удалось изменить DNS (код {result.ExitCode}): {result.Output}");
+                    return (false, $"Не удалось изменить DNS (код {result.ExitCode}): {ToolOutput(result)}");
                 }
 
                 return (true, $"DNS успешно изменен на {primaryDns} / {secondaryDns}!");
@@ -146,19 +166,18 @@ public class NetworkOptimizerService
                 var script = "$a = @(Get-NetAdapter | Where-Object { $_.Status -eq 'Up' }); " +
                              "if ($a.Count -eq 0) { throw 'no active network adapters' }; " +
                              "$a | ForEach-Object { Set-DnsClientServerAddress -InterfaceIndex $_.ifIndex -ResetServerAddresses -ErrorAction Stop }";
-                var psi = new ProcessStartInfo
+                var result = await _commandExecutor.ExecuteAsync(new CommandExecutionRequest
                 {
                     // Системный Windows PowerShell по абсолютному пути — binary planting (M7),
                     // см. ApplyDnsAsync
                     FileName = SystemToolLocator.GetWindowsPowerShellPath(),
-                    Arguments = $"-NoProfile -NonInteractive -Command \"{script}\"",
-                    CreateNoWindow = true,
-                    UseShellExecute = false
-                };
-                var result = await RunToolAsync(psi, 15000);
+                    Arguments = ["-NoProfile", "-NonInteractive", "-Command", script],
+                    WorkingDirectory = string.Empty,
+                    Timeout = DnsApplyTimeout
+                });
                 if (result.ExitCode != 0)
                 {
-                    return (false, $"Не удалось сбросить DNS (код {result.ExitCode}): {result.Output}");
+                    return (false, $"Не удалось сбросить DNS (код {result.ExitCode}): {ToolOutput(result)}");
                 }
 
                 return (true, "DNS успешно сброшен на автоматический (DHCP)!");
@@ -212,61 +231,9 @@ public class NetworkOptimizerService
         });
     }
 
-    // Запускает системную утилиту и возвращает фактический код возврата и вывод
-    // (stderr приоритетнее: ipconfig/netsh пишут сообщения в stdout, powershell — в stderr).
-    // Таймаут — тоже отказ: никакого «успеха по молчанию».
-    private static async Task<(int ExitCode, bool TimedOut, string Output)> RunToolAsync(ProcessStartInfo psi, int timeoutMs)
-    {
-        psi.CreateNoWindow = true;
-        psi.UseShellExecute = false;
-        psi.RedirectStandardOutput = true;
-        psi.RedirectStandardError = true;
-
-        try
-        {
-            using var process = new Process { StartInfo = psi };
-            if (!process.Start())
-            {
-                return (-1, false, $"не удалось запустить «{psi.FileName}»");
-            }
-
-            // Потоки читаем до ожидания выхода, чтобы заполненный буфер не заблокировал утилиту
-            var stdoutTask = process.StandardOutput.ReadToEndAsync();
-            var stderrTask = process.StandardError.ReadToEndAsync();
-
-            try
-            {
-                await process.WaitForExitAsync().WaitAsync(TimeSpan.FromMilliseconds(timeoutMs));
-            }
-            catch (TimeoutException)
-            {
-                KillProcessTree(process);
-                return (-1, true, $"«{psi.FileName}» не завершилась за {timeoutMs} мс");
-            }
-
-            var stdout = await stdoutTask;
-            var stderr = await stderrTask;
-            var output = string.IsNullOrWhiteSpace(stderr) ? stdout : stderr;
-            return (process.ExitCode, false, output.Trim());
-        }
-        catch (Exception ex)
-        {
-            return (-1, false, $"«{psi.FileName}»: {ex.Message}");
-        }
-    }
-
-    private static void KillProcessTree(Process process)
-    {
-        try
-        {
-            if (!process.HasExited)
-            {
-                process.Kill(entireProcessTree: true);
-            }
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"[NetworkOptimizerService] Kill timed-out process failed: {ex.Message}");
-        }
-    }
+    // Вывод утилиты для диагностики: stderr приоритетнее — ipconfig/netsh пишут
+    // сообщения в stdout, powershell — в stderr (дисциплина дней 4-5, сохранённая
+    // поверх результатов исполнителя команд).
+    private static string ToolOutput(CommandExecutionResult result) =>
+        string.IsNullOrWhiteSpace(result.StandardError) ? result.StandardOutput.Trim() : result.StandardError.Trim();
 }
