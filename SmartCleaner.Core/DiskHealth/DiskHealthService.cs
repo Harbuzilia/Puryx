@@ -53,7 +53,10 @@ public class DiskHealthService
                     "} | ConvertTo-Json -Compress";
                 var psi = new ProcessStartInfo
                 {
-                    FileName = "powershell.exe",
+                    // Системный Windows PowerShell по абсолютному пути (командлеты
+                    // Get-PhysicalDisk/Get-StorageReliabilityCounter — системная семантика):
+                    // неквалифицированное имя = binary planting (M7, День 16б)
+                    FileName = SystemToolLocator.GetWindowsPowerShellPath(),
                     Arguments = $"-NoProfile -NonInteractive -Command \"{script}\"",
                     RedirectStandardOutput = true,
                     CreateNoWindow = true,

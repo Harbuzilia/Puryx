@@ -1,3 +1,4 @@
+using SmartCleaner.Core.Helpers;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Microsoft.Win32;
@@ -242,7 +243,9 @@ public sealed class StartupEngine
         {
             var psi = new ProcessStartInfo
             {
-                FileName = "schtasks.exe",
+                // Абсолютный путь из системного каталога: запуск по неквалифицированному
+                // имени ищет exe в каталоге приложения — binary planting (M7, День 16б)
+                FileName = SystemToolLocator.GetSchtasksPath(),
                 Arguments = "/query /fo CSV /NH /V",
                 RedirectStandardOutput = true,
                 UseShellExecute = false,

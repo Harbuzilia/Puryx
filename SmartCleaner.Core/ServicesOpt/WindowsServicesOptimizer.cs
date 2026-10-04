@@ -1,3 +1,4 @@
+using SmartCleaner.Core.Helpers;
 using Microsoft.Win32;
 using System.Diagnostics;
 using System.IO;
@@ -163,7 +164,9 @@ public class WindowsServicesOptimizer
 
                 var psiConfig = new ProcessStartInfo
                 {
-                    FileName = "sc.exe",
+                    // Абсолютный путь из системного каталога: запуск по неквалифицированному
+                    // имени ищет exe в каталоге приложения — binary planting (M7, День 16б)
+                    FileName = SystemToolLocator.GetScPath(),
                     Arguments = $"config {serviceName} start= {startArg}",
                     CreateNoWindow = true,
                     UseShellExecute = false
@@ -179,7 +182,8 @@ public class WindowsServicesOptimizer
                 {
                     var psiStop = new ProcessStartInfo
                     {
-                        FileName = "net.exe",
+                        // Абсолютный путь (binary planting, M7): см. psiConfig выше
+                        FileName = SystemToolLocator.GetNetPath(),
                         Arguments = $"stop {serviceName} /y",
                         CreateNoWindow = true,
                         UseShellExecute = false
@@ -295,7 +299,8 @@ public class WindowsServicesOptimizer
             // Check running status via sc query
             var psi = new ProcessStartInfo
             {
-                FileName = "sc.exe",
+                // Абсолютный путь из системного каталога — binary planting (M7)
+                FileName = SystemToolLocator.GetScPath(),
                 Arguments = $"query {item.ServiceName}",
                 CreateNoWindow = true,
                 UseShellExecute = false,
@@ -379,7 +384,8 @@ public class WindowsServicesOptimizer
         {
             var psi = new ProcessStartInfo
             {
-                FileName = "sc.exe",
+                // Абсолютный путь из системного каталога — binary planting (M7)
+                FileName = SystemToolLocator.GetScPath(),
                 Arguments = $"query {serviceName}",
                 CreateNoWindow = true,
                 UseShellExecute = false

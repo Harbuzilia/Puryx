@@ -1,3 +1,4 @@
+using SmartCleaner.Core.Helpers;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 
@@ -37,25 +38,25 @@ public sealed class StandardGameBoostSystemOperations : IGameBoostSystemOperatio
         RegexOptions.Compiled);
 
     public bool StopService(string serviceName) =>
-        RunCommand("net.exe", $"stop {serviceName}", ServiceTimeoutMs) == 0;
+        RunCommand(SystemToolLocator.GetNetPath(), $"stop {serviceName}", ServiceTimeoutMs) == 0;
 
     public bool StartService(string serviceName) =>
-        RunCommand("net.exe", $"start {serviceName}", ServiceTimeoutMs) == 0;
+        RunCommand(SystemToolLocator.GetNetPath(), $"start {serviceName}", ServiceTimeoutMs) == 0;
 
     public string? GetActivePowerSchemeGuid()
     {
-        var output = RunCommandCapture("powercfg", "/getactivescheme", PowerCfgTimeoutMs);
+        var output = RunCommandCapture(SystemToolLocator.GetPowercfgPath(), "/getactivescheme", PowerCfgTimeoutMs);
         if (output is null) return null;
         var match = PowerSchemeGuidRegex.Match(output);
         return match.Success ? match.Groups[0].Value.ToLowerInvariant() : null;
     }
 
     public bool TrySetPowerScheme(string schemeGuid) =>
-        RunCommand("powercfg", $"/setactive {schemeGuid}", PowerCfgTimeoutMs) == 0;
+        RunCommand(SystemToolLocator.GetPowercfgPath(), $"/setactive {schemeGuid}", PowerCfgTimeoutMs) == 0;
 
     public bool PowerSchemeExists(string schemeGuid)
     {
-        var output = RunCommandCapture("powercfg", "/list", PowerCfgTimeoutMs);
+        var output = RunCommandCapture(SystemToolLocator.GetPowercfgPath(), "/list", PowerCfgTimeoutMs);
         if (output is null) return false;
         return PowerSchemeGuidRegex.Matches(output).Any(m =>
             string.Equals(m.Groups[0].Value, schemeGuid, StringComparison.OrdinalIgnoreCase));

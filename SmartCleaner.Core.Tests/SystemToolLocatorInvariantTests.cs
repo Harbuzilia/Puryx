@@ -11,20 +11,36 @@ namespace SmartCleaner.Core.Tests;
 /// в каталоге приложения, а в portable-распространении он доступен пользователю
 /// на запись — подмена утилиты с правами elevated.
 ///
-/// Инвариант сканирует исходники SmartCleaner.Core и запрещает строковые литералы,
-/// равные имени утилиты (с .exe или без), вне Helpers/SystemToolLocator.cs —
-/// единственного санкционированного места, где имя комбинируется с системным
-/// каталогом в абсолютный путь. Подсветка совпадает не только с «FileName = "...",»,
-/// но и с передачей имени параметром (RunCommand("net.exe", ...)) — так регрессии
-/// не вернутся ни через одну форму запуска.
+/// Инвариант сканирует исходники SmartCleaner.Core и запрещает вне
+/// Helpers/SystemToolLocator.cs — единственного санкционированного места, где
+/// имена комбинируются с системным каталогом в абсолютный путь, — строковые
+/// литералы, равные имени утилиты: с .exe всегда, без .exe — только в
+/// launch-контексте строки (FileName/RunCommand/ProcessStartInfo/...).
+/// Так ловится и «FileName = "sc.exe",», и передача имени параметром
+/// (RunCommand("net.exe", ...)), и «FileName = "powercfg"», — но не ложные
+/// совпадения вроде Contains("compact") в NL-парсере или "powershell" как
+/// сегмента пути в CliInspector.
 ///
 /// Внешние dev-инструменты (docker, npm) под инвариант НЕ попадают: их нет в
 /// системном каталоге, PATH-поиск — осознанная семантика для них.
 /// </summary>
 public class SystemToolLocatorInvariantTests
 {
-    private static readonly Regex UnqualifiedToolNameRegex = new(
-        "\"(?<tool>sc|net|netsh|ipconfig|schtasks|dism|pnputil|compact|powercfg|powershell)(\\.exe)?\"",
+    // Детерминированный слой: литерал, равный имени утилиты С .exe, в коде
+    // недопустим всегда — это гарантированно форма запуска/передачи имени.
+    private static readonly Regex UnqualifiedToolNameWithExeRegex = new(
+        "\"(?<tool>sc|net|netsh|ipconfig|schtasks|dism|pnputil|compact|powercfg|powershell)\\.exe\"",
+        RegexOptions.Compiled);
+
+    // Эвристический слой: литерал БЕЗ .exe — только в launch-контексте (строка
+    // упоминает запуск процесса). Отделяет RunCommand("powercfg", ...) от
+    // Contains("compact") в NL-парсере или "powershell" как сегмента пути.
+    private static readonly Regex LaunchContextRegex = new(
+        "RunCommand|RunCommandCapture|FileName|Process\\.Start|ProcessStartInfo",
+        RegexOptions.Compiled);
+
+    private static readonly Regex UnqualifiedToolBareNameRegex = new(
+        "\"(?<tool>sc|net|netsh|ipconfig|schtasks|dism|pnputil|compact|powercfg|powershell)\"",
         RegexOptions.Compiled);
 
     [Fact]
@@ -58,7 +74,10 @@ public class SystemToolLocatorInvariantTests
                 if (trimmed.StartsWith("//") || trimmed.StartsWith("*") || trimmed.StartsWith("/*"))
                     continue;
 
-                if (UnqualifiedToolNameRegex.IsMatch(lines[i]))
+                var violation =
+                    UnqualifiedToolNameWithExeRegex.IsMatch(lines[i])
+                    || (LaunchContextRegex.IsMatch(lines[i]) && UnqualifiedToolBareNameRegex.IsMatch(lines[i]));
+                if (violation)
                 {
                     violations.Add($"{relative}:{i + 1}: {trimmed}");
                 }

@@ -1,3 +1,4 @@
+using SmartCleaner.Core.Helpers;
 using System.Diagnostics;
 using System.Text.Json;
 
@@ -129,7 +130,9 @@ public sealed class CleaningSchedulerService
 
             var psi = new ProcessStartInfo
             {
-                FileName = "schtasks.exe",
+                // Абсолютный путь из системного каталога: запуск по неквалифицированному
+                // имени ищет exe в каталоге приложения — binary planting (M7, День 16б)
+                FileName = SystemToolLocator.GetSchtasksPath(),
                 Arguments = args,
                 CreateNoWindow = true,
                 UseShellExecute = false,
@@ -153,7 +156,8 @@ public sealed class CleaningSchedulerService
         {
             var psi = new ProcessStartInfo
             {
-                FileName = "schtasks.exe",
+                // Абсолютный путь из системного каталога — binary planting (M7)
+                FileName = SystemToolLocator.GetSchtasksPath(),
                 Arguments = $"/Delete /TN \"{TaskName}\" /F",
                 CreateNoWindow = true,
                 UseShellExecute = false,
@@ -177,7 +181,8 @@ public sealed class CleaningSchedulerService
         {
             var psi = new ProcessStartInfo
             {
-                FileName = "schtasks.exe",
+                // Абсолютный путь из системного каталога — binary planting (M7)
+                FileName = SystemToolLocator.GetSchtasksPath(),
                 Arguments = $"/Query /TN \"{TaskName}\"",
                 CreateNoWindow = true,
                 UseShellExecute = false,

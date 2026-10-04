@@ -20,4 +20,35 @@ internal static class SystemToolLocator
     internal static string GetDismPath() => Path.Combine(NativeSystemDirectory, "dism.exe");
 
     internal static string GetPnputilPath() => Path.Combine(NativeSystemDirectory, "pnputil.exe");
+
+    /// <summary>sc.exe — конфигурация и запрос состояния системных служб.</summary>
+    internal static string GetScPath() => Path.Combine(NativeSystemDirectory, "sc.exe");
+
+    /// <summary>net.exe — запуск/остановка системных служб (net start/stop).</summary>
+    internal static string GetNetPath() => Path.Combine(NativeSystemDirectory, "net.exe");
+
+    /// <summary>ipconfig.exe — диагностика сетевых интерфейсов и DNS-кэша.</summary>
+    internal static string GetIpconfigPath() => Path.Combine(NativeSystemDirectory, "ipconfig.exe");
+
+    /// <summary>netsh.exe — конфигурация сетевого стека.</summary>
+    internal static string GetNetshPath() => Path.Combine(NativeSystemDirectory, "netsh.exe");
+
+    /// <summary>schtasks.exe — управление задачами планировщика Windows.</summary>
+    internal static string GetSchtasksPath() => Path.Combine(NativeSystemDirectory, "schtasks.exe");
+
+    /// <summary>powercfg.exe — схемы питания и управление питанием.</summary>
+    internal static string GetPowercfgPath() => Path.Combine(NativeSystemDirectory, "powercfg.exe");
+
+    /// <summary>
+    /// Системный Windows PowerShell (System32\WindowsPowerShell\v1.0). Все текущие
+    /// сайты Core вызывают Windows-специфичные системные командлеты
+    /// (Get-NetAdapter, Set-DnsClientServerAddress, Get-PhysicalDisk,
+    /// Get-StorageReliabilityCounter) — их семантика «системный Windows PowerShell»,
+    /// поэтому путь обязан быть абсолютным. Если будущему сайту нужна иная семантика
+    /// («любой pwsh из PATH»), он обязан НЕ использовать этот метод и явно
+    /// задокументировать выбор; внешние dev-инструменты (docker, npm) ищутся в PATH
+    /// осознанно — в системном каталоге их нет, binary planting для них неприменим.
+    /// </summary>
+    internal static string GetWindowsPowerShellPath() =>
+        Path.Combine(NativeSystemDirectory, "WindowsPowerShell", "v1.0", "powershell.exe");
 }

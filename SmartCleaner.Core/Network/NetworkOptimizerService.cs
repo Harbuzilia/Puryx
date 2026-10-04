@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+﻿using SmartCleaner.Core.Helpers;
+using Microsoft.Win32;
 using System.Diagnostics;
 using System.Net.NetworkInformation;
 
@@ -58,7 +59,9 @@ public class NetworkOptimizerService
                 // 1. Flush DNS
                 var psiDns = new ProcessStartInfo
                 {
-                    FileName = "ipconfig.exe",
+                    // Абсолютный путь из системного каталога: запуск по неквалифицированному
+                    // имени ищет exe в каталоге приложения — binary planting (M7, День 16б)
+                    FileName = SystemToolLocator.GetIpconfigPath(),
                     Arguments = "/flushdns",
                     CreateNoWindow = true,
                     UseShellExecute = false
@@ -72,7 +75,8 @@ public class NetworkOptimizerService
                 // 2. Clear ARP
                 var psiArp = new ProcessStartInfo
                 {
-                    FileName = "netsh.exe",
+                    // Абсолютный путь из системного каталога — binary planting (M7)
+                    FileName = SystemToolLocator.GetNetshPath(),
                     Arguments = "interface ip delete arpcache",
                     CreateNoWindow = true,
                     UseShellExecute = false
@@ -107,7 +111,10 @@ public class NetworkOptimizerService
                              $"$a | ForEach-Object {{ Set-DnsClientServerAddress -InterfaceIndex $_.ifIndex -ServerAddresses ('{primaryDns}','{secondaryDns}') -ErrorAction Stop }}";
                 var psi = new ProcessStartInfo
                 {
-                    FileName = "powershell.exe",
+                    // Системный Windows PowerShell по абсолютному пути: командлеты
+                    // Get-NetAdapter/Set-DnsClientServerAddress — системная семантика;
+                    // неквалифицированное имя = binary planting (M7, День 16б)
+                    FileName = SystemToolLocator.GetWindowsPowerShellPath(),
                     Arguments = $"-NoProfile -NonInteractive -Command \"{script}\"",
                     CreateNoWindow = true,
                     UseShellExecute = false
@@ -141,7 +148,9 @@ public class NetworkOptimizerService
                              "$a | ForEach-Object { Set-DnsClientServerAddress -InterfaceIndex $_.ifIndex -ResetServerAddresses -ErrorAction Stop }";
                 var psi = new ProcessStartInfo
                 {
-                    FileName = "powershell.exe",
+                    // Системный Windows PowerShell по абсолютному пути — binary planting (M7),
+                    // см. ApplyDnsAsync
+                    FileName = SystemToolLocator.GetWindowsPowerShellPath(),
                     Arguments = $"-NoProfile -NonInteractive -Command \"{script}\"",
                     CreateNoWindow = true,
                     UseShellExecute = false

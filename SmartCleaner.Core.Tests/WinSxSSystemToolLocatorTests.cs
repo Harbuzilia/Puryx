@@ -5,10 +5,10 @@ using Xunit;
 namespace SmartCleaner.Core.Tests;
 
 /// <summary>
-/// День 5 — M7 (ROADMAP): binary planting.
-/// Системные утилиты (dism/pnputil/compact) должны резолвиться только по абсолютному
-/// пути из настоящего системного каталога: запуск по неквалифицированному имени ищет exe
-/// сначала в каталоге приложения, а в portable-распространении он доступен пользователю
+/// День 5 — M7 (ROADMAP), День 16б (расширение на все Core-утилиты): binary planting.
+/// Системные утилиты должны резолвиться только по абсолютному пути из настоящего
+/// системного каталога: запуск по неквалифицированному имени ищет exe сначала
+/// в каталоге приложения, а в portable-распространении он доступен пользователю
 /// на запись — подмена утилиты с правами elevated.
 /// </summary>
 public class WinSxSSystemToolLocatorTests
@@ -17,6 +17,12 @@ public class WinSxSSystemToolLocatorTests
     [InlineData("dism")]
     [InlineData("pnputil")]
     [InlineData("compact")]
+    [InlineData("sc")]
+    [InlineData("net")]
+    [InlineData("netsh")]
+    [InlineData("ipconfig")]
+    [InlineData("schtasks")]
+    [InlineData("powercfg")]
     public void SystemTool_ResolvedByAbsolutePathFromNativeSystemDirectory(string tool)
     {
         var path = Resolve(tool);
@@ -45,6 +51,32 @@ public class WinSxSSystemToolLocatorTests
         "dism" => SystemToolLocator.GetDismPath(),
         "pnputil" => SystemToolLocator.GetPnputilPath(),
         "compact" => SystemToolLocator.GetCompactPath(),
+        "sc" => SystemToolLocator.GetScPath(),
+        "net" => SystemToolLocator.GetNetPath(),
+        "netsh" => SystemToolLocator.GetNetshPath(),
+        "ipconfig" => SystemToolLocator.GetIpconfigPath(),
+        "schtasks" => SystemToolLocator.GetSchtasksPath(),
+        "powercfg" => SystemToolLocator.GetPowercfgPath(),
         _ => throw new ArgumentException($"неизвестная утилита: {tool}", nameof(tool))
     };
+
+    [Fact]
+    public void WindowsPowerShell_ResolvedByAbsolutePathFromSystemPowerShellDirectory()
+    {
+        var path = SystemToolLocator.GetWindowsPowerShellPath();
+
+        // Абсолютный путь: запуск не зависит от PATH и каталога приложения
+        Assert.True(Path.IsPathRooted(path), $"путь должен быть абсолютным: {path}");
+        Assert.Equal("powershell.exe", Path.GetFileName(path), ignoreCase: true);
+
+        // Системный Windows PowerShell живёт в WindowsPowerShell\v1.0 настоящего
+        // системного каталога (System32 либо SysNative для 32-битного процесса).
+        var directory = Path.GetDirectoryName(path);
+        Assert.NotNull(directory);
+        Assert.EndsWith(
+            Path.Combine("WindowsPowerShell", "v1.0"),
+            directory,
+            StringComparison.OrdinalIgnoreCase);
+        Assert.True(File.Exists(path), $"утилита должна существовать: {path}");
+    }
 }
