@@ -6,40 +6,48 @@
 
 ---
 
-## [Unreleased]
+## [3.0.0] — 04.10.2026
 
-### Дни 17–23 — консолидация исполнения внешних команд: единый ICommandExecutor, ILogger, отменяемость
+### 🎯 Тема релиза: Production readiness — финальный продукт: систематика исполнения внешних команд (единый ICommandExecutor, ILogger, честная отмена) и публичная инфраструктура доверия (CI, вклад, безопасность, winget), тесты 349 → 475
 
-Фаза по плану `docs/ROADMAP.md` после тега v2.8.0: все прямые запуски внешних утилит в Core переведены на единый контракт исполнителя `ICommandExecutor` (`SmartCleaner.Core/Cleaning/CommandExecution.cs`), диагностика Release переведена на `ILogger`, публичные операции получили честную отмену. Итог фазы: сборка 0 ошибок / 0 предупреждений; тесты 459 → 475 (вместе с Днём 24).
+Major-релиз по дорожной карте `docs/ROADMAP.md` (2.7.2 → 3.0.0, «финальный продукт»): завершает фазы P0–P4 плана. Фазы P0 (базовая линия) и P1–P2 (High/Medium-дефекты аудита) закрыты ранее — итоги P1/P2 вышли релизом v2.8.0; этот релиз несёт фазы P3 «Систематика» и P4 «Продуктизация» (45 атомарных коммитов от тега v2.8.0; дневная детализация — в git-истории и плане). Сквозные инварианты релиза: ни одного запуска внешней утилиты в обход единого исполнителя; ни одного «успеха» внешней утилиты без её кода возврата; отмена — честный статус, а не ошибка; диагностика — через `ILogger`, а не `Debug.WriteLine`. Итог: сборка 0 ошибок / 0 предупреждений; 475/475 тестов зелёные (в 2.8.0 — 349).
 
-#### Что сделано (консолидация исполнителя, Дни 17–19 — три среза + DI + расширения контракта)
-- Срез A (День 17): `sc`/`net` (WindowsServicesOptimizer, GameBoost), `ipconfig`/`netsh` (NetworkOptimizerService) — через контракт с честным кодом возврата и таймаутом.
-- Срез B (День 18): dism (WinSxS), pnputil (DriverStore), compact.exe (Compact), деинсталлятор — плюс построчный стриминг stdout (`StandardOutputLineProgress`): прогресс долгих операций виден пользователю, kill-tree при таймауте/отмене.
-- Срез C (День 19): приватность (PrivacyDebloat), ipconfig/netsh-остатки, schtasks (Startup), планировщик, SQLite, CLI; явная кодировка декодирования stdout (`StandardOutputEncoding`): schtasks — OEM (День 8), pnputil — ANSI по живому замеру на русской Win11.
-- DI (Дни 18–19): единый `ICommandExecutor` и `ILoggerFactory` зарегистрированы в App; сервисы принимают исполнителя/логгер необязательными ctor-параметрами — регистрация «включает» шов.
-- Стаб `RecordingCommandExecutor` (тесты): фиксирует полное имя утилиты, аргументы и таймаут — детерминированные контрактные тесты всех переведённых сервисов.
-- Аудит `Process.Start` в App (День 19): shell-запуски помечены комментариями «Обоснованное исключение».
+---
 
-#### Что сделано (ILogger и отменяемость, Дни 20–21)
-- 44 записи `Debug.WriteLine` в Core заменены на `Microsoft.Extensions.Logging`: Safety/Cleaning/Quarantine, ServicesOpt/Network/Privacy/SystemOpt/WinSxS; в App зарегистрирована `ILoggerFactory`.
-- `CancellationToken` в профилях Privacy/ServicesOpt (День 21).
-- TaskScheduler-операции Disable/Enable/Delete — через `schtasks` исполнителем, а не прямые Process.
-- `/ResetBase` в WinSxS — только явный opt-in (необратимость документирована, по умолчанию выключен).
-- VACUUM в SQLite-компакторе — проба только при незанятой БД.
+### 1. 🔧 P3 — Систематика: единый ICommandExecutor, ILogger, честная отмена (Дни 17–24)
+- **Что сделано:**
+  - Все прямые запуски внешних утилит в Core переведены на единый контракт исполнителя `ICommandExecutor` (`SmartCleaner.Core/Cleaning/CommandExecution.cs`): службы (`sc`/`net`), сеть (`ipconfig`/`netsh`), WinSxS (`dism`), драйверы (`pnputil`), Compact (`compact.exe`), деинсталлятор, приватность, автозагрузка (`schtasks`), планировщик, SQLite, CLI, телеметрия дисков (PowerShell). Контракт даёт честный код возврата, таймаут с kill-tree, построчный стриминг stdout (`StandardOutputLineProgress` — прогресс долгих операций виден пользователю) и явную кодировку декодирования stdout (`StandardOutputEncoding`: schtasks — OEM, pnputil — ANSI по живому замеру на русской Win11).
+  - DI: `ICommandExecutor` и `ILoggerFactory` зарегистрированы в App; сервисы принимают исполнителя/логгер необязательными ctor-параметрами — регистрация «включает» шов. Аудит `Process.Start` в App: shell-запуски помечены маркерами «Обоснованное исключение».
+  - Диагностика: 44 записи `Debug.WriteLine` в Core заменены на `Microsoft.Extensions.Logging` (Safety/Cleaning/Quarantine, ServicesOpt/Network/Privacy/SystemOpt/WinSxS).
+  - Отменяемость: `CancellationToken` в профилях Privacy/ServicesOpt; OCE-дисциплина — отмена не глотается как ошибка (WinSxS, DriverStore, GameBoost); `ProcessCommandExecutor` возвращает честный TimedOut при выводе в момент таймаута (граничная гонка StreamReader даёт результат, а не исключение).
+  - Осторожность необратимых операций: `/ResetBase` (WinSxS) — только явный opt-in, по умолчанию выключен; VACUUM (SQLite-компактор) — проба только при незанятой БД; reparse-гвард в `CustomFolderScanner` — junction/symlink не уводят сканер из корня пользователя; телеметрия S.M.A.R.T. в DiskHealth — bounded-таймаут 30 с (прежде ReadToEnd не ограничен) с честным fallback по DriveInfo.
+  - Мутационные тесты +27: мутации вывода schtasks, junction-сценарии обхода whitelist, «фейл sc/dism/pnputil ≠ успех»; детерминированные контрактные тесты всех переведённых сервисов на стабе `RecordingCommandExecutor`.
+  - Low-остатки и регресс-фиксы ревьюера (День 24): hardlinks дубликатов через `ISafetyService` и `.bak`-сироты; `.Result` убран из CLI; powershell-терминал CliInspector и `explorer.exe` (6 сайтов) — по абсолютным путям (`SystemToolLocator`); гвард формата IP в DNS-операциях до интерполяции в PowerShell-скрипт.
+- **Файлы:**
+  - `SmartCleaner.Core/Cleaning/CommandExecution.cs`, `SmartCleaner.Core/Cleaning/ProcessCommandExecutor.cs`, `SmartCleaner.Core/Helpers/SystemToolLocator.cs`
+  - Сервисы Core: ServicesOpt/Network/Privacy/WinSxS (WinSxSEngine, DriverStoreCleaner)/Compression/Uninstaller/Startup/Scheduler/Optimization (SqliteCompactorService)/CliInspector/DiskHealth/Scanning (CustomFolderScanner)/Duplicates (DuplicateEngine)
+  - `SmartCleaner.App/App.xaml.cs`
+- **Почему:** Разрозненные `Process.Start` с разными правилами успеха, таймаута и кодировок — целый класс дефектов, который закрывается одним тестируемым контрактом, а не точечными фиксами; «отмена = ошибка» и молчаливый таймаут — ложные статусы для операций, где пользователь решает вопрос необратимости.
 
-#### Что сделано (тестирование и инварианты, Дни 22–23)
-- Мутационные тесты +27: мутации вывода schtasks, junction-сценарии обхода whitelist, «фейл sc/dism/pnputil ≠ успех».
-- CustomFolderScanner: reparse-гвард — junction/symlink не уводят сканер из корня пользователя.
-- Low-дефекты: hardlinks дубликатов через ISafetyService, `.bak`-сироты, `.Result` убран из CLI-терминала, powershell-терминал CliInspector по абсолютному пути (инвариант M7 распространён на исходники App).
+---
 
-### День 24 — регресс фазы + сверка доков (находки reviewer'а P3)
-- OCE-дисциплина: отмена не глотается как ошибка — WinSxS (`guard` до запуска DISM, честный статус «отменено», best-effort kill elevated-процесса с документированным ограничением runas), DriverStore (честный прогресс «отменено»), GameBoost (отмена — исключение, не «−1»).
-- `ProcessCommandExecutor`: честный TimedOut при выводе в момент таймаута — TaskCanceledException StreamReader в граничной гонке даёт TimedOut-результат, а не исключение; задачи потоков наблюдаются в таймаут/отмен-ветке.
-- DiskHealthService: PowerShell телеметрии S.M.A.R.T. через `ICommandExecutor` — bounded-таймаут 30 с (прежде ReadToEnd был не ограничен вовсе) + `ILogger` + UTF-8-декодирование; фейл/таймаут — честный fallback по DriveInfo.
-- Маркеры обоснованных Process-исключений: elevated-clean (runas + auth-токен), docker (PATH-семантика), shell-open HTML-отчёта.
-- explorer.exe в App (6 сайтов) — абсолютный путь из корня Windows через `SystemToolLocator.GetExplorerPath()` (в System32 explorer отсутствует); инвариант M7 расширен на explorer.
-- `NetworkOptimizerService.ApplyDnsAsync`: гвард формата IP для primaryDns/secondaryDns до интерполяции в PowerShell-скрипт.
-- Тесты: +16 (отмена x4, исполнитель x1, DiskHealth x6, DNS x4, локатор/инвариант explorer x1). Итог: 475/475 зелёные.
+### 2. 🏗️ P4 — Продуктизация: CI, вклад, безопасность, winget (Дни 25–28)
+- **Что сделано:**
+  - CI: GitHub Actions `.github/workflows/ci.yml` — build+test на `windows-latest` на каждый push/PR в master; бейдж статуса CI в README.
+  - `CONTRIBUTING.md` (новый): сборка, тесты (машинозависимые Integration-трейты и быстрый фильтр `Category!=Integration`), стиль Conventional Commits, модель ветвления из RELEASE-CADENCE, как предлагать изменения.
+  - `SECURITY.md` (новый): политика сообщений об уязвимостях — приватный канал GitHub Security Advisories, ориентиры времени реакции без обещаний, scope механизмов защиты чистильщика.
+  - `docs/CODE-SIGNING.md` (новый): зафиксированное решение — v3.0.0 выходит без подписи кода, инструкция обхода SmartScreen — в README; опции (self-signed, OV/EV-сертификат, облачная подпись) разобраны без выдуманных цен.
+  - `docs/RESEARCH-WINGET.md` (новый) + черновик манифеста `packaging/winget/Harbuzilia.Puryx.yaml`: исследование winget-публикации portable-версии — целевая схема манифеста 1.12.0, механика сабмита в community-репозиторий, ограничения без подписи кода, альтернатива scoop; сам сабмит — вне скоупа плана.
+  - README: быстрый старт для нового пользователя, секция «Скриншоты» с заглушками (`docs/screenshots/`), ссылки на CONTRIBUTING/SECURITY, примечание SmartScreen.
+- **Файлы:**
+  - `.github/workflows/ci.yml` (новый), `CONTRIBUTING.md` (новый), `SECURITY.md` (новый), `docs/CODE-SIGNING.md` (новый), `docs/RESEARCH-WINGET.md` (новый), `packaging/winget/Harbuzilia.Puryx.yaml` (новый), `README.md`
+- **Почему:** Код без публичной инфраструктуры доверия — не продукт: CI делает зелёный гейт видимым для вкладчиков, SECURITY/CONTRIBUTING задают правила взаимодействия, а решения по подписи и дистрибуции зафиксированы до публикации, а не в спешке после неё.
+
+---
+
+### 3. ✅ Верификация и релиз
+- **Что сделано:** `dotnet build SmartCleaner.sln -c Release` — 0 ошибок / 0 предупреждений; `dotnet test SmartCleaner.sln -c Release` — 475/475 зелёные (в 2.8.0 — 349). Версия 3.0.0 в `SmartCleaner.App.csproj` (Version/AssemblyVersion/FileVersion) и бейдже `README.md`; UI-версия читается из сборки (`SmartCleaner.App/Helpers/AppInfo.cs` — `Assembly.GetName().Version`) — дрейф csproj↔UI исключён по построению. Тег `v3.0.0`, GitHub Release с portable-артефактом и черновик анонса — День 30 плана.
+- **Почему:** Релиз без прогона — не релиз (правило дневного гейта, `docs/RELEASE-CADENCE.md` §3).
 
 ---
 
