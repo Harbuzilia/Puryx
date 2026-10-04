@@ -26,9 +26,19 @@
 
 ## 🚀 Быстрый старт
 
-1. **Скачайте** portable-сборку (один exe, без установки) со страницы [Releases](https://github.com/Harbuzilia/Puryx/releases).
+**Вариант A — portable (один exe, без установки):**
+
+1. **Скачайте** portable-сборку со страницы [Releases](https://github.com/Harbuzilia/Puryx/releases).
 2. **Запустите** скачанный `Puryx-3.0.0-portable-win-x64.exe`. Приложение не подписано код-подписью: при первом запуске Windows SmartScreen покажет предупреждение — нажмите «Подробнее» → «Выполнить в любом случае».
-3. **Сканируйте**: запустите сканирование (`Ctrl + S`), просмотрите результаты и очистите выбранное (`Delete`) — удалённое по умолчанию отправляется в Корзину с возможностью восстановления.
+
+**Вариант B — Scoop (пакетный менеджер):**
+
+```powershell
+scoop bucket add puryx https://github.com/Harbuzilia/scoop-bucket
+scoop install puryx
+```
+
+**Сканируйте**: запустите сканирование (`Ctrl + S`), просмотрите результаты и очистите выбранное (`Delete`) — удалённое по умолчанию отправляется в Корзину с возможностью восстановления.
 
 > Что нового — [CHANGELOG.md](CHANGELOG.md): релиз 3.0.0; ниже — история версий.
 
@@ -215,7 +225,7 @@ publish_portable.bat
 
 ## 🧑‍💻 Разработка
 
-Правила сборки, тестов, стиль коммитов и модель ветвления — [CONTRIBUTING.md](CONTRIBUTING.md).
+Правила сборки, тестов, стиль коммитов и модель ветвления — [CONTRIBUTING.md](CONTRIBUTING.md). Дистрибуция через winget и Scoop — [docs/RESEARCH-WINGET.md](docs/RESEARCH-WINGET.md).
 
 ### Структура решения
 
