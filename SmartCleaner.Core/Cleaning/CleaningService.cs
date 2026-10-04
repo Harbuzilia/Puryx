@@ -177,6 +177,14 @@ public class CleaningService : ICleaningService
 
         try
         {
+            // Обоснованное исключение (День 24, по образцу WinSxS/DriverStore/
+            // Uninstaller): elevated-clean перезапускает само приложение с
+            // повышением — UseShellExecute=true + Verb="runas" показывает
+            // UAC-диалог; контракт передаётся файлом запроса с auth-токеном.
+            // Контракт ICommandExecutor исполняет команды без элевации
+            // (UseShellExecute=false, редирект потоков) — перевод этой ветки
+            // на исполнителя требует расширения контракта ролью «запуск с
+            // повышением»
             var startInfo = new ProcessStartInfo
             {
                 FileName = Environment.ProcessPath ?? "dotnet",
@@ -335,6 +343,9 @@ public class CleaningService : ICleaningService
                 return (false, "Неизвестная docker команда");
             }
 
+            // Обоснованное исключение (День 24): docker — внешний dev-инструмент,
+            // его нет в системном каталоге, PATH-поиск имени — осознанная
+            // семантика (инвариант M7 docker намеренно не покрывает)
             using var process = new Process
             {
                 StartInfo = new ProcessStartInfo

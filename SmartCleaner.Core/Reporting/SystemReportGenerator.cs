@@ -34,6 +34,11 @@ public class SystemReportGenerator
 
         try
         {
+            // Обоснованное исключение (День 24, срез C — shell-запуск): открытие
+            // HTML-отчёта в браузере по ассоциации — естественный shell-запуск
+            // для пользователя, не исполнение команды: UseShellExecute=true и
+            // видимое окно — сам смысл операции, контракт исполнителя
+            // (CreateNoWindow, редирект потоков, kill-tree) здесь не применим
             Process.Start(new ProcessStartInfo
             {
                 FileName = filePath,
