@@ -209,10 +209,13 @@ public partial class CliInspectorViewModel : ObservableObject
             // потоков, таймаут с kill-tree) превратил бы терминал в невидимый
             // подвешенный процесс. Рабочая директория задаётся через
             // ProcessStartInfo — никакой
-            // инъекции пути в командную строку PowerShell (апостроф в имени папки)
+            // инъекции пути в командную строку PowerShell (апостроф в имени папки).
+            // День 23 (M7, перенос Дня 19): FileName — абсолютный путь из
+            // SystemToolLocator; запуск "powershell.exe" по неквалифицированному
+            // имени искал exe в каталоге приложения (binary planting в portable)
             var startInfo = new ProcessStartInfo
             {
-                FileName = "powershell.exe",
+                FileName = SystemToolLocator.GetWindowsPowerShellPath(),
                 Arguments = "-NoExit",
                 WorkingDirectory = workDir,
                 UseShellExecute = true

@@ -50,8 +50,42 @@ public class SystemToolLocatorInvariantTests
         var coreRoot = Path.Combine(repositoryRoot, "SmartCleaner.Core");
         Assert.True(Directory.Exists(coreRoot), $"каталог исходников Core не найден: {coreRoot}");
 
+        var violations = ScanProjectForUnqualifiedToolNames(Path.Combine(repositoryRoot, "SmartCleaner.Core"));
+        Assert.True(violations.Count == 0,
+            "Неквалифицированные имена системных утилит в Core (binary planting, M7). " +
+            "Запуск возможен только через SmartCleaner.Core.Helpers.SystemToolLocator:\n" +
+            string.Join("\n", violations));
+    }
+
+    /// <summary>
+    /// День 23 — перенос находки Дня 19: инвариант M7 распространён на исходники
+    /// App (срез C консолидации покрывал Core, App- ViewModel ускользал):
+    /// powershell.exe в CliInspectorViewModel.OpenTerminal запускался по
+    /// неквалифицированному имени — binary planting в portable-сценарии.
+    /// </summary>
+    [Fact]
+    public void AppSources_ContainNoUnqualifiedWindowsUtilityNames()
+    {
+        var repositoryRoot = FindRepositoryRoot();
+        var appRoot = Path.Combine(repositoryRoot, "SmartCleaner.App");
+        Assert.True(Directory.Exists(appRoot), $"каталог исходников App не найден: {appRoot}");
+
+        var violations = ScanProjectForUnqualifiedToolNames(appRoot);
+        Assert.True(violations.Count == 0,
+            "Неквалифицированные имена системных утилит в App (binary planting, M7 — перенос Дня 19). " +
+            "Запуск возможен только через SmartCleaner.Core.Helpers.SystemToolLocator:\n" +
+            string.Join("\n", violations));
+    }
+
+    /// <summary>
+    /// Сканирует исходники проекта (*.cs, кроме obj/bin) на строковые литералы,
+    /// равные имени системной утилиты (см. доктайп класса).
+    /// </summary>
+    private static List<string> ScanProjectForUnqualifiedToolNames(string projectRoot)
+    {
+        var repositoryRoot = FindRepositoryRoot();
         var violations = new List<string>();
-        foreach (var file in Directory.EnumerateFiles(coreRoot, "*.cs", SearchOption.AllDirectories))
+        foreach (var file in Directory.EnumerateFiles(projectRoot, "*.cs", SearchOption.AllDirectories))
         {
             var relative = Path.GetRelativePath(repositoryRoot, file);
 
@@ -84,10 +118,7 @@ public class SystemToolLocatorInvariantTests
             }
         }
 
-        Assert.True(violations.Count == 0,
-            "Неквалифицированные имена системных утилит в Core (binary planting, M7). " +
-            "Запуск возможен только через SmartCleaner.Core.Helpers.SystemToolLocator:\n" +
-            string.Join("\n", violations));
+        return violations;
     }
 
     /// <summary>
