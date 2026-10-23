@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:loc="clr-namespace:SmartCleaner.Core.Localization;assembly=SmartCleaner.Core"
              mc:Ignorable="d" 
              d:DesignHeight="750" d:DesignWidth="950">
     <Grid Margin="24,20">
@@ -20,12 +21,12 @@
                     <Border Width="32" Height="32" CornerRadius="8" Background="{DynamicResource AccentGradientBrush}" Margin="0,0,10,0" VerticalAlignment="Center">
                         <TextBlock Text="&#xE727;" FontFamily="Segoe MDL2 Assets" FontSize="16" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
-                    <TextBlock Text="Защита приватности и Anti-Spy Debloater" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
+                    <TextBlock Text="{x:Static loc:Localizer.PrivacyDebloat_Title}" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
                     <Border Background="{DynamicResource AccentBrush}" CornerRadius="4" Padding="6,2" Margin="10,0,0,0" VerticalAlignment="Center">
                         <TextBlock Text="ULTIMATE" FontSize="9.5" Foreground="White" FontWeight="Bold"/>
                     </Border>
                 </StackPanel>
-                <TextBlock Text="Отключение скрытой телеметрии Windows, рекламных трекеров, Bing в меню Пуск и фонового сбора данных с возможностью 1-Click отката" 
+                <TextBlock Text="{x:Static loc:Localizer.PrivacyDebloat_Subtitle}" 
                            FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,4,0,0"/>
             </StackPanel>
 
@@ -37,7 +38,7 @@
                         Margin="0,0,8,0">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="&#xE711;" FontFamily="Segoe MDL2 Assets" FontSize="13" Margin="0,0,6,0" VerticalAlignment="Center"/>
-                        <TextBlock Text="Отмена" VerticalAlignment="Center"/>
+                        <TextBlock Text="{x:Static loc:Localizer.Common_Cancel}" VerticalAlignment="Center"/>
                     </StackPanel>
                 </Button>
 
@@ -46,7 +47,7 @@
                         Style="{StaticResource PrimaryButton}" Margin="0,0,8,0">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="&#xE727;" FontFamily="Segoe MDL2 Assets" FontSize="13" Margin="0,0,6,0" VerticalAlignment="Center"/>
-                        <TextBlock Text="Отключить рекомендуемое" VerticalAlignment="Center"/>
+                        <TextBlock Text="{x:Static loc:Localizer.PrivacyDebloat_ApplyRecommended}" VerticalAlignment="Center"/>
                     </StackPanel>
                 </Button>
 
@@ -55,7 +56,7 @@
                         Style="{StaticResource SecondaryButton}" Margin="0,0,8,0">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="&#xE777;" FontFamily="Segoe MDL2 Assets" FontSize="13" Margin="0,0,6,0" VerticalAlignment="Center"/>
-                        <TextBlock Text="Восстановить" VerticalAlignment="Center"/>
+                        <TextBlock Text="{x:Static loc:Localizer.Common_Restore}" VerticalAlignment="Center"/>
                     </StackPanel>
                 </Button>
 
@@ -64,7 +65,7 @@
                         Style="{StaticResource SecondaryButton}">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="&#xE72C;" FontFamily="Segoe MDL2 Assets" FontSize="13" Margin="0,0,6,0" VerticalAlignment="Center"/>
-                        <TextBlock Text="Обновить" VerticalAlignment="Center"/>
+                        <TextBlock Text="{x:Static loc:Localizer.Common_Refresh}" VerticalAlignment="Center"/>
                     </StackPanel>
                 </Button>
             </StackPanel>
@@ -88,7 +89,7 @@
                             <TextBlock Text="/" FontSize="16" Foreground="{DynamicResource TextSecondaryBrush}" Margin="3,0"/>
                             <TextBlock Text="{Binding TotalCount}" FontSize="16" Foreground="{DynamicResource TextSecondaryBrush}"/>
                         </StackPanel>
-                        <TextBlock Text="ЗАЩИЩЕНО ПАРАМЕТРОВ" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0"/>
+                        <TextBlock Text="{x:Static loc:Localizer.PrivacyDebloat_ProtectedMetrics}" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0"/>
                     </StackPanel>
                 </Grid>
             </Border>
@@ -104,8 +105,8 @@
                         <TextBlock Text="&#xE72E;" FontFamily="Segoe MDL2 Assets" FontSize="18" Foreground="{DynamicResource AccentBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
                     <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                        <TextBlock Text="Приватность активна" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-                        <TextBlock Text="БЛОКИРОВКА СБОРА ДАННЫХ" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0"/>
+                        <TextBlock Text="{x:Static loc:Localizer.PrivacyDebloat_PrivacyActive}" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                        <TextBlock Text="{x:Static loc:Localizer.PrivacyDebloat_DataCollectionBlocked}" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0"/>
                     </StackPanel>
                 </Grid>
             </Border>
@@ -121,8 +122,8 @@
                         <TextBlock Text="&#xE74E;" FontFamily="Segoe MDL2 Assets" FontSize="18" Foreground="{DynamicResource CautionBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
                     <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                        <TextBlock Text="Безопасный откат" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-                        <TextBlock Text="РЕЗЕРВНАЯ КОПИЯ В JSON" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0"/>
+                        <TextBlock Text="{x:Static loc:Localizer.PrivacyDebloat_SafeRollback}" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                        <TextBlock Text="{x:Static loc:Localizer.PrivacyDebloat_JsonBackup}" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0"/>
                     </StackPanel>
                 </Grid>
             </Border>
@@ -139,13 +140,13 @@
                 <!-- Category Filter Selector -->
                 <DockPanel Grid.Row="0" Margin="0,0,0,12">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <TextBlock Text="Категория:" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,8,0" FontWeight="SemiBold"/>
+                        <TextBlock Text="{x:Static loc:Localizer.PrivacyDebloat_CategoryLabel}" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,8,0" FontWeight="SemiBold"/>
                         <ComboBox SelectedIndex="{Binding SelectedCategoryIndex, Mode=TwoWay}" Width="240" Height="32">
-                            <ComboBoxItem Content="Все параметры"/>
-                            <ComboBoxItem Content="Телеметрия и диагностика"/>
-                            <ComboBoxItem Content="Реклама и предложения"/>
-                            <ComboBoxItem Content="Отчёты и отзывы"/>
-                            <ComboBoxItem Content="Слежка и датчики"/>
+                            <ComboBoxItem Content="{x:Static loc:Localizer.PrivacyDebloat_CategoryAll}"/>
+                            <ComboBoxItem Content="{x:Static loc:Localizer.PrivacyDebloat_CategoryTelemetry}"/>
+                            <ComboBoxItem Content="{x:Static loc:Localizer.PrivacyDebloat_CategoryAds}"/>
+                            <ComboBoxItem Content="{x:Static loc:Localizer.PrivacyDebloat_CategoryReports}"/>
+                            <ComboBoxItem Content="{x:Static loc:Localizer.PrivacyDebloat_CategorySensors}"/>
                         </ComboBox>
                     </StackPanel>
                 </DockPanel>
@@ -203,11 +204,11 @@
                                             <TextBlock FontSize="11" FontWeight="SemiBold">
                                                 <TextBlock.Style>
                                                     <Style TargetType="TextBlock">
-                                                        <Setter Property="Text" Value="Активен сбор"/>
+                                                        <Setter Property="Text" Value="{x:Static loc:Localizer.PrivacyDebloat_StatusCollecting}"/>
                                                         <Setter Property="Foreground" Value="{DynamicResource DangerBrush}"/>
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding IsApplied}" Value="True">
-                                                                <Setter Property="Text" Value="Заблокировано"/>
+                                                                <Setter Property="Text" Value="{x:Static loc:Localizer.PrivacyDebloat_StatusBlocked}"/>
                                                                 <Setter Property="Foreground" Value="{DynamicResource SafeBrush}"/>
                                                             </DataTrigger>
                                                         </Style.Triggers>
@@ -223,10 +224,10 @@
                                                 IsEnabled="{Binding DataContext.IsBusy, RelativeSource={RelativeSource AncestorType=ListView}, Converter={StaticResource InverseBoolConverter}}">
                                             <Button.Style>
                                                 <Style TargetType="Button" BasedOn="{StaticResource SecondaryButton}">
-                                                    <Setter Property="Content" Value="Отключить"/>
+                                                    <Setter Property="Content" Value="{x:Static loc:Localizer.Common_Disable}"/>
                                                     <Style.Triggers>
                                                         <DataTrigger Binding="{Binding IsApplied}" Value="True">
-                                                            <Setter Property="Content" Value="Включить"/>
+                                                            <Setter Property="Content" Value="{x:Static loc:Localizer.Common_Enable}"/>
                                                         </DataTrigger>
                                                     </Style.Triggers>
                                                 </Style>
@@ -244,7 +245,7 @@
         <!-- Footer Status -->
         <Border Grid.Row="3" Margin="0,12,0,0" Padding="12,8" Background="{DynamicResource SurfaceBrush}" CornerRadius="6">
             <DockPanel>
-                <TextBlock Text="Все параметры обратимы. Перед изменением создается автоматический снимок реестра в privacy_backup.json." 
+                <TextBlock Text="{x:Static loc:Localizer.PrivacyDebloat_FooterNote}" 
                            FontSize="11.5" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
                 <TextBlock Text="{Binding StatusText}" HorizontalAlignment="Right" FontSize="11.5" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center"/>
             </DockPanel>

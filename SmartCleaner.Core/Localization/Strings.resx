@@ -618,4 +618,295 @@
   <data name="AiAssistant_Send" xml:space="preserve">
     <value>Send</value>
   </data>
+  <data name="RamOptimizer_Title" xml:space="preserve">
+    <value>Memory Optimization, Game Boost, SSD &amp; Shredder</value>
+  </data>
+  <data name="RamOptimizer_Subtitle" xml:space="preserve">
+    <value>1-click game acceleration, RAM freeing, SSD wear telemetry, SQLite vacuum and DoD 5220.22-M shredder</value>
+  </data>
+  <data name="RamOptimizer_TabRam" xml:space="preserve">
+    <value>Memory</value>
+  </data>
+  <data name="RamOptimizer_StatTotal" xml:space="preserve">
+    <value>Total memory</value>
+  </data>
+  <data name="RamOptimizer_StatUsed" xml:space="preserve">
+    <value>Memory used</value>
+  </data>
+  <data name="RamOptimizer_LoadLabel" xml:space="preserve">
+    <value>Load: </value>
+  </data>
+  <data name="RamOptimizer_StatAvailable" xml:space="preserve">
+    <value>Memory available</value>
+  </data>
+  <data name="RamOptimizer_StandbyTitle" xml:space="preserve">
+    <value>Standby List &amp; Working Sets Cleanup</value>
+  </data>
+  <data name="RamOptimizer_StandbyDescription" xml:space="preserve">
+    <value>Optimizes the working sets of running processes and returns memory held by Windows without closing programs.</value>
+  </data>
+  <data name="RamOptimizer_Optimize" xml:space="preserve">
+    <value>Clean up RAM</value>
+  </data>
+  <data name="RamOptimizer_GameBoostDescription" xml:space="preserve">
+    <value>Maximum performance for games and heavy software in 1 click:\n• Flushes RAM cache and frees up maximum RAM\n• Pauses SysMain, Windows telemetry and update services\n• Enables the High performance power profile</value>
+  </data>
+  <data name="RamOptimizer_ToggleGameBoost" xml:space="preserve">
+    <value>Toggle Game Turbo Boost</value>
+  </data>
+  <data name="RamOptimizer_TabSsdHealth" xml:space="preserve">
+    <value>S.M.A.R.T. SSD Health</value>
+  </data>
+  <data name="RamOptimizer_RefreshDisks" xml:space="preserve">
+    <value>Refresh disk telemetry</value>
+  </data>
+  <data name="RamOptimizer_ColDisk" xml:space="preserve">
+    <value>Disk / Model</value>
+  </data>
+  <data name="RamOptimizer_ColMediaType" xml:space="preserve">
+    <value>Media type</value>
+  </data>
+  <data name="RamOptimizer_ColBus" xml:space="preserve">
+    <value>Bus</value>
+  </data>
+  <data name="RamOptimizer_ColSize" xml:space="preserve">
+    <value>Total size</value>
+  </data>
+  <data name="RamOptimizer_ColHealth" xml:space="preserve">
+    <value>Health</value>
+  </data>
+  <data name="RamOptimizer_ColRemainingLife" xml:space="preserve">
+    <value>Remaining life</value>
+  </data>
+  <data name="RamOptimizer_ColTemperature" xml:space="preserve">
+    <value>Temperature</value>
+  </data>
+  <data name="RamOptimizer_TabSqlite" xml:space="preserve">
+    <value>SQLite Databases</value>
+  </data>
+  <data name="RamOptimizer_FindDatabases" xml:space="preserve">
+    <value>Find databases</value>
+  </data>
+  <data name="RamOptimizer_CompactDatabases" xml:space="preserve">
+    <value>Compact and vacuum databases</value>
+  </data>
+  <data name="RamOptimizer_ColApp" xml:space="preserve">
+    <value>Application</value>
+  </data>
+  <data name="RamOptimizer_ColDbName" xml:space="preserve">
+    <value>Database name</value>
+  </data>
+  <data name="RamOptimizer_ColOriginalSize" xml:space="preserve">
+    <value>Original size</value>
+  </data>
+  <data name="RamOptimizer_ColCompactedSize" xml:space="preserve">
+    <value>After compaction</value>
+  </data>
+  <data name="RamOptimizer_ColStatus" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="RamOptimizer_TabShredder" xml:space="preserve">
+    <value>File Shredder</value>
+  </data>
+  <data name="RamOptimizer_ShredTitle" xml:space="preserve">
+    <value>Irreversible File Destruction</value>
+  </data>
+  <data name="RamOptimizer_ShredDescription" xml:space="preserve">
+    <value>Guaranteed erasure of confidential documents, passwords and keys in 3 passes (DoD 5220.22-M) with sector overwrite using zeros and cryptographic pseudo-random bytes.</value>
+  </data>
+  <data name="RamOptimizer_ShredPathLabel" xml:space="preserve">
+    <value>Path to the file to destroy:</value>
+  </data>
+  <data name="RamOptimizer_ShredFile" xml:space="preserve">
+    <value>IRREVERSIBLY SHRED FILE (DoD 3-Pass)</value>
+  </data>
+  <data name="NetworkOptimizer_Title" xml:space="preserve">
+    <value>Network, Ping &amp; DNS Optimization</value>
+  </data>
+  <data name="NetworkOptimizer_Subtitle" xml:space="preserve">
+    <value>Lower latency in online games, fast secure DNS and Windows network stack reset</value>
+  </data>
+  <data name="NetworkOptimizer_ResetTitle" xml:space="preserve">
+    <value>Network Reset &amp; DNS Cleanup</value>
+  </data>
+  <data name="NetworkOptimizer_ResetDescription" xml:space="preserve">
+    <value>Flushes the DNS resolver cache (flushdns), clears Winsock sockets and the ARP table when you experience lag or network errors.</value>
+  </data>
+  <data name="NetworkOptimizer_FlushAction" xml:space="preserve">
+    <value>Flush DNS and sockets</value>
+  </data>
+  <data name="NetworkOptimizer_NoDelayTitle" xml:space="preserve">
+    <value>TCP NoDelay Gaming Tweak</value>
+  </data>
+  <data name="NetworkOptimizer_NoDelayDescription" xml:space="preserve">
+    <value>Disables Nagle's algorithm in the registry (TcpAckFrequency = 1). Network packets are sent immediately without batching delay.</value>
+  </data>
+  <data name="NetworkOptimizer_EnableNoDelay" xml:space="preserve">
+    <value>Enable TCP NoDelay (lower ping in games)</value>
+  </data>
+  <data name="NetworkOptimizer_DnsTableTitle" xml:space="preserve">
+    <value>Fast DNS servers with latency measurement (Ping)</value>
+  </data>
+  <data name="NetworkOptimizer_BenchmarkPing" xml:space="preserve">
+    <value>Measure Ping</value>
+  </data>
+  <data name="NetworkOptimizer_ResetToDhcp" xml:space="preserve">
+    <value>Reset to DHCP (Auto)</value>
+  </data>
+  <data name="NetworkOptimizer_ColProvider" xml:space="preserve">
+    <value>DNS provider</value>
+  </data>
+  <data name="NetworkOptimizer_ColPrimary" xml:space="preserve">
+    <value>Primary DNS</value>
+  </data>
+  <data name="NetworkOptimizer_ColSecondary" xml:space="preserve">
+    <value>Secondary DNS</value>
+  </data>
+  <data name="NetworkOptimizer_ColLatency" xml:space="preserve">
+    <value>Ping (Latency)</value>
+  </data>
+  <data name="NetworkOptimizer_ColAction" xml:space="preserve">
+    <value>Action</value>
+  </data>
+  <data name="NetworkOptimizer_Apply" xml:space="preserve">
+    <value>Apply</value>
+  </data>
+  <data name="Common_Restore" xml:space="preserve">
+    <value>Restore</value>
+  </data>
+  <data name="Common_Disable" xml:space="preserve">
+    <value>Disable</value>
+  </data>
+  <data name="Common_Enable" xml:space="preserve">
+    <value>Enable</value>
+  </data>
+  <data name="PrivacyDebloat_Title" xml:space="preserve">
+    <value>Privacy Protection &amp; Anti-Spy Debloater</value>
+  </data>
+  <data name="PrivacyDebloat_Subtitle" xml:space="preserve">
+    <value>Disables hidden Windows telemetry, advertising trackers, Bing in the Start menu and background data collection with 1-Click rollback</value>
+  </data>
+  <data name="PrivacyDebloat_ApplyRecommended" xml:space="preserve">
+    <value>Disable recommended</value>
+  </data>
+  <data name="PrivacyDebloat_ProtectedMetrics" xml:space="preserve">
+    <value>SETTINGS PROTECTED</value>
+  </data>
+  <data name="PrivacyDebloat_PrivacyActive" xml:space="preserve">
+    <value>Privacy active</value>
+  </data>
+  <data name="PrivacyDebloat_DataCollectionBlocked" xml:space="preserve">
+    <value>DATA COLLECTION BLOCKED</value>
+  </data>
+  <data name="PrivacyDebloat_SafeRollback" xml:space="preserve">
+    <value>Safe rollback</value>
+  </data>
+  <data name="PrivacyDebloat_JsonBackup" xml:space="preserve">
+    <value>BACKUP COPY IN JSON</value>
+  </data>
+  <data name="PrivacyDebloat_CategoryLabel" xml:space="preserve">
+    <value>Category:</value>
+  </data>
+  <data name="PrivacyDebloat_CategoryAll" xml:space="preserve">
+    <value>All settings</value>
+  </data>
+  <data name="PrivacyDebloat_CategoryTelemetry" xml:space="preserve">
+    <value>Telemetry &amp; diagnostics</value>
+  </data>
+  <data name="PrivacyDebloat_CategoryAds" xml:space="preserve">
+    <value>Ads and offers</value>
+  </data>
+  <data name="PrivacyDebloat_CategoryReports" xml:space="preserve">
+    <value>Reports &amp; feedback</value>
+  </data>
+  <data name="PrivacyDebloat_CategorySensors" xml:space="preserve">
+    <value>Tracking &amp; sensors</value>
+  </data>
+  <data name="PrivacyDebloat_StatusCollecting" xml:space="preserve">
+    <value>Collection active</value>
+  </data>
+  <data name="PrivacyDebloat_StatusBlocked" xml:space="preserve">
+    <value>Blocked</value>
+  </data>
+  <data name="PrivacyDebloat_FooterNote" xml:space="preserve">
+    <value>All settings are reversible. An automatic registry snapshot is saved to privacy_backup.json before any change.</value>
+  </data>
+  <data name="ServicesOptimizer_Title" xml:space="preserve">
+    <value>Windows Background Services Optimizer</value>
+  </data>
+  <data name="ServicesOptimizer_Subtitle" xml:space="preserve">
+    <value>Smart profiling of system services: lower CPU and disk load in games while keeping stability, with 1-Click backup</value>
+  </data>
+  <data name="ServicesOptimizer_RestoreServices" xml:space="preserve">
+    <value>Restore services</value>
+  </data>
+  <data name="ServicesOptimizer_GamingProfile" xml:space="preserve">
+    <value>Gaming profile</value>
+  </data>
+  <data name="ServicesOptimizer_GamingProfileHint" xml:space="preserve">
+    <value>Maximum FPS and responsiveness</value>
+  </data>
+  <data name="ServicesOptimizer_GamingProfileDescription" xml:space="preserve">
+    <value>Disables SysMain, telemetry, fax, remote registry, WerSvc and demo services to eliminate micro-stutters.</value>
+  </data>
+  <data name="ServicesOptimizer_ApplyProfile" xml:space="preserve">
+    <value>Apply profile</value>
+  </data>
+  <data name="ServicesOptimizer_BalancedProfile" xml:space="preserve">
+    <value>Balanced</value>
+  </data>
+  <data name="ServicesOptimizer_BalancedProfileHint" xml:space="preserve">
+    <value>100% safe cleanup</value>
+  </data>
+  <data name="ServicesOptimizer_BalancedProfileDescription" xml:space="preserve">
+    <value>Disables unused system ballast (fax, maps, retail demo, telemetry). Recommended for all PCs.</value>
+  </data>
+  <data name="ServicesOptimizer_WorkstationProfile" xml:space="preserve">
+    <value>Workstation</value>
+  </data>
+  <data name="ServicesOptimizer_WorkstationProfileHint" xml:space="preserve">
+    <value>Keeps printers and network</value>
+  </data>
+  <data name="ServicesOptimizer_WorkstationProfileDescription" xml:space="preserve">
+    <value>Blocks ads and tracking while keeping the print spooler, network shares and Windows Hello working.</value>
+  </data>
+  <data name="ServicesOptimizer_RiskFilterLabel" xml:space="preserve">
+    <value>Risk filter:</value>
+  </data>
+  <data name="ServicesOptimizer_RiskFilterAll" xml:space="preserve">
+    <value>All services</value>
+  </data>
+  <data name="ServicesOptimizer_RiskFilterSafe" xml:space="preserve">
+    <value>Safe to disable</value>
+  </data>
+  <data name="ServicesOptimizer_RiskFilterModerate" xml:space="preserve">
+    <value>Moderate risk</value>
+  </data>
+  <data name="ServicesOptimizer_DisabledCountLabel" xml:space="preserve">
+    <value>Disabled services:</value>
+  </data>
+  <data name="ServicesOptimizer_CountSeparator" xml:space="preserve">
+    <value>of</value>
+  </data>
+  <data name="ServicesOptimizer_ColService" xml:space="preserve">
+    <value>Service</value>
+  </data>
+  <data name="ServicesOptimizer_ColCategory" xml:space="preserve">
+    <value>Category</value>
+  </data>
+  <data name="ServicesOptimizer_ColStatus" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="ServicesOptimizer_ColStartupType" xml:space="preserve">
+    <value>Startup type</value>
+  </data>
+  <data name="ServicesOptimizer_ColRisk" xml:space="preserve">
+    <value>Risk</value>
+  </data>
+  <data name="ServicesOptimizer_ColAction" xml:space="preserve">
+    <value>Action</value>
+  </data>
+  <data name="ServicesOptimizer_FooterNote" xml:space="preserve">
+    <value>Service changes are fully reversible. The initial state is saved to services_backup.json.</value>
+  </data>
 </root>

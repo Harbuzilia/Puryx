@@ -315,4 +315,111 @@ public static class Localizer
     public static string AiAssistant_Subtitle => GetString(nameof(AiAssistant_Subtitle));
     public static string AiAssistant_InputPlaceholder => GetString(nameof(AiAssistant_InputPlaceholder));
     public static string AiAssistant_Send => GetString(nameof(AiAssistant_Send));
+
+    // День 3, срез 2: Оптимизация памяти / Game Boost / SSD / Шредер
+    public static string RamOptimizer_Title => GetString(nameof(RamOptimizer_Title));
+    public static string RamOptimizer_Subtitle => GetString(nameof(RamOptimizer_Subtitle));
+    public static string RamOptimizer_TabRam => GetString(nameof(RamOptimizer_TabRam));
+    public static string RamOptimizer_StatTotal => GetString(nameof(RamOptimizer_StatTotal));
+    public static string RamOptimizer_StatUsed => GetString(nameof(RamOptimizer_StatUsed));
+    public static string RamOptimizer_LoadLabel => GetString(nameof(RamOptimizer_LoadLabel));
+    public static string RamOptimizer_StatAvailable => GetString(nameof(RamOptimizer_StatAvailable));
+    public static string RamOptimizer_StandbyTitle => GetString(nameof(RamOptimizer_StandbyTitle));
+    public static string RamOptimizer_StandbyDescription => GetString(nameof(RamOptimizer_StandbyDescription));
+    public static string RamOptimizer_Optimize => GetString(nameof(RamOptimizer_Optimize));
+    public static string RamOptimizer_GameBoostDescription => GetString(nameof(RamOptimizer_GameBoostDescription));
+    public static string RamOptimizer_ToggleGameBoost => GetString(nameof(RamOptimizer_ToggleGameBoost));
+    public static string RamOptimizer_TabSsdHealth => GetString(nameof(RamOptimizer_TabSsdHealth));
+    public static string RamOptimizer_RefreshDisks => GetString(nameof(RamOptimizer_RefreshDisks));
+    public static string RamOptimizer_ColDisk => GetString(nameof(RamOptimizer_ColDisk));
+    public static string RamOptimizer_ColMediaType => GetString(nameof(RamOptimizer_ColMediaType));
+    public static string RamOptimizer_ColBus => GetString(nameof(RamOptimizer_ColBus));
+    public static string RamOptimizer_ColSize => GetString(nameof(RamOptimizer_ColSize));
+    public static string RamOptimizer_ColHealth => GetString(nameof(RamOptimizer_ColHealth));
+    public static string RamOptimizer_ColRemainingLife => GetString(nameof(RamOptimizer_ColRemainingLife));
+    public static string RamOptimizer_ColTemperature => GetString(nameof(RamOptimizer_ColTemperature));
+    public static string RamOptimizer_TabSqlite => GetString(nameof(RamOptimizer_TabSqlite));
+    public static string RamOptimizer_FindDatabases => GetString(nameof(RamOptimizer_FindDatabases));
+    public static string RamOptimizer_CompactDatabases => GetString(nameof(RamOptimizer_CompactDatabases));
+    public static string RamOptimizer_ColApp => GetString(nameof(RamOptimizer_ColApp));
+    public static string RamOptimizer_ColDbName => GetString(nameof(RamOptimizer_ColDbName));
+    public static string RamOptimizer_ColOriginalSize => GetString(nameof(RamOptimizer_ColOriginalSize));
+    public static string RamOptimizer_ColCompactedSize => GetString(nameof(RamOptimizer_ColCompactedSize));
+    public static string RamOptimizer_ColStatus => GetString(nameof(RamOptimizer_ColStatus));
+    public static string RamOptimizer_TabShredder => GetString(nameof(RamOptimizer_TabShredder));
+    public static string RamOptimizer_ShredTitle => GetString(nameof(RamOptimizer_ShredTitle));
+    public static string RamOptimizer_ShredDescription => GetString(nameof(RamOptimizer_ShredDescription));
+    public static string RamOptimizer_ShredPathLabel => GetString(nameof(RamOptimizer_ShredPathLabel));
+    public static string RamOptimizer_ShredFile => GetString(nameof(RamOptimizer_ShredFile));
+
+    // День 3, срез 2: Оптимизация сети
+    public static string NetworkOptimizer_Title => GetString(nameof(NetworkOptimizer_Title));
+    public static string NetworkOptimizer_Subtitle => GetString(nameof(NetworkOptimizer_Subtitle));
+    public static string NetworkOptimizer_ResetTitle => GetString(nameof(NetworkOptimizer_ResetTitle));
+    public static string NetworkOptimizer_ResetDescription => GetString(nameof(NetworkOptimizer_ResetDescription));
+    public static string NetworkOptimizer_FlushAction => GetString(nameof(NetworkOptimizer_FlushAction));
+    public static string NetworkOptimizer_NoDelayTitle => GetString(nameof(NetworkOptimizer_NoDelayTitle));
+    public static string NetworkOptimizer_NoDelayDescription => GetString(nameof(NetworkOptimizer_NoDelayDescription));
+    public static string NetworkOptimizer_EnableNoDelay => GetString(nameof(NetworkOptimizer_EnableNoDelay));
+    public static string NetworkOptimizer_DnsTableTitle => GetString(nameof(NetworkOptimizer_DnsTableTitle));
+    public static string NetworkOptimizer_BenchmarkPing => GetString(nameof(NetworkOptimizer_BenchmarkPing));
+    public static string NetworkOptimizer_ResetToDhcp => GetString(nameof(NetworkOptimizer_ResetToDhcp));
+    public static string NetworkOptimizer_ColProvider => GetString(nameof(NetworkOptimizer_ColProvider));
+    public static string NetworkOptimizer_ColPrimary => GetString(nameof(NetworkOptimizer_ColPrimary));
+    public static string NetworkOptimizer_ColSecondary => GetString(nameof(NetworkOptimizer_ColSecondary));
+    public static string NetworkOptimizer_ColLatency => GetString(nameof(NetworkOptimizer_ColLatency));
+    public static string NetworkOptimizer_ColAction => GetString(nameof(NetworkOptimizer_ColAction));
+    public static string NetworkOptimizer_Apply => GetString(nameof(NetworkOptimizer_Apply));
+
+    // День 3, срез 2: общие строки (новые повторы)
+    public static string Common_Restore => GetString(nameof(Common_Restore));
+    public static string Common_Disable => GetString(nameof(Common_Disable));
+    public static string Common_Enable => GetString(nameof(Common_Enable));
+
+    // День 3, срез 2: Приватность / Anti-Spy
+    public static string PrivacyDebloat_Title => GetString(nameof(PrivacyDebloat_Title));
+    public static string PrivacyDebloat_Subtitle => GetString(nameof(PrivacyDebloat_Subtitle));
+    public static string PrivacyDebloat_ApplyRecommended => GetString(nameof(PrivacyDebloat_ApplyRecommended));
+    public static string PrivacyDebloat_ProtectedMetrics => GetString(nameof(PrivacyDebloat_ProtectedMetrics));
+    public static string PrivacyDebloat_PrivacyActive => GetString(nameof(PrivacyDebloat_PrivacyActive));
+    public static string PrivacyDebloat_DataCollectionBlocked => GetString(nameof(PrivacyDebloat_DataCollectionBlocked));
+    public static string PrivacyDebloat_SafeRollback => GetString(nameof(PrivacyDebloat_SafeRollback));
+    public static string PrivacyDebloat_JsonBackup => GetString(nameof(PrivacyDebloat_JsonBackup));
+    public static string PrivacyDebloat_CategoryLabel => GetString(nameof(PrivacyDebloat_CategoryLabel));
+    public static string PrivacyDebloat_CategoryAll => GetString(nameof(PrivacyDebloat_CategoryAll));
+    public static string PrivacyDebloat_CategoryTelemetry => GetString(nameof(PrivacyDebloat_CategoryTelemetry));
+    public static string PrivacyDebloat_CategoryAds => GetString(nameof(PrivacyDebloat_CategoryAds));
+    public static string PrivacyDebloat_CategoryReports => GetString(nameof(PrivacyDebloat_CategoryReports));
+    public static string PrivacyDebloat_CategorySensors => GetString(nameof(PrivacyDebloat_CategorySensors));
+    public static string PrivacyDebloat_StatusCollecting => GetString(nameof(PrivacyDebloat_StatusCollecting));
+    public static string PrivacyDebloat_StatusBlocked => GetString(nameof(PrivacyDebloat_StatusBlocked));
+    public static string PrivacyDebloat_FooterNote => GetString(nameof(PrivacyDebloat_FooterNote));
+
+    // День 3, срез 2: Оптимизатор служб
+    public static string ServicesOptimizer_Title => GetString(nameof(ServicesOptimizer_Title));
+    public static string ServicesOptimizer_Subtitle => GetString(nameof(ServicesOptimizer_Subtitle));
+    public static string ServicesOptimizer_RestoreServices => GetString(nameof(ServicesOptimizer_RestoreServices));
+    public static string ServicesOptimizer_GamingProfile => GetString(nameof(ServicesOptimizer_GamingProfile));
+    public static string ServicesOptimizer_GamingProfileHint => GetString(nameof(ServicesOptimizer_GamingProfileHint));
+    public static string ServicesOptimizer_GamingProfileDescription => GetString(nameof(ServicesOptimizer_GamingProfileDescription));
+    public static string ServicesOptimizer_ApplyProfile => GetString(nameof(ServicesOptimizer_ApplyProfile));
+    public static string ServicesOptimizer_BalancedProfile => GetString(nameof(ServicesOptimizer_BalancedProfile));
+    public static string ServicesOptimizer_BalancedProfileHint => GetString(nameof(ServicesOptimizer_BalancedProfileHint));
+    public static string ServicesOptimizer_BalancedProfileDescription => GetString(nameof(ServicesOptimizer_BalancedProfileDescription));
+    public static string ServicesOptimizer_WorkstationProfile => GetString(nameof(ServicesOptimizer_WorkstationProfile));
+    public static string ServicesOptimizer_WorkstationProfileHint => GetString(nameof(ServicesOptimizer_WorkstationProfileHint));
+    public static string ServicesOptimizer_WorkstationProfileDescription => GetString(nameof(ServicesOptimizer_WorkstationProfileDescription));
+    public static string ServicesOptimizer_RiskFilterLabel => GetString(nameof(ServicesOptimizer_RiskFilterLabel));
+    public static string ServicesOptimizer_RiskFilterAll => GetString(nameof(ServicesOptimizer_RiskFilterAll));
+    public static string ServicesOptimizer_RiskFilterSafe => GetString(nameof(ServicesOptimizer_RiskFilterSafe));
+    public static string ServicesOptimizer_RiskFilterModerate => GetString(nameof(ServicesOptimizer_RiskFilterModerate));
+    public static string ServicesOptimizer_DisabledCountLabel => GetString(nameof(ServicesOptimizer_DisabledCountLabel));
+    public static string ServicesOptimizer_CountSeparator => GetString(nameof(ServicesOptimizer_CountSeparator));
+    public static string ServicesOptimizer_ColService => GetString(nameof(ServicesOptimizer_ColService));
+    public static string ServicesOptimizer_ColCategory => GetString(nameof(ServicesOptimizer_ColCategory));
+    public static string ServicesOptimizer_ColStatus => GetString(nameof(ServicesOptimizer_ColStatus));
+    public static string ServicesOptimizer_ColStartupType => GetString(nameof(ServicesOptimizer_ColStartupType));
+    public static string ServicesOptimizer_ColRisk => GetString(nameof(ServicesOptimizer_ColRisk));
+    public static string ServicesOptimizer_ColAction => GetString(nameof(ServicesOptimizer_ColAction));
+    public static string ServicesOptimizer_FooterNote => GetString(nameof(ServicesOptimizer_FooterNote));
 }

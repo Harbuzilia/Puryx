@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:loc="clr-namespace:SmartCleaner.Core.Localization;assembly=SmartCleaner.Core"
              mc:Ignorable="d" 
              d:DesignHeight="700" d:DesignWidth="900">
     <Grid Margin="24,20">
@@ -19,12 +20,12 @@
                     <Border Width="32" Height="32" CornerRadius="8" Background="{DynamicResource AccentGradientBrush}" Margin="0,0,10,0" VerticalAlignment="Center">
                         <TextBlock Text="&#xE774;" FontFamily="Segoe MDL2 Assets" FontSize="16" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
-                    <TextBlock Text="Оптимизация сети, Ping и DNS" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
+                    <TextBlock Text="{x:Static loc:Localizer.NetworkOptimizer_Title}" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
                     <Border Background="{DynamicResource AccentBrush}" CornerRadius="4" Padding="6,2" Margin="10,0,0,0" VerticalAlignment="Center">
                         <TextBlock Text="LOW LATENCY" FontSize="9.5" Foreground="White" FontWeight="Bold"/>
                     </Border>
                 </StackPanel>
-                <TextBlock Text="Снижение задержек в онлайн-играх, быстрые защищенные DNS и сброс сетевого стека Windows" FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,4,0,0"/>
+                <TextBlock Text="{x:Static loc:Localizer.NetworkOptimizer_Subtitle}" FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,4,0,0"/>
             </StackPanel>
         </DockPanel>
 
@@ -39,15 +40,15 @@
             <UniformGrid Grid.Row="0" Columns="2" Margin="0,0,0,16">
                 <Border Background="{DynamicResource SurfaceBrush}" CornerRadius="12" Padding="20" Margin="0,0,8,0" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
                     <StackPanel>
-                        <TextBlock Text="Сброс сети и очистка DNS" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-                        <TextBlock Text="Сбрасывает кэш распознавателя DNS (flushdns), очищает сокеты Winsock и ARP-таблицу при лагах или сетевых ошибках." TextWrapping="Wrap" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,6,0,14"/>
+                        <TextBlock Text="{x:Static loc:Localizer.NetworkOptimizer_ResetTitle}" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                        <TextBlock Text="{x:Static loc:Localizer.NetworkOptimizer_ResetDescription}" TextWrapping="Wrap" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,6,0,14"/>
 
                         <Button Command="{Binding FlushDnsAndWinsockCommand}"
                                 IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"
                                 Style="{StaticResource PrimaryButton}" HorizontalAlignment="Left">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="&#xE777;" FontFamily="Segoe MDL2 Assets" FontSize="13" Margin="0,0,6,0" VerticalAlignment="Center"/>
-                                <TextBlock Text="Очистить DNS и сокеты" VerticalAlignment="Center"/>
+                                <TextBlock Text="{x:Static loc:Localizer.NetworkOptimizer_FlushAction}" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
                     </StackPanel>
@@ -55,10 +56,10 @@
 
                 <Border Background="{DynamicResource SurfaceBrush}" CornerRadius="12" Padding="20" Margin="8,0,0,0" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
                     <StackPanel>
-                        <TextBlock Text="Игровой твик TCP NoDelay" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-                        <TextBlock Text="Отключает алгоритм Нагла в реестре (TcpAckFrequency = 1). Сетевые пакеты отправляются немедленно без задержки накопления." TextWrapping="Wrap" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,6,0,14"/>
+                        <TextBlock Text="{x:Static loc:Localizer.NetworkOptimizer_NoDelayTitle}" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                        <TextBlock Text="{x:Static loc:Localizer.NetworkOptimizer_NoDelayDescription}" TextWrapping="Wrap" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,6,0,14"/>
 
-                        <CheckBox Content="Включить TCP NoDelay (снижение пинга в играх)" 
+                        <CheckBox Content="{x:Static loc:Localizer.NetworkOptimizer_EnableNoDelay}" 
                                   IsChecked="{Binding IsTcpNoDelayEnabled, Mode=TwoWay}"
                                   Command="{Binding ToggleTcpNoDelayCommand}"
                                   FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/>
@@ -75,15 +76,15 @@
                     </Grid.RowDefinitions>
 
                     <DockPanel Grid.Row="0" Margin="0,0,0,12">
-                        <TextBlock DockPanel.Dock="Left" Text="Быстрые DNS-серверы с замером задержки (Ping)" FontSize="15" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
+                        <TextBlock DockPanel.Dock="Left" Text="{x:Static loc:Localizer.NetworkOptimizer_DnsTableTitle}" FontSize="15" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
                         
                         <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
-                            <Button Content="Замерить Ping" 
+                            <Button Content="{x:Static loc:Localizer.NetworkOptimizer_BenchmarkPing}" 
                                     Command="{Binding BenchmarkDnsCommand}"
                                     IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"
                                     Style="{StaticResource SecondaryButton}" Margin="0,0,8,0" Padding="14,6"/>
 
-                            <Button Content="Сбросить на DHCP (Авто)" 
+                            <Button Content="{x:Static loc:Localizer.NetworkOptimizer_ResetToDhcp}" 
                                     Command="{Binding ResetToDhcpCommand}"
                                     IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"
                                     Style="{StaticResource SecondaryButton}" Padding="14,6"/>
@@ -92,15 +93,15 @@
 
                     <DataGrid Grid.Row="1" ItemsSource="{Binding Presets}" AutoGenerateColumns="False" CanUserAddRows="False" Background="Transparent" BorderThickness="0" GridLinesVisibility="Horizontal" HeadersVisibility="Column">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Binding="{Binding Name}" Header="Провайдер DNS" Width="280" FontWeight="SemiBold"/>
-                            <DataGridTextColumn Binding="{Binding Primary}" Header="Основной DNS" Width="140"/>
-                            <DataGridTextColumn Binding="{Binding Secondary}" Header="Дополнительный DNS" Width="150"/>
-                            <DataGridTextColumn Binding="{Binding LatencyFormatted}" Header="Пинг (Задержка)" Width="130" Foreground="{DynamicResource SafeBrush}"/>
+                            <DataGridTextColumn Binding="{Binding Name}" Header="{x:Static loc:Localizer.NetworkOptimizer_ColProvider}" Width="280" FontWeight="SemiBold"/>
+                            <DataGridTextColumn Binding="{Binding Primary}" Header="{x:Static loc:Localizer.NetworkOptimizer_ColPrimary}" Width="140"/>
+                            <DataGridTextColumn Binding="{Binding Secondary}" Header="{x:Static loc:Localizer.NetworkOptimizer_ColSecondary}" Width="150"/>
+                            <DataGridTextColumn Binding="{Binding LatencyFormatted}" Header="{x:Static loc:Localizer.NetworkOptimizer_ColLatency}" Width="130" Foreground="{DynamicResource SafeBrush}"/>
                             
-                            <DataGridTemplateColumn Header="Действие" Width="*">
+                            <DataGridTemplateColumn Header="{x:Static loc:Localizer.NetworkOptimizer_ColAction}" Width="*">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <Button Content="Установить" 
+                                        <Button Content="{x:Static loc:Localizer.NetworkOptimizer_Apply}" 
                                                 Command="{Binding DataContext.ApplyDnsPresetCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                 CommandParameter="{Binding}"
                                                 Style="{StaticResource PrimaryButton}" Padding="12,4" Height="26" FontSize="11"/>

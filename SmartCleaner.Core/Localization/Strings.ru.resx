@@ -618,4 +618,295 @@
   <data name="AiAssistant_Send" xml:space="preserve">
     <value>Отправить</value>
   </data>
+  <data name="RamOptimizer_Title" xml:space="preserve">
+    <value>Оптимизация памяти, Game Boost, SSD &amp; Шредер</value>
+  </data>
+  <data name="RamOptimizer_Subtitle" xml:space="preserve">
+    <value>Ускорение игр в 1 клик, освобождение RAM, телеметрия износа SSD, вакуум SQLite и шредер DoD 5220.22-M</value>
+  </data>
+  <data name="RamOptimizer_TabRam" xml:space="preserve">
+    <value>Оперативная память</value>
+  </data>
+  <data name="RamOptimizer_StatTotal" xml:space="preserve">
+    <value>Всего памяти</value>
+  </data>
+  <data name="RamOptimizer_StatUsed" xml:space="preserve">
+    <value>Использовано памяти</value>
+  </data>
+  <data name="RamOptimizer_LoadLabel" xml:space="preserve">
+    <value>Загрузка: </value>
+  </data>
+  <data name="RamOptimizer_StatAvailable" xml:space="preserve">
+    <value>Свободно памяти</value>
+  </data>
+  <data name="RamOptimizer_StandbyTitle" xml:space="preserve">
+    <value>Очистка Standby List и Working Sets</value>
+  </data>
+  <data name="RamOptimizer_StandbyDescription" xml:space="preserve">
+    <value>Оптимизирует рабочие наборы запущенных процессов и возвращает занятую память Windows без закрытия программ.</value>
+  </data>
+  <data name="RamOptimizer_Optimize" xml:space="preserve">
+    <value>Очистить оперативную память (RAM)</value>
+  </data>
+  <data name="RamOptimizer_GameBoostDescription" xml:space="preserve">
+    <value>Максимальная производительность для игр и тяжелого софта в 1 клик:\n• Сбрасывает кэш оперативной памяти и освобождает максимум RAM\n• Приостанавливает службы SysMain, телеметрию Windows и обновление\n• Включает профиль электропитания «Высокая производительность»</value>
+  </data>
+  <data name="RamOptimizer_ToggleGameBoost" xml:space="preserve">
+    <value>Переключить Game Turbo Boost</value>
+  </data>
+  <data name="RamOptimizer_TabSsdHealth" xml:space="preserve">
+    <value>S.M.A.R.T. Здоровье SSD</value>
+  </data>
+  <data name="RamOptimizer_RefreshDisks" xml:space="preserve">
+    <value>Обновить телеметрию дисков</value>
+  </data>
+  <data name="RamOptimizer_ColDisk" xml:space="preserve">
+    <value>Диск / Модель</value>
+  </data>
+  <data name="RamOptimizer_ColMediaType" xml:space="preserve">
+    <value>Тип носителя</value>
+  </data>
+  <data name="RamOptimizer_ColBus" xml:space="preserve">
+    <value>Шина</value>
+  </data>
+  <data name="RamOptimizer_ColSize" xml:space="preserve">
+    <value>Общий объем</value>
+  </data>
+  <data name="RamOptimizer_ColHealth" xml:space="preserve">
+    <value>Состояние</value>
+  </data>
+  <data name="RamOptimizer_ColRemainingLife" xml:space="preserve">
+    <value>Остаток ресурса</value>
+  </data>
+  <data name="RamOptimizer_ColTemperature" xml:space="preserve">
+    <value>Температура</value>
+  </data>
+  <data name="RamOptimizer_TabSqlite" xml:space="preserve">
+    <value>Базы данных SQLite</value>
+  </data>
+  <data name="RamOptimizer_FindDatabases" xml:space="preserve">
+    <value>Найти базы данных</value>
+  </data>
+  <data name="RamOptimizer_CompactDatabases" xml:space="preserve">
+    <value>Сжать и вакуумировать базы</value>
+  </data>
+  <data name="RamOptimizer_ColApp" xml:space="preserve">
+    <value>Приложение</value>
+  </data>
+  <data name="RamOptimizer_ColDbName" xml:space="preserve">
+    <value>Имя базы</value>
+  </data>
+  <data name="RamOptimizer_ColOriginalSize" xml:space="preserve">
+    <value>Исходный размер</value>
+  </data>
+  <data name="RamOptimizer_ColCompactedSize" xml:space="preserve">
+    <value>После сжатия</value>
+  </data>
+  <data name="RamOptimizer_ColStatus" xml:space="preserve">
+    <value>Статус</value>
+  </data>
+  <data name="RamOptimizer_TabShredder" xml:space="preserve">
+    <value>Шредер файлов</value>
+  </data>
+  <data name="RamOptimizer_ShredTitle" xml:space="preserve">
+    <value>Безвозвратное уничтожение файлов</value>
+  </data>
+  <data name="RamOptimizer_ShredDescription" xml:space="preserve">
+    <value>Гарантированное стирание конфиденциальных документов, паролей и ключей в 3 прохода (DoD 5220.22-M) с перезаписью секторов нулями и криптографическими псевдослучайными байтами.</value>
+  </data>
+  <data name="RamOptimizer_ShredPathLabel" xml:space="preserve">
+    <value>Путь к файлу для уничтожения:</value>
+  </data>
+  <data name="RamOptimizer_ShredFile" xml:space="preserve">
+    <value>БЕЗВОЗВРАТНО СТЕРЕТЬ ФАЙЛ (DoD 3-Pass)</value>
+  </data>
+  <data name="NetworkOptimizer_Title" xml:space="preserve">
+    <value>Оптимизация сети, Ping и DNS</value>
+  </data>
+  <data name="NetworkOptimizer_Subtitle" xml:space="preserve">
+    <value>Снижение задержек в онлайн-играх, быстрые защищенные DNS и сброс сетевого стека Windows</value>
+  </data>
+  <data name="NetworkOptimizer_ResetTitle" xml:space="preserve">
+    <value>Сброс сети и очистка DNS</value>
+  </data>
+  <data name="NetworkOptimizer_ResetDescription" xml:space="preserve">
+    <value>Сбрасывает кэш распознавателя DNS (flushdns), очищает сокеты Winsock и ARP-таблицу при лагах или сетевых ошибках.</value>
+  </data>
+  <data name="NetworkOptimizer_FlushAction" xml:space="preserve">
+    <value>Очистить DNS и сокеты</value>
+  </data>
+  <data name="NetworkOptimizer_NoDelayTitle" xml:space="preserve">
+    <value>Игровой твик TCP NoDelay</value>
+  </data>
+  <data name="NetworkOptimizer_NoDelayDescription" xml:space="preserve">
+    <value>Отключает алгоритм Нагла в реестре (TcpAckFrequency = 1). Сетевые пакеты отправляются немедленно без задержки накопления.</value>
+  </data>
+  <data name="NetworkOptimizer_EnableNoDelay" xml:space="preserve">
+    <value>Включить TCP NoDelay (снижение пинга в играх)</value>
+  </data>
+  <data name="NetworkOptimizer_DnsTableTitle" xml:space="preserve">
+    <value>Быстрые DNS-серверы с замером задержки (Ping)</value>
+  </data>
+  <data name="NetworkOptimizer_BenchmarkPing" xml:space="preserve">
+    <value>Замерить Ping</value>
+  </data>
+  <data name="NetworkOptimizer_ResetToDhcp" xml:space="preserve">
+    <value>Сбросить на DHCP (Авто)</value>
+  </data>
+  <data name="NetworkOptimizer_ColProvider" xml:space="preserve">
+    <value>Провайдер DNS</value>
+  </data>
+  <data name="NetworkOptimizer_ColPrimary" xml:space="preserve">
+    <value>Основной DNS</value>
+  </data>
+  <data name="NetworkOptimizer_ColSecondary" xml:space="preserve">
+    <value>Дополнительный DNS</value>
+  </data>
+  <data name="NetworkOptimizer_ColLatency" xml:space="preserve">
+    <value>Пинг (Задержка)</value>
+  </data>
+  <data name="NetworkOptimizer_ColAction" xml:space="preserve">
+    <value>Действие</value>
+  </data>
+  <data name="NetworkOptimizer_Apply" xml:space="preserve">
+    <value>Установить</value>
+  </data>
+  <data name="Common_Restore" xml:space="preserve">
+    <value>Восстановить</value>
+  </data>
+  <data name="Common_Disable" xml:space="preserve">
+    <value>Отключить</value>
+  </data>
+  <data name="Common_Enable" xml:space="preserve">
+    <value>Включить</value>
+  </data>
+  <data name="PrivacyDebloat_Title" xml:space="preserve">
+    <value>Защита приватности и Anti-Spy Debloater</value>
+  </data>
+  <data name="PrivacyDebloat_Subtitle" xml:space="preserve">
+    <value>Отключение скрытой телеметрии Windows, рекламных трекеров, Bing в меню Пуск и фонового сбора данных с возможностью 1-Click отката</value>
+  </data>
+  <data name="PrivacyDebloat_ApplyRecommended" xml:space="preserve">
+    <value>Отключить рекомендуемое</value>
+  </data>
+  <data name="PrivacyDebloat_ProtectedMetrics" xml:space="preserve">
+    <value>ЗАЩИЩЕНО ПАРАМЕТРОВ</value>
+  </data>
+  <data name="PrivacyDebloat_PrivacyActive" xml:space="preserve">
+    <value>Приватность активна</value>
+  </data>
+  <data name="PrivacyDebloat_DataCollectionBlocked" xml:space="preserve">
+    <value>БЛОКИРОВКА СБОРА ДАННЫХ</value>
+  </data>
+  <data name="PrivacyDebloat_SafeRollback" xml:space="preserve">
+    <value>Безопасный откат</value>
+  </data>
+  <data name="PrivacyDebloat_JsonBackup" xml:space="preserve">
+    <value>РЕЗЕРВНАЯ КОПИЯ В JSON</value>
+  </data>
+  <data name="PrivacyDebloat_CategoryLabel" xml:space="preserve">
+    <value>Категория:</value>
+  </data>
+  <data name="PrivacyDebloat_CategoryAll" xml:space="preserve">
+    <value>Все параметры</value>
+  </data>
+  <data name="PrivacyDebloat_CategoryTelemetry" xml:space="preserve">
+    <value>Телеметрия и диагностика</value>
+  </data>
+  <data name="PrivacyDebloat_CategoryAds" xml:space="preserve">
+    <value>Реклама и предложения</value>
+  </data>
+  <data name="PrivacyDebloat_CategoryReports" xml:space="preserve">
+    <value>Отчёты и отзывы</value>
+  </data>
+  <data name="PrivacyDebloat_CategorySensors" xml:space="preserve">
+    <value>Слежка и датчики</value>
+  </data>
+  <data name="PrivacyDebloat_StatusCollecting" xml:space="preserve">
+    <value>Активен сбор</value>
+  </data>
+  <data name="PrivacyDebloat_StatusBlocked" xml:space="preserve">
+    <value>Заблокировано</value>
+  </data>
+  <data name="PrivacyDebloat_FooterNote" xml:space="preserve">
+    <value>Все параметры обратимы. Перед изменением создается автоматический снимок реестра в privacy_backup.json.</value>
+  </data>
+  <data name="ServicesOptimizer_Title" xml:space="preserve">
+    <value>Оптимизатор фоновых служб Windows</value>
+  </data>
+  <data name="ServicesOptimizer_Subtitle" xml:space="preserve">
+    <value>Умное профилирование системных служб: снижение нагрузки на процессор и диск в играх с сохранением стабильности и 1-Click бэкапом</value>
+  </data>
+  <data name="ServicesOptimizer_RestoreServices" xml:space="preserve">
+    <value>Восстановить службы</value>
+  </data>
+  <data name="ServicesOptimizer_GamingProfile" xml:space="preserve">
+    <value>Игровой профиль</value>
+  </data>
+  <data name="ServicesOptimizer_GamingProfileHint" xml:space="preserve">
+    <value>Максимум FPS и отклика</value>
+  </data>
+  <data name="ServicesOptimizer_GamingProfileDescription" xml:space="preserve">
+    <value>Отключает SysMain, телеметрию, факсы, удаленный реестр, WerSvc и демо-службы для устранения микрофризов.</value>
+  </data>
+  <data name="ServicesOptimizer_ApplyProfile" xml:space="preserve">
+    <value>Применить профиль</value>
+  </data>
+  <data name="ServicesOptimizer_BalancedProfile" xml:space="preserve">
+    <value>Сбалансированный</value>
+  </data>
+  <data name="ServicesOptimizer_BalancedProfileHint" xml:space="preserve">
+    <value>100% безопасная очистка</value>
+  </data>
+  <data name="ServicesOptimizer_BalancedProfileDescription" xml:space="preserve">
+    <value>Отключает неиспользуемый системный балласт (факсы, карты, ритейл демо, телеметрию). Рекомендуется для всех ПК.</value>
+  </data>
+  <data name="ServicesOptimizer_WorkstationProfile" xml:space="preserve">
+    <value>Рабочая станция</value>
+  </data>
+  <data name="ServicesOptimizer_WorkstationProfileHint" xml:space="preserve">
+    <value>Сохранение принтеров и сети</value>
+  </data>
+  <data name="ServicesOptimizer_WorkstationProfileDescription" xml:space="preserve">
+    <value>Блокирует рекламу и трекинг, сохраняя работоспособность диспетчера печати, сетевых папок и Windows Hello.</value>
+  </data>
+  <data name="ServicesOptimizer_RiskFilterLabel" xml:space="preserve">
+    <value>Фильтр риска:</value>
+  </data>
+  <data name="ServicesOptimizer_RiskFilterAll" xml:space="preserve">
+    <value>Все службы</value>
+  </data>
+  <data name="ServicesOptimizer_RiskFilterSafe" xml:space="preserve">
+    <value>Безопасные к отключению</value>
+  </data>
+  <data name="ServicesOptimizer_RiskFilterModerate" xml:space="preserve">
+    <value>Умеренный риск</value>
+  </data>
+  <data name="ServicesOptimizer_DisabledCountLabel" xml:space="preserve">
+    <value>Отключено служб:</value>
+  </data>
+  <data name="ServicesOptimizer_CountSeparator" xml:space="preserve">
+    <value>из</value>
+  </data>
+  <data name="ServicesOptimizer_ColService" xml:space="preserve">
+    <value>Служба</value>
+  </data>
+  <data name="ServicesOptimizer_ColCategory" xml:space="preserve">
+    <value>Категория</value>
+  </data>
+  <data name="ServicesOptimizer_ColStatus" xml:space="preserve">
+    <value>Состояние</value>
+  </data>
+  <data name="ServicesOptimizer_ColStartupType" xml:space="preserve">
+    <value>Тип запуска</value>
+  </data>
+  <data name="ServicesOptimizer_ColRisk" xml:space="preserve">
+    <value>Риск</value>
+  </data>
+  <data name="ServicesOptimizer_ColAction" xml:space="preserve">
+    <value>Действие</value>
+  </data>
+  <data name="ServicesOptimizer_FooterNote" xml:space="preserve">
+    <value>Изменения служб полностью обратимы. Начальное состояние сохраняется в services_backup.json.</value>
+  </data>
 </root>

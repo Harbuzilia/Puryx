@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:loc="clr-namespace:SmartCleaner.Core.Localization;assembly=SmartCleaner.Core"
              mc:Ignorable="d" 
              d:DesignHeight="750" d:DesignWidth="950">
     <Grid Margin="24,20">
@@ -20,12 +21,12 @@
                     <Border Width="32" Height="32" CornerRadius="8" Background="{DynamicResource AccentGradientBrush}" Margin="0,0,10,0" VerticalAlignment="Center">
                         <TextBlock Text="&#xE912;" FontFamily="Segoe MDL2 Assets" FontSize="16" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
-                    <TextBlock Text="Оптимизатор фоновых служб Windows" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
+                    <TextBlock Text="{x:Static loc:Localizer.ServicesOptimizer_Title}" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
                     <Border Background="{DynamicResource AccentBrush}" CornerRadius="4" Padding="6,2" Margin="10,0,0,0" VerticalAlignment="Center">
                         <TextBlock Text="ULTIMATE" FontSize="9.5" Foreground="White" FontWeight="Bold"/>
                     </Border>
                 </StackPanel>
-                <TextBlock Text="Умное профилирование системных служб: снижение нагрузки на процессор и диск в играх с сохранением стабильности и 1-Click бэкапом" 
+                <TextBlock Text="{x:Static loc:Localizer.ServicesOptimizer_Subtitle}" 
                            FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,4,0,0"/>
             </StackPanel>
 
@@ -37,7 +38,7 @@
                         Margin="0,0,8,0">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="&#xE711;" FontFamily="Segoe MDL2 Assets" FontSize="13" Margin="0,0,6,0" VerticalAlignment="Center"/>
-                        <TextBlock Text="Отмена" VerticalAlignment="Center"/>
+                        <TextBlock Text="{x:Static loc:Localizer.Common_Cancel}" VerticalAlignment="Center"/>
                     </StackPanel>
                 </Button>
 
@@ -46,7 +47,7 @@
                         Style="{StaticResource SecondaryButton}" Margin="0,0,8,0">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="&#xE777;" FontFamily="Segoe MDL2 Assets" FontSize="13" Margin="0,0,6,0" VerticalAlignment="Center"/>
-                        <TextBlock Text="Восстановить службы" VerticalAlignment="Center"/>
+                        <TextBlock Text="{x:Static loc:Localizer.ServicesOptimizer_RestoreServices}" VerticalAlignment="Center"/>
                     </StackPanel>
                 </Button>
 
@@ -55,7 +56,7 @@
                         Style="{StaticResource SecondaryButton}">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="&#xE72C;" FontFamily="Segoe MDL2 Assets" FontSize="13" Margin="0,0,6,0" VerticalAlignment="Center"/>
-                        <TextBlock Text="Обновить" VerticalAlignment="Center"/>
+                        <TextBlock Text="{x:Static loc:Localizer.Common_Refresh}" VerticalAlignment="Center"/>
                     </StackPanel>
                 </Button>
             </StackPanel>
@@ -76,13 +77,13 @@
                             <TextBlock Text="&#xE7FC;" FontFamily="Segoe MDL2 Assets" FontSize="18" Foreground="{DynamicResource AccentBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <StackPanel VerticalAlignment="Center">
-                            <TextBlock Text="Игровой профиль" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-                            <TextBlock Text="Максимум FPS и отклика" FontSize="11" Foreground="{DynamicResource AccentBrush}"/>
+                            <TextBlock Text="{x:Static loc:Localizer.ServicesOptimizer_GamingProfile}" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                            <TextBlock Text="{x:Static loc:Localizer.ServicesOptimizer_GamingProfileHint}" FontSize="11" Foreground="{DynamicResource AccentBrush}"/>
                         </StackPanel>
                     </StackPanel>
-                    <TextBlock Grid.Row="1" Text="Отключает SysMain, телеметрию, факсы, удаленный реестр, WerSvc и демо-службы для устранения микрофризов." 
+                    <TextBlock Grid.Row="1" Text="{x:Static loc:Localizer.ServicesOptimizer_GamingProfileDescription}" 
                                FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" Margin="0,8,0,12"/>
-                    <Button Grid.Row="2" Content="Применить профиль" 
+                    <Button Grid.Row="2" Content="{x:Static loc:Localizer.ServicesOptimizer_ApplyProfile}" 
                             Command="{Binding ApplyGamingProfileCommand}"
                             IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"
                             Style="{StaticResource PrimaryButton}" HorizontalAlignment="Stretch"/>
@@ -102,13 +103,13 @@
                             <TextBlock Text="&#xE945;" FontFamily="Segoe MDL2 Assets" FontSize="18" Foreground="{DynamicResource SafeBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <StackPanel VerticalAlignment="Center">
-                            <TextBlock Text="Сбалансированный" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-                            <TextBlock Text="100% безопасная очистка" FontSize="11" Foreground="{DynamicResource SafeBrush}"/>
+                            <TextBlock Text="{x:Static loc:Localizer.ServicesOptimizer_BalancedProfile}" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                            <TextBlock Text="{x:Static loc:Localizer.ServicesOptimizer_BalancedProfileHint}" FontSize="11" Foreground="{DynamicResource SafeBrush}"/>
                         </StackPanel>
                     </StackPanel>
-                    <TextBlock Grid.Row="1" Text="Отключает неиспользуемый системный балласт (факсы, карты, ритейл демо, телеметрию). Рекомендуется для всех ПК." 
+                    <TextBlock Grid.Row="1" Text="{x:Static loc:Localizer.ServicesOptimizer_BalancedProfileDescription}" 
                                FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" Margin="0,8,0,12"/>
-                    <Button Grid.Row="2" Content="Применить профиль" 
+                    <Button Grid.Row="2" Content="{x:Static loc:Localizer.ServicesOptimizer_ApplyProfile}" 
                             Command="{Binding ApplyBalancedProfileCommand}"
                             IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"
                             Style="{StaticResource SecondaryButton}" HorizontalAlignment="Stretch"/>
@@ -128,13 +129,13 @@
                             <TextBlock Text="&#xE821;" FontFamily="Segoe MDL2 Assets" FontSize="18" Foreground="{DynamicResource CautionBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <StackPanel VerticalAlignment="Center">
-                            <TextBlock Text="Рабочая станция" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-                            <TextBlock Text="Сохранение принтеров и сети" FontSize="11" Foreground="{DynamicResource AccentBrush}"/>
+                            <TextBlock Text="{x:Static loc:Localizer.ServicesOptimizer_WorkstationProfile}" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                            <TextBlock Text="{x:Static loc:Localizer.ServicesOptimizer_WorkstationProfileHint}" FontSize="11" Foreground="{DynamicResource AccentBrush}"/>
                         </StackPanel>
                     </StackPanel>
-                    <TextBlock Grid.Row="1" Text="Блокирует рекламу и трекинг, сохраняя работоспособность диспетчера печати, сетевых папок и Windows Hello." 
+                    <TextBlock Grid.Row="1" Text="{x:Static loc:Localizer.ServicesOptimizer_WorkstationProfileDescription}" 
                                FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" Margin="0,8,0,12"/>
-                    <Button Grid.Row="2" Content="Применить профиль" 
+                    <Button Grid.Row="2" Content="{x:Static loc:Localizer.ServicesOptimizer_ApplyProfile}" 
                             Command="{Binding ApplyWorkstationProfileCommand}"
                             IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"
                             Style="{StaticResource SecondaryButton}" HorizontalAlignment="Stretch"/>
@@ -152,30 +153,30 @@
 
                 <DockPanel Grid.Row="0" Margin="0,0,0,12">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <TextBlock Text="Фильтр риска:" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,8,0" FontWeight="SemiBold"/>
+                        <TextBlock Text="{x:Static loc:Localizer.ServicesOptimizer_RiskFilterLabel}" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,8,0" FontWeight="SemiBold"/>
                         <ComboBox SelectedIndex="{Binding SelectedRiskFilterIndex, Mode=TwoWay}" Width="220" Height="32">
-                            <ComboBoxItem Content="Все службы"/>
-                            <ComboBoxItem Content="Безопасные к отключению"/>
-                            <ComboBoxItem Content="Умеренный риск"/>
+                            <ComboBoxItem Content="{x:Static loc:Localizer.ServicesOptimizer_RiskFilterAll}"/>
+                            <ComboBoxItem Content="{x:Static loc:Localizer.ServicesOptimizer_RiskFilterSafe}"/>
+                            <ComboBoxItem Content="{x:Static loc:Localizer.ServicesOptimizer_RiskFilterModerate}"/>
                         </ComboBox>
                     </StackPanel>
 
                     <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right">
-                        <TextBlock Text="Отключено служб:" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                        <TextBlock Text="{x:Static loc:Localizer.ServicesOptimizer_DisabledCountLabel}" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" Margin="0,0,6,0"/>
                         <TextBlock Text="{Binding DisabledCount}" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center"/>
-                        <TextBlock Text="из" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" Margin="4,0"/>
+                        <TextBlock Text="{x:Static loc:Localizer.ServicesOptimizer_CountSeparator}" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" Margin="4,0"/>
                         <TextBlock Text="{Binding TotalCount}" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
                     </StackPanel>
                 </DockPanel>
 
                 <DataGrid Grid.Row="1" ItemsSource="{Binding FilteredServices}" AutoGenerateColumns="False" CanUserAddRows="False" Background="Transparent" BorderThickness="0" GridLinesVisibility="Horizontal" HeadersVisibility="Column">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Binding="{Binding DisplayName}" Header="Служба" Width="260" FontWeight="SemiBold"/>
-                        <DataGridTextColumn Binding="{Binding Category}" Header="Категория" Width="140"/>
-                        <DataGridTextColumn Binding="{Binding StatusFormatted}" Header="Состояние" Width="120"/>
-                        <DataGridTextColumn Binding="{Binding StartupTypeFormatted}" Header="Тип запуска" Width="100"/>
+                        <DataGridTextColumn Binding="{Binding DisplayName}" Header="{x:Static loc:Localizer.ServicesOptimizer_ColService}" Width="260" FontWeight="SemiBold"/>
+                        <DataGridTextColumn Binding="{Binding Category}" Header="{x:Static loc:Localizer.ServicesOptimizer_ColCategory}" Width="140"/>
+                        <DataGridTextColumn Binding="{Binding StatusFormatted}" Header="{x:Static loc:Localizer.ServicesOptimizer_ColStatus}" Width="120"/>
+                        <DataGridTextColumn Binding="{Binding StartupTypeFormatted}" Header="{x:Static loc:Localizer.ServicesOptimizer_ColStartupType}" Width="100"/>
                         
-                        <DataGridTemplateColumn Header="Риск" Width="120">
+                        <DataGridTemplateColumn Header="{x:Static loc:Localizer.ServicesOptimizer_ColRisk}" Width="120">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <Border CornerRadius="10" Padding="8,2" HorizontalAlignment="Left">
@@ -212,7 +213,7 @@
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
 
-                        <DataGridTemplateColumn Header="Действие" Width="*">
+                        <DataGridTemplateColumn Header="{x:Static loc:Localizer.ServicesOptimizer_ColAction}" Width="*">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <Button Command="{Binding DataContext.ToggleServiceCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
@@ -221,10 +222,10 @@
                                             IsEnabled="{Binding DataContext.IsBusy, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource InverseBoolConverter}}">
                                         <Button.Style>
                                             <Style TargetType="Button" BasedOn="{StaticResource SecondaryButton}">
-                                                <Setter Property="Content" Value="Отключить"/>
+                                                <Setter Property="Content" Value="{x:Static loc:Localizer.Common_Disable}"/>
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding IsDisabled}" Value="True">
-                                                        <Setter Property="Content" Value="Включить"/>
+                                                        <Setter Property="Content" Value="{x:Static loc:Localizer.Common_Enable}"/>
                                                     </DataTrigger>
                                                 </Style.Triggers>
                                             </Style>
@@ -241,7 +242,7 @@
         <!-- Footer Status -->
         <Border Grid.Row="3" Margin="0,12,0,0" Padding="12,8" Background="{DynamicResource SurfaceBrush}" CornerRadius="6">
             <DockPanel>
-                <TextBlock Text="Изменения служб полностью обратимы. Начальное состояние сохраняется в services_backup.json." 
+                <TextBlock Text="{x:Static loc:Localizer.ServicesOptimizer_FooterNote}" 
                            FontSize="11.5" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
                 <TextBlock Text="{Binding StatusText}" HorizontalAlignment="Right" FontSize="11.5" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center"/>
             </DockPanel>

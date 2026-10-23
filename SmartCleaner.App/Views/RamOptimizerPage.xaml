@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:loc="clr-namespace:SmartCleaner.Core.Localization;assembly=SmartCleaner.Core"
              mc:Ignorable="d" 
              d:DesignHeight="750" d:DesignWidth="950">
     <Grid Margin="24,20">
@@ -19,19 +20,19 @@
                     <Border Width="32" Height="32" CornerRadius="8" Background="{DynamicResource AccentGradientBrush}" Margin="0,0,10,0" VerticalAlignment="Center">
                         <TextBlock Text="&#xE950;" FontFamily="Segoe MDL2 Assets" FontSize="16" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
-                    <TextBlock Text="Оптимизация памяти, Game Boost, SSD &amp; Шредер" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
+                    <TextBlock Text="{x:Static loc:Localizer.RamOptimizer_Title}" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
                     <Border Background="{DynamicResource AccentBrush}" CornerRadius="4" Padding="6,2" Margin="10,0,0,0" VerticalAlignment="Center">
                         <TextBlock Text="PERFORMANCE HUB" FontSize="9.5" Foreground="White" FontWeight="Bold"/>
                     </Border>
                 </StackPanel>
-                <TextBlock Text="Ускорение игр в 1 клик, освобождение RAM, телеметрия износа SSD, вакуум SQLite и шредер DoD 5220.22-M" FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,4,0,0"/>
+                <TextBlock Text="{x:Static loc:Localizer.RamOptimizer_Subtitle}" FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,4,0,0"/>
             </StackPanel>
         </DockPanel>
 
         <!-- Main Content (Tabs) -->
         <TabControl Grid.Row="1" Background="Transparent" BorderThickness="0">
             <!-- TAB 1: RAM Optimizer -->
-            <TabItem Header="Оперативная память">
+            <TabItem Header="{x:Static loc:Localizer.RamOptimizer_TabRam}">
                 <Grid Margin="0,16,0,0">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -41,22 +42,24 @@
                     <UniformGrid Grid.Row="0" Columns="3" Margin="0,0,0,20">
                         <Border Background="{DynamicResource SurfaceBrush}" CornerRadius="12" Padding="16" Margin="0,0,8,0" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
                             <StackPanel>
-                                <TextBlock Text="Всего памяти" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                <TextBlock Text="{x:Static loc:Localizer.RamOptimizer_StatTotal}" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}"/>
                                 <TextBlock Text="{Binding RamTotal}" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,6,0,0"/>
                             </StackPanel>
                         </Border>
 
                         <Border Background="{DynamicResource SurfaceBrush}" CornerRadius="12" Padding="16" Margin="4,0,4,0" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
                             <StackPanel>
-                                <TextBlock Text="Использовано памяти" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                <TextBlock Text="{x:Static loc:Localizer.RamOptimizer_StatUsed}" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}"/>
                                 <TextBlock Text="{Binding RamUsed}" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource DangerBrush}" Margin="0,6,0,0"/>
-                                <TextBlock Text="{Binding RamLoadPercentage, StringFormat='Загрузка: {0:F0}%'}" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0"/>
+                                <TextBlock FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0">
+                                    <Run Text="{x:Static loc:Localizer.RamOptimizer_LoadLabel}"/><Run Text="{Binding RamLoadPercentage, StringFormat='{}{0:F0}%'}"/>
+                                </TextBlock>
                             </StackPanel>
                         </Border>
 
                         <Border Background="{DynamicResource SurfaceBrush}" CornerRadius="12" Padding="16" Margin="8,0,0,0" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
                             <StackPanel>
-                                <TextBlock Text="Свободно памяти" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                <TextBlock Text="{x:Static loc:Localizer.RamOptimizer_StatAvailable}" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}"/>
                                 <TextBlock Text="{Binding RamAvailable}" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource SafeBrush}" Margin="0,6,0,0"/>
                             </StackPanel>
                         </Border>
@@ -64,8 +67,8 @@
 
                     <Border Grid.Row="1" Background="{DynamicResource SurfaceBrush}" CornerRadius="12" Padding="24" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
                         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" MaxWidth="500">
-                            <TextBlock Text="Очистка Standby List и Working Sets" FontSize="18" FontWeight="SemiBold" HorizontalAlignment="Center" Foreground="{DynamicResource TextPrimaryBrush}"/>
-                            <TextBlock Text="Оптимизирует рабочие наборы запущенных процессов и возвращает занятую память Windows без закрытия программ." TextWrapping="Wrap" TextAlignment="Center" FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,10,0,24"/>
+                            <TextBlock Text="{x:Static loc:Localizer.RamOptimizer_StandbyTitle}" FontSize="18" FontWeight="SemiBold" HorizontalAlignment="Center" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                            <TextBlock Text="{x:Static loc:Localizer.RamOptimizer_StandbyDescription}" TextWrapping="Wrap" TextAlignment="Center" FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,10,0,24"/>
 
                             <Button Command="{Binding OptimizeRamCommand}"
                                     IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"
@@ -75,7 +78,7 @@
                                     FontSize="14">
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="&#xE945;" FontFamily="Segoe MDL2 Assets" FontSize="15" Margin="0,0,8,0" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Очистить оперативную память (RAM)" VerticalAlignment="Center"/>
+                                    <TextBlock Text="{x:Static loc:Localizer.RamOptimizer_Optimize}" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Button>
 
@@ -95,9 +98,9 @@
                     <Border Background="{DynamicResource SurfaceBrush}" CornerRadius="12" Padding="32" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
                         <StackPanel MaxWidth="600" VerticalAlignment="Center" HorizontalAlignment="Center">
                             <TextBlock Text="1-Click Game Turbo Boost" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" HorizontalAlignment="Center"/>
-                            <TextBlock Text="Максимальная производительность для игр и тяжелого софта в 1 клик:\n• Сбрасывает кэш оперативной памяти и освобождает максимум RAM\n• Приостанавливает службы SysMain, телеметрию Windows и обновление\n• Включает профиль электропитания «Высокая производительность»" TextWrapping="Wrap" FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,12,0,24"/>
+                            <TextBlock Text="{x:Static loc:Localizer.RamOptimizer_GameBoostDescription}" TextWrapping="Wrap" FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,12,0,24"/>
 
-                            <Button Content="Переключить Game Turbo Boost" 
+                            <Button Content="{x:Static loc:Localizer.RamOptimizer_ToggleGameBoost}" 
                                     Command="{Binding ToggleGameBoostCommand}"
                                     IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"
                                     Style="{StaticResource PrimaryButton}"
@@ -110,7 +113,7 @@
             </TabItem>
 
             <!-- TAB 3: SSD Health & S.M.A.R.T. -->
-            <TabItem Header="S.M.A.R.T. Здоровье SSD">
+            <TabItem Header="{x:Static loc:Localizer.RamOptimizer_TabSsdHealth}">
                 <Grid Margin="0,16,0,0">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -118,7 +121,7 @@
                     </Grid.RowDefinitions>
 
                     <DockPanel Grid.Row="0" Margin="0,0,0,12">
-                        <Button Content="Обновить телеметрию дисков" 
+                        <Button Content="{x:Static loc:Localizer.RamOptimizer_RefreshDisks}" 
                                 Command="{Binding LoadDisksHealthCommand}"
                                 IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"
                                 Style="{StaticResource SecondaryButton}" Padding="16,8"/>
@@ -127,13 +130,13 @@
                     <Border Grid.Row="1" Background="{DynamicResource SurfaceBrush}" CornerRadius="12" Padding="12" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
                         <DataGrid ItemsSource="{Binding PhysicalDisks}" AutoGenerateColumns="False" CanUserAddRows="False" Background="Transparent" BorderThickness="0" GridLinesVisibility="Horizontal" HeadersVisibility="Column">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Binding="{Binding FriendlyName}" Header="Диск / Модель" Width="240" FontWeight="SemiBold"/>
-                                <DataGridTextColumn Binding="{Binding MediaType}" Header="Тип носителя" Width="120"/>
-                                <DataGridTextColumn Binding="{Binding BusType}" Header="Шина" Width="100"/>
-                                <DataGridTextColumn Binding="{Binding SizeFormatted}" Header="Общий объем" Width="120"/>
-                                <DataGridTextColumn Binding="{Binding HealthStatus}" Header="Состояние" Width="120" Foreground="{DynamicResource SafeBrush}"/>
-                                <DataGridTextColumn Binding="{Binding RemainingLifeFormatted}" Header="Остаток ресурса" Width="130"/>
-                                <DataGridTextColumn Binding="{Binding TemperatureFormatted}" Header="Температура" Width="110"/>
+                                <DataGridTextColumn Binding="{Binding FriendlyName}" Header="{x:Static loc:Localizer.RamOptimizer_ColDisk}" Width="240" FontWeight="SemiBold"/>
+                                <DataGridTextColumn Binding="{Binding MediaType}" Header="{x:Static loc:Localizer.RamOptimizer_ColMediaType}" Width="120"/>
+                                <DataGridTextColumn Binding="{Binding BusType}" Header="{x:Static loc:Localizer.RamOptimizer_ColBus}" Width="100"/>
+                                <DataGridTextColumn Binding="{Binding SizeFormatted}" Header="{x:Static loc:Localizer.RamOptimizer_ColSize}" Width="120"/>
+                                <DataGridTextColumn Binding="{Binding HealthStatus}" Header="{x:Static loc:Localizer.RamOptimizer_ColHealth}" Width="120" Foreground="{DynamicResource SafeBrush}"/>
+                                <DataGridTextColumn Binding="{Binding RemainingLifeFormatted}" Header="{x:Static loc:Localizer.RamOptimizer_ColRemainingLife}" Width="130"/>
+                                <DataGridTextColumn Binding="{Binding TemperatureFormatted}" Header="{x:Static loc:Localizer.RamOptimizer_ColTemperature}" Width="110"/>
                             </DataGrid.Columns>
                         </DataGrid>
                     </Border>
@@ -141,7 +144,7 @@
             </TabItem>
 
             <!-- TAB 4: SQLite Compactor -->
-            <TabItem Header="Базы данных SQLite">
+            <TabItem Header="{x:Static loc:Localizer.RamOptimizer_TabSqlite}">
                 <Grid Margin="0,16,0,0">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -149,12 +152,12 @@
                     </Grid.RowDefinitions>
 
                     <DockPanel Grid.Row="0" Margin="0,0,0,12">
-                        <Button DockPanel.Dock="Left" Content="Найти базы данных" 
+                        <Button DockPanel.Dock="Left" Content="{x:Static loc:Localizer.RamOptimizer_FindDatabases}" 
                                 Command="{Binding ScanDatabasesCommand}"
                                 IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"
                                 Style="{StaticResource SecondaryButton}" Padding="16,8"/>
 
-                        <Button DockPanel.Dock="Right" Content="Сжать и вакуумировать базы" 
+                        <Button DockPanel.Dock="Right" Content="{x:Static loc:Localizer.RamOptimizer_CompactDatabases}" 
                                 Command="{Binding CompactDatabasesCommand}"
                                 IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"
                                 Style="{StaticResource PrimaryButton}" Padding="16,8"/>
@@ -164,11 +167,11 @@
                         <DataGrid ItemsSource="{Binding Databases}" AutoGenerateColumns="False" CanUserAddRows="False" Background="Transparent" BorderThickness="0" GridLinesVisibility="Horizontal" HeadersVisibility="Column">
                             <DataGrid.Columns>
                                 <DataGridCheckBoxColumn Binding="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}" Header="" Width="40"/>
-                                <DataGridTextColumn Binding="{Binding AppName}" Header="Приложение" Width="160" FontWeight="SemiBold"/>
-                                <DataGridTextColumn Binding="{Binding Name}" Header="Имя базы" Width="180"/>
-                                <DataGridTextColumn Binding="{Binding OriginalSizeFormatted}" Header="Исходный размер" Width="120"/>
-                                <DataGridTextColumn Binding="{Binding CompactedSizeFormatted}" Header="После сжатия" Width="120"/>
-                                <DataGridTextColumn Binding="{Binding Status}" Header="Статус" Width="*"/>
+                                <DataGridTextColumn Binding="{Binding AppName}" Header="{x:Static loc:Localizer.RamOptimizer_ColApp}" Width="160" FontWeight="SemiBold"/>
+                                <DataGridTextColumn Binding="{Binding Name}" Header="{x:Static loc:Localizer.RamOptimizer_ColDbName}" Width="180"/>
+                                <DataGridTextColumn Binding="{Binding OriginalSizeFormatted}" Header="{x:Static loc:Localizer.RamOptimizer_ColOriginalSize}" Width="120"/>
+                                <DataGridTextColumn Binding="{Binding CompactedSizeFormatted}" Header="{x:Static loc:Localizer.RamOptimizer_ColCompactedSize}" Width="120"/>
+                                <DataGridTextColumn Binding="{Binding Status}" Header="{x:Static loc:Localizer.RamOptimizer_ColStatus}" Width="*"/>
                             </DataGrid.Columns>
                         </DataGrid>
                     </Border>
@@ -176,14 +179,14 @@
             </TabItem>
 
             <!-- TAB 5: DoD File Shredder -->
-            <TabItem Header="Шредер файлов">
+            <TabItem Header="{x:Static loc:Localizer.RamOptimizer_TabShredder}">
                 <Grid Margin="0,16,0,0">
                     <Border Background="{DynamicResource SurfaceBrush}" CornerRadius="12" Padding="24" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
                         <StackPanel MaxWidth="600" VerticalAlignment="Center">
-                            <TextBlock Text="Безвозвратное уничтожение файлов" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" HorizontalAlignment="Center"/>
-                            <TextBlock Text="Гарантированное стирание конфиденциальных документов, паролей и ключей в 3 прохода (DoD 5220.22-M) с перезаписью секторов нулями и криптографическими псевдослучайными байтами." TextWrapping="Wrap" TextAlignment="Center" FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,8,0,24"/>
+                            <TextBlock Text="{x:Static loc:Localizer.RamOptimizer_ShredTitle}" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" HorizontalAlignment="Center"/>
+                            <TextBlock Text="{x:Static loc:Localizer.RamOptimizer_ShredDescription}" TextWrapping="Wrap" TextAlignment="Center" FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,8,0,24"/>
 
-                            <TextBlock Text="Путь к файлу для уничтожения:" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,6"/>
+                            <TextBlock Text="{x:Static loc:Localizer.RamOptimizer_ShredPathLabel}" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,6"/>
                             <TextBox Text="{Binding ShredFilePath, UpdateSourceTrigger=PropertyChanged}" Height="38" Padding="10,6" FontSize="13" Margin="0,0,0,16"/>
 
                             <Button Command="{Binding ShredFileCommand}"
@@ -192,7 +195,7 @@
                                     Padding="24,14" FontSize="14" FontWeight="Bold" HorizontalAlignment="Center">
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="&#xE74D;" FontFamily="Segoe MDL2 Assets" FontSize="15" Margin="0,0,8,0" VerticalAlignment="Center"/>
-                                    <TextBlock Text="БЕЗВОЗВРАТНО СТЕРЕТЬ ФАЙЛ (DoD 3-Pass)" VerticalAlignment="Center"/>
+                                    <TextBlock Text="{x:Static loc:Localizer.RamOptimizer_ShredFile}" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Button>
                         </StackPanel>
