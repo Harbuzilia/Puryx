@@ -1119,4 +1119,7 @@
   <data name="Settings_ShellShredMenu" xml:space="preserve">
     <value>"Irreversibly shred (DoD Shredder)" item (for files)</value>
   </data>
+  <data name="Main_Status_Found" xml:space="preserve">
+    <value>Found: {0} in {1} items</value>
+  </data>
 </root>

@@ -1119,4 +1119,7 @@
   <data name="Settings_ShellShredMenu" xml:space="preserve">
     <value>Пункт «Безвозвратно уничтожить (Шредер DoD)» (для файлов)</value>
   </data>
+  <data name="Main_Status_Found" xml:space="preserve">
+    <value>Найдено: {0} в {1} элементах</value>
+  </data>
 </root>

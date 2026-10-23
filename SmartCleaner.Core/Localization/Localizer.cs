@@ -70,6 +70,20 @@ public static class Localizer
     }
 
     /// <summary>
+    /// Форматированная строка (День 4, фаза L): значение ключа с плейсхолдерами
+    /// {0}/{1}/… заполняется <see cref="string.Format(IFormatProvider, string, object[])"/>
+    /// по ТЕКУЩЕЙ культуре — числа и даты локализуются («1.5» EN / «1,5» RU),
+    /// а не инвариантно. Аргументов нет — эквивалент <see cref="GetString(string)"/>.
+    /// Отсутствующий ключ возвращает имя ключа без форматирования (без {} в имени —
+    /// исключения не будет).
+    /// </summary>
+    public static string GetString(string key, params object[] args)
+    {
+        var value = GetString(key);
+        return args.Length == 0 ? value : string.Format(Culture ?? CultureInfo.InvariantCulture, value, args);
+    }
+
+    /// <summary>
     /// Ключи культуры без родительского фолбэка — для инварианта паритета EN↔RU
     /// и диагностики (какие ключи есть в resx конкретной культуры).
     /// </summary>
@@ -500,4 +514,8 @@ public static class Localizer
     public static string Settings_ShellAnalyzeMenu => GetString(nameof(Settings_ShellAnalyzeMenu));
     public static string Settings_ShellCompactMenu => GetString(nameof(Settings_ShellCompactMenu));
     public static string Settings_ShellShredMenu => GetString(nameof(Settings_ShellShredMenu));
+
+    // День 4: строка со статусом результата сканирования (первый VM-ключ
+    // с плейсхолдерами {0}/{1} — форматирование по текущей культуре)
+    public static string Main_Status_Found => GetString(nameof(Main_Status_Found));
 }

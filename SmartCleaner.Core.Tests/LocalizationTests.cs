@@ -119,7 +119,7 @@ public class LocalizationTests : IDisposable
     }
 
     [Fact]
-    public void Localizer_StaticProperties_MatchResxKeys()
+    public void Localizer_StaticProperties_AreSubsetOfResxKeys()
     {
         var propertyNames = typeof(Localizer)
             .GetProperties(BindingFlags.Public | BindingFlags.Static)
@@ -130,7 +130,63 @@ public class LocalizationTests : IDisposable
 
         var keys = Localizer.GetKeys(CultureInfo.InvariantCulture).OrderBy(k => k).ToList();
 
+        // Инвариант (День 4): свойство обязано иметь ключ в resx — иначе XAML
+        // {x:Static} покажет имя ключа. Обратное не требуется: VM-строки
+        // (День 4, GetString из кода) ключи без XAML-свойств.
+        var orphans = propertyNames.Except(keys).ToList();
+
         Assert.NotEmpty(propertyNames);
-        Assert.Equal(keys, propertyNames);
+        Assert.Empty(orphans);
+    }
+
+    /// <summary>
+    /// День 4: GetString(key, args) подставляет {0}/{1} по значению resx
+    /// текущей культуры — в обеих культурах свой текст с теми же аргументами.
+    /// </summary>
+    [Fact]
+    public void GetString_WithFormatArgs_SubstitutesPlaceholders_InBothCultures()
+    {
+        Localizer.Culture = CultureInfo.InvariantCulture;
+        var en = Localizer.GetString("Main_Status_Found", "1.2 GB", 42);
+        Assert.Equal("Found: 1.2 GB in 42 items", en);
+
+        Localizer.Culture = new CultureInfo("ru");
+        var ru = Localizer.GetString("Main_Status_Found", "1,2 ГБ", 42);
+        Assert.Equal("Найдено: 1,2 ГБ в 42 элементах", ru);
+    }
+
+    /// <summary>
+    /// День 4: числовые и временные аргументы форматируются по ТЕКУЩЕЙ культуре
+    /// Localizer (ru: «1,5» и «23.10.2026»), а не инвариантно.
+    /// </summary>
+    [Fact]
+    public void GetString_WithFormatArgs_FormatsNumbersAndDates_ByCurrentCulture()
+    {
+        var number = 1.5;
+        var date = new DateTime(2026, 10, 23);
+
+        Localizer.Culture = CultureInfo.InvariantCulture;
+        var en = Localizer.GetString("Main_Status_Found", number, date);
+        Assert.Contains("1.5", en);
+        Assert.Contains("10/23/2026", en);
+
+        Localizer.Culture = new CultureInfo("ru");
+        var ru = Localizer.GetString("Main_Status_Found", number, date);
+        Assert.Contains("1,5", ru);
+        Assert.Contains("23.10.2026", ru);
+    }
+
+    /// <summary>
+    /// День 4: отсутствующий ключ с аргументами — тот же читаемый fallback
+    /// (имя ключа), без FormatException: в имени ключа нет плейсхолдеров.
+    /// </summary>
+    [Fact]
+    public void GetString_WithFormatArgs_MissingKey_ReturnsKeyName_WithoutFormatting()
+    {
+        Localizer.Culture = new CultureInfo("ru");
+
+        var result = Localizer.GetString("No_Such_Key_Abc123", 1, 2);
+
+        Assert.Equal("No_Such_Key_Abc123", result);
     }
 }
