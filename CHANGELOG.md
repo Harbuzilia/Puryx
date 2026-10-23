@@ -18,6 +18,16 @@
 - **Файлы:** `SmartCleaner.Core/Localization/{Localizer.cs, Strings.resx, Strings.ru.resx}`, `SmartCleaner.Core.Tests/LocalizationTests.cs`, `SmartCleaner.Core/Models/SettingsModels.cs`, `SmartCleaner.App/{App.xaml.cs, MainWindow.xaml, MainWindow.xaml.cs, Views/AboutWindow.xaml, Views/SettingsView.xaml, ViewModels/{SettingsViewModel.cs, MainViewModel.cs}, Services/ThemeManager.cs}`
 - **Почему:** RU-only интерфейс сужает аудиторию на порядки (у CCleaner 50+ языков); нейтральная культура EN + satellite-схема ResourceManager — стандартная механика с гарантированным прогрессом, строки нужны последующим фазам ROADMAP v3.1 (MFT, авто-обновление). Смена языка через рестарт, а не live-переключение — осознанное упрощение (XAML-статик не следит за Culture), подсказка-тост компенсирует UX.
 
+### 🌍 Фаза L — Локализация: срез 1 — восемь основных страниц EN/RU (ROADMAP v3.1, День 2)
+
+- **Что сделано:**
+  - Локализован срез 1 — 8 основных страниц (часть 1: Dashboard/DiskMap/LargeFiles/Duplicates; часть 2: Startup/Uninstaller/Quarantine/Scheduler): заголовки/подзаголовки, KPI-карточки и метрики, кнопки с tooltips, вкладки/фильтры/чекбоксы, подписи форм и секций, строки статуса. Все литеральные RU-строки XAML переведены на `{x:Static loc:Localizer.*}`; статические обёртки Localizer синхронны: +112 ключей в обоих resx (37 → 149; часть 1 — +69, часть 2 — +43).
+  - Именование ключей: префикс страницы (Dashboard_/DiskMap_/LargeFiles_/Duplicates_/Startup_/Uninstaller_/Quarantine_/Scheduler_); идентичные литералы нескольких страниц — общие Common_-ключи Дня 1 (Refresh/Cancel/Path/OpenInExplorer), в части 2 переиспользованы (кнопки «Обновить» Quarantine/Uninstaller — Common_Refresh).
+  - Run-фрагменты/StringFormat-расщепление: интерполированные подписи вида `StringFormat='Исходный путь: {0}'` / `'Изолировано: {0:dd.MM.yyyy HH:mm}'` разбиты на пары `<Run>` — локализуемый префикс-ключ + Run с чистым Binding (StringFormat остаётся только как формат даты, без RU-текста). StringFormat-строки без RU-текста (даты) не трогались; EN-бейджи (ANALYTICS/HEAVY FILES/BYTE-EXACT/ZERO-RISK и т.п.) — бренды, не локализуются.
+  - Верификация: паритет-инвариант LocalizationTests 18/18 зелёный (ключи EN↔RU↔свойства); сборка 0 ошибок / 0 предупреждений; UIA-смоук — 8 вкладок открываются; fallback-имён ключей в UI нет; полный прогон — 477 passed / 16 failed (известные песочные машинозависимые Integration, категория не изменилась).
+- **Файлы:** `SmartCleaner.App/Views/{DashboardPage.xaml, DiskMapPage.xaml, LargeFilesPage.xaml, DuplicatesPage.xaml, StartupPage.xaml, UninstallerPage.xaml, QuarantinePage.xaml, SchedulerPage.xaml}`, `SmartCleaner.Core/Localization/{Localizer.cs, Strings.resx, Strings.ru.resx}`
+- **Почему:** Пилот Дня 1 закрыл механику, но основной текст интерфейса оставался RU-хардкодом в XAML; срез 1 переводит самые посещаемые страницы на двойную культуру без изменения механики (те же ключи, тот же ResourceManager), а расщепление StringFormat-подписей на Run-фрагменты выносит локализуемый текст из композитного формата в ключи — иначе такие подписи не переводимы вовсе.
+
 ---
 
 ## [3.0.0] — 04.10.2026

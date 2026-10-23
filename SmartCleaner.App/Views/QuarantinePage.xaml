@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:loc="clr-namespace:SmartCleaner.Core.Localization;assembly=SmartCleaner.Core"
              mc:Ignorable="d" 
              d:DesignHeight="650" d:DesignWidth="900">
     <Grid Margin="24,20">
@@ -23,12 +24,12 @@
                     <Border Width="32" Height="32" CornerRadius="8" Background="{DynamicResource AccentGradientBrush}" Margin="0,0,10,0" VerticalAlignment="Center">
                         <TextBlock Text="&#xF133;" FontFamily="Segoe MDL2 Assets" FontSize="16" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
-                    <TextBlock Text="Карантин и Безопасная песочница" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
+                    <TextBlock Text="{x:Static loc:Localizer.Quarantine_Title}" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
                     <Border Background="{DynamicResource AccentBrush}" CornerRadius="4" Padding="6,2" Margin="10,0,0,0" VerticalAlignment="Center">
                         <TextBlock Text="ZERO-RISK" FontSize="9.5" Foreground="White" FontWeight="Bold"/>
                     </Border>
                 </StackPanel>
-                <TextBlock Text="Изоляция удаленных файлов с гарантией безопасного восстановления в 1 клик" 
+                <TextBlock Text="{x:Static loc:Localizer.Quarantine_Subtitle}" 
                            FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,4,0,0"/>
             </StackPanel>
             <Button Grid.Column="1" 
@@ -37,7 +38,7 @@
                     VerticalAlignment="Center">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="&#xE72C;" FontFamily="Segoe MDL2 Assets" FontSize="13" Margin="0,0,6,0" VerticalAlignment="Center"/>
-                    <TextBlock Text="Обновить" VerticalAlignment="Center"/>
+                    <TextBlock Text="{x:Static loc:Localizer.Common_Refresh}" VerticalAlignment="Center"/>
                 </StackPanel>
             </Button>
         </Grid>
@@ -51,14 +52,14 @@
 
             <Border Grid.Column="0" Style="{StaticResource Card}" Margin="0,0,8,0">
                 <StackPanel>
-                    <TextBlock Text="Элементов в изоляции" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                    <TextBlock Text="{x:Static loc:Localizer.Quarantine_ItemsMetric}" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}"/>
                     <TextBlock FontSize="20" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" Margin="0,4,0,0" Text="{Binding QuarantinedCount, Mode=OneWay}"/>
                 </StackPanel>
             </Border>
 
             <Border Grid.Column="1" Style="{StaticResource Card}" Margin="8,0,0,0">
                 <StackPanel>
-                    <TextBlock Text="Объем изолированных файлов" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                    <TextBlock Text="{x:Static loc:Localizer.Quarantine_SizeMetric}" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}"/>
                     <TextBlock FontSize="20" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,4,0,0" Text="{Binding TotalSizeFormatted, Mode=OneWay}"/>
                 </StackPanel>
             </Border>
@@ -84,8 +85,12 @@
                                         <TextBlock Text="{Binding Category}" FontSize="10" Foreground="{DynamicResource AccentBrush}"/>
                                     </Border>
                                 </StackPanel>
-                                <TextBlock Text="{Binding OriginalPath, StringFormat='Исходный путь: {0}'}" FontSize="11" Foreground="{DynamicResource TextDisabledBrush}" Margin="0,3,0,0" TextTrimming="CharacterEllipsis"/>
-                                <TextBlock Text="{Binding QuarantinedAt, StringFormat='Изолировано: {0:dd.MM.yyyy HH:mm}'}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0"/>
+                                <TextBlock FontSize="11" Foreground="{DynamicResource TextDisabledBrush}" Margin="0,3,0,0" TextTrimming="CharacterEllipsis">
+                                    <Run Text="{x:Static loc:Localizer.Quarantine_OriginalPathPrefix}"/><Run Text="{Binding OriginalPath}"/>
+                                </TextBlock>
+                                <TextBlock FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0">
+                                    <Run Text="{x:Static loc:Localizer.Quarantine_QuarantinedAtPrefix}"/><Run Text="{Binding QuarantinedAt, StringFormat='{}{0:dd.MM.yyyy HH:mm}'}"/>
+                                </TextBlock>
                             </StackPanel>
 
                             <StackPanel Grid.Column="1" Margin="16,0" VerticalAlignment="Center" HorizontalAlignment="Right">
@@ -96,13 +101,13 @@
                                 <Button Style="{StaticResource PrimaryButton}" 
                                         Command="{Binding DataContext.RestoreItemCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                         CommandParameter="{Binding .}"
-                                        Content="Восстановить" 
+                                        Content="{x:Static loc:Localizer.Quarantine_Restore}" 
                                         Padding="10,5" Margin="0,0,6,0"/>
 
                                 <Button Style="{StaticResource DangerButton}" 
                                         Command="{Binding DataContext.PurgeItemCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                         CommandParameter="{Binding .}"
-                                        Content="Удалить навсегда" 
+                                        Content="{x:Static loc:Localizer.Quarantine_Purge}" 
                                         Padding="8,5"/>
                             </StackPanel>
                         </Grid>

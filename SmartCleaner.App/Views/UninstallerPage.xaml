@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:loc="clr-namespace:SmartCleaner.Core.Localization;assembly=SmartCleaner.Core"
              mc:Ignorable="d" 
              d:DesignHeight="650" d:DesignWidth="900">
     <Grid Margin="24,20">
@@ -24,12 +25,12 @@
                     <Border Width="32" Height="32" CornerRadius="8" Background="{DynamicResource AccentGradientBrush}" Margin="0,0,10,0" VerticalAlignment="Center">
                         <TextBlock Text="&#xE74D;" FontFamily="Segoe MDL2 Assets" FontSize="16" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
-                    <TextBlock Text="Умный деинсталлятор приложений" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
+                    <TextBlock Text="{x:Static loc:Localizer.Uninstaller_Title}" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
                     <Border Background="{DynamicResource AccentBrush}" CornerRadius="4" Padding="6,2" Margin="10,0,0,0" VerticalAlignment="Center">
                         <TextBlock Text="LEFTOVER HUNTER" FontSize="9.5" Foreground="White" FontWeight="Bold"/>
                     </Border>
                 </StackPanel>
-                <TextBlock Text="Чистое удаление программ с поиском и ликвидацией забытых остаточных файлов и веток реестра" 
+                <TextBlock Text="{x:Static loc:Localizer.Uninstaller_Subtitle}" 
                            FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,4,0,0"/>
             </StackPanel>
             <Button Grid.Column="1" 
@@ -39,7 +40,7 @@
                     VerticalAlignment="Center">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="&#xE72C;" FontFamily="Segoe MDL2 Assets" FontSize="13" Margin="0,0,6,0" VerticalAlignment="Center"/>
-                    <TextBlock Text="Обновить список" VerticalAlignment="Center"/>
+                    <TextBlock Text="{x:Static loc:Localizer.Uninstaller_RefreshList}" VerticalAlignment="Center"/>
                 </StackPanel>
             </Button>
         </Grid>
@@ -53,18 +54,18 @@
             
             <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" 
                      Padding="8,6" VerticalAlignment="Center"
-                     Tag="Поиск по названию программы или издателю..."/>
+                     Tag="{x:Static loc:Localizer.Uninstaller_SearchPlaceholder}"/>
 
             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="16,0,0,0">
                 <Border Background="{DynamicResource SurfaceVariantBrush}" CornerRadius="6" Padding="10,6" Margin="0,0,8,0">
                     <TextBlock FontSize="12">
-                        <Run Text="Всего программ:" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                        <Run Text="{x:Static loc:Localizer.Uninstaller_StatTotalApps}" Foreground="{DynamicResource TextSecondaryBrush}"/>
                         <Run Text="{Binding TotalAppsCount, Mode=OneWay}" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}"/>
                     </TextBlock>
                 </Border>
                 <Border Background="{DynamicResource SurfaceVariantBrush}" CornerRadius="6" Padding="10,6">
                     <TextBlock FontSize="12">
-                        <Run Text="Общий объем:" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                        <Run Text="{x:Static loc:Localizer.Uninstaller_StatTotalSize}" Foreground="{DynamicResource TextSecondaryBrush}"/>
                         <Run Text="{Binding TotalSizeFormatted, Mode=OneWay}" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}"/>
                     </TextBlock>
                 </Border>
@@ -117,16 +118,16 @@
                                 <Button Style="{StaticResource SecondaryButton}" 
                                         Command="{Binding DataContext.ScanLeftoversOnlyCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                         CommandParameter="{Binding .}"
-                                        Content="Хвосты" 
+                                        Content="{x:Static loc:Localizer.Uninstaller_ScanLeftovers}" 
                                         Padding="8,5" Margin="0,0,6,0"
-                                        ToolTip="Найти оставшиеся файлы и ключи реестра"/>
+                                        ToolTip="{x:Static loc:Localizer.Uninstaller_ScanLeftoversToolTip}"/>
 
                                 <Button Style="{StaticResource DangerButton}" 
                                         Command="{Binding DataContext.UninstallCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                         CommandParameter="{Binding .}"
-                                        Content="Удалить" 
+                                        Content="{x:Static loc:Localizer.Uninstaller_Uninstall}" 
                                         Padding="10,5"
-                                        ToolTip="Деинсталлировать и найти остатки"/>
+                                        ToolTip="{x:Static loc:Localizer.Uninstaller_UninstallToolTip}"/>
                             </StackPanel>
                         </Grid>
                     </Border>
@@ -145,7 +146,7 @@
                 </Grid.RowDefinitions>
 
                 <DockPanel Grid.Row="0" Margin="0,0,0,10">
-                    <TextBlock Text="Обнаруженные остаточные элементы («хвосты» в реестре и на диске)" FontWeight="Bold" FontSize="13"/>
+                    <TextBlock Text="{x:Static loc:Localizer.Uninstaller_LeftoversTitle}" FontWeight="Bold" FontSize="13"/>
                     <Button DockPanel.Dock="Right" Style="{StaticResource SubtleButton}" Command="{Binding CloseLeftoversCommand}" Content="&#xE711;" FontFamily="Segoe MDL2 Assets" HorizontalAlignment="Right"/>
                 </DockPanel>
 
@@ -171,8 +172,8 @@
                 </ListBox>
 
                 <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
-                    <Button Content="Закрыть" Style="{StaticResource SecondaryButton}" Command="{Binding CloseLeftoversCommand}" Margin="0,0,8,0"/>
-                    <Button Content="Очистить выбранные хвосты" Style="{StaticResource DangerButton}" Command="{Binding CleanSelectedLeftoversCommand}"/>
+                    <Button Content="{x:Static loc:Localizer.Uninstaller_CloseLeftovers}" Style="{StaticResource SecondaryButton}" Command="{Binding CloseLeftoversCommand}" Margin="0,0,8,0"/>
+                    <Button Content="{x:Static loc:Localizer.Uninstaller_CleanSelectedLeftovers}" Style="{StaticResource DangerButton}" Command="{Binding CleanSelectedLeftoversCommand}"/>
                 </StackPanel>
             </Grid>
         </Border>

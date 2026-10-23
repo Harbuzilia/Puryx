@@ -393,4 +393,133 @@
   <data name="Duplicates_CompareFolders" xml:space="preserve">
     <value>Compare</value>
   </data>
+  <data name="Startup_Title" xml:space="preserve">
+    <value>Startup Manager</value>
+  </data>
+  <data name="Startup_Subtitle" xml:space="preserve">
+    <value>Control programs, services and tasks that launch with Windows</value>
+  </data>
+  <data name="Startup_StatTotal" xml:space="preserve">
+    <value>Total: </value>
+  </data>
+  <data name="Startup_StatActive" xml:space="preserve">
+    <value>Active: </value>
+  </data>
+  <data name="Startup_FilterLabel" xml:space="preserve">
+    <value>Filter:</value>
+  </data>
+  <data name="Startup_FilterAll" xml:space="preserve">
+    <value>All</value>
+  </data>
+  <data name="Startup_FilterEnabled" xml:space="preserve">
+    <value>Enabled</value>
+  </data>
+  <data name="Startup_FilterDisabled" xml:space="preserve">
+    <value>Disabled</value>
+  </data>
+  <data name="Uninstaller_Title" xml:space="preserve">
+    <value>Smart App Uninstaller</value>
+  </data>
+  <data name="Uninstaller_Subtitle" xml:space="preserve">
+    <value>Clean software removal that hunts down leftover files and registry entries</value>
+  </data>
+  <data name="Uninstaller_RefreshList" xml:space="preserve">
+    <value>Refresh List</value>
+  </data>
+  <data name="Uninstaller_SearchPlaceholder" xml:space="preserve">
+    <value>Search by program name or publisher...</value>
+  </data>
+  <data name="Uninstaller_StatTotalApps" xml:space="preserve">
+    <value>Total programs:</value>
+  </data>
+  <data name="Uninstaller_StatTotalSize" xml:space="preserve">
+    <value>Total size:</value>
+  </data>
+  <data name="Uninstaller_ScanLeftovers" xml:space="preserve">
+    <value>Leftovers</value>
+  </data>
+  <data name="Uninstaller_ScanLeftoversToolTip" xml:space="preserve">
+    <value>Find leftover files and registry keys</value>
+  </data>
+  <data name="Uninstaller_Uninstall" xml:space="preserve">
+    <value>Uninstall</value>
+  </data>
+  <data name="Uninstaller_UninstallToolTip" xml:space="preserve">
+    <value>Uninstall and scan for leftovers</value>
+  </data>
+  <data name="Uninstaller_LeftoversTitle" xml:space="preserve">
+    <value>Detected leftovers (registry and file system)</value>
+  </data>
+  <data name="Uninstaller_CloseLeftovers" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="Uninstaller_CleanSelectedLeftovers" xml:space="preserve">
+    <value>Clean Selected Leftovers</value>
+  </data>
+  <data name="Quarantine_Title" xml:space="preserve">
+    <value>Quarantine &amp; Safe Sandbox</value>
+  </data>
+  <data name="Quarantine_Subtitle" xml:space="preserve">
+    <value>Isolated storage for deleted files with one-click safe restore</value>
+  </data>
+  <data name="Quarantine_ItemsMetric" xml:space="preserve">
+    <value>Items in quarantine</value>
+  </data>
+  <data name="Quarantine_SizeMetric" xml:space="preserve">
+    <value>Size of quarantined files</value>
+  </data>
+  <data name="Quarantine_OriginalPathPrefix" xml:space="preserve">
+    <value>Original path: </value>
+  </data>
+  <data name="Quarantine_QuarantinedAtPrefix" xml:space="preserve">
+    <value>Quarantined: </value>
+  </data>
+  <data name="Quarantine_Restore" xml:space="preserve">
+    <value>Restore</value>
+  </data>
+  <data name="Quarantine_Purge" xml:space="preserve">
+    <value>Delete Permanently</value>
+  </data>
+  <data name="Scheduler_Title" xml:space="preserve">
+    <value>Automatic Scheduler</value>
+  </data>
+  <data name="Scheduler_Subtitle" xml:space="preserve">
+    <value>Schedule recurring background disk maintenance</value>
+  </data>
+  <data name="Scheduler_EnableAutoClean" xml:space="preserve">
+    <value>Enable automatic cleanup</value>
+  </data>
+  <data name="Scheduler_SectionSchedule" xml:space="preserve">
+    <value>SCHEDULE</value>
+  </data>
+  <data name="Scheduler_IntervalLabel" xml:space="preserve">
+    <value>Interval:</value>
+  </data>
+  <data name="Scheduler_DayOfWeekLabel" xml:space="preserve">
+    <value>Day of week:</value>
+  </data>
+  <data name="Scheduler_TimeLabel" xml:space="preserve">
+    <value>Time:</value>
+  </data>
+  <data name="Scheduler_SectionProfile" xml:space="preserve">
+    <value>PROFILE</value>
+  </data>
+  <data name="Scheduler_ProfileLabel" xml:space="preserve">
+    <value>Profile:</value>
+  </data>
+  <data name="Scheduler_RemoveTask" xml:space="preserve">
+    <value>Remove Task</value>
+  </data>
+  <data name="Scheduler_Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="Scheduler_SectionInfo" xml:space="preserve">
+    <value>INFO</value>
+  </data>
+  <data name="Scheduler_TaskStatusLabel" xml:space="preserve">
+    <value>Task status:</value>
+  </data>
+  <data name="Scheduler_LastRunLabel" xml:space="preserve">
+    <value>Last run:</value>
+  </data>
 </root>

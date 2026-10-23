@@ -393,4 +393,133 @@
   <data name="Duplicates_CompareFolders" xml:space="preserve">
     <value>Сравнить</value>
   </data>
+  <data name="Startup_Title" xml:space="preserve">
+    <value>Управление автозагрузкой</value>
+  </data>
+  <data name="Startup_Subtitle" xml:space="preserve">
+    <value>Контроль программ, служб и задач, запускающихся вместе с операционной системой Windows</value>
+  </data>
+  <data name="Startup_StatTotal" xml:space="preserve">
+    <value>Всего: </value>
+  </data>
+  <data name="Startup_StatActive" xml:space="preserve">
+    <value>Активных: </value>
+  </data>
+  <data name="Startup_FilterLabel" xml:space="preserve">
+    <value>Фильтр:</value>
+  </data>
+  <data name="Startup_FilterAll" xml:space="preserve">
+    <value>Все</value>
+  </data>
+  <data name="Startup_FilterEnabled" xml:space="preserve">
+    <value>Включённые</value>
+  </data>
+  <data name="Startup_FilterDisabled" xml:space="preserve">
+    <value>Отключённые</value>
+  </data>
+  <data name="Uninstaller_Title" xml:space="preserve">
+    <value>Умный деинсталлятор приложений</value>
+  </data>
+  <data name="Uninstaller_Subtitle" xml:space="preserve">
+    <value>Чистое удаление программ с поиском и ликвидацией забытых остаточных файлов и веток реестра</value>
+  </data>
+  <data name="Uninstaller_RefreshList" xml:space="preserve">
+    <value>Обновить список</value>
+  </data>
+  <data name="Uninstaller_SearchPlaceholder" xml:space="preserve">
+    <value>Поиск по названию программы или издателю...</value>
+  </data>
+  <data name="Uninstaller_StatTotalApps" xml:space="preserve">
+    <value>Всего программ:</value>
+  </data>
+  <data name="Uninstaller_StatTotalSize" xml:space="preserve">
+    <value>Общий объем:</value>
+  </data>
+  <data name="Uninstaller_ScanLeftovers" xml:space="preserve">
+    <value>Хвосты</value>
+  </data>
+  <data name="Uninstaller_ScanLeftoversToolTip" xml:space="preserve">
+    <value>Найти оставшиеся файлы и ключи реестра</value>
+  </data>
+  <data name="Uninstaller_Uninstall" xml:space="preserve">
+    <value>Удалить</value>
+  </data>
+  <data name="Uninstaller_UninstallToolTip" xml:space="preserve">
+    <value>Деинсталлировать и найти остатки</value>
+  </data>
+  <data name="Uninstaller_LeftoversTitle" xml:space="preserve">
+    <value>Обнаруженные остаточные элементы («хвосты» в реестре и на диске)</value>
+  </data>
+  <data name="Uninstaller_CloseLeftovers" xml:space="preserve">
+    <value>Закрыть</value>
+  </data>
+  <data name="Uninstaller_CleanSelectedLeftovers" xml:space="preserve">
+    <value>Очистить выбранные хвосты</value>
+  </data>
+  <data name="Quarantine_Title" xml:space="preserve">
+    <value>Карантин и Безопасная песочница</value>
+  </data>
+  <data name="Quarantine_Subtitle" xml:space="preserve">
+    <value>Изоляция удаленных файлов с гарантией безопасного восстановления в 1 клик</value>
+  </data>
+  <data name="Quarantine_ItemsMetric" xml:space="preserve">
+    <value>Элементов в изоляции</value>
+  </data>
+  <data name="Quarantine_SizeMetric" xml:space="preserve">
+    <value>Объем изолированных файлов</value>
+  </data>
+  <data name="Quarantine_OriginalPathPrefix" xml:space="preserve">
+    <value>Исходный путь: </value>
+  </data>
+  <data name="Quarantine_QuarantinedAtPrefix" xml:space="preserve">
+    <value>Изолировано: </value>
+  </data>
+  <data name="Quarantine_Restore" xml:space="preserve">
+    <value>Восстановить</value>
+  </data>
+  <data name="Quarantine_Purge" xml:space="preserve">
+    <value>Удалить навсегда</value>
+  </data>
+  <data name="Scheduler_Title" xml:space="preserve">
+    <value>Автоматический планировщик</value>
+  </data>
+  <data name="Scheduler_Subtitle" xml:space="preserve">
+    <value>Настройка регулярного обслуживания дисков в фоновом режиме по расписанию</value>
+  </data>
+  <data name="Scheduler_EnableAutoClean" xml:space="preserve">
+    <value>Включить автоматическую очистку</value>
+  </data>
+  <data name="Scheduler_SectionSchedule" xml:space="preserve">
+    <value>РАСПИСАНИЕ</value>
+  </data>
+  <data name="Scheduler_IntervalLabel" xml:space="preserve">
+    <value>Интервал:</value>
+  </data>
+  <data name="Scheduler_DayOfWeekLabel" xml:space="preserve">
+    <value>День недели:</value>
+  </data>
+  <data name="Scheduler_TimeLabel" xml:space="preserve">
+    <value>Время:</value>
+  </data>
+  <data name="Scheduler_SectionProfile" xml:space="preserve">
+    <value>ПРОФИЛЬ</value>
+  </data>
+  <data name="Scheduler_ProfileLabel" xml:space="preserve">
+    <value>Профиль:</value>
+  </data>
+  <data name="Scheduler_RemoveTask" xml:space="preserve">
+    <value>Удалить задачу</value>
+  </data>
+  <data name="Scheduler_Save" xml:space="preserve">
+    <value>Сохранить</value>
+  </data>
+  <data name="Scheduler_SectionInfo" xml:space="preserve">
+    <value>ИНФОРМАЦИЯ</value>
+  </data>
+  <data name="Scheduler_TaskStatusLabel" xml:space="preserve">
+    <value>Статус задачи:</value>
+  </data>
+  <data name="Scheduler_LastRunLabel" xml:space="preserve">
+    <value>Последний запуск:</value>
+  </data>
 </root>

@@ -224,4 +224,55 @@ public static class Localizer
     public static string Duplicates_Scan => GetString(nameof(Duplicates_Scan));
     public static string Duplicates_FindCopies => GetString(nameof(Duplicates_FindCopies));
     public static string Duplicates_CompareFolders => GetString(nameof(Duplicates_CompareFolders));
+
+    // Автозагрузка
+    public static string Startup_Title => GetString(nameof(Startup_Title));
+    public static string Startup_Subtitle => GetString(nameof(Startup_Subtitle));
+    public static string Startup_StatTotal => GetString(nameof(Startup_StatTotal));
+    public static string Startup_StatActive => GetString(nameof(Startup_StatActive));
+    public static string Startup_FilterLabel => GetString(nameof(Startup_FilterLabel));
+    public static string Startup_FilterAll => GetString(nameof(Startup_FilterAll));
+    public static string Startup_FilterEnabled => GetString(nameof(Startup_FilterEnabled));
+    public static string Startup_FilterDisabled => GetString(nameof(Startup_FilterDisabled));
+
+    // Деинсталлятор
+    public static string Uninstaller_Title => GetString(nameof(Uninstaller_Title));
+    public static string Uninstaller_Subtitle => GetString(nameof(Uninstaller_Subtitle));
+    public static string Uninstaller_RefreshList => GetString(nameof(Uninstaller_RefreshList));
+    public static string Uninstaller_SearchPlaceholder => GetString(nameof(Uninstaller_SearchPlaceholder));
+    public static string Uninstaller_StatTotalApps => GetString(nameof(Uninstaller_StatTotalApps));
+    public static string Uninstaller_StatTotalSize => GetString(nameof(Uninstaller_StatTotalSize));
+    public static string Uninstaller_ScanLeftovers => GetString(nameof(Uninstaller_ScanLeftovers));
+    public static string Uninstaller_ScanLeftoversToolTip => GetString(nameof(Uninstaller_ScanLeftoversToolTip));
+    public static string Uninstaller_Uninstall => GetString(nameof(Uninstaller_Uninstall));
+    public static string Uninstaller_UninstallToolTip => GetString(nameof(Uninstaller_UninstallToolTip));
+    public static string Uninstaller_LeftoversTitle => GetString(nameof(Uninstaller_LeftoversTitle));
+    public static string Uninstaller_CloseLeftovers => GetString(nameof(Uninstaller_CloseLeftovers));
+    public static string Uninstaller_CleanSelectedLeftovers => GetString(nameof(Uninstaller_CleanSelectedLeftovers));
+
+    // Карантин
+    public static string Quarantine_Title => GetString(nameof(Quarantine_Title));
+    public static string Quarantine_Subtitle => GetString(nameof(Quarantine_Subtitle));
+    public static string Quarantine_ItemsMetric => GetString(nameof(Quarantine_ItemsMetric));
+    public static string Quarantine_SizeMetric => GetString(nameof(Quarantine_SizeMetric));
+    public static string Quarantine_OriginalPathPrefix => GetString(nameof(Quarantine_OriginalPathPrefix));
+    public static string Quarantine_QuarantinedAtPrefix => GetString(nameof(Quarantine_QuarantinedAtPrefix));
+    public static string Quarantine_Restore => GetString(nameof(Quarantine_Restore));
+    public static string Quarantine_Purge => GetString(nameof(Quarantine_Purge));
+
+    // Планировщик
+    public static string Scheduler_Title => GetString(nameof(Scheduler_Title));
+    public static string Scheduler_Subtitle => GetString(nameof(Scheduler_Subtitle));
+    public static string Scheduler_EnableAutoClean => GetString(nameof(Scheduler_EnableAutoClean));
+    public static string Scheduler_SectionSchedule => GetString(nameof(Scheduler_SectionSchedule));
+    public static string Scheduler_IntervalLabel => GetString(nameof(Scheduler_IntervalLabel));
+    public static string Scheduler_DayOfWeekLabel => GetString(nameof(Scheduler_DayOfWeekLabel));
+    public static string Scheduler_TimeLabel => GetString(nameof(Scheduler_TimeLabel));
+    public static string Scheduler_SectionProfile => GetString(nameof(Scheduler_SectionProfile));
+    public static string Scheduler_ProfileLabel => GetString(nameof(Scheduler_ProfileLabel));
+    public static string Scheduler_RemoveTask => GetString(nameof(Scheduler_RemoveTask));
+    public static string Scheduler_Save => GetString(nameof(Scheduler_Save));
+    public static string Scheduler_SectionInfo => GetString(nameof(Scheduler_SectionInfo));
+    public static string Scheduler_TaskStatusLabel => GetString(nameof(Scheduler_TaskStatusLabel));
+    public static string Scheduler_LastRunLabel => GetString(nameof(Scheduler_LastRunLabel));
 }
