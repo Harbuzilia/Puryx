@@ -1,6 +1,7 @@
 <UserControl x:Class="SmartCleaner.App.Views.LargeFilesPage"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="clr-namespace:SmartCleaner.Core.Localization;assembly=SmartCleaner.Core">
 
     <Grid Margin="24,20">
         <Grid.RowDefinitions>
@@ -17,12 +18,12 @@
                     <Border Width="32" Height="32" CornerRadius="8" Background="{DynamicResource AccentGradientBrush}" Margin="0,0,10,0" VerticalAlignment="Center">
                         <TextBlock Text="&#xE8B7;" FontFamily="Segoe MDL2 Assets" FontSize="16" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
-                    <TextBlock Text="Анализ больших файлов" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
+                    <TextBlock Text="{x:Static loc:Localizer.LargeFiles_Title}" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
                     <Border Background="{DynamicResource AccentBrush}" CornerRadius="4" Padding="6,2" Margin="10,0,0,0" VerticalAlignment="Center">
                         <TextBlock Text="HEAVY FILES" FontSize="9.5" Foreground="White" FontWeight="Bold"/>
                     </Border>
                 </StackPanel>
-                <TextBlock Text="Быстрый поиск и очистка самых тяжелых видео, архивов, виртуальных машин и дампов" 
+                <TextBlock Text="{x:Static loc:Localizer.LargeFiles_Subtitle}" 
                            FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,4,0,0"/>
             </StackPanel>
         </DockPanel>
@@ -37,7 +38,7 @@
                             Style="{StaticResource SecondaryButton}" Margin="0,0,8,0">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="&#xE711;" FontFamily="Segoe MDL2 Assets" FontSize="13" Margin="0,0,6,0" VerticalAlignment="Center"/>
-                            <TextBlock Text="Отмена" VerticalAlignment="Center"/>
+                            <TextBlock Text="{x:Static loc:Localizer.Common_Cancel}" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
                     <Button Command="{Binding ScanCommand}"
@@ -45,13 +46,13 @@
                             Style="{StaticResource PrimaryButton}">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="&#xE721;" FontFamily="Segoe MDL2 Assets" FontSize="13" Margin="0,0,6,0" VerticalAlignment="Center"/>
-                            <TextBlock Text="Найти" VerticalAlignment="Center"/>
+                            <TextBlock Text="{x:Static loc:Localizer.LargeFiles_Find}" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="Путь:" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                    <TextBlock Text="{x:Static loc:Localizer.Common_Path}" VerticalAlignment="Center" Margin="0,0,6,0"/>
                     <TextBox Text="{Binding ScanPath, UpdateSourceTrigger=PropertyChanged}" Width="280" Margin="0,0,4,0"/>
                     <Button Width="32"
                             Command="{Binding BrowseFolderCommand}"
@@ -62,7 +63,7 @@
                     <TextBlock Text="Top:" VerticalAlignment="Center" Margin="0,0,4,0"/>
                     <TextBox Text="{Binding TopNText, UpdateSourceTrigger=PropertyChanged}" Width="40" Margin="0,0,12,0"/>
 
-                    <TextBlock Text="Мин. МБ:" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                    <TextBlock Text="{x:Static loc:Localizer.LargeFiles_MinSize}" VerticalAlignment="Center" Margin="0,0,4,0"/>
                     <TextBox Text="{Binding MinSizeText, UpdateSourceTrigger=PropertyChanged}" Width="45"/>
                 </StackPanel>
             </DockPanel>
@@ -110,14 +111,14 @@
                                     Command="{Binding DataContext.OpenInExplorerCommand, RelativeSource={RelativeSource AncestorType=ListView}}"
                                     CommandParameter="{Binding}"
                                     Style="{StaticResource SecondaryButton}"
-                                    Padding="8,6" Margin="8,0,4,0" ToolTip="Открыть в проводнике">
+                                    Padding="8,6" Margin="8,0,4,0" ToolTip="{x:Static loc:Localizer.Common_OpenInExplorer}">
                                 <TextBlock Text="&#xE8B7;" FontFamily="Segoe MDL2 Assets" FontSize="11"/>
                             </Button>
                             <Button Grid.Column="2"
                                     Command="{Binding DataContext.DeleteFileCommand, RelativeSource={RelativeSource AncestorType=ListView}}"
                                     CommandParameter="{Binding}"
                                     Style="{StaticResource DangerButton}"
-                                    Padding="8,6" ToolTip="Удалить в корзину">
+                                    Padding="8,6" ToolTip="{x:Static loc:Localizer.LargeFiles_ToolTipDeleteToRecycleBin}">
                                 <TextBlock Text="&#xE74D;" FontFamily="Segoe MDL2 Assets" FontSize="11"/>
                             </Button>
                         </Grid>
@@ -133,7 +134,7 @@
                 <TextBlock DockPanel.Dock="Right" FontWeight="SemiBold"
                            Foreground="{DynamicResource AccentBrush}"
                            Visibility="{Binding TotalSizeFormatted, Converter={StaticResource NullToVisibilityConverter}}">
-                    <Run Text="Итого: "/><Run Text="{Binding TotalSizeFormatted, Mode=OneWay}"/>
+                    <Run Text="{x:Static loc:Localizer.LargeFiles_Total}"/><Run Text="{Binding TotalSizeFormatted, Mode=OneWay}"/>
                 </TextBlock>
                 <StackPanel Orientation="Horizontal">
                     <ProgressBar Width="100" Height="4" IsIndeterminate="True" Margin="0,0,8,0"

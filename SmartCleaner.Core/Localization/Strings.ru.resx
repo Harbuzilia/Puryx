@@ -185,4 +185,212 @@
   <data name="Settings_LanguageRestartHint" xml:space="preserve">
     <value>Перезапустите приложение, чтобы применить новый язык</value>
   </data>
+  <!-- День 2, срез 1: страницы (Dashboard/DiskMap/LargeFiles/Duplicates/Startup/Uninstaller/Quarantine/Scheduler). -->
+  <data name="Common_Refresh" xml:space="preserve">
+    <value>Обновить</value>
+  </data>
+  <data name="Common_Cancel" xml:space="preserve">
+    <value>Отмена</value>
+  </data>
+  <data name="Common_Path" xml:space="preserve">
+    <value>Путь:</value>
+  </data>
+  <data name="Common_OpenInExplorer" xml:space="preserve">
+    <value>Открыть в проводнике</value>
+  </data>
+  <data name="Dashboard_Title" xml:space="preserve">
+    <value>Аналитический дашборд</value>
+  </data>
+  <data name="Dashboard_Subtitle" xml:space="preserve">
+    <value>Хроника освобожденного дискового пространства, история сессий и диаграмма категорий</value>
+  </data>
+  <data name="Dashboard_ClearHistory" xml:space="preserve">
+    <value>Очистить историю</value>
+  </data>
+  <data name="Dashboard_KpiSessions" xml:space="preserve">
+    <value>СЕССИЙ ОЧИСТКИ</value>
+  </data>
+  <data name="Dashboard_KpiTotalFreed" xml:space="preserve">
+    <value>ОСВОБОЖДЕНО ВСЕГО</value>
+  </data>
+  <data name="Dashboard_KpiFilesRemoved" xml:space="preserve">
+    <value>ФАЙЛОВ УДАЛЕНО</value>
+  </data>
+  <data name="Dashboard_KpiAveragePerSession" xml:space="preserve">
+    <value>СРЕДНЕЕ ЗА СЕССИЮ</value>
+  </data>
+  <data name="Dashboard_ChartPeriodLabel" xml:space="preserve">
+    <value>Период:</value>
+  </data>
+  <data name="Dashboard_ChartPeriodMonthly" xml:space="preserve">
+    <value>По месяцам</value>
+  </data>
+  <data name="Dashboard_ChartPeriodWeekly" xml:space="preserve">
+    <value>По неделям</value>
+  </data>
+  <data name="Dashboard_ChartMonthlyTitle" xml:space="preserve">
+    <value>Освобождено по месяцам</value>
+  </data>
+  <data name="Dashboard_ChartWeeklyTitle" xml:space="preserve">
+    <value>Освобождено по неделям</value>
+  </data>
+  <data name="DiskMap_Title" xml:space="preserve">
+    <value>Интерактивная карта диска</value>
+  </data>
+  <data name="DiskMap_Subtitle" xml:space="preserve">
+    <value>Наглядная древовидная визуализация занятого дискового пространства с быстрым переходом</value>
+  </data>
+  <data name="DiskMap_Analyze" xml:space="preserve">
+    <value>Анализировать</value>
+  </data>
+  <data name="DiskMap_Depth" xml:space="preserve">
+    <value>Глубина:</value>
+  </data>
+  <data name="DiskMap_InfoTitle" xml:space="preserve">
+    <value>Информация</value>
+  </data>
+  <data name="DiskMap_GoToRoot" xml:space="preserve">
+    <value>Вернуться к корню</value>
+  </data>
+  <data name="LargeFiles_Title" xml:space="preserve">
+    <value>Анализ больших файлов</value>
+  </data>
+  <data name="LargeFiles_Subtitle" xml:space="preserve">
+    <value>Быстрый поиск и очистка самых тяжелых видео, архивов, виртуальных машин и дампов</value>
+  </data>
+  <data name="LargeFiles_Find" xml:space="preserve">
+    <value>Найти</value>
+  </data>
+  <data name="LargeFiles_MinSize" xml:space="preserve">
+    <value>Мин. МБ:</value>
+  </data>
+  <data name="LargeFiles_ToolTipDeleteToRecycleBin" xml:space="preserve">
+    <value>Удалить в корзину</value>
+  </data>
+  <data name="LargeFiles_Total" xml:space="preserve">
+    <value>Итого: </value>
+  </data>
+  <data name="Duplicates_Title" xml:space="preserve">
+    <value>Умный поиск дубликатов файлов</value>
+  </data>
+  <data name="Duplicates_Subtitle" xml:space="preserve">
+    <value>Быстрое обнаружение одинаковых файлов по размеру, хэшу SHA-256 и побайтовому сравнению</value>
+  </data>
+  <data name="Duplicates_TabDuplicates" xml:space="preserve">
+    <value>Дубликаты</value>
+  </data>
+  <data name="Duplicates_TabBySample" xml:space="preserve">
+    <value>По образцу</value>
+  </data>
+  <data name="Duplicates_TabCompare" xml:space="preserve">
+    <value>Сравнение</value>
+  </data>
+  <data name="Duplicates_TabDeletionLog" xml:space="preserve">
+    <value>Лог удалений</value>
+  </data>
+  <data name="Duplicates_ScanFoldersLabel" xml:space="preserve">
+    <value>Папки для сканирования:</value>
+  </data>
+  <data name="Duplicates_ExcludeLabel" xml:space="preserve">
+    <value>Исключения (по строкам):</value>
+  </data>
+  <data name="Duplicates_CriteriaLabel" xml:space="preserve">
+    <value>Критерии сравнения:</value>
+  </data>
+  <data name="Duplicates_OptBySize" xml:space="preserve">
+    <value>По размеру</value>
+  </data>
+  <data name="Duplicates_OptByHash" xml:space="preserve">
+    <value>По хэшу (SHA256)</value>
+  </data>
+  <data name="Duplicates_OptByName" xml:space="preserve">
+    <value>По имени файла</value>
+  </data>
+  <data name="Duplicates_OptByByte" xml:space="preserve">
+    <value>Побайтовое (точно, медленно)</value>
+  </data>
+  <data name="Duplicates_OptTurbo" xml:space="preserve">
+    <value>Turbo — частичный хэш (быстро)</value>
+  </data>
+  <data name="Duplicates_MinFileSizeLabel" xml:space="preserve">
+    <value>Мин. размер (байт):</value>
+  </data>
+  <data name="Duplicates_StatGroups" xml:space="preserve">
+    <value>Групп: </value>
+  </data>
+  <data name="Duplicates_StatDuplicates" xml:space="preserve">
+    <value>Дубликатов: </value>
+  </data>
+  <data name="Duplicates_StatWasted" xml:space="preserve">
+    <value>Потрачено впустую: </value>
+  </data>
+  <data name="Duplicates_GroupFilesTimes" xml:space="preserve">
+    <value> файлов × </value>
+  </data>
+  <data name="Duplicates_PreviewTitle" xml:space="preserve">
+    <value>Превью</value>
+  </data>
+  <data name="Duplicates_SampleFileLabel" xml:space="preserve">
+    <value>Файл-образец:</value>
+  </data>
+  <data name="Duplicates_SampleSearchFoldersLabel" xml:space="preserve">
+    <value>Искать в папках:</value>
+  </data>
+  <data name="Duplicates_FolderALabel" xml:space="preserve">
+    <value>Папка A:</value>
+  </data>
+  <data name="Duplicates_FolderBLabel" xml:space="preserve">
+    <value>Папка B:</value>
+  </data>
+  <data name="Duplicates_StatOnlyInA" xml:space="preserve">
+    <value>Только A: </value>
+  </data>
+  <data name="Duplicates_StatOnlyInB" xml:space="preserve">
+    <value>Только B: </value>
+  </data>
+  <data name="Duplicates_StatCommon" xml:space="preserve">
+    <value>Общие: </value>
+  </data>
+  <data name="Duplicates_ColStatus" xml:space="preserve">
+    <value>Статус</value>
+  </data>
+  <data name="Duplicates_ColPath" xml:space="preserve">
+    <value>Путь</value>
+  </data>
+  <data name="Duplicates_ColSizeA" xml:space="preserve">
+    <value>Размер A</value>
+  </data>
+  <data name="Duplicates_ColSizeB" xml:space="preserve">
+    <value>Размер B</value>
+  </data>
+  <data name="Duplicates_ColNewer" xml:space="preserve">
+    <value>Новее</value>
+  </data>
+  <data name="Duplicates_OpenRecycleBin" xml:space="preserve">
+    <value>Открыть корзину</value>
+  </data>
+  <data name="Duplicates_ClearLog" xml:space="preserve">
+    <value>Очистить лог</value>
+  </data>
+  <data name="Duplicates_LogFilesBullet" xml:space="preserve">
+    <value> файлов • </value>
+  </data>
+  <data name="Duplicates_ReplaceWithHardlinks" xml:space="preserve">
+    <value>Заменить хардлинками</value>
+  </data>
+  <data name="Duplicates_ReplaceWithHardlinksToolTip" xml:space="preserve">
+    <value>Заменяет дубликаты жесткими ссылками NTFS: освобождает место без удаления путей</value>
+  </data>
+  <data name="Duplicates_DeleteSelected" xml:space="preserve">
+    <value>Удалить выбранные</value>
+  </data>
+  <data name="Duplicates_Scan" xml:space="preserve">
+    <value>Сканировать</value>
+  </data>
+  <data name="Duplicates_FindCopies" xml:space="preserve">
+    <value>Найти копии</value>
+  </data>
+  <data name="Duplicates_CompareFolders" xml:space="preserve">
+    <value>Сравнить</value>
+  </data>
 </root>

@@ -185,4 +185,212 @@
   <data name="Settings_LanguageRestartHint" xml:space="preserve">
     <value>Restart the app to apply the new language</value>
   </data>
+  <!-- Day 2, slice 1: pages (Dashboard/DiskMap/LargeFiles/Duplicates/Startup/Uninstaller/Quarantine/Scheduler). -->
+  <data name="Common_Refresh" xml:space="preserve">
+    <value>Refresh</value>
+  </data>
+  <data name="Common_Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="Common_Path" xml:space="preserve">
+    <value>Path:</value>
+  </data>
+  <data name="Common_OpenInExplorer" xml:space="preserve">
+    <value>Open in File Explorer</value>
+  </data>
+  <data name="Dashboard_Title" xml:space="preserve">
+    <value>Analytics Dashboard</value>
+  </data>
+  <data name="Dashboard_Subtitle" xml:space="preserve">
+    <value>Freed disk space over time, session history and category chart</value>
+  </data>
+  <data name="Dashboard_ClearHistory" xml:space="preserve">
+    <value>Clear History</value>
+  </data>
+  <data name="Dashboard_KpiSessions" xml:space="preserve">
+    <value>CLEANUP SESSIONS</value>
+  </data>
+  <data name="Dashboard_KpiTotalFreed" xml:space="preserve">
+    <value>TOTAL FREED</value>
+  </data>
+  <data name="Dashboard_KpiFilesRemoved" xml:space="preserve">
+    <value>FILES REMOVED</value>
+  </data>
+  <data name="Dashboard_KpiAveragePerSession" xml:space="preserve">
+    <value>AVERAGE PER SESSION</value>
+  </data>
+  <data name="Dashboard_ChartPeriodLabel" xml:space="preserve">
+    <value>Period:</value>
+  </data>
+  <data name="Dashboard_ChartPeriodMonthly" xml:space="preserve">
+    <value>By month</value>
+  </data>
+  <data name="Dashboard_ChartPeriodWeekly" xml:space="preserve">
+    <value>By week</value>
+  </data>
+  <data name="Dashboard_ChartMonthlyTitle" xml:space="preserve">
+    <value>Freed space by month</value>
+  </data>
+  <data name="Dashboard_ChartWeeklyTitle" xml:space="preserve">
+    <value>Freed space by week</value>
+  </data>
+  <data name="DiskMap_Title" xml:space="preserve">
+    <value>Interactive Disk Map</value>
+  </data>
+  <data name="DiskMap_Subtitle" xml:space="preserve">
+    <value>A visual tree map of disk usage with quick drill-down</value>
+  </data>
+  <data name="DiskMap_Analyze" xml:space="preserve">
+    <value>Analyze</value>
+  </data>
+  <data name="DiskMap_Depth" xml:space="preserve">
+    <value>Depth:</value>
+  </data>
+  <data name="DiskMap_InfoTitle" xml:space="preserve">
+    <value>Details</value>
+  </data>
+  <data name="DiskMap_GoToRoot" xml:space="preserve">
+    <value>Back to Root</value>
+  </data>
+  <data name="LargeFiles_Title" xml:space="preserve">
+    <value>Large File Analysis</value>
+  </data>
+  <data name="LargeFiles_Subtitle" xml:space="preserve">
+    <value>Quickly find and clean up the biggest videos, archives, VM images and dumps</value>
+  </data>
+  <data name="LargeFiles_Find" xml:space="preserve">
+    <value>Find</value>
+  </data>
+  <data name="LargeFiles_MinSize" xml:space="preserve">
+    <value>Min. MB:</value>
+  </data>
+  <data name="LargeFiles_ToolTipDeleteToRecycleBin" xml:space="preserve">
+    <value>Move to Recycle Bin</value>
+  </data>
+  <data name="LargeFiles_Total" xml:space="preserve">
+    <value>Total: </value>
+  </data>
+  <data name="Duplicates_Title" xml:space="preserve">
+    <value>Smart Duplicate Finder</value>
+  </data>
+  <data name="Duplicates_Subtitle" xml:space="preserve">
+    <value>Fast detection of identical files by size, SHA-256 hash and byte-by-byte comparison</value>
+  </data>
+  <data name="Duplicates_TabDuplicates" xml:space="preserve">
+    <value>Duplicates</value>
+  </data>
+  <data name="Duplicates_TabBySample" xml:space="preserve">
+    <value>By Sample</value>
+  </data>
+  <data name="Duplicates_TabCompare" xml:space="preserve">
+    <value>Compare</value>
+  </data>
+  <data name="Duplicates_TabDeletionLog" xml:space="preserve">
+    <value>Deletion Log</value>
+  </data>
+  <data name="Duplicates_ScanFoldersLabel" xml:space="preserve">
+    <value>Folders to scan:</value>
+  </data>
+  <data name="Duplicates_ExcludeLabel" xml:space="preserve">
+    <value>Exclusions (line patterns):</value>
+  </data>
+  <data name="Duplicates_CriteriaLabel" xml:space="preserve">
+    <value>Comparison criteria:</value>
+  </data>
+  <data name="Duplicates_OptBySize" xml:space="preserve">
+    <value>By size</value>
+  </data>
+  <data name="Duplicates_OptByHash" xml:space="preserve">
+    <value>By hash (SHA256)</value>
+  </data>
+  <data name="Duplicates_OptByName" xml:space="preserve">
+    <value>By file name</value>
+  </data>
+  <data name="Duplicates_OptByByte" xml:space="preserve">
+    <value>Byte-by-byte (exact, slow)</value>
+  </data>
+  <data name="Duplicates_OptTurbo" xml:space="preserve">
+    <value>Turbo — partial hash (fast)</value>
+  </data>
+  <data name="Duplicates_MinFileSizeLabel" xml:space="preserve">
+    <value>Min. size (bytes):</value>
+  </data>
+  <data name="Duplicates_StatGroups" xml:space="preserve">
+    <value>Groups: </value>
+  </data>
+  <data name="Duplicates_StatDuplicates" xml:space="preserve">
+    <value>Duplicates: </value>
+  </data>
+  <data name="Duplicates_StatWasted" xml:space="preserve">
+    <value>Wasted: </value>
+  </data>
+  <data name="Duplicates_GroupFilesTimes" xml:space="preserve">
+    <value> files × </value>
+  </data>
+  <data name="Duplicates_PreviewTitle" xml:space="preserve">
+    <value>Preview</value>
+  </data>
+  <data name="Duplicates_SampleFileLabel" xml:space="preserve">
+    <value>Sample file:</value>
+  </data>
+  <data name="Duplicates_SampleSearchFoldersLabel" xml:space="preserve">
+    <value>Search in folders:</value>
+  </data>
+  <data name="Duplicates_FolderALabel" xml:space="preserve">
+    <value>Folder A:</value>
+  </data>
+  <data name="Duplicates_FolderBLabel" xml:space="preserve">
+    <value>Folder B:</value>
+  </data>
+  <data name="Duplicates_StatOnlyInA" xml:space="preserve">
+    <value>Only in A: </value>
+  </data>
+  <data name="Duplicates_StatOnlyInB" xml:space="preserve">
+    <value>Only in B: </value>
+  </data>
+  <data name="Duplicates_StatCommon" xml:space="preserve">
+    <value>Common: </value>
+  </data>
+  <data name="Duplicates_ColStatus" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="Duplicates_ColPath" xml:space="preserve">
+    <value>Path</value>
+  </data>
+  <data name="Duplicates_ColSizeA" xml:space="preserve">
+    <value>Size A</value>
+  </data>
+  <data name="Duplicates_ColSizeB" xml:space="preserve">
+    <value>Size B</value>
+  </data>
+  <data name="Duplicates_ColNewer" xml:space="preserve">
+    <value>Newer</value>
+  </data>
+  <data name="Duplicates_OpenRecycleBin" xml:space="preserve">
+    <value>Open Recycle Bin</value>
+  </data>
+  <data name="Duplicates_ClearLog" xml:space="preserve">
+    <value>Clear Log</value>
+  </data>
+  <data name="Duplicates_LogFilesBullet" xml:space="preserve">
+    <value> files • </value>
+  </data>
+  <data name="Duplicates_ReplaceWithHardlinks" xml:space="preserve">
+    <value>Replace with Hard Links</value>
+  </data>
+  <data name="Duplicates_ReplaceWithHardlinksToolTip" xml:space="preserve">
+    <value>Replaces duplicates with NTFS hard links: frees up space without removing file paths</value>
+  </data>
+  <data name="Duplicates_DeleteSelected" xml:space="preserve">
+    <value>Delete Selected</value>
+  </data>
+  <data name="Duplicates_Scan" xml:space="preserve">
+    <value>Scan</value>
+  </data>
+  <data name="Duplicates_FindCopies" xml:space="preserve">
+    <value>Find Copies</value>
+  </data>
+  <data name="Duplicates_CompareFolders" xml:space="preserve">
+    <value>Compare</value>
+  </data>
 </root>

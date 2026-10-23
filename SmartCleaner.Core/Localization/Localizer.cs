@@ -145,4 +145,83 @@ public static class Localizer
     public static string Settings_LanguageAuto => GetString(nameof(Settings_LanguageAuto));
     public static string Settings_LanguageDescription => GetString(nameof(Settings_LanguageDescription));
     public static string Settings_LanguageRestartHint => GetString(nameof(Settings_LanguageRestartHint));
+
+    // День 2, срез 1: общие строки страниц (идентичные литералы нескольких страниц)
+    public static string Common_Refresh => GetString(nameof(Common_Refresh));
+    public static string Common_Cancel => GetString(nameof(Common_Cancel));
+    public static string Common_Path => GetString(nameof(Common_Path));
+    public static string Common_OpenInExplorer => GetString(nameof(Common_OpenInExplorer));
+
+    // Дашборд
+    public static string Dashboard_Title => GetString(nameof(Dashboard_Title));
+    public static string Dashboard_Subtitle => GetString(nameof(Dashboard_Subtitle));
+    public static string Dashboard_ClearHistory => GetString(nameof(Dashboard_ClearHistory));
+    public static string Dashboard_KpiSessions => GetString(nameof(Dashboard_KpiSessions));
+    public static string Dashboard_KpiTotalFreed => GetString(nameof(Dashboard_KpiTotalFreed));
+    public static string Dashboard_KpiFilesRemoved => GetString(nameof(Dashboard_KpiFilesRemoved));
+    public static string Dashboard_KpiAveragePerSession => GetString(nameof(Dashboard_KpiAveragePerSession));
+    public static string Dashboard_ChartPeriodLabel => GetString(nameof(Dashboard_ChartPeriodLabel));
+    public static string Dashboard_ChartPeriodMonthly => GetString(nameof(Dashboard_ChartPeriodMonthly));
+    public static string Dashboard_ChartPeriodWeekly => GetString(nameof(Dashboard_ChartPeriodWeekly));
+    public static string Dashboard_ChartMonthlyTitle => GetString(nameof(Dashboard_ChartMonthlyTitle));
+    public static string Dashboard_ChartWeeklyTitle => GetString(nameof(Dashboard_ChartWeeklyTitle));
+
+    // Карта диска
+    public static string DiskMap_Title => GetString(nameof(DiskMap_Title));
+    public static string DiskMap_Subtitle => GetString(nameof(DiskMap_Subtitle));
+    public static string DiskMap_Analyze => GetString(nameof(DiskMap_Analyze));
+    public static string DiskMap_Depth => GetString(nameof(DiskMap_Depth));
+    public static string DiskMap_InfoTitle => GetString(nameof(DiskMap_InfoTitle));
+    public static string DiskMap_GoToRoot => GetString(nameof(DiskMap_GoToRoot));
+
+    // Большие файлы
+    public static string LargeFiles_Title => GetString(nameof(LargeFiles_Title));
+    public static string LargeFiles_Subtitle => GetString(nameof(LargeFiles_Subtitle));
+    public static string LargeFiles_Find => GetString(nameof(LargeFiles_Find));
+    public static string LargeFiles_MinSize => GetString(nameof(LargeFiles_MinSize));
+    public static string LargeFiles_ToolTipDeleteToRecycleBin => GetString(nameof(LargeFiles_ToolTipDeleteToRecycleBin));
+    public static string LargeFiles_Total => GetString(nameof(LargeFiles_Total));
+
+    // Дубликаты
+    public static string Duplicates_Title => GetString(nameof(Duplicates_Title));
+    public static string Duplicates_Subtitle => GetString(nameof(Duplicates_Subtitle));
+    public static string Duplicates_TabDuplicates => GetString(nameof(Duplicates_TabDuplicates));
+    public static string Duplicates_TabBySample => GetString(nameof(Duplicates_TabBySample));
+    public static string Duplicates_TabCompare => GetString(nameof(Duplicates_TabCompare));
+    public static string Duplicates_TabDeletionLog => GetString(nameof(Duplicates_TabDeletionLog));
+    public static string Duplicates_ScanFoldersLabel => GetString(nameof(Duplicates_ScanFoldersLabel));
+    public static string Duplicates_ExcludeLabel => GetString(nameof(Duplicates_ExcludeLabel));
+    public static string Duplicates_CriteriaLabel => GetString(nameof(Duplicates_CriteriaLabel));
+    public static string Duplicates_OptBySize => GetString(nameof(Duplicates_OptBySize));
+    public static string Duplicates_OptByHash => GetString(nameof(Duplicates_OptByHash));
+    public static string Duplicates_OptByName => GetString(nameof(Duplicates_OptByName));
+    public static string Duplicates_OptByByte => GetString(nameof(Duplicates_OptByByte));
+    public static string Duplicates_OptTurbo => GetString(nameof(Duplicates_OptTurbo));
+    public static string Duplicates_MinFileSizeLabel => GetString(nameof(Duplicates_MinFileSizeLabel));
+    public static string Duplicates_StatGroups => GetString(nameof(Duplicates_StatGroups));
+    public static string Duplicates_StatDuplicates => GetString(nameof(Duplicates_StatDuplicates));
+    public static string Duplicates_StatWasted => GetString(nameof(Duplicates_StatWasted));
+    public static string Duplicates_GroupFilesTimes => GetString(nameof(Duplicates_GroupFilesTimes));
+    public static string Duplicates_PreviewTitle => GetString(nameof(Duplicates_PreviewTitle));
+    public static string Duplicates_SampleFileLabel => GetString(nameof(Duplicates_SampleFileLabel));
+    public static string Duplicates_SampleSearchFoldersLabel => GetString(nameof(Duplicates_SampleSearchFoldersLabel));
+    public static string Duplicates_FolderALabel => GetString(nameof(Duplicates_FolderALabel));
+    public static string Duplicates_FolderBLabel => GetString(nameof(Duplicates_FolderBLabel));
+    public static string Duplicates_StatOnlyInA => GetString(nameof(Duplicates_StatOnlyInA));
+    public static string Duplicates_StatOnlyInB => GetString(nameof(Duplicates_StatOnlyInB));
+    public static string Duplicates_StatCommon => GetString(nameof(Duplicates_StatCommon));
+    public static string Duplicates_ColStatus => GetString(nameof(Duplicates_ColStatus));
+    public static string Duplicates_ColPath => GetString(nameof(Duplicates_ColPath));
+    public static string Duplicates_ColSizeA => GetString(nameof(Duplicates_ColSizeA));
+    public static string Duplicates_ColSizeB => GetString(nameof(Duplicates_ColSizeB));
+    public static string Duplicates_ColNewer => GetString(nameof(Duplicates_ColNewer));
+    public static string Duplicates_OpenRecycleBin => GetString(nameof(Duplicates_OpenRecycleBin));
+    public static string Duplicates_ClearLog => GetString(nameof(Duplicates_ClearLog));
+    public static string Duplicates_LogFilesBullet => GetString(nameof(Duplicates_LogFilesBullet));
+    public static string Duplicates_ReplaceWithHardlinks => GetString(nameof(Duplicates_ReplaceWithHardlinks));
+    public static string Duplicates_ReplaceWithHardlinksToolTip => GetString(nameof(Duplicates_ReplaceWithHardlinksToolTip));
+    public static string Duplicates_DeleteSelected => GetString(nameof(Duplicates_DeleteSelected));
+    public static string Duplicates_Scan => GetString(nameof(Duplicates_Scan));
+    public static string Duplicates_FindCopies => GetString(nameof(Duplicates_FindCopies));
+    public static string Duplicates_CompareFolders => GetString(nameof(Duplicates_CompareFolders));
 }

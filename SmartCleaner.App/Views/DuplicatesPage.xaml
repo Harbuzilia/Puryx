@@ -2,6 +2,7 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="clr-namespace:SmartCleaner.App.ViewModels"
+             xmlns:loc="clr-namespace:SmartCleaner.Core.Localization;assembly=SmartCleaner.Core"
              AllowDrop="True"
              Drop="OnDrop"
              DragOver="OnDragOver">
@@ -20,12 +21,12 @@
                     <Border Width="32" Height="32" CornerRadius="8" Background="{DynamicResource AccentGradientBrush}" Margin="0,0,10,0" VerticalAlignment="Center">
                         <TextBlock Text="&#xE7C3;" FontFamily="Segoe MDL2 Assets" FontSize="16" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
-                    <TextBlock Text="Умный поиск дубликатов файлов" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
+                    <TextBlock Text="{x:Static loc:Localizer.Duplicates_Title}" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
                     <Border Background="{DynamicResource AccentBrush}" CornerRadius="4" Padding="6,2" Margin="10,0,0,0" VerticalAlignment="Center">
                         <TextBlock Text="BYTE-EXACT" FontSize="9.5" Foreground="White" FontWeight="Bold"/>
                     </Border>
                 </StackPanel>
-                <TextBlock Text="Быстрое обнаружение одинаковых файлов по размеру, хэшу SHA-256 и побайтовому сравнению" 
+                <TextBlock Text="{x:Static loc:Localizer.Duplicates_Subtitle}" 
                            FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,4,0,0"/>
             </StackPanel>
         </DockPanel>
@@ -36,7 +37,7 @@
                     BorderThickness="0">
 
             <!-- ═══ Tab 1: Поиск дубликатов ═══ -->
-            <TabItem Header="Дубликаты">
+            <TabItem Header="{x:Static loc:Localizer.Duplicates_TabDuplicates}">
                 <Grid Margin="0,12,0,0">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -55,7 +56,7 @@
 
                             <!-- Left: Folders + Exclude -->
                             <StackPanel Grid.Column="0" Margin="0,0,8,0">
-                                <TextBlock Text="Папки для сканирования:" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                                <TextBlock Text="{x:Static loc:Localizer.Duplicates_ScanFoldersLabel}" FontWeight="SemiBold" Margin="0,0,0,4"/>
                                 <DockPanel>
                                     <Button DockPanel.Dock="Right" Width="32"
                                             Command="{Binding BrowseScanFoldersCommand}" 
@@ -67,7 +68,7 @@
                                              VerticalScrollBarVisibility="Auto"/>
                                 </DockPanel>
 
-                                <TextBlock Text="Исключения (по строкам):" FontWeight="SemiBold" Margin="0,8,0,4"/>
+                                <TextBlock Text="{x:Static loc:Localizer.Duplicates_ExcludeLabel}" FontWeight="SemiBold" Margin="0,8,0,4"/>
                                 <TextBox Text="{Binding ExcludePatterns, UpdateSourceTrigger=PropertyChanged}" 
                                          MinHeight="40" AcceptsReturn="True" TextWrapping="Wrap"
                                          FontSize="11" VerticalScrollBarVisibility="Auto"/>
@@ -75,16 +76,16 @@
 
                             <!-- Right: Checkboxes -->
                             <StackPanel Grid.Column="1" Margin="8,0,0,0">
-                                <TextBlock Text="Критерии сравнения:" FontWeight="SemiBold" Margin="0,0,0,8"/>
-                                <CheckBox Content="По размеру" IsChecked="{Binding OptBySize}" Margin="0,2"/>
-                                <CheckBox Content="По хэшу (SHA256)" IsChecked="{Binding OptByHash}" Margin="0,2"/>
-                                <CheckBox Content="По имени файла" IsChecked="{Binding OptByName}" Margin="0,2"/>
-                                <CheckBox Content="Побайтовое (точно, медленно)" IsChecked="{Binding OptByByte}" Margin="0,2"/>
+                                <TextBlock Text="{x:Static loc:Localizer.Duplicates_CriteriaLabel}" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                                <CheckBox Content="{x:Static loc:Localizer.Duplicates_OptBySize}" IsChecked="{Binding OptBySize}" Margin="0,2"/>
+                                <CheckBox Content="{x:Static loc:Localizer.Duplicates_OptByHash}" IsChecked="{Binding OptByHash}" Margin="0,2"/>
+                                <CheckBox Content="{x:Static loc:Localizer.Duplicates_OptByName}" IsChecked="{Binding OptByName}" Margin="0,2"/>
+                                <CheckBox Content="{x:Static loc:Localizer.Duplicates_OptByByte}" IsChecked="{Binding OptByByte}" Margin="0,2"/>
                                 <Separator Margin="0,6"/>
-                                <CheckBox Content="Turbo — частичный хэш (быстро)" IsChecked="{Binding OptTurbo}" 
+                                <CheckBox Content="{x:Static loc:Localizer.Duplicates_OptTurbo}" IsChecked="{Binding OptTurbo}" 
                                           Margin="0,2" FontWeight="SemiBold" Foreground="{DynamicResource AccentBrush}"/>
                                 <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
-                                    <TextBlock Text="Мин. размер (байт):" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                    <TextBlock Text="{x:Static loc:Localizer.Duplicates_MinFileSizeLabel}" VerticalAlignment="Center" Margin="0,0,6,0"/>
                                     <TextBox Text="{Binding MinFileSizeText, UpdateSourceTrigger=PropertyChanged}" Width="80"/>
                                 </StackPanel>
                             </StackPanel>
@@ -97,13 +98,13 @@
                             Visibility="{Binding TotalGroups, Converter={StaticResource IntToVisibilityConverter}}">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock FontWeight="SemiBold" Margin="0,0,16,0">
-                                <Run Text="Групп: "/><Run Text="{Binding TotalGroups}" Foreground="{DynamicResource AccentBrush}"/>
+                                <Run Text="{x:Static loc:Localizer.Duplicates_StatGroups}"/><Run Text="{Binding TotalGroups}" Foreground="{DynamicResource AccentBrush}"/>
                             </TextBlock>
                             <TextBlock Margin="0,0,16,0">
-                                <Run Text="Дубликатов: "/><Run Text="{Binding TotalDuplicates}" Foreground="{DynamicResource CautionBrush}"/>
+                                <Run Text="{x:Static loc:Localizer.Duplicates_StatDuplicates}"/><Run Text="{Binding TotalDuplicates}" Foreground="{DynamicResource CautionBrush}"/>
                             </TextBlock>
                             <TextBlock>
-                                <Run Text="Потрачено впустую: "/><Run Text="{Binding TotalWasted}" Foreground="{DynamicResource DangerBrush}" FontWeight="Bold"/>
+                                <Run Text="{x:Static loc:Localizer.Duplicates_StatWasted}"/><Run Text="{Binding TotalWasted}" Foreground="{DynamicResource DangerBrush}" FontWeight="Bold"/>
                             </TextBlock>
                         </StackPanel>
                     </Border>
@@ -128,7 +129,7 @@
                                             <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
                                                 <TextBlock Text="&#xE8B7;" FontFamily="Segoe MDL2 Assets" Margin="0,0,6,0"/>
                                                 <TextBlock FontWeight="SemiBold">
-                                                    <Run Text="{Binding FileCount, Mode=OneWay}"/><Run Text=" файлов × "/>
+                                                    <Run Text="{Binding FileCount, Mode=OneWay}"/><Run Text="{x:Static loc:Localizer.Duplicates_GroupFilesTimes}"/>
                                                     <Run Text="{Binding FileSize, Mode=OneWay}"/>
                                                 </TextBlock>
                                                 <TextBlock Foreground="{DynamicResource DangerBrush}" Margin="12,0,0,0">
@@ -168,7 +169,7 @@
                                 Visibility="{Binding SelectedPreviewFile, Converter={StaticResource NullToVisibilityConverter}}">
                             <ScrollViewer VerticalScrollBarVisibility="Auto">
                                 <StackPanel>
-                                    <TextBlock Text="Превью" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                                    <TextBlock Text="{x:Static loc:Localizer.Duplicates_PreviewTitle}" FontWeight="SemiBold" Margin="0,0,0,8"/>
 
                                     <!-- Image preview -->
                                     <Image Source="{Binding PreviewImage}" MaxHeight="220" Stretch="Uniform"
@@ -225,7 +226,7 @@
             </TabItem>
 
             <!-- ═══ Tab 2: Поиск по образцу ═══ -->
-            <TabItem Header="По образцу">
+            <TabItem Header="{x:Static loc:Localizer.Duplicates_TabBySample}">
                 <Grid Margin="0,12,0,0">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -235,7 +236,7 @@
                     <Border Grid.Row="0" Background="{DynamicResource SurfaceBrush}" 
                             CornerRadius="8" Padding="16" Margin="0,0,0,12">
                         <StackPanel>
-                            <TextBlock Text="Файл-образец:" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                            <TextBlock Text="{x:Static loc:Localizer.Duplicates_SampleFileLabel}" FontWeight="SemiBold" Margin="0,0,0,4"/>
                             <DockPanel Margin="0,0,0,8">
                                 <Button DockPanel.Dock="Right" Width="32"
                                         Command="{Binding BrowseSampleFileCommand}" 
@@ -245,7 +246,7 @@
                                 <TextBox Text="{Binding SampleFilePath, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True"/>
                             </DockPanel>
 
-                            <TextBlock Text="Искать в папках:" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                            <TextBlock Text="{x:Static loc:Localizer.Duplicates_SampleSearchFoldersLabel}" FontWeight="SemiBold" Margin="0,0,0,4"/>
                             <DockPanel>
                                 <Button DockPanel.Dock="Right" Width="32"
                                         Command="{Binding BrowseSampleSearchFoldersCommand}" 
@@ -283,7 +284,7 @@
             </TabItem>
 
             <!-- ═══ Tab 3: Сравнение папок ═══ -->
-            <TabItem Header="Сравнение">
+            <TabItem Header="{x:Static loc:Localizer.Duplicates_TabCompare}">
                 <Grid Margin="0,12,0,0">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -300,7 +301,7 @@
                             </Grid.ColumnDefinitions>
 
                             <StackPanel Grid.Column="0" Margin="0,0,8,0">
-                                <TextBlock Text="Папка A:" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                                <TextBlock Text="{x:Static loc:Localizer.Duplicates_FolderALabel}" FontWeight="SemiBold" Margin="0,0,0,4"/>
                                 <DockPanel>
                                     <Button DockPanel.Dock="Right" Width="32"
                                             Command="{Binding BrowseFolderACommand}" 
@@ -312,7 +313,7 @@
                             </StackPanel>
 
                             <StackPanel Grid.Column="1" Margin="8,0,0,0">
-                                <TextBlock Text="Папка B:" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                                <TextBlock Text="{x:Static loc:Localizer.Duplicates_FolderBLabel}" FontWeight="SemiBold" Margin="0,0,0,4"/>
                                 <DockPanel>
                                     <Button DockPanel.Dock="Right" Width="32"
                                             Command="{Binding BrowseFolderBCommand}" 
@@ -331,13 +332,13 @@
                             Visibility="{Binding CommonCount, Converter={StaticResource IntToVisibilityConverter}}">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Margin="0,0,16,0">
-                                <Run Text="Только A: "/><Run Text="{Binding UniqueACount}" Foreground="{DynamicResource AccentBrush}" FontWeight="SemiBold"/>
+                                <Run Text="{x:Static loc:Localizer.Duplicates_StatOnlyInA}"/><Run Text="{Binding UniqueACount}" Foreground="{DynamicResource AccentBrush}" FontWeight="SemiBold"/>
                             </TextBlock>
                             <TextBlock Margin="0,0,16,0">
-                                <Run Text="Только B: "/><Run Text="{Binding UniqueBCount}" Foreground="{DynamicResource AccentBrush}" FontWeight="SemiBold"/>
+                                <Run Text="{x:Static loc:Localizer.Duplicates_StatOnlyInB}"/><Run Text="{Binding UniqueBCount}" Foreground="{DynamicResource AccentBrush}" FontWeight="SemiBold"/>
                             </TextBlock>
                             <TextBlock>
-                                <Run Text="Общие: "/><Run Text="{Binding CommonCount}" Foreground="{DynamicResource SafeBrush}" FontWeight="SemiBold"/>
+                                <Run Text="{x:Static loc:Localizer.Duplicates_StatCommon}"/><Run Text="{Binding CommonCount}" Foreground="{DynamicResource SafeBrush}" FontWeight="SemiBold"/>
                             </TextBlock>
                         </StackPanel>
                     </Border>
@@ -351,18 +352,18 @@
                               GridLinesVisibility="Horizontal"
                               HorizontalGridLinesBrush="{DynamicResource BorderBrush}">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Статус" Binding="{Binding Status}" Width="140"/>
-                            <DataGridTextColumn Header="Путь" Binding="{Binding Path}" Width="*"/>
-                            <DataGridTextColumn Header="Размер A" Binding="{Binding SizeA}" Width="90"/>
-                            <DataGridTextColumn Header="Размер B" Binding="{Binding SizeB}" Width="90"/>
-                            <DataGridTextColumn Header="Новее" Binding="{Binding Newer}" Width="60"/>
+                            <DataGridTextColumn Header="{x:Static loc:Localizer.Duplicates_ColStatus}" Binding="{Binding Status}" Width="140"/>
+                            <DataGridTextColumn Header="{x:Static loc:Localizer.Duplicates_ColPath}" Binding="{Binding Path}" Width="*"/>
+                            <DataGridTextColumn Header="{x:Static loc:Localizer.Duplicates_ColSizeA}" Binding="{Binding SizeA}" Width="90"/>
+                            <DataGridTextColumn Header="{x:Static loc:Localizer.Duplicates_ColSizeB}" Binding="{Binding SizeB}" Width="90"/>
+                            <DataGridTextColumn Header="{x:Static loc:Localizer.Duplicates_ColNewer}" Binding="{Binding Newer}" Width="60"/>
                         </DataGrid.Columns>
                     </DataGrid>
                 </Grid>
             </TabItem>
 
             <!-- ═══ Tab 4: Лог удалений ═══ -->
-            <TabItem Header="Лог удалений">
+            <TabItem Header="{x:Static loc:Localizer.Duplicates_TabDeletionLog}">
                 <Grid Margin="0,12,0,0">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -371,10 +372,10 @@
 
                     <!-- Action buttons -->
                     <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,12">
-                        <Button Content="Открыть корзину" 
+                        <Button Content="{x:Static loc:Localizer.Duplicates_OpenRecycleBin}" 
                                 Command="{Binding OpenRecycleBinCommand}"
                                 Style="{StaticResource SecondaryButton}" Margin="0,0,8,0"/>
-                        <Button Content="Очистить лог" 
+                        <Button Content="{x:Static loc:Localizer.Duplicates_ClearLog}" 
                                 Command="{Binding ClearDeletionHistoryCommand}"
                                 Style="{StaticResource SecondaryButton}"/>
                     </StackPanel>
@@ -391,7 +392,7 @@
                                             <TextBlock Text="&#xE823;" FontFamily="Segoe MDL2 Assets" Margin="0,0,6,0"/>
                                             <TextBlock Text="{Binding TimestampFormatted}" FontWeight="SemiBold" Margin="0,0,12,0"/>
                                             <TextBlock Foreground="{DynamicResource TextSecondaryBrush}">
-                                                <Run Text="{Binding FileCount, Mode=OneWay}"/><Run Text=" файлов • "/>
+                                                <Run Text="{Binding FileCount, Mode=OneWay}"/><Run Text="{x:Static loc:Localizer.Duplicates_LogFilesBullet}"/>
                                                 <Run Text="{Binding TotalSize, Mode=OneWay}"/>
                                             </TextBlock>
                                         </StackPanel>
@@ -432,23 +433,23 @@
                 <!-- Status + buttons -->
                 <DockPanel Grid.Row="1">
                     <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
-                        <Button Content="Заменить хардлинками" 
+                        <Button Content="{x:Static loc:Localizer.Duplicates_ReplaceWithHardlinks}" 
                                 Command="{Binding ReplaceWithHardlinksCommand}"
                                 Style="{StaticResource PrimaryButton}"
-                                ToolTip="Заменяет дубликаты жесткими ссылками NTFS: освобождает место без удаления путей"
+                                ToolTip="{x:Static loc:Localizer.Duplicates_ReplaceWithHardlinksToolTip}"
                                 Visibility="{Binding TotalGroups, Converter={StaticResource IntToVisibilityConverter}}"
                                 Margin="0,0,8,0"/>
-                        <Button Content="Удалить выбранные" 
+                        <Button Content="{x:Static loc:Localizer.Duplicates_DeleteSelected}" 
                                 Command="{Binding DeleteSelectedDuplicatesCommand}"
                                 Style="{StaticResource DangerButton}"
                                 Visibility="{Binding TotalGroups, Converter={StaticResource IntToVisibilityConverter}}"
                                 Margin="0,0,8,0"/>
-                        <Button Content="Отмена" 
+                        <Button Content="{x:Static loc:Localizer.Common_Cancel}" 
                                 Command="{Binding CancelScanCommand}"
                                 Style="{StaticResource SecondaryButton}"
                                 Visibility="{Binding IsScanning, Converter={StaticResource BoolToVisibilityConverter}}"
                                 Margin="0,0,8,0"/>
-                        <Button Content="Сканировать" 
+                        <Button Content="{x:Static loc:Localizer.Duplicates_Scan}" 
                                 Command="{Binding StartDuplicateScanCommand}"
                                 IsEnabled="{Binding IsScanning, Converter={StaticResource InverseBoolConverter}}"
                                 Style="{StaticResource PrimaryButton}">
@@ -456,7 +457,7 @@
                                 <Binding Path="SelectedTabIndex" Converter="{StaticResource IntToVisibilityConverter}" ConverterParameter="0"/>
                             </Button.Visibility>
                         </Button>
-                        <Button Content="Найти копии" 
+                        <Button Content="{x:Static loc:Localizer.Duplicates_FindCopies}" 
                                 Command="{Binding StartSampleScanCommand}"
                                 IsEnabled="{Binding IsScanning, Converter={StaticResource InverseBoolConverter}}"
                                 Style="{StaticResource PrimaryButton}">
@@ -464,7 +465,7 @@
                                 <Binding Path="SelectedTabIndex" Converter="{StaticResource IntToVisibilityConverter}" ConverterParameter="1"/>
                             </Button.Visibility>
                         </Button>
-                        <Button Content="Сравнить" 
+                        <Button Content="{x:Static loc:Localizer.Duplicates_CompareFolders}" 
                                 Command="{Binding StartCompareFoldersCommand}"
                                 IsEnabled="{Binding IsScanning, Converter={StaticResource InverseBoolConverter}}"
                                 Style="{StaticResource PrimaryButton}">
