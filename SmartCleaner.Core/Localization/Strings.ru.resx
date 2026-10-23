@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!--
+    Microsoft ResX Schema
+
+    Version 2.0
+
+    The primary goals of this format is to allow a simple XML format
+    that is mostly human readable. The generation and parsing of the
+    various data types are done through the TypeConverter classes
+    associated with the data types.
+
+    Example:
+
+    ... (standard schema header, do not modify) ...
+
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <!-- RU (satellite). Паритет ключей с Strings.resx (EN) — инвариант-тест LocalizationTests. -->
+  <data name="MainWindow_Title" xml:space="preserve">
+    <value>Puryx — Умная очистка диска</value>
+  </data>
+  <data name="MainWindow_Tagline" xml:space="preserve">
+    <value>Умная очистка диска</value>
+  </data>
+  <data name="Nav_Section_Cleanup" xml:space="preserve">
+    <value>ОЧИСТКА</value>
+  </data>
+  <data name="Nav_Section_Tools" xml:space="preserve">
+    <value>ИНСТРУМЕНТЫ</value>
+  </data>
+  <data name="Nav_Section_System" xml:space="preserve">
+    <value>СИСТЕМА</value>
+  </data>
+  <data name="Nav_Overview" xml:space="preserve">
+    <value>Обзор</value>
+  </data>
+  <data name="Nav_Duplicates" xml:space="preserve">
+    <value>Дубликаты</value>
+  </data>
+  <data name="Nav_DiskMap" xml:space="preserve">
+    <value>Карта диска</value>
+  </data>
+  <data name="Nav_LargeFiles" xml:space="preserve">
+    <value>Большие файлы</value>
+  </data>
+  <data name="Nav_Startup" xml:space="preserve">
+    <value>Автозагрузка</value>
+  </data>
+  <data name="Nav_Discovery" xml:space="preserve">
+    <value>Обнаружение</value>
+  </data>
+  <data name="Nav_CliInspector" xml:space="preserve">
+    <value>CLI и AI Агенты</value>
+  </data>
+  <data name="Nav_AiAssistant" xml:space="preserve">
+    <value>AI Ассистент</value>
+  </data>
+  <data name="Nav_Uninstaller" xml:space="preserve">
+    <value>Деинсталлятор</value>
+  </data>
+  <data name="Nav_Compact" xml:space="preserve">
+    <value>Сжатие CompactOS</value>
+  </data>
+  <data name="Nav_WinSxS" xml:space="preserve">
+    <value>Очистка ядра WinSxS</value>
+  </data>
+  <data name="Nav_Quarantine" xml:space="preserve">
+    <value>Карантин Sandbox</value>
+  </data>
+  <data name="Nav_Plugins" xml:space="preserve">
+    <value>Плагины сообщества</value>
+  </data>
+  <data name="Nav_RamOptimizer" xml:space="preserve">
+    <value>Оптимизация RAM и БД</value>
+  </data>
+  <data name="Nav_NetworkOptimizer" xml:space="preserve">
+    <value>Оптимизация сети (DNS)</value>
+  </data>
+  <data name="Nav_Privacy" xml:space="preserve">
+    <value>Приватность и защита</value>
+  </data>
+  <data name="Nav_ServicesOptimizer" xml:space="preserve">
+    <value>Оптимизатор служб</value>
+  </data>
+  <data name="Nav_Dashboard" xml:space="preserve">
+    <value>Дашборд</value>
+  </data>
+  <data name="Nav_Scheduler" xml:space="preserve">
+    <value>Планировщик</value>
+  </data>
+  <data name="Nav_Settings" xml:space="preserve">
+    <value>Настройки</value>
+  </data>
+  <data name="Footer_ThemeButton" xml:space="preserve">
+    <value>Тема</value>
+  </data>
+  <data name="Footer_ThemeButtonToolTip" xml:space="preserve">
+    <value>Быстрое переключение темы оформления</value>
+  </data>
+  <data name="Footer_AboutButtonToolTip" xml:space="preserve">
+    <value>О программе</value>
+  </data>
+  <data name="About_Title" xml:space="preserve">
+    <value>О программе — Puryx</value>
+  </data>
+  <data name="About_Subtitle" xml:space="preserve">
+    <value>Puryx — Ультимативный комплекс очистки и тюнинга Windows</value>
+  </data>
+  <data name="About_TechSpec" xml:space="preserve">
+    <value>.NET 8.0 LTS · WPF MVVM · 16 сканеров · Anti-Spy · Services Optimizer · Game Boost · CompactOS</value>
+  </data>
+  <data name="About_Copyright" xml:space="preserve">
+    <value>© 2026 Puryx Team. Высокая производительность и полная безопасность.</value>
+  </data>
+  <data name="About_CloseButton" xml:space="preserve">
+    <value>Закрыть</value>
+  </data>
+  <data name="Settings_Language" xml:space="preserve">
+    <value>Язык интерфейса:</value>
+  </data>
+  <data name="Settings_LanguageAuto" xml:space="preserve">
+    <value>Авто</value>
+  </data>
+  <data name="Settings_LanguageDescription" xml:space="preserve">
+    <value>«Авто» — язык системы. Изменение применяется после перезапуска.</value>
+  </data>
+  <data name="Settings_LanguageRestartHint" xml:space="preserve">
+    <value>Перезапустите приложение, чтобы применить новый язык</value>
+  </data>
+</root>
