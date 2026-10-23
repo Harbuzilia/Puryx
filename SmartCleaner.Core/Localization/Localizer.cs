@@ -275,4 +275,44 @@ public static class Localizer
     public static string Scheduler_SectionInfo => GetString(nameof(Scheduler_SectionInfo));
     public static string Scheduler_TaskStatusLabel => GetString(nameof(Scheduler_TaskStatusLabel));
     public static string Scheduler_LastRunLabel => GetString(nameof(Scheduler_LastRunLabel));
+
+    // День 3, срез 2: Сжатие CompactOS
+    public static string Compact_Title => GetString(nameof(Compact_Title));
+    public static string Compact_Subtitle => GetString(nameof(Compact_Subtitle));
+    public static string Compact_Discover => GetString(nameof(Compact_Discover));
+    public static string Compact_StatTargets => GetString(nameof(Compact_StatTargets));
+    public static string Compact_FoldersUnit => GetString(nameof(Compact_FoldersUnit));
+    public static string Compact_StatCurrentSize => GetString(nameof(Compact_StatCurrentSize));
+    public static string Compact_StatEstimatedSavings => GetString(nameof(Compact_StatEstimatedSavings));
+    public static string Compact_NoFpsLoss => GetString(nameof(Compact_NoFpsLoss));
+    public static string Compact_Decompress => GetString(nameof(Compact_Decompress));
+    public static string Compact_Compress => GetString(nameof(Compact_Compress));
+
+    // День 3, срез 2: Очистка компонентов ядра Windows
+    public static string SystemDeepClean_Title => GetString(nameof(SystemDeepClean_Title));
+    public static string SystemDeepClean_Subtitle => GetString(nameof(SystemDeepClean_Subtitle));
+    public static string SystemDeepClean_RunAudit => GetString(nameof(SystemDeepClean_RunAudit));
+    public static string SystemDeepClean_WinSxSTitle => GetString(nameof(SystemDeepClean_WinSxSTitle));
+    public static string SystemDeepClean_CleanupRecommended => GetString(nameof(SystemDeepClean_CleanupRecommended));
+    public static string SystemDeepClean_WinSxSDescription => GetString(nameof(SystemDeepClean_WinSxSDescription));
+    public static string SystemDeepClean_ActualSizeLabel => GetString(nameof(SystemDeepClean_ActualSizeLabel));
+    public static string SystemDeepClean_ReclaimableLabel => GetString(nameof(SystemDeepClean_ReclaimableLabel));
+    public static string SystemDeepClean_CleanWinSxS => GetString(nameof(SystemDeepClean_CleanWinSxS));
+    public static string SystemDeepClean_DriversTitle => GetString(nameof(SystemDeepClean_DriversTitle));
+    public static string SystemDeepClean_DriversDescription => GetString(nameof(SystemDeepClean_DriversDescription));
+    public static string SystemDeepClean_DeleteSelectedDrivers => GetString(nameof(SystemDeepClean_DeleteSelectedDrivers));
+    public static string SystemDeepClean_StaleDuplicateBadge => GetString(nameof(SystemDeepClean_StaleDuplicateBadge));
+
+    // День 3, срез 2: Плагины
+    public static string Plugins_Title => GetString(nameof(Plugins_Title));
+    public static string Plugins_Subtitle => GetString(nameof(Plugins_Subtitle));
+    public static string Plugins_CleanSelected => GetString(nameof(Plugins_CleanSelected));
+    public static string Plugins_Scan => GetString(nameof(Plugins_Scan));
+    public static string Plugins_InstalledLabel => GetString(nameof(Plugins_InstalledLabel));
+
+    // День 3, срез 2: AI-Ассистент
+    public static string AiAssistant_Title => GetString(nameof(AiAssistant_Title));
+    public static string AiAssistant_Subtitle => GetString(nameof(AiAssistant_Subtitle));
+    public static string AiAssistant_InputPlaceholder => GetString(nameof(AiAssistant_InputPlaceholder));
+    public static string AiAssistant_Send => GetString(nameof(AiAssistant_Send));
 }

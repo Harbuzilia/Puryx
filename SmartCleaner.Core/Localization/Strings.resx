@@ -522,4 +522,100 @@
   <data name="Scheduler_LastRunLabel" xml:space="preserve">
     <value>Last run:</value>
   </data>
+  <data name="Compact_Title" xml:space="preserve">
+    <value>CompactOS &amp; LZX Compression</value>
+  </data>
+  <data name="Compact_Subtitle" xml:space="preserve">
+    <value>Transparent system compression of Windows files and game folders with no performance drop</value>
+  </data>
+  <data name="Compact_Discover" xml:space="preserve">
+    <value>Find compression targets</value>
+  </data>
+  <data name="Compact_StatTargets" xml:space="preserve">
+    <value>Targets to optimize</value>
+  </data>
+  <data name="Compact_FoldersUnit" xml:space="preserve">
+    <value> folders</value>
+  </data>
+  <data name="Compact_StatCurrentSize" xml:space="preserve">
+    <value>Current size on disk</value>
+  </data>
+  <data name="Compact_StatEstimatedSavings" xml:space="preserve">
+    <value>Potential savings (+30-50%)</value>
+  </data>
+  <data name="Compact_NoFpsLoss" xml:space="preserve">
+    <value>No FPS loss</value>
+  </data>
+  <data name="Compact_Decompress" xml:space="preserve">
+    <value>Decompress</value>
+  </data>
+  <data name="Compact_Compress" xml:space="preserve">
+    <value>Compress LZX</value>
+  </data>
+  <data name="SystemDeepClean_Title" xml:space="preserve">
+    <value>Windows Core Components Cleanup</value>
+  </data>
+  <data name="SystemDeepClean_Subtitle" xml:space="preserve">
+    <value>Compacts the WinSxS store, removes old update packages and duplicate drivers</value>
+  </data>
+  <data name="SystemDeepClean_RunAudit" xml:space="preserve">
+    <value>Run system audit</value>
+  </data>
+  <data name="SystemDeepClean_WinSxSTitle" xml:space="preserve">
+    <value>Windows component store (WinSxS)</value>
+  </data>
+  <data name="SystemDeepClean_CleanupRecommended" xml:space="preserve">
+    <value>Cleanup recommended</value>
+  </data>
+  <data name="SystemDeepClean_WinSxSDescription" xml:space="preserve">
+    <value>Holds old versions of Windows updates and components. Cleaned through the built-in DISM mechanism.</value>
+  </data>
+  <data name="SystemDeepClean_ActualSizeLabel" xml:space="preserve">
+    <value>Actual size: </value>
+  </data>
+  <data name="SystemDeepClean_ReclaimableLabel" xml:space="preserve">
+    <value>Reclaimable: </value>
+  </data>
+  <data name="SystemDeepClean_CleanWinSxS" xml:space="preserve">
+    <value>Clean WinSxS (/ResetBase)</value>
+  </data>
+  <data name="SystemDeepClean_DriversTitle" xml:space="preserve">
+    <value>Stale duplicate drivers (DriverStore)</value>
+  </data>
+  <data name="SystemDeepClean_DriversDescription" xml:space="preserve">
+    <value>Old versions of GPU, chipset and device drivers left behind after updates.</value>
+  </data>
+  <data name="SystemDeepClean_DeleteSelectedDrivers" xml:space="preserve">
+    <value>Delete selected drivers</value>
+  </data>
+  <data name="SystemDeepClean_StaleDuplicateBadge" xml:space="preserve">
+    <value>Stale duplicate</value>
+  </data>
+  <data name="Plugins_Title" xml:space="preserve">
+    <value>Community Plugin Engine</value>
+  </data>
+  <data name="Plugins_Subtitle" xml:space="preserve">
+    <value>Extends cleanup capabilities with custom YAML/JSON profiles and third-party scripts</value>
+  </data>
+  <data name="Plugins_CleanSelected" xml:space="preserve">
+    <value>Clean selected</value>
+  </data>
+  <data name="Plugins_Scan" xml:space="preserve">
+    <value>Scan plugins</value>
+  </data>
+  <data name="Plugins_InstalledLabel" xml:space="preserve">
+    <value>Installed community plugins:</value>
+  </data>
+  <data name="AiAssistant_Title" xml:space="preserve">
+    <value>Smart AI Cleanup Assistant</value>
+  </data>
+  <data name="AiAssistant_Subtitle" xml:space="preserve">
+    <value>Converse with your disk: describe the task in plain language and the AI will run an audit and suggest a solution</value>
+  </data>
+  <data name="AiAssistant_InputPlaceholder" xml:space="preserve">
+    <value>Type a request (e.g. "Find videos larger than 1 GB" or "Free up 20 GB for games")...</value>
+  </data>
+  <data name="AiAssistant_Send" xml:space="preserve">
+    <value>Send</value>
+  </data>
 </root>

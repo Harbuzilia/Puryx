@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:loc="clr-namespace:SmartCleaner.Core.Localization;assembly=SmartCleaner.Core"
              mc:Ignorable="d" 
              d:DesignHeight="650" d:DesignWidth="900">
     <Grid Margin="24,20">
@@ -23,12 +24,12 @@
                     <Border Width="32" Height="32" CornerRadius="8" Background="{DynamicResource AccentGradientBrush}" Margin="0,0,10,0" VerticalAlignment="Center">
                         <TextBlock Text="&#xE7B8;" FontFamily="Segoe MDL2 Assets" FontSize="16" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
-                    <TextBlock Text="Сжатие CompactOS &amp; LZX" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
+                    <TextBlock Text="{x:Static loc:Localizer.Compact_Title}" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
                     <Border Background="{DynamicResource AccentBrush}" CornerRadius="4" Padding="6,2" Margin="10,0,0,0" VerticalAlignment="Center">
                         <TextBlock Text="LZX ENGINE" FontSize="9.5" Foreground="White" FontWeight="Bold"/>
                     </Border>
                 </StackPanel>
-                <TextBlock Text="Прозрачное системное сжатие файлов Windows и игровых каталогов без падения производительности" 
+                <TextBlock Text="{x:Static loc:Localizer.Compact_Subtitle}" 
                            FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,4,0,0"/>
             </StackPanel>
             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
@@ -38,7 +39,7 @@
                         Margin="0,0,8,0">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="&#xE711;" FontFamily="Segoe MDL2 Assets" FontSize="13" Margin="0,0,6,0" VerticalAlignment="Center"/>
-                        <TextBlock Text="Отмена" VerticalAlignment="Center"/>
+                        <TextBlock Text="{x:Static loc:Localizer.Common_Cancel}" VerticalAlignment="Center"/>
                     </StackPanel>
                 </Button>
                 <Button Style="{StaticResource PrimaryButton}" 
@@ -46,7 +47,7 @@
                         IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="&#xE721;" FontFamily="Segoe MDL2 Assets" FontSize="13" Margin="0,0,6,0" VerticalAlignment="Center"/>
-                        <TextBlock Text="Найти объекты для сжатия" VerticalAlignment="Center"/>
+                        <TextBlock Text="{x:Static loc:Localizer.Compact_Discover}" VerticalAlignment="Center"/>
                     </StackPanel>
                 </Button>
             </StackPanel>
@@ -63,10 +64,9 @@
             <!-- Card 1: Targets -->
             <Border Grid.Column="0" Style="{StaticResource Card}" Margin="0,0,8,0">
                 <StackPanel>
-                    <TextBlock Text="Объектов для оптимизации" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                    <TextBlock Text="{x:Static loc:Localizer.Compact_StatTargets}" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}"/>
                     <TextBlock FontSize="20" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" Margin="0,4,0,0">
-                        <Run Text="{Binding TotalTargetsCount, Mode=OneWay}"/>
-                        <Run Text="папок" FontSize="13" FontWeight="Normal" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                        <Run Text="{Binding TotalTargetsCount, Mode=OneWay}"/><Run Text="{x:Static loc:Localizer.Compact_FoldersUnit}" FontSize="13" FontWeight="Normal" Foreground="{DynamicResource TextSecondaryBrush}"/>
                     </TextBlock>
                 </StackPanel>
             </Border>
@@ -74,7 +74,7 @@
             <!-- Card 2: Total Size -->
             <Border Grid.Column="1" Style="{StaticResource Card}" Margin="4,0,4,0">
                 <StackPanel>
-                    <TextBlock Text="Текущий размер на диске" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                    <TextBlock Text="{x:Static loc:Localizer.Compact_StatCurrentSize}" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}"/>
                     <TextBlock FontSize="20" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,4,0,0" Text="{Binding TotalSizeFormatted, Mode=OneWay}"/>
                 </StackPanel>
             </Border>
@@ -82,7 +82,7 @@
             <!-- Card 3: Estimated Savings -->
             <Border Grid.Column="2" Style="{StaticResource Card}" Margin="8,0,0,0">
                 <StackPanel>
-                    <TextBlock Text="Потенциальная экономия (+30-50%)" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                    <TextBlock Text="{x:Static loc:Localizer.Compact_StatEstimatedSavings}" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}"/>
                     <TextBlock FontSize="20" FontWeight="Bold" Foreground="{DynamicResource SafeBrush}" Margin="0,4,0,0">
                         <Run Text="~"/>
                         <Run Text="{Binding EstimatedSavingsFormatted, Mode=OneWay}"/>
@@ -123,7 +123,7 @@
                             <!-- Size -->
                             <StackPanel Grid.Column="1" Margin="16,0" VerticalAlignment="Center" HorizontalAlignment="Right">
                                 <TextBlock Text="{Binding OriginalSizeFormatted}" FontWeight="SemiBold" FontSize="13" HorizontalAlignment="Right"/>
-                                <TextBlock Text="Без потери FPS" FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Right"/>
+                                <TextBlock Text="{x:Static loc:Localizer.Compact_NoFpsLoss}" FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Right"/>
                             </StackPanel>
 
                             <!-- Action -->
@@ -131,14 +131,14 @@
                                 <Button Style="{StaticResource SecondaryButton}" 
                                         Command="{Binding DataContext.DecompressTargetCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                         CommandParameter="{Binding .}"
-                                        Content="Распаковать" 
+                                        Content="{x:Static loc:Localizer.Compact_Decompress}" 
                                         Padding="8,5" Margin="0,0,6,0"
                                         Visibility="{Binding IsCompressed, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
                                 <Button Style="{StaticResource PrimaryButton}" 
                                         Command="{Binding DataContext.CompressTargetCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                         CommandParameter="{Binding .}"
-                                        Content="Сжать LZX" 
+                                        Content="{x:Static loc:Localizer.Compact_Compress}" 
                                         Padding="10,5"/>
                             </StackPanel>
                         </Grid>

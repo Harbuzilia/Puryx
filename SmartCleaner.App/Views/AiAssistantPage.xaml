@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:loc="clr-namespace:SmartCleaner.Core.Localization;assembly=SmartCleaner.Core"
              mc:Ignorable="d" 
              d:DesignHeight="650" d:DesignWidth="900">
     <Grid Margin="24,20">
@@ -19,12 +20,12 @@
                     <Border Width="32" Height="32" CornerRadius="8" Background="{DynamicResource AccentGradientBrush}" Margin="0,0,10,0" VerticalAlignment="Center">
                         <TextBlock Text="&#xE99A;" FontFamily="Segoe MDL2 Assets" FontSize="16" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
-                    <TextBlock Text="Умный AI-Ассистент очистки" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
+                    <TextBlock Text="{x:Static loc:Localizer.AiAssistant_Title}" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
                     <Border Background="{DynamicResource AccentBrush}" CornerRadius="4" Padding="6,2" Margin="10,0,0,0" VerticalAlignment="Center">
                         <TextBlock Text="AI CO-PILOT" FontSize="9.5" Foreground="White" FontWeight="Bold"/>
                     </Border>
                 </StackPanel>
-                <TextBlock Text="Диалог с диском: сформулируйте задачу на естественном языке, а AI выполнит аудит и предложит решение" 
+                <TextBlock Text="{x:Static loc:Localizer.AiAssistant_Subtitle}" 
                            FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,4,0,0"/>
             </StackPanel>
         </DockPanel>
@@ -77,12 +78,12 @@
                      Text="{Binding UserInput, UpdateSourceTrigger=PropertyChanged}"
                      KeyDown="InputTextBox_KeyDown"
                      Padding="12,10" FontSize="13"
-                     Tag="Напишите запрос (например: «Найди видео больше 1 ГБ» или «Освободи 20 ГБ под игры»)..."/>
+                     Tag="{x:Static loc:Localizer.AiAssistant_InputPlaceholder}"/>
 
             <Button Grid.Column="1" Margin="8,0,0,0" Padding="16,10"
                     Style="{StaticResource PrimaryButton}"
                     Command="{Binding SendMessageCommand}"
-                    Content="Отправить"/>
+                    Content="{x:Static loc:Localizer.AiAssistant_Send}"/>
         </Grid>
     </Grid>
 </UserControl>

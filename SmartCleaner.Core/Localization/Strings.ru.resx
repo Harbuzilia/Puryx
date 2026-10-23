@@ -522,4 +522,100 @@
   <data name="Scheduler_LastRunLabel" xml:space="preserve">
     <value>Последний запуск:</value>
   </data>
+  <data name="Compact_Title" xml:space="preserve">
+    <value>Сжатие CompactOS &amp; LZX</value>
+  </data>
+  <data name="Compact_Subtitle" xml:space="preserve">
+    <value>Прозрачное системное сжатие файлов Windows и игровых каталогов без падения производительности</value>
+  </data>
+  <data name="Compact_Discover" xml:space="preserve">
+    <value>Найти объекты для сжатия</value>
+  </data>
+  <data name="Compact_StatTargets" xml:space="preserve">
+    <value>Объектов для оптимизации</value>
+  </data>
+  <data name="Compact_FoldersUnit" xml:space="preserve">
+    <value> папок</value>
+  </data>
+  <data name="Compact_StatCurrentSize" xml:space="preserve">
+    <value>Текущий размер на диске</value>
+  </data>
+  <data name="Compact_StatEstimatedSavings" xml:space="preserve">
+    <value>Потенциальная экономия (+30-50%)</value>
+  </data>
+  <data name="Compact_NoFpsLoss" xml:space="preserve">
+    <value>Без потери FPS</value>
+  </data>
+  <data name="Compact_Decompress" xml:space="preserve">
+    <value>Распаковать</value>
+  </data>
+  <data name="Compact_Compress" xml:space="preserve">
+    <value>Сжать LZX</value>
+  </data>
+  <data name="SystemDeepClean_Title" xml:space="preserve">
+    <value>Очистка компонентов ядра Windows</value>
+  </data>
+  <data name="SystemDeepClean_Subtitle" xml:space="preserve">
+    <value>Сжатие хранилища WinSxS, удаление старых пакетов обновлений и дубликатов драйверов</value>
+  </data>
+  <data name="SystemDeepClean_RunAudit" xml:space="preserve">
+    <value>Выполнить аудит системы</value>
+  </data>
+  <data name="SystemDeepClean_WinSxSTitle" xml:space="preserve">
+    <value>Хранилище компонентов Windows (WinSxS)</value>
+  </data>
+  <data name="SystemDeepClean_CleanupRecommended" xml:space="preserve">
+    <value>Рекомендуется очистка</value>
+  </data>
+  <data name="SystemDeepClean_WinSxSDescription" xml:space="preserve">
+    <value>Содержит старые версии обновлений Windows и компонентов. Очищается через системный механизм DISM.</value>
+  </data>
+  <data name="SystemDeepClean_ActualSizeLabel" xml:space="preserve">
+    <value>Фактический размер: </value>
+  </data>
+  <data name="SystemDeepClean_ReclaimableLabel" xml:space="preserve">
+    <value>Можно освободить: </value>
+  </data>
+  <data name="SystemDeepClean_CleanWinSxS" xml:space="preserve">
+    <value>Очистить WinSxS (/ResetBase)</value>
+  </data>
+  <data name="SystemDeepClean_DriversTitle" xml:space="preserve">
+    <value>Устаревшие дубликаты драйверов (DriverStore)</value>
+  </data>
+  <data name="SystemDeepClean_DriversDescription" xml:space="preserve">
+    <value>Старые версии драйверов видеокарт, чипсетов и устройств, оставшиеся после обновлений.</value>
+  </data>
+  <data name="SystemDeepClean_DeleteSelectedDrivers" xml:space="preserve">
+    <value>Удалить выбранные драйверы</value>
+  </data>
+  <data name="SystemDeepClean_StaleDuplicateBadge" xml:space="preserve">
+    <value>Устаревший дубликат</value>
+  </data>
+  <data name="Plugins_Title" xml:space="preserve">
+    <value>Движок плагинов сообщества</value>
+  </data>
+  <data name="Plugins_Subtitle" xml:space="preserve">
+    <value>Расширение возможностей очистки через кастомные YAML/JSON профили и сторонние скрипты</value>
+  </data>
+  <data name="Plugins_CleanSelected" xml:space="preserve">
+    <value>Очистить выбранное</value>
+  </data>
+  <data name="Plugins_Scan" xml:space="preserve">
+    <value>Сканировать плагины</value>
+  </data>
+  <data name="Plugins_InstalledLabel" xml:space="preserve">
+    <value>Установленные плагины сообщества:</value>
+  </data>
+  <data name="AiAssistant_Title" xml:space="preserve">
+    <value>Умный AI-Ассистент очистки</value>
+  </data>
+  <data name="AiAssistant_Subtitle" xml:space="preserve">
+    <value>Диалог с диском: сформулируйте задачу на естественном языке, а AI выполнит аудит и предложит решение</value>
+  </data>
+  <data name="AiAssistant_InputPlaceholder" xml:space="preserve">
+    <value>Напишите запрос (например: «Найди видео больше 1 ГБ» или «Освободи 20 ГБ под игры»)...</value>
+  </data>
+  <data name="AiAssistant_Send" xml:space="preserve">
+    <value>Отправить</value>
+  </data>
 </root>
