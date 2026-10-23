@@ -41,6 +41,30 @@ public partial class SettingsViewModel : ObservableObject
 
     public IReadOnlyList<string> ThemeOptions { get; } = ["Системная", "Тёмная", "Светлая"];
 
+    // ─── Язык интерфейса (ROADMAP v3.1, фаза L) ───
+
+    private const string UiSettingsFilename = "ui_settings.json";
+
+    [ObservableProperty]
+    private int _selectedLanguageIndex;
+
+    /// <summary>
+    /// Варианты языка: «Авто» (локализован), «Русский»/«English» —
+    /// самоназвания языков, не переводятся.
+    /// </summary>
+    public IReadOnlyList<string> LanguageOptions { get; } =
+    [
+        SmartCleaner.Core.Localization.Localizer.GetString("Settings_LanguageAuto"),
+        "Русский",
+        "English"
+    ];
+
+    /// <summary>
+    /// Запрос показать toast «перезапустите для смены языка» — подписывается
+    /// MainWindow (toast живёт в MainViewModel).
+    /// </summary>
+    public event Action? LanguageRestartHintRequested;
+
     [ObservableProperty]
     private string _newWhitelistPattern = string.Empty;
 
@@ -94,6 +118,14 @@ public partial class SettingsViewModel : ObservableObject
         {
             AppTheme.Dark => 1,
             AppTheme.Light => 2,
+            _ => 0
+        };
+
+        // Прямое поле (не свойство) — загрузка не триггерит OnChanged/сохранение
+        _selectedLanguageIndex = _configService.Load<UiSettingsConfig>(UiSettingsFilename).Language switch
+        {
+            "ru" => 1,
+            "en" => 2,
             _ => 0
         };
 
@@ -152,6 +184,27 @@ public partial class SettingsViewModel : ObservableObject
             2 => AppTheme.Light,
             _ => AppTheme.System
         };
+    }
+
+    partial void OnSelectedLanguageIndexChanged(int value)
+    {
+        // Язык применяется при следующем старте: сохраняем настройку и
+        // подсказываем перезапуском (toast — на языке текущей сессии)
+        SaveLanguageSetting(value switch
+        {
+            1 => "ru",
+            2 => "en",
+            _ => "Auto"
+        });
+        LanguageRestartHintRequested?.Invoke();
+    }
+
+    private void SaveLanguageSetting(string language)
+    {
+        // Read-modify-write: ui_settings.json общий с темой — как в ThemeManager.SaveTheme
+        var settings = _configService.Load<UiSettingsConfig>(UiSettingsFilename);
+        settings.Language = language;
+        _configService.Save(UiSettingsFilename, settings);
     }
 
     partial void OnIsSoundEnabledChanged(bool value)

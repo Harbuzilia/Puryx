@@ -837,9 +837,11 @@ public partial class MainViewModel : ObservableObject, IDisposable
     private CancellationTokenSource? _toastCts;
 
     /// <summary>
-    /// Показать toast-уведомление на 4 секунды (с защитой от гонки)
+    /// Показать toast-уведомление на 4 секунды (с защитой от гонки).
+    /// Public (фаза L, ROADMAP v3.1): точка входа для страниц-вкладок —
+    /// например, подсказка о перезапуске при смене языка в настройках.
     /// </summary>
-    private async void ShowToast(string message)
+    public async void ShowToast(string message)
     {
         _toastCts?.Cancel();
         _toastCts = new CancellationTokenSource();

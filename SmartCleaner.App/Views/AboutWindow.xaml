@@ -2,7 +2,8 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:helpers="clr-namespace:SmartCleaner.App.Helpers"
-        Title="О программе — Puryx" 
+        xmlns:loc="clr-namespace:SmartCleaner.Core.Localization;assembly=SmartCleaner.Core"
+        Title="{x:Static loc:Localizer.About_Title}" 
         Height="360" Width="440"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
@@ -36,7 +37,7 @@
                 </StackPanel>
                 
                 <!-- Subtitle -->
-                <TextBlock Text="Puryx — Ультимативный комплекс очистки и тюнинга Windows" 
+                <TextBlock Text="{x:Static loc:Localizer.About_Subtitle}" 
                            FontSize="12"
                            Foreground="{DynamicResource TextSecondaryBrush}"
                            HorizontalAlignment="Center"
@@ -45,7 +46,7 @@
                 
                 <!-- Tech Spec Card -->
                 <Border Background="{DynamicResource SurfaceVariantBrush}" CornerRadius="6" Padding="12,8" Margin="0,16,0,0">
-                    <TextBlock Text=".NET 8.0 LTS · WPF MVVM · 16 сканеров · Anti-Spy · Services Optimizer · Game Boost · CompactOS" 
+                    <TextBlock Text="{x:Static loc:Localizer.About_TechSpec}" 
                                FontSize="11"
                                Foreground="{DynamicResource AccentBrush}"
                                HorizontalAlignment="Center"
@@ -54,14 +55,14 @@
                 </Border>
 
                 <!-- Copyright -->
-                <TextBlock Text="© 2026 Puryx Team. Высокая производительность и полная безопасность." 
+                <TextBlock Text="{x:Static loc:Localizer.About_Copyright}" 
                            FontSize="10.5"
                            Foreground="{DynamicResource TextDisabledBrush}"
                            HorizontalAlignment="Center"
                            Margin="0,12,0,0"/>
 
                 <!-- Close Button -->
-                <Button Content="Закрыть" 
+                <Button Content="{x:Static loc:Localizer.About_CloseButton}" 
                         HorizontalAlignment="Center"
                         Margin="0,18,0,0"
                         Padding="28,7"

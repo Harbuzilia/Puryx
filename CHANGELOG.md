@@ -6,6 +6,20 @@
 
 ---
 
+## [Unreleased]
+
+### 🌍 Фаза L — Локализация: инфраструктура EN/RU + пилот (ROADMAP v3.1, День 1)
+
+- **Что сделано:**
+  - Инфраструктура i18n в Core: `SmartCleaner.Core/Localization/Localizer` — статический `GetString(key)` поверх ResourceManager, геттер/сеттер `Culture`, `Init(setting)` при старте; авто-детект: `CurrentUICulture` `ru*` → русский, остальное → нейтральная EN (шов-параметр для тестов); отсутствие/пустота ключа — читаемый fallback именем ключа, XAML-загрузка не падает. resx: `Strings.resx` (EN, нейтральная культура) + `Strings.ru.resx` (satellite), 37 пилотных ключей с осмысленными именами (`MainWindow_Title`, `Nav_Cleanup`-секция, `Settings_Language` и т.п.).
+  - Инварианты-тесты `LocalizationTests` (18): паритет множеств ключей EN↔RU, непустые значения всех ключей в обеих культурах, авто-детект через шов (настройка приоритетнее), `Init` по CurrentUICulture, fallback отсутствующего ключа, соответствие `{x:Static}`-свойств Localizer ключам resx (защита XAML от опечаток).
+  - Пилот-проводка XAML через `{x:Static loc:Localizer.*}`: `MainWindow.xaml` (Title, таглайн, секции сайдбара «ОЧИСТКА/ИНСТРУМЕНТЫ/СИСТЕМА», все 22 пункта навигации, кнопки «Тема»/«О программе» с tooltips), `AboutWindow.xaml` (Title, subtitle, tech-spec, copyright, «Закрыть»), `SettingsView.xaml` (настройка «Язык интерфейса»: Авто/Русский/English).
+  - Настройка языка: `UiSettingsConfig.Language` ("Auto"|"ru"|"en") сохраняется через IConfigService в `ui_settings.json`; `ThemeManager.SaveTheme` переведён на read-modify-write — смена темы больше не затирает язык; `App.xaml.cs` инициализирует Localizer до создания окон (XAML-статик читает Culture при парсинге); смена языка применяется при следующем старте, toast-подсказка «перезапустите для смены языка» — локализована (`MainViewModel.ShowToast` стал public — точка входа для вкладок).
+- **Файлы:** `SmartCleaner.Core/Localization/{Localizer.cs, Strings.resx, Strings.ru.resx}`, `SmartCleaner.Core.Tests/LocalizationTests.cs`, `SmartCleaner.Core/Models/SettingsModels.cs`, `SmartCleaner.App/{App.xaml.cs, MainWindow.xaml, MainWindow.xaml.cs, Views/AboutWindow.xaml, Views/SettingsView.xaml, ViewModels/{SettingsViewModel.cs, MainViewModel.cs}, Services/ThemeManager.cs}`
+- **Почему:** RU-only интерфейс сужает аудиторию на порядки (у CCleaner 50+ языков); нейтральная культура EN + satellite-схема ResourceManager — стандартная механика с гарантированным прогрессом, строки нужны последующим фазам ROADMAP v3.1 (MFT, авто-обновление). Смена языка через рестарт, а не live-переключение — осознанное упрощение (XAML-статик не следит за Culture), подсказка-тост компенсирует UX.
+
+---
+
 ## [3.0.0] — 04.10.2026
 
 ### 🎯 Тема релиза: Production readiness — финальный продукт: систематика исполнения внешних команд (единый ICommandExecutor, ILogger, честная отмена) и публичная инфраструктура доверия (CI, вклад, безопасность, winget), тесты 349 → 475

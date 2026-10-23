@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using SmartCleaner.App.ViewModels;
 using SmartCleaner.Core.Cleaning;
 using SmartCleaner.Core.Knowledge;
+using SmartCleaner.Core.Localization;
 using SmartCleaner.Core.Models;
 using SmartCleaner.Core.Safety;
 using SmartCleaner.Core.Scheduler;
@@ -48,6 +49,12 @@ public partial class App : Application
 
             var themeManager = _serviceProvider.GetRequiredService<SmartCleaner.App.Services.ThemeManager>();
             themeManager.Initialize();
+
+            // i18n (ROADMAP v3.1, фаза L): язык из ui_settings.json применяется ДО
+            // создания окон — {x:Static loc:Localizer.*} в XAML читает Localizer
+            // при парсинге разметки; смена языка действует со следующего старта
+            Localizer.Init(_serviceProvider.GetRequiredService<IConfigService>()
+                .Load<UiSettingsConfig>("ui_settings.json").Language);
 
             // M5: восстановление после краша с активным Game Boost —
             // state-файл существует, а процесс-владелец мёртв => вернуть службы и план питания

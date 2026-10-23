@@ -100,10 +100,11 @@ public class ThemeManager
 
     private void SaveTheme(AppTheme theme)
     {
-        _configService.Save(SettingsFilename, new UiSettingsConfig
-        {
-            Theme = theme.ToString()
-        });
+        // Read-modify-write: файл общий с настройкой Language (фаза L, ROADMAP v3.1) —
+        // перезапись с нуля затирала бы язык при смене темы
+        var settings = _configService.Load<UiSettingsConfig>(SettingsFilename);
+        settings.Theme = theme.ToString();
+        _configService.Save(SettingsFilename, settings);
     }
 
     public static bool IsSystemDarkTheme()

@@ -86,9 +86,20 @@ public partial class MainWindow : Window
     {
         if (_settingsView == null && App.Services != null)
         {
+            var settingsVm = App.Services.GetRequiredService<SettingsViewModel>();
+            // Фаза L: смена языка применяется со следующего старта — подсказка-тост
+            // через главный toast (текст локализован, на языке текущей сессии)
+            settingsVm.LanguageRestartHintRequested += () =>
+            {
+                if (DataContext is MainViewModel mainVm)
+                {
+                    mainVm.ShowToast(SmartCleaner.Core.Localization.Localizer
+                        .GetString("Settings_LanguageRestartHint"));
+                }
+            };
             _settingsView = new SettingsView
             {
-                DataContext = App.Services.GetRequiredService<SettingsViewModel>()
+                DataContext = settingsVm
             };
         }
         

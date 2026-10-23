@@ -4,8 +4,9 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:helpers="clr-namespace:SmartCleaner.App.Helpers"
+        xmlns:loc="clr-namespace:SmartCleaner.Core.Localization;assembly=SmartCleaner.Core"
         mc:Ignorable="d"
-        Title="{x:Static helpers:AppInfo.ProductTitle}"
+        Title="{x:Static loc:Localizer.MainWindow_Title}"
         Height="740" Width="1180"
         MinHeight="560" MinWidth="880"
         WindowStartupLocation="CenterScreen"
@@ -77,17 +78,17 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         <Button Style="{StaticResource SecondaryButton}" 
-                                Content="Тема"
+                                Content="{x:Static loc:Localizer.Footer_ThemeButton}"
                                 HorizontalAlignment="Stretch"
                                 Margin="0,0,6,0"
                                 Padding="8,6"
                                 Click="ToggleTheme_Click"
-                                ToolTip="Быстрое переключение темы оформления"/>
+                                ToolTip="{x:Static loc:Localizer.Footer_ThemeButtonToolTip}"/>
                         <Button Grid.Column="1"
                                 Style="{StaticResource SubtleButton}" 
                                 Padding="8,6"
                                 Click="ShowAbout_Click"
-                                ToolTip="О программе">
+                                ToolTip="{x:Static loc:Localizer.Footer_AboutButtonToolTip}">
                             <TextBlock Text="&#xE946;" FontFamily="Segoe MDL2 Assets" FontSize="14"/>
                         </Button>
                     </Grid>
@@ -97,7 +98,7 @@
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="8,8,8,8">
                     <StackPanel>
                         <!-- ═══ СЕКЦИЯ: ОЧИСТКА ═══ -->
-                        <TextBlock Text="ОЧИСТКА" 
+                        <TextBlock Text="{x:Static loc:Localizer.Nav_Section_Cleanup}" 
                                    FontSize="11"
                                    FontWeight="SemiBold"
                                    Foreground="{DynamicResource TextDisabledBrush}"
@@ -105,7 +106,7 @@
 
                         <!-- Кнопка "Обзор" (все категории) -->
                         <RadioButton Style="{StaticResource NavButton}" 
-                                     Content="Обзор" 
+                                     Content="{x:Static loc:Localizer.Nav_Overview}" 
                                      Tag="&#xE80F;"
                                      IsChecked="True"
                                      Checked="NavigateToAllCategories"
@@ -145,112 +146,112 @@
                         </ItemsControl>
 
                         <!-- ═══ СЕКЦИЯ: ИНСТРУМЕНТЫ ═══ -->
-                        <TextBlock Text="ИНСТРУМЕНТЫ" 
+                        <TextBlock Text="{x:Static loc:Localizer.Nav_Section_Tools}" 
                                    FontSize="11"
                                    FontWeight="SemiBold"
                                    Foreground="{DynamicResource TextDisabledBrush}"
                                    Margin="12,18,0,6"/>
 
                         <RadioButton Style="{StaticResource NavButton}" 
-                                     Content="Дубликаты" 
+                                     Content="{x:Static loc:Localizer.Nav_Duplicates}" 
                                      Tag="&#xE8B7;"
                                      Checked="NavigateToDuplicates"
                                      GroupName="Nav"/>
                         <RadioButton Style="{StaticResource NavButton}" 
-                                     Content="Карта диска" 
+                                     Content="{x:Static loc:Localizer.Nav_DiskMap}" 
                                      Tag="&#xE9F9;"
                                      Checked="NavigateToDiskMap"
                                      GroupName="Nav"/>
                         <RadioButton Style="{StaticResource NavButton}" 
-                                     Content="Большие файлы" 
+                                     Content="{x:Static loc:Localizer.Nav_LargeFiles}" 
                                      Tag="&#xE8F1;"
                                      Checked="NavigateToLargeFiles"
                                      GroupName="Nav"/>
                         <RadioButton Style="{StaticResource NavButton}" 
-                                     Content="Автозагрузка" 
+                                     Content="{x:Static loc:Localizer.Nav_Startup}" 
                                      Tag="&#xE7B5;"
                                      Checked="NavigateToStartup"
                                      GroupName="Nav"/>
                         <RadioButton Style="{StaticResource NavButton}" 
-                                     Content="Обнаружение" 
+                                     Content="{x:Static loc:Localizer.Nav_Discovery}" 
                                      Tag="&#xE773;"
                                      Checked="NavigateToDiscovery"
                                      GroupName="Nav"/>
                         <RadioButton Style="{StaticResource NavButton}" 
-                                     Content="CLI и AI Агенты" 
+                                     Content="{x:Static loc:Localizer.Nav_CliInspector}" 
                                      Tag="&#xE756;"
                                      Checked="NavigateToCliInspector"
                                      GroupName="Nav"/>
                         <RadioButton Style="{StaticResource NavButton}" 
-                                     Content="AI Ассистент" 
+                                     Content="{x:Static loc:Localizer.Nav_AiAssistant}" 
                                      Tag="&#xE99A;"
                                      Checked="NavigateToAiAssistant"
                                      GroupName="Nav"/>
                         <RadioButton Style="{StaticResource NavButton}" 
-                                     Content="Деинсталлятор" 
+                                     Content="{x:Static loc:Localizer.Nav_Uninstaller}" 
                                      Tag="&#xE74D;"
                                      Checked="NavigateToUninstaller"
                                      GroupName="Nav"/>
                         <RadioButton Style="{StaticResource NavButton}" 
-                                     Content="Сжатие CompactOS" 
+                                     Content="{x:Static loc:Localizer.Nav_Compact}" 
                                      Tag="&#xE7B8;"
                                      Checked="NavigateToCompact"
                                      GroupName="Nav"/>
                         <RadioButton Style="{StaticResource NavButton}" 
-                                     Content="Очистка ядра WinSxS" 
+                                     Content="{x:Static loc:Localizer.Nav_WinSxS}" 
                                      Tag="&#xEA1F;"
                                      Checked="NavigateToSystemDeepClean"
                                      GroupName="Nav"/>
                         <RadioButton Style="{StaticResource NavButton}" 
-                                     Content="Карантин Sandbox" 
+                                     Content="{x:Static loc:Localizer.Nav_Quarantine}" 
                                      Tag="&#xEA3B;"
                                      Checked="NavigateToQuarantine"
                                      GroupName="Nav"/>
                         <RadioButton Style="{StaticResource NavButton}" 
-                                     Content="Плагины сообщества" 
+                                     Content="{x:Static loc:Localizer.Nav_Plugins}" 
                                      Tag="&#xE71D;"
                                      Checked="NavigateToPlugins"
                                      GroupName="Nav"/>
                         <RadioButton Style="{StaticResource NavButton}" 
-                                     Content="Оптимизация RAM и БД" 
+                                     Content="{x:Static loc:Localizer.Nav_RamOptimizer}" 
                                      Tag="&#xE950;"
                                      Checked="NavigateToRamOptimizer"
                                      GroupName="Nav"/>
                         <RadioButton Style="{StaticResource NavButton}" 
-                                     Content="Оптимизация сети (DNS)" 
+                                     Content="{x:Static loc:Localizer.Nav_NetworkOptimizer}" 
                                      Tag="&#xE704;"
                                      Checked="NavigateToNetworkOptimizer"
                                      GroupName="Nav"/>
 
                         <!-- ═══ СЕКЦИЯ: СИСТЕМА ═══ -->
-                        <TextBlock Text="СИСТЕМА" 
+                        <TextBlock Text="{x:Static loc:Localizer.Nav_Section_System}" 
                                    FontSize="11"
                                    FontWeight="SemiBold"
                                    Foreground="{DynamicResource TextDisabledBrush}"
                                    Margin="12,18,0,6"/>
 
                         <RadioButton Style="{StaticResource NavButton}" 
-                                     Content="Приватность и защита" 
+                                     Content="{x:Static loc:Localizer.Nav_Privacy}" 
                                      Tag="&#xE727;"
                                      Checked="NavigateToPrivacyDebloat"
                                      GroupName="Nav"/>
                         <RadioButton Style="{StaticResource NavButton}" 
-                                     Content="Оптимизатор служб" 
+                                     Content="{x:Static loc:Localizer.Nav_ServicesOptimizer}" 
                                      Tag="&#xE8B9;"
                                      Checked="NavigateToServicesOptimizer"
                                      GroupName="Nav"/>
                         <RadioButton Style="{StaticResource NavButton}" 
-                                     Content="Дашборд" 
+                                     Content="{x:Static loc:Localizer.Nav_Dashboard}" 
                                      Tag="&#xE9D9;"
                                      Checked="NavigateToDashboard"
                                      GroupName="Nav"/>
                         <RadioButton Style="{StaticResource NavButton}" 
-                                     Content="Планировщик" 
+                                     Content="{x:Static loc:Localizer.Nav_Scheduler}" 
                                      Tag="&#xE787;"
                                      Checked="NavigateToScheduler"
                                      GroupName="Nav"/>
                         <RadioButton Style="{StaticResource NavButton}" 
-                                     Content="Настройки" 
+                                     Content="{x:Static loc:Localizer.Nav_Settings}" 
                                      Tag="&#xE713;"
                                      Checked="NavigateToSettings"
                                      GroupName="Nav"/>
@@ -275,7 +276,7 @@
                     <DockPanel>
                         <!-- Title & Subtitle -->
                         <StackPanel VerticalAlignment="Center">
-                            <TextBlock Text="Умная очистка диска" Style="{StaticResource Heading1}"/>
+                            <TextBlock Text="{x:Static loc:Localizer.MainWindow_Tagline}" Style="{StaticResource Heading1}"/>
                             <TextBlock Text="{Binding StatusText}" Style="{StaticResource BodyText}" Margin="0,4,0,0"/>
                         </StackPanel>
 

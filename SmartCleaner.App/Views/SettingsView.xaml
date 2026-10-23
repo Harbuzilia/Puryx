@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:loc="clr-namespace:SmartCleaner.Core.Localization;assembly=SmartCleaner.Core"
              mc:Ignorable="d">
 
     <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="24,20" Padding="0,0,8,0">
@@ -45,6 +46,29 @@
                                   HorizontalAlignment="Left"
                                   ItemsSource="{Binding ThemeOptions}"
                                   SelectedIndex="{Binding SelectedThemeIndex}"/>
+                    </Grid>
+
+                    <!-- Язык интерфейса (ROADMAP v3.1, фаза L): применяется при следующем старте -->
+                    <Grid Margin="0,16,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="{x:Static loc:Localizer.Settings_Language}"
+                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                   VerticalAlignment="Center"
+                                   Margin="0,0,16,0"/>
+                        <StackPanel Grid.Column="1">
+                            <ComboBox Width="180"
+                                      HorizontalAlignment="Left"
+                                      ItemsSource="{Binding LanguageOptions}"
+                                      SelectedIndex="{Binding SelectedLanguageIndex}"/>
+                            <TextBlock Text="{x:Static loc:Localizer.Settings_LanguageDescription}"
+                                       Style="{StaticResource Caption}"
+                                       Foreground="{DynamicResource TextSecondaryBrush}"
+                                       Margin="0,6,0,0"
+                                       TextWrapping="Wrap"/>
+                        </StackPanel>
                     </Grid>
                 </StackPanel>
             </Border>
