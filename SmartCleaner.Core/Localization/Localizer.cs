@@ -375,6 +375,7 @@ public static class Localizer
     public static string Common_Restore => GetString(nameof(Common_Restore));
     public static string Common_Disable => GetString(nameof(Common_Disable));
     public static string Common_Enable => GetString(nameof(Common_Enable));
+    public static string Common_Scan => GetString(nameof(Common_Scan));
 
     // День 3, срез 2: Приватность / Anti-Spy
     public static string PrivacyDebloat_Title => GetString(nameof(PrivacyDebloat_Title));
@@ -422,4 +423,81 @@ public static class Localizer
     public static string ServicesOptimizer_ColRisk => GetString(nameof(ServicesOptimizer_ColRisk));
     public static string ServicesOptimizer_ColAction => GetString(nameof(ServicesOptimizer_ColAction));
     public static string ServicesOptimizer_FooterNote => GetString(nameof(ServicesOptimizer_FooterNote));
+
+    // День 3, срез 2: Инспектор CLI
+    public static string CliInspector_Title => GetString(nameof(CliInspector_Title));
+    public static string CliInspector_Subtitle => GetString(nameof(CliInspector_Subtitle));
+    public static string CliInspector_ExportReport => GetString(nameof(CliInspector_ExportReport));
+    public static string CliInspector_StatTools => GetString(nameof(CliInspector_StatTools));
+    public static string CliInspector_PiecesUnit => GetString(nameof(CliInspector_PiecesUnit));
+    public static string CliInspector_StatDeadPaths => GetString(nameof(CliInspector_StatDeadPaths));
+    public static string CliInspector_PathCountSeparator => GetString(nameof(CliInspector_PathCountSeparator));
+    public static string CliInspector_StatPsProfiles => GetString(nameof(CliInspector_StatPsProfiles));
+    public static string CliInspector_FoundUnit => GetString(nameof(CliInspector_FoundUnit));
+    public static string CliInspector_TabTools => GetString(nameof(CliInspector_TabTools));
+    public static string CliInspector_SearchPlaceholder => GetString(nameof(CliInspector_SearchPlaceholder));
+    public static string CliInspector_CategoryLabel => GetString(nameof(CliInspector_CategoryLabel));
+    public static string CliInspector_ToolTipOpenInExplorer => GetString(nameof(CliInspector_ToolTipOpenInExplorer));
+    public static string CliInspector_ToolTipOpenTerminal => GetString(nameof(CliInspector_ToolTipOpenTerminal));
+    public static string CliInspector_ToolTipCopyUninstall => GetString(nameof(CliInspector_ToolTipCopyUninstall));
+    public static string CliInspector_ToolTipDeleteToRecycleBin => GetString(nameof(CliInspector_ToolTipDeleteToRecycleBin));
+    public static string CliInspector_TabPathHealth => GetString(nameof(CliInspector_TabPathHealth));
+    public static string CliInspector_PathAnalyzerTitle => GetString(nameof(CliInspector_PathAnalyzerTitle));
+    public static string CliInspector_PathAnalyzerDescription => GetString(nameof(CliInspector_PathAnalyzerDescription));
+    public static string CliInspector_CleanDeadPaths => GetString(nameof(CliInspector_CleanDeadPaths));
+    public static string CliInspector_BinCountLabel => GetString(nameof(CliInspector_BinCountLabel));
+    public static string CliInspector_ToolTipRemovePathEntry => GetString(nameof(CliInspector_ToolTipRemovePathEntry));
+    public static string CliInspector_PsProfilesTitle => GetString(nameof(CliInspector_PsProfilesTitle));
+    public static string CliInspector_PsProfilesDescription => GetString(nameof(CliInspector_PsProfilesDescription));
+    public static string CliInspector_ToolTipOpenFile => GetString(nameof(CliInspector_ToolTipOpenFile));
+    public static string CliInspector_Open => GetString(nameof(CliInspector_Open));
+
+    // День 3, срез 2: Диалог подтверждения очистки
+    public static string PreviewDialog_Title => GetString(nameof(PreviewDialog_Title));
+    public static string PreviewDialog_Header => GetString(nameof(PreviewDialog_Header));
+    public static string PreviewDialog_Subheader => GetString(nameof(PreviewDialog_Subheader));
+    public static string PreviewDialog_ItemsMetric => GetString(nameof(PreviewDialog_ItemsMetric));
+    public static string PreviewDialog_DeleteMetric => GetString(nameof(PreviewDialog_DeleteMetric));
+    public static string PreviewDialog_UninstallMetric => GetString(nameof(PreviewDialog_UninstallMetric));
+    public static string PreviewDialog_SizeMetric => GetString(nameof(PreviewDialog_SizeMetric));
+    public static string PreviewDialog_Confirm => GetString(nameof(PreviewDialog_Confirm));
+
+    // День 3, срез 2: Автообнаружение приложений
+    public static string Discovery_Title => GetString(nameof(Discovery_Title));
+    public static string Discovery_Subtitle => GetString(nameof(Discovery_Subtitle));
+    public static string Discovery_EmptyState => GetString(nameof(Discovery_EmptyState));
+    public static string Discovery_CacheLabel => GetString(nameof(Discovery_CacheLabel));
+    public static string Discovery_ProtectedLabel => GetString(nameof(Discovery_ProtectedLabel));
+    public static string Discovery_AddAllWithCache => GetString(nameof(Discovery_AddAllWithCache));
+
+    // День 3, срез 2: Настройки (разделы вокруг существующих Settings_Language*)
+    public static string Settings_Title => GetString(nameof(Settings_Title));
+    public static string Settings_Subtitle => GetString(nameof(Settings_Subtitle));
+    public static string Settings_SectionAppearance => GetString(nameof(Settings_SectionAppearance));
+    public static string Settings_ThemeLabel => GetString(nameof(Settings_ThemeLabel));
+    public static string Settings_SectionMode => GetString(nameof(Settings_SectionMode));
+    public static string Settings_ConfigModeLabel => GetString(nameof(Settings_ConfigModeLabel));
+    public static string Settings_SectionCleaning => GetString(nameof(Settings_SectionCleaning));
+    public static string Settings_UseRecycleBin => GetString(nameof(Settings_UseRecycleBin));
+    public static string Settings_ProtectedPeriodLabel => GetString(nameof(Settings_ProtectedPeriodLabel));
+    public static string Settings_HoursUnit => GetString(nameof(Settings_HoursUnit));
+    public static string Settings_ProtectedPeriodHint => GetString(nameof(Settings_ProtectedPeriodHint));
+    public static string Settings_SectionScanPaths => GetString(nameof(Settings_SectionScanPaths));
+    public static string Settings_ScanPathsHint => GetString(nameof(Settings_ScanPathsHint));
+    public static string Settings_BrowseFolderToolTip => GetString(nameof(Settings_BrowseFolderToolTip));
+    public static string Settings_Add => GetString(nameof(Settings_Add));
+    public static string Settings_SectionWhitelist => GetString(nameof(Settings_SectionWhitelist));
+    public static string Settings_WhitelistHint => GetString(nameof(Settings_WhitelistHint));
+    public static string Settings_ExamplesLabel => GetString(nameof(Settings_ExamplesLabel));
+    public static string Settings_BuiltInPatternsNote => GetString(nameof(Settings_BuiltInPatternsNote));
+    public static string Settings_SectionSound => GetString(nameof(Settings_SectionSound));
+    public static string Settings_SoundCheckbox => GetString(nameof(Settings_SoundCheckbox));
+    public static string Settings_SectionReport => GetString(nameof(Settings_SectionReport));
+    public static string Settings_ReportDescription => GetString(nameof(Settings_ReportDescription));
+    public static string Settings_GenerateReport => GetString(nameof(Settings_GenerateReport));
+    public static string Settings_SectionShellIntegration => GetString(nameof(Settings_SectionShellIntegration));
+    public static string Settings_ShellIntegrationHint => GetString(nameof(Settings_ShellIntegrationHint));
+    public static string Settings_ShellAnalyzeMenu => GetString(nameof(Settings_ShellAnalyzeMenu));
+    public static string Settings_ShellCompactMenu => GetString(nameof(Settings_ShellCompactMenu));
+    public static string Settings_ShellShredMenu => GetString(nameof(Settings_ShellShredMenu));
 }

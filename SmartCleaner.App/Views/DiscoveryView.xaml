@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:loc="clr-namespace:SmartCleaner.Core.Localization;assembly=SmartCleaner.Core"
              mc:Ignorable="d">
 
     <Grid Margin="24,20">
@@ -20,12 +21,12 @@
                     <Border Width="32" Height="32" CornerRadius="8" Background="{DynamicResource AccentGradientBrush}" Margin="0,0,10,0" VerticalAlignment="Center">
                         <TextBlock Text="&#xE721;" FontFamily="Segoe MDL2 Assets" FontSize="16" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
-                    <TextBlock Text="Автообнаружение приложений" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
+                    <TextBlock Text="{x:Static loc:Localizer.Discovery_Title}" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
                     <Border Background="{DynamicResource AccentBrush}" CornerRadius="4" Padding="6,2" Margin="10,0,0,0" VerticalAlignment="Center">
                         <TextBlock Text="AUTO DISCOVERY" FontSize="9.5" Foreground="White" FontWeight="Bold"/>
                     </Border>
                 </StackPanel>
-                <TextBlock Text="Эвристический поиск неизвестных программ и каталогов с накапливающимся кэшем" 
+                <TextBlock Text="{x:Static loc:Localizer.Discovery_Subtitle}" 
                            FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,4,0,0"/>
             </StackPanel>
         </DockPanel>
@@ -51,7 +52,7 @@
                     Margin="8,0,0,0">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="&#xE721;" FontFamily="Segoe MDL2 Assets" FontSize="13" Margin="0,0,6,0" VerticalAlignment="Center"/>
-                    <TextBlock Text="Сканировать" VerticalAlignment="Center"/>
+                    <TextBlock Text="{x:Static loc:Localizer.Common_Scan}" VerticalAlignment="Center"/>
                 </StackPanel>
             </Button>
         </Grid>
@@ -67,7 +68,7 @@
                     <TextBlock Text="&#xE721;" FontFamily="Segoe MDL2 Assets" 
                                FontSize="48"
                                HorizontalAlignment="Center"/>
-                    <TextBlock Text="Нажмите «Сканировать» для поиска приложений" 
+                    <TextBlock Text="{x:Static loc:Localizer.Discovery_EmptyState}" 
                                Style="{StaticResource BodyText}"
                                Margin="0,12,0,0"/>
                 </StackPanel>
@@ -144,7 +145,7 @@
                                                 Orientation="Horizontal"
                                                 Margin="0,8,0,0"
                                                 Visibility="{Binding HasCacheSuggestions, Converter={StaticResource BoolToVisibilityConverter}}">
-                                        <TextBlock Text="Кэш:" 
+                                        <TextBlock Text="{x:Static loc:Localizer.Discovery_CacheLabel}" 
                                                    Foreground="{DynamicResource SafeBrush}"
                                                    Margin="0,0,8,0"/>
                                         <TextBlock Text="{Binding CacheFoldersText}"
@@ -156,7 +157,7 @@
                                                 Orientation="Horizontal"
                                                 Margin="0,4,0,0"
                                                 Visibility="{Binding HasProtectedSuggestions, Converter={StaticResource BoolToVisibilityConverter}}">
-                                        <TextBlock Text="Защищено:" 
+                                        <TextBlock Text="{x:Static loc:Localizer.Discovery_ProtectedLabel}" 
                                                    Foreground="{DynamicResource CautionBrush}"
                                                    Margin="0,0,8,0"/>
                                         <TextBlock Text="{Binding ProtectedFilesText}"
@@ -172,7 +173,7 @@
 
         <!-- Footer -->
         <Grid Grid.Row="3" Margin="0,16,0,0">
-            <Button Content="Добавить все с кэшем"
+            <Button Content="{x:Static loc:Localizer.Discovery_AddAllWithCache}"
                     Style="{StaticResource PrimaryButton}"
                     Command="{Binding AddAllSafeCommand}"
                     HorizontalAlignment="Right"/>

@@ -28,6 +28,17 @@
 - **Файлы:** `SmartCleaner.App/Views/{DashboardPage.xaml, DiskMapPage.xaml, LargeFilesPage.xaml, DuplicatesPage.xaml, StartupPage.xaml, UninstallerPage.xaml, QuarantinePage.xaml, SchedulerPage.xaml}`, `SmartCleaner.Core/Localization/{Localizer.cs, Strings.resx, Strings.ru.resx}`
 - **Почему:** Пилот Дня 1 закрыл механику, но основной текст интерфейса оставался RU-хардкодом в XAML; срез 1 переводит самые посещаемые страницы на двойную культуру без изменения механики (те же ключи, тот же ResourceManager), а расщепление StringFormat-подписей на Run-фрагменты выносит локализуемый текст из композитного формата в ключи — иначе такие подписи не переводимы вовсе.
 
+### 🌍 Фаза L — Локализация: срез 2 — оставшиеся 12 View EN/RU (ROADMAP v3.1, День 3)
+
+- **Что сделано:**
+  - Локализован срез 2 — 12 оставшихся View (часть 1: Compact/SystemDeepClean/Plugins/AiAssistant; часть 2: RamOptimizer/NetworkOptimizer/PrivacyDebloat/ServicesOptimizer; часть 3: CliInspector/PreviewDialog/DiscoveryView/SettingsView): заголовки/подзаголовки, KPI-карточки, вкладки TabItem, колонки DataGrid, фильтры/чекбоксы/ComboBox-пункты, ToolTips, Setter-значения DataTrigger-стилей (статусные бейджи и toggle-кнопки PrivacyDebloat/ServicesOptimizer), Tag-плейсхолдеры ввода (AiAssistant/CliInspector), заголовок окна PreviewDialog. Все литеральные RU-строки XAML переведены на `{x:Static loc:Localizer.*}`; code-behind всех 12 файлов проверен — RU-литералов нет.
+  - Ключи: +199 в обоих resx (149 → 348; часть 1 — +32, часть 2 — +97, часть 3 — +70). Именование: префикс страницы; новые общие литералы — Common_-ключи (Restore/Disable/Enable/Scan — «Восстановить», «Отключить»/«Включить» toggle-кнопки Privacy+Services, «Сканировать» CliInspector+Discovery); переиспользованы Common_Cancel/Common_Refresh/Common_Path.
+  - StringFormat-расщепление: `StringFormat='Загрузка: {0:F0}%'` (RamOptimizer) разбита на Run-пару — локализуемый префикс-ключ + чистый Binding-формат; StringFormat без RU-текста (v{0}, даты, ` (v{0})`) не тронуты; EN-бейджи (LZX ENGINE/DISM & DRIVERS/PERFORMANCE HUB/AUTO DISCOVERY и т.п.) — бренды, не локализуются.
+  - SettingsView: разделы настроек вокруг существующих среза Дня 1 (язык уже был) — внешний вид/режим/очистка/папки сканирования/белый список/звук/паспорт системы/интеграция в Проводник.
+  - Верификация: паритет-инвариант LocalizationTests 18/18; сборка 0 ошибок / 0 предупреждений; UIA-смоук по 12 вкладкам среза 2; fallback-имён ключей в UI нет.
+- **Файлы:** `SmartCleaner.App/Views/{CompactPage.xaml, SystemDeepCleanPage.xaml, PluginsPage.xaml, AiAssistantPage.xaml, RamOptimizerPage.xaml, NetworkOptimizerPage.xaml, PrivacyDebloatPage.xaml, ServicesOptimizerPage.xaml, CliInspectorPage.xaml, PreviewDialog.xaml, DiscoveryView.xaml, SettingsView.xaml}`, `SmartCleaner.Core/Localization/{Localizer.cs, Strings.resx, Strings.ru.resx}`
+- **Почему:** Срез 1 закрыл 8 основных страниц, но 12 вторых View оставались RU-хардкодом; срез 2 доводит XAML-слой до полного двуязычия (VM-строки — статус-тексты, OperationCaption, ActionButtonText — остаются на День 4), StringFormat-подпись «Загрузка» единственная в срезе содержит RU-текст и расщеплена по образцу Дня 2.
+
 ---
 
 ## [3.0.0] — 04.10.2026

@@ -780,6 +780,9 @@
   <data name="Common_Enable" xml:space="preserve">
     <value>Включить</value>
   </data>
+  <data name="Common_Scan" xml:space="preserve">
+    <value>Сканировать</value>
+  </data>
   <data name="PrivacyDebloat_Title" xml:space="preserve">
     <value>Защита приватности и Anti-Spy Debloater</value>
   </data>
@@ -908,5 +911,212 @@
   </data>
   <data name="ServicesOptimizer_FooterNote" xml:space="preserve">
     <value>Изменения служб полностью обратимы. Начальное состояние сохраняется в services_backup.json.</value>
+  </data>
+  <data name="CliInspector_Title" xml:space="preserve">
+    <value>Инспектор CLI, PATH &amp; AI-агентов</value>
+  </data>
+  <data name="CliInspector_Subtitle" xml:space="preserve">
+    <value>Поиск установленных утилит разработчика, очистка битых путей PATH и модулей PowerShell</value>
+  </data>
+  <data name="CliInspector_ExportReport" xml:space="preserve">
+    <value>Экспорт отчёта</value>
+  </data>
+  <data name="CliInspector_StatTools" xml:space="preserve">
+    <value>Найдено утилит</value>
+  </data>
+  <data name="CliInspector_PiecesUnit" xml:space="preserve">
+    <value>шт •</value>
+  </data>
+  <data name="CliInspector_StatDeadPaths" xml:space="preserve">
+    <value>Битые пути в PATH</value>
+  </data>
+  <data name="CliInspector_PathCountSeparator" xml:space="preserve">
+    <value>из</value>
+  </data>
+  <data name="CliInspector_StatPsProfiles" xml:space="preserve">
+    <value>PowerShell Profiles &amp; Модули</value>
+  </data>
+  <data name="CliInspector_FoundUnit" xml:space="preserve">
+    <value>найдено</value>
+  </data>
+  <data name="CliInspector_TabTools" xml:space="preserve">
+    <value>Инструменты &amp; AI-агенты</value>
+  </data>
+  <data name="CliInspector_SearchPlaceholder" xml:space="preserve">
+    <value>Поиск по имени, категории, пути...</value>
+  </data>
+  <data name="CliInspector_CategoryLabel" xml:space="preserve">
+    <value>Категория:</value>
+  </data>
+  <data name="CliInspector_ToolTipOpenInExplorer" xml:space="preserve">
+    <value>Открыть в Проводнике</value>
+  </data>
+  <data name="CliInspector_ToolTipOpenTerminal" xml:space="preserve">
+    <value>Запустить PowerShell в папке</value>
+  </data>
+  <data name="CliInspector_ToolTipCopyUninstall" xml:space="preserve">
+    <value>Скопировать команду удаления</value>
+  </data>
+  <data name="CliInspector_ToolTipDeleteToRecycleBin" xml:space="preserve">
+    <value>Удалить в Корзину</value>
+  </data>
+  <data name="CliInspector_TabPathHealth" xml:space="preserve">
+    <value>Здоровье PATH &amp; Битые пути</value>
+  </data>
+  <data name="CliInspector_PathAnalyzerTitle" xml:space="preserve">
+    <value>Анализатор переменных среды Windows PATH</value>
+  </data>
+  <data name="CliInspector_PathAnalyzerDescription" xml:space="preserve">
+    <value>Удаление несуществующих папок из PATH ускоряет запуск консоли и предотвращает ошибки поиска команд.</value>
+  </data>
+  <data name="CliInspector_CleanDeadPaths" xml:space="preserve">
+    <value>Очистить все битые пути</value>
+  </data>
+  <data name="CliInspector_BinCountLabel" xml:space="preserve">
+    <value>• Исполняемых файлов:</value>
+  </data>
+  <data name="CliInspector_ToolTipRemovePathEntry" xml:space="preserve">
+    <value>Удалить эту запись из переменной PATH</value>
+  </data>
+  <data name="CliInspector_PsProfilesTitle" xml:space="preserve">
+    <value>Скрипты автозагрузки PowerShell ($PROFILE) и установленные модули</value>
+  </data>
+  <data name="CliInspector_PsProfilesDescription" xml:space="preserve">
+    <value>Здесь отображаются скрипты инициализации оболочки (темы Oh My Posh, алиасы, функции) и пользовательские модули.</value>
+  </data>
+  <data name="CliInspector_ToolTipOpenFile" xml:space="preserve">
+    <value>Открыть файл в Проводнике</value>
+  </data>
+  <data name="CliInspector_Open" xml:space="preserve">
+    <value>Открыть</value>
+  </data>
+  <data name="PreviewDialog_Title" xml:space="preserve">
+    <value>Подтверждение очистки — Puryx</value>
+  </data>
+  <data name="PreviewDialog_Header" xml:space="preserve">
+    <value>Подтверждение безвозвратной очистки</value>
+  </data>
+  <data name="PreviewDialog_Subheader" xml:space="preserve">
+    <value>Внимательно проверьте список объектов перед удалением</value>
+  </data>
+  <data name="PreviewDialog_ItemsMetric" xml:space="preserve">
+    <value>Объектов</value>
+  </data>
+  <data name="PreviewDialog_DeleteMetric" xml:space="preserve">
+    <value>Удаление</value>
+  </data>
+  <data name="PreviewDialog_UninstallMetric" xml:space="preserve">
+    <value>Деинсталляция</value>
+  </data>
+  <data name="PreviewDialog_SizeMetric" xml:space="preserve">
+    <value>Будет очищено</value>
+  </data>
+  <data name="PreviewDialog_Confirm" xml:space="preserve">
+    <value>Подтвердить и очистить</value>
+  </data>
+  <data name="Discovery_Title" xml:space="preserve">
+    <value>Автообнаружение приложений</value>
+  </data>
+  <data name="Discovery_Subtitle" xml:space="preserve">
+    <value>Эвристический поиск неизвестных программ и каталогов с накапливающимся кэшем</value>
+  </data>
+  <data name="Discovery_EmptyState" xml:space="preserve">
+    <value>Нажмите «Сканировать» для поиска приложений</value>
+  </data>
+  <data name="Discovery_CacheLabel" xml:space="preserve">
+    <value>Кэш:</value>
+  </data>
+  <data name="Discovery_ProtectedLabel" xml:space="preserve">
+    <value>Защищено:</value>
+  </data>
+  <data name="Discovery_AddAllWithCache" xml:space="preserve">
+    <value>Добавить все с кэшем</value>
+  </data>
+  <data name="Settings_Title" xml:space="preserve">
+    <value>Параметры и настройки</value>
+  </data>
+  <data name="Settings_Subtitle" xml:space="preserve">
+    <value>Конфигурация тем оформления, белых списков, звуковых оповещений и интеграции в систему</value>
+  </data>
+  <data name="Settings_SectionAppearance" xml:space="preserve">
+    <value>Внешний вид</value>
+  </data>
+  <data name="Settings_ThemeLabel" xml:space="preserve">
+    <value>Тема оформления:</value>
+  </data>
+  <data name="Settings_SectionMode" xml:space="preserve">
+    <value>Режим работы</value>
+  </data>
+  <data name="Settings_ConfigModeLabel" xml:space="preserve">
+    <value>Режим:</value>
+  </data>
+  <data name="Settings_SectionCleaning" xml:space="preserve">
+    <value>Очистка</value>
+  </data>
+  <data name="Settings_UseRecycleBin" xml:space="preserve">
+    <value>Удалять в корзину (рекомендуется)</value>
+  </data>
+  <data name="Settings_ProtectedPeriodLabel" xml:space="preserve">
+    <value>Защищённый период:</value>
+  </data>
+  <data name="Settings_HoursUnit" xml:space="preserve">
+    <value>часов</value>
+  </data>
+  <data name="Settings_ProtectedPeriodHint" xml:space="preserve">
+    <value>Файлы, созданные или изменённые в этот период, не будут удалены.</value>
+  </data>
+  <data name="Settings_SectionScanPaths" xml:space="preserve">
+    <value>Дополнительные папки для сканирования</value>
+  </data>
+  <data name="Settings_ScanPathsHint" xml:space="preserve">
+    <value>Добавьте папки с других дисков для поиска мусора</value>
+  </data>
+  <data name="Settings_BrowseFolderToolTip" xml:space="preserve">
+    <value>Выбрать папку</value>
+  </data>
+  <data name="Settings_Add" xml:space="preserve">
+    <value>Добавить</value>
+  </data>
+  <data name="Settings_SectionWhitelist" xml:space="preserve">
+    <value>Белый список (защита от удаления)</value>
+  </data>
+  <data name="Settings_WhitelistHint" xml:space="preserve">
+    <value>Паттерны файлов и папок, которые никогда не будут удалены</value>
+  </data>
+  <data name="Settings_ExamplesLabel" xml:space="preserve">
+    <value>Примеры:</value>
+  </data>
+  <data name="Settings_BuiltInPatternsNote" xml:space="preserve">
+    <value>Встроенные паттерны защиты (Antigravity, сохранения игр, базы данных) нельзя удалить.</value>
+  </data>
+  <data name="Settings_SectionSound" xml:space="preserve">
+    <value>Звуковое сопровождение</value>
+  </data>
+  <data name="Settings_SoundCheckbox" xml:space="preserve">
+    <value>Воспроизводить звуковые сигналы при завершении сканирования, очистки и активации Game Boost</value>
+  </data>
+  <data name="Settings_SectionReport" xml:space="preserve">
+    <value>Паспорт системы и экспорт отчета</value>
+  </data>
+  <data name="Settings_ReportDescription" xml:space="preserve">
+    <value>Сформируйте интерактивный темный HTML-отчет с полной аппаратной телеметрией (CPU, RAM, S.M.A.R.T. SSD, температура) и детальной статистикой очистки для печати или сохранения в PDF.</value>
+  </data>
+  <data name="Settings_GenerateReport" xml:space="preserve">
+    <value>Сформировать и открыть паспорт системы (HTML / PDF)</value>
+  </data>
+  <data name="Settings_SectionShellIntegration" xml:space="preserve">
+    <value>Интеграция в контекстное меню Windows Explorer</value>
+  </data>
+  <data name="Settings_ShellIntegrationHint" xml:space="preserve">
+    <value>Управление пунктами правого клика мыши в Проводнике Windows:</value>
+  </data>
+  <data name="Settings_ShellAnalyzeMenu" xml:space="preserve">
+    <value>Пункт «Анализировать в SmartCleaner» (для папок)</value>
+  </data>
+  <data name="Settings_ShellCompactMenu" xml:space="preserve">
+    <value>Пункт «Сжать через CompactOS (LZX)» (для папок)</value>
+  </data>
+  <data name="Settings_ShellShredMenu" xml:space="preserve">
+    <value>Пункт «Безвозвратно уничтожить (Шредер DoD)» (для файлов)</value>
   </data>
 </root>

@@ -16,12 +16,12 @@
                         <Border Width="32" Height="32" CornerRadius="8" Background="{DynamicResource AccentGradientBrush}" Margin="0,0,10,0" VerticalAlignment="Center">
                             <TextBlock Text="&#xE713;" FontFamily="Segoe MDL2 Assets" FontSize="16" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
-                        <TextBlock Text="Параметры и настройки" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
+                        <TextBlock Text="{x:Static loc:Localizer.Settings_Title}" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
                         <Border Background="{DynamicResource AccentBrush}" CornerRadius="4" Padding="6,2" Margin="10,0,0,0" VerticalAlignment="Center">
                             <TextBlock Text="PREFERENCES" FontSize="9.5" Foreground="White" FontWeight="Bold"/>
                         </Border>
                     </StackPanel>
-                    <TextBlock Text="Конфигурация тем оформления, белых списков, звуковых оповещений и интеграции в систему" 
+                    <TextBlock Text="{x:Static loc:Localizer.Settings_Subtitle}" 
                                FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,4,0,0"/>
                 </StackPanel>
             </DockPanel>
@@ -29,7 +29,7 @@
             <!-- Appearance / Theme -->
             <Border Style="{StaticResource Card}" Margin="0,0,0,16">
                 <StackPanel>
-                    <TextBlock Text="Внешний вид" 
+                    <TextBlock Text="{x:Static loc:Localizer.Settings_SectionAppearance}" 
                                Style="{StaticResource Heading2}"
                                Margin="0,0,0,12"/>
                     <Grid>
@@ -37,7 +37,7 @@
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="Тема оформления:" 
+                        <TextBlock Text="{x:Static loc:Localizer.Settings_ThemeLabel}" 
                                    Foreground="{DynamicResource TextSecondaryBrush}"
                                    VerticalAlignment="Center"
                                    Margin="0,0,16,0"/>
@@ -76,7 +76,7 @@
             <!-- Mode Info -->
             <Border Style="{StaticResource Card}" Margin="0,0,0,16">
                 <StackPanel>
-                    <TextBlock Text="Режим работы" 
+                    <TextBlock Text="{x:Static loc:Localizer.Settings_SectionMode}" 
                                Style="{StaticResource Heading2}"
                                Margin="0,0,0,12"/>
                     
@@ -90,7 +90,7 @@
                             <RowDefinition/>
                         </Grid.RowDefinitions>
 
-                        <TextBlock Text="Режим:" 
+                        <TextBlock Text="{x:Static loc:Localizer.Settings_ConfigModeLabel}" 
                                    Foreground="{DynamicResource TextSecondaryBrush}"
                                    Margin="0,0,16,8"/>
                         <TextBlock Grid.Column="1" 
@@ -98,7 +98,7 @@
                                    FontWeight="SemiBold"/>
 
                         <TextBlock Grid.Row="1" 
-                                   Text="Путь:" 
+                                   Text="{x:Static loc:Localizer.Common_Path}"
                                    Foreground="{DynamicResource TextSecondaryBrush}"
                                    Margin="0,0,16,0"/>
                         <TextBlock Grid.Row="1" Grid.Column="1" 
@@ -113,16 +113,16 @@
             <!-- Cleaning Settings -->
             <Border Style="{StaticResource Card}" Margin="0,0,0,16">
                 <StackPanel>
-                    <TextBlock Text="Очистка" 
+                    <TextBlock Text="{x:Static loc:Localizer.Settings_SectionCleaning}" 
                                Style="{StaticResource Heading2}"
                                Margin="0,0,0,12"/>
 
-                    <CheckBox Content="Удалять в корзину (рекомендуется)"
+                    <CheckBox Content="{x:Static loc:Localizer.Settings_UseRecycleBin}"
                               IsChecked="{Binding UseRecycleBin}"
                               Margin="0,0,0,12"/>
 
                     <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
-                        <TextBlock Text="Защищённый период:" 
+                        <TextBlock Text="{x:Static loc:Localizer.Settings_ProtectedPeriodLabel}" 
                                    VerticalAlignment="Center"
                                    Margin="0,0,12,0"/>
                         <TextBox Text="{Binding ProtectedHours, UpdateSourceTrigger=PropertyChanged}"
@@ -132,13 +132,13 @@
                                  Background="{DynamicResource SurfaceVariantBrush}"
                                  Foreground="{DynamicResource TextPrimaryBrush}"
                                  BorderBrush="{DynamicResource BorderBrush}"/>
-                        <TextBlock Text="часов" 
+                        <TextBlock Text="{x:Static loc:Localizer.Settings_HoursUnit}" 
                                    VerticalAlignment="Center"
                                    Margin="8,0,0,0"
                                    Foreground="{DynamicResource TextSecondaryBrush}"/>
                     </StackPanel>
                     
-                    <TextBlock Text="Файлы, созданные или изменённые в этот период, не будут удалены."
+                    <TextBlock Text="{x:Static loc:Localizer.Settings_ProtectedPeriodHint}"
                                Style="{StaticResource Caption}"
                                Margin="0,8,0,0"/>
                 </StackPanel>
@@ -147,10 +147,10 @@
             <!-- Custom Scan Paths -->
             <Border Style="{StaticResource Card}" Margin="0,0,0,16">
                 <StackPanel>
-                    <TextBlock Text="Дополнительные папки для сканирования" 
+                    <TextBlock Text="{x:Static loc:Localizer.Settings_SectionScanPaths}" 
                                Style="{StaticResource Heading2}"
                                Margin="0,0,0,4"/>
-                    <TextBlock Text="Добавьте папки с других дисков для поиска мусора"
+                    <TextBlock Text="{x:Static loc:Localizer.Settings_ScanPathsHint}"
                                Style="{StaticResource Caption}"
                                Margin="0,0,0,16"/>
 
@@ -174,7 +174,7 @@
                         </TextBox>
                         
                         <Button Grid.Column="1" 
-                                ToolTip="Выбрать папку"
+                                ToolTip="{x:Static loc:Localizer.Settings_BrowseFolderToolTip}"
                                 Style="{StaticResource SecondaryButton}"
                                 Command="{Binding BrowseFolderCommand}"
                                 Margin="8,0,0,0">
@@ -182,7 +182,7 @@
                         </Button>
                         
                         <Button Grid.Column="2" 
-                                Content="Добавить"
+                                Content="{x:Static loc:Localizer.Settings_Add}"
                                 Style="{StaticResource PrimaryButton}"
                                 Command="{Binding AddScanPathCommand}"
                                 Margin="8,0,0,0"/>
@@ -229,10 +229,10 @@
             <!-- Whitelist -->
             <Border Style="{StaticResource Card}">
                 <StackPanel>
-                    <TextBlock Text="Белый список (защита от удаления)" 
+                    <TextBlock Text="{x:Static loc:Localizer.Settings_SectionWhitelist}" 
                                Style="{StaticResource Heading2}"
                                Margin="0,0,0,4"/>
-                    <TextBlock Text="Паттерны файлов и папок, которые никогда не будут удалены"
+                    <TextBlock Text="{x:Static loc:Localizer.Settings_WhitelistHint}"
                                Style="{StaticResource Caption}"
                                Margin="0,0,0,16"/>
 
@@ -255,7 +255,7 @@
                         </TextBox>
                         
                         <Button Grid.Column="1" 
-                                Content="Добавить"
+                                Content="{x:Static loc:Localizer.Settings_Add}"
                                 Style="{StaticResource PrimaryButton}"
                                 Command="{Binding AddPatternCommand}"
                                 Margin="8,0,0,0"/>
@@ -263,7 +263,7 @@
 
                     <!-- Pattern Examples -->
                     <TextBlock Style="{StaticResource Caption}" Margin="0,0,0,12">
-                        <Run Text="Примеры:"/>
+                        <Run Text="{x:Static loc:Localizer.Settings_ExamplesLabel}"/>
                         <Run Text="**\SaveGames\**" FontFamily="Consolas" Foreground="{DynamicResource AccentBrush}"/>
                         <Run Text="—"/>
                         <Run Text="%USERPROFILE%\.myconfig" FontFamily="Consolas" Foreground="{DynamicResource AccentBrush}"/>
@@ -311,7 +311,7 @@
                             Padding="12,8"
                             Margin="0,12,0,0">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Встроенные паттерны защиты (Antigravity, сохранения игр, базы данных) нельзя удалить."
+                            <TextBlock Text="{x:Static loc:Localizer.Settings_BuiltInPatternsNote}"
                                        Style="{StaticResource Caption}"
                                        TextWrapping="Wrap"/>
                         </StackPanel>
@@ -322,10 +322,10 @@
             <!-- Sound & Audio Feedback -->
             <Border Style="{StaticResource Card}" Margin="0,0,0,16">
                 <StackPanel>
-                    <TextBlock Text="Звуковое сопровождение" 
+                    <TextBlock Text="{x:Static loc:Localizer.Settings_SectionSound}" 
                                Style="{StaticResource Heading2}"
                                Margin="0,0,0,12"/>
-                    <CheckBox Content="Воспроизводить звуковые сигналы при завершении сканирования, очистки и активации Game Boost"
+                    <CheckBox Content="{x:Static loc:Localizer.Settings_SoundCheckbox}"
                               IsChecked="{Binding IsSoundEnabled, Mode=TwoWay}"
                               Foreground="{DynamicResource TextPrimaryBrush}" FontSize="13"/>
                 </StackPanel>
@@ -334,13 +334,13 @@
             <!-- Executive System Passport & HTML Report -->
             <Border Style="{StaticResource Card}" Margin="0,0,0,16">
                 <StackPanel>
-                    <TextBlock Text="Паспорт системы и экспорт отчета" 
+                    <TextBlock Text="{x:Static loc:Localizer.Settings_SectionReport}" 
                                Style="{StaticResource Heading2}"
                                Margin="0,0,0,8"/>
-                    <TextBlock Text="Сформируйте интерактивный темный HTML-отчет с полной аппаратной телеметрией (CPU, RAM, S.M.A.R.T. SSD, температура) и детальной статистикой очистки для печати или сохранения в PDF."
+                    <TextBlock Text="{x:Static loc:Localizer.Settings_ReportDescription}"
                                Style="{StaticResource BodyText}" Margin="0,0,0,14"/>
 
-                    <Button Content="Сформировать и открыть паспорт системы (HTML / PDF)" 
+                    <Button Content="{x:Static loc:Localizer.Settings_GenerateReport}" 
                             Command="{Binding GenerateSystemReportCommand}"
                             Style="{StaticResource PrimaryButton}" HorizontalAlignment="Left" Padding="18,10" FontSize="13" FontWeight="SemiBold"/>
                 </StackPanel>
@@ -349,24 +349,24 @@
             <!-- Windows Explorer Shell Integration -->
             <Border Style="{StaticResource Card}" Margin="0,0,0,16">
                 <StackPanel>
-                    <TextBlock Text="Интеграция в контекстное меню Windows Explorer" 
+                    <TextBlock Text="{x:Static loc:Localizer.Settings_SectionShellIntegration}" 
                                Style="{StaticResource Heading2}"
                                Margin="0,0,0,12"/>
-                    <TextBlock Text="Управление пунктами правого клика мыши в Проводнике Windows:"
+                    <TextBlock Text="{x:Static loc:Localizer.Settings_ShellIntegrationHint}"
                                Style="{StaticResource BodyText}" Margin="0,0,0,14"/>
 
                     <StackPanel>
-                        <CheckBox Content="Пункт «Анализировать в SmartCleaner» (для папок)"
+                        <CheckBox Content="{x:Static loc:Localizer.Settings_ShellAnalyzeMenu}"
                                   IsChecked="{Binding IsAnalyzeMenuEnabled, Mode=TwoWay}"
                                   Command="{Binding ToggleAnalyzeMenuCommand}"
                                   Foreground="{DynamicResource TextPrimaryBrush}" FontSize="13" Margin="0,0,0,8"/>
 
-                        <CheckBox Content="Пункт «Сжать через CompactOS (LZX)» (для папок)"
+                        <CheckBox Content="{x:Static loc:Localizer.Settings_ShellCompactMenu}"
                                   IsChecked="{Binding IsCompactMenuEnabled, Mode=TwoWay}"
                                   Command="{Binding ToggleCompactMenuCommand}"
                                   Foreground="{DynamicResource TextPrimaryBrush}" FontSize="13" Margin="0,0,0,8"/>
 
-                        <CheckBox Content="Пункт «Безвозвратно уничтожить (Шредер DoD)» (для файлов)"
+                        <CheckBox Content="{x:Static loc:Localizer.Settings_ShellShredMenu}"
                                   IsChecked="{Binding IsShredMenuEnabled, Mode=TwoWay}"
                                   Command="{Binding ToggleShredMenuCommand}"
                                   Foreground="{DynamicResource TextPrimaryBrush}" FontSize="13"/>

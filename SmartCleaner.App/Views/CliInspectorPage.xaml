@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:loc="clr-namespace:SmartCleaner.Core.Localization;assembly=SmartCleaner.Core"
              mc:Ignorable="d" 
              d:DesignHeight="650" d:DesignWidth="900">
     <Grid Margin="24,20">
@@ -23,12 +24,12 @@
                     <Border Width="32" Height="32" CornerRadius="8" Background="{DynamicResource AccentGradientBrush}" Margin="0,0,10,0" VerticalAlignment="Center">
                         <TextBlock Text="&#xE756;" FontFamily="Segoe MDL2 Assets" FontSize="16" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
-                    <TextBlock Text="Инспектор CLI, PATH &amp; AI-агентов" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
+                    <TextBlock Text="{x:Static loc:Localizer.CliInspector_Title}" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
                     <Border Background="{DynamicResource AccentBrush}" CornerRadius="4" Padding="6,2" Margin="10,0,0,0" VerticalAlignment="Center">
                         <TextBlock Text="DEV &amp; CLI" FontSize="9.5" Foreground="White" FontWeight="Bold"/>
                     </Border>
                 </StackPanel>
-                <TextBlock Text="Поиск установленных утилит разработчика, очистка битых путей PATH и модулей PowerShell" 
+                <TextBlock Text="{x:Static loc:Localizer.CliInspector_Subtitle}" 
                            FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,4,0,0"/>
             </StackPanel>
             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
@@ -37,7 +38,7 @@
                         Margin="0,0,8,0">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="&#xE72D;" FontFamily="Segoe MDL2 Assets" FontSize="13" Margin="0,0,6,0" VerticalAlignment="Center"/>
-                        <TextBlock Text="Экспорт отчёта" VerticalAlignment="Center"/>
+                        <TextBlock Text="{x:Static loc:Localizer.CliInspector_ExportReport}" VerticalAlignment="Center"/>
                     </StackPanel>
                 </Button>
                 <Button Style="{StaticResource PrimaryButton}" 
@@ -45,7 +46,7 @@
                         IsEnabled="{Binding IsScanning, Converter={StaticResource InverseBoolConverter}}">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="&#xE72C;" FontFamily="Segoe MDL2 Assets" FontSize="13" Margin="0,0,6,0" VerticalAlignment="Center"/>
-                        <TextBlock Text="Сканировать" VerticalAlignment="Center"/>
+                        <TextBlock Text="{x:Static loc:Localizer.Common_Scan}" VerticalAlignment="Center"/>
                     </StackPanel>
                 </Button>
             </StackPanel>
@@ -62,10 +63,10 @@
             <!-- Card 1: Tools & Size -->
             <Border Grid.Column="0" Style="{StaticResource Card}" Margin="0,0,8,0">
                 <StackPanel>
-                    <TextBlock Text="Найдено утилит" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                    <TextBlock Text="{x:Static loc:Localizer.CliInspector_StatTools}" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}"/>
                     <TextBlock FontSize="20" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" Margin="0,4,0,0">
                         <Run Text="{Binding TotalToolsCount, Mode=OneWay}"/>
-                        <Run Text="шт •" FontSize="14" FontWeight="Normal"/>
+                        <Run Text="{x:Static loc:Localizer.CliInspector_PiecesUnit}" FontSize="14" FontWeight="Normal"/>
                         <Run Text="{Binding TotalSizeFormatted, Mode=OneWay}" FontSize="14" FontWeight="Normal"/>
                     </TextBlock>
                 </StackPanel>
@@ -74,11 +75,11 @@
             <!-- Card 2: Dead PATH entries -->
             <Border Grid.Column="1" Style="{StaticResource Card}" Margin="4,0,4,0">
                 <StackPanel>
-                    <TextBlock Text="Битые пути в PATH" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                    <TextBlock Text="{x:Static loc:Localizer.CliInspector_StatDeadPaths}" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}"/>
                     <TextBlock FontSize="20" FontWeight="Bold" Margin="0,4,0,0"
                                Foreground="{Binding DeadPathsCount, Converter={StaticResource ZeroToColorConverter}}">
                         <Run Text="{Binding DeadPathsCount, Mode=OneWay}"/>
-                        <Run Text="из" FontSize="13" FontWeight="Normal" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                        <Run Text="{x:Static loc:Localizer.CliInspector_PathCountSeparator}" FontSize="13" FontWeight="Normal" Foreground="{DynamicResource TextSecondaryBrush}"/>
                         <Run Text="{Binding TotalPathsCount, Mode=OneWay}" FontSize="13" FontWeight="Normal" Foreground="{DynamicResource TextSecondaryBrush}"/>
                     </TextBlock>
                 </StackPanel>
@@ -87,10 +88,10 @@
             <!-- Card 3: PowerShell profiles -->
             <Border Grid.Column="2" Style="{StaticResource Card}" Margin="8,0,0,0">
                 <StackPanel>
-                    <TextBlock Text="PowerShell Profiles &amp; Модули" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                    <TextBlock Text="{x:Static loc:Localizer.CliInspector_StatPsProfiles}" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}"/>
                     <TextBlock FontSize="20" FontWeight="Bold" Foreground="{DynamicResource SafeBrush}" Margin="0,4,0,0">
                         <Run Text="{Binding PsProfilesCount, Mode=OneWay}"/>
-                        <Run Text="найдено" FontSize="13" FontWeight="Normal" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                        <Run Text="{x:Static loc:Localizer.CliInspector_FoundUnit}" FontSize="13" FontWeight="Normal" Foreground="{DynamicResource TextSecondaryBrush}"/>
                     </TextBlock>
                 </StackPanel>
             </Border>
@@ -100,7 +101,7 @@
         <TabControl Grid.Row="2" SelectedIndex="{Binding SelectedTabIndex}">
             
             <!-- ════════ TAB 1: CLI & AI TOOLS ════════ -->
-            <TabItem Header="Инструменты &amp; AI-агенты">
+            <TabItem Header="{x:Static loc:Localizer.CliInspector_TabTools}">
                 <Grid Margin="0,12,0,0">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -117,9 +118,9 @@
 
                         <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" 
                                  Padding="8,6" VerticalAlignment="Center"
-                                 Tag="Поиск по имени, категории, пути..."/>
+                                 Tag="{x:Static loc:Localizer.CliInspector_SearchPlaceholder}"/>
                         
-                        <TextBlock Grid.Column="1" Text="Категория:" VerticalAlignment="Center" 
+                        <TextBlock Grid.Column="1" Text="{x:Static loc:Localizer.CliInspector_CategoryLabel}" VerticalAlignment="Center" 
                                    Foreground="{DynamicResource TextSecondaryBrush}" Margin="16,0,8,0"/>
 
                         <ComboBox Grid.Column="2" 
@@ -170,28 +171,28 @@
                                             <Button Style="{StaticResource SubtleButton}" 
                                                     Command="{Binding DataContext.OpenInExplorerCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                     CommandParameter="{Binding Path}"
-                                                    ToolTip="Открыть в Проводнике" Margin="2,0">
+                                                    ToolTip="{x:Static loc:Localizer.CliInspector_ToolTipOpenInExplorer}" Margin="2,0">
                                                 <TextBlock Text="&#xE8B7;" FontFamily="Segoe MDL2 Assets" FontSize="13"/>
                                             </Button>
 
                                             <Button Style="{StaticResource SubtleButton}" 
                                                     Command="{Binding DataContext.OpenTerminalCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                     CommandParameter="{Binding Path}"
-                                                    ToolTip="Запустить PowerShell в папке" Margin="2,0">
+                                                    ToolTip="{x:Static loc:Localizer.CliInspector_ToolTipOpenTerminal}" Margin="2,0">
                                                 <TextBlock Text="&#xE945;" FontFamily="Segoe MDL2 Assets" FontSize="13"/>
                                             </Button>
 
                                             <Button Style="{StaticResource SubtleButton}" 
                                                     Command="{Binding DataContext.CopyUninstallCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                     CommandParameter="{Binding UninstallCmd}"
-                                                    ToolTip="Скопировать команду удаления" Margin="2,0">
+                                                    ToolTip="{x:Static loc:Localizer.CliInspector_ToolTipCopyUninstall}" Margin="2,0">
                                                 <TextBlock Text="&#xE8C8;" FontFamily="Segoe MDL2 Assets" FontSize="13"/>
                                             </Button>
 
                                             <Button Style="{StaticResource SubtleButton}" 
                                                     Command="{Binding DataContext.DeleteToolCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                     CommandParameter="{Binding .}"
-                                                    ToolTip="Удалить в Корзину" Margin="2,0">
+                                                    ToolTip="{x:Static loc:Localizer.CliInspector_ToolTipDeleteToRecycleBin}" Margin="2,0">
                                                 <TextBlock Text="&#xE74D;" FontFamily="Segoe MDL2 Assets" FontSize="13" Foreground="{DynamicResource DangerBrush}"/>
                                             </Button>
                                         </StackPanel>
@@ -204,7 +205,7 @@
             </TabItem>
 
             <!-- ════════ TAB 2: PATH HEALTH & DEAD PATHS ════════ -->
-            <TabItem Header="Здоровье PATH &amp; Битые пути">
+            <TabItem Header="{x:Static loc:Localizer.CliInspector_TabPathHealth}">
                 <Grid Margin="0,12,0,0">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -219,12 +220,12 @@
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             <StackPanel VerticalAlignment="Center">
-                                <TextBlock Text="Анализатор переменных среды Windows PATH" FontWeight="SemiBold" FontSize="13"/>
-                                <TextBlock Text="Удаление несуществующих папок из PATH ускоряет запуск консоли и предотвращает ошибки поиска команд." 
+                                <TextBlock Text="{x:Static loc:Localizer.CliInspector_PathAnalyzerTitle}" FontWeight="SemiBold" FontSize="13"/>
+                                <TextBlock Text="{x:Static loc:Localizer.CliInspector_PathAnalyzerDescription}" 
                                            FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0"/>
                             </StackPanel>
                             <Button Grid.Column="1" 
-                                    Content="Очистить все битые пути" 
+                                    Content="{x:Static loc:Localizer.CliInspector_CleanDeadPaths}" 
                                     Style="{StaticResource DangerButton}" 
                                     Command="{Binding CleanDeadPathsCommand}"
                                     VerticalAlignment="Center"/>
@@ -258,7 +259,7 @@
                                             <TextBlock FontSize="11" Margin="0,2,0,0">
                                                 <Run Text="{Binding Status}" FontWeight="SemiBold"
                                                      Foreground="{Binding IsDead, Converter={StaticResource DeadStatusColorConverter}}"/>
-                                                <Run Text="• Исполняемых файлов:" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                                <Run Text="{x:Static loc:Localizer.CliInspector_BinCountLabel}" Foreground="{DynamicResource TextSecondaryBrush}"/>
                                                 <Run Text="{Binding BinCount}" Foreground="{DynamicResource TextSecondaryBrush}"/>
                                             </TextBlock>
                                         </StackPanel>
@@ -272,7 +273,7 @@
                                             <Button Style="{StaticResource SubtleButton}" 
                                                     Command="{Binding DataContext.OpenInExplorerCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                     CommandParameter="{Binding Path}"
-                                                    ToolTip="Открыть в Проводнике"
+                                                    ToolTip="{x:Static loc:Localizer.CliInspector_ToolTipOpenInExplorer}"
                                                     Visibility="{Binding Exists, Converter={StaticResource BoolToVisibilityConverter}}">
                                                 <TextBlock Text="&#xE8B7;" FontFamily="Segoe MDL2 Assets" FontSize="13"/>
                                             </Button>
@@ -280,7 +281,7 @@
                                             <Button Style="{StaticResource SubtleButton}" 
                                                     Command="{Binding DataContext.RemoveSinglePathCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                     CommandParameter="{Binding .}"
-                                                    ToolTip="Удалить эту запись из переменной PATH">
+                                                    ToolTip="{x:Static loc:Localizer.CliInspector_ToolTipRemovePathEntry}">
                                                 <TextBlock Text="&#xE711;" FontFamily="Segoe MDL2 Assets" FontSize="12" Foreground="{DynamicResource DangerBrush}"/>
                                             </Button>
                                         </StackPanel>
@@ -302,8 +303,8 @@
 
                     <Border Grid.Row="0" Style="{StaticResource Card}" Margin="0,0,0,12" Padding="14,10" Background="{DynamicResource SurfaceVariantBrush}">
                         <StackPanel>
-                            <TextBlock Text="Скрипты автозагрузки PowerShell ($PROFILE) и установленные модули" FontWeight="SemiBold" FontSize="13"/>
-                            <TextBlock Text="Здесь отображаются скрипты инициализации оболочки (темы Oh My Posh, алиасы, функции) и пользовательские модули." 
+                            <TextBlock Text="{x:Static loc:Localizer.CliInspector_PsProfilesTitle}" FontWeight="SemiBold" FontSize="13"/>
+                            <TextBlock Text="{x:Static loc:Localizer.CliInspector_PsProfilesDescription}" 
                                        FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0"/>
                         </StackPanel>
                     </Border>
@@ -330,8 +331,8 @@
                                             <Button Grid.Column="1" Style="{StaticResource SubtleButton}" 
                                                     Command="{Binding DataContext.OpenInExplorerCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                     CommandParameter="{Binding Path}"
-                                                    ToolTip="Открыть файл в Проводнике">
-                                                <StackPanel Orientation="Horizontal"><TextBlock Text="&#xE8B7;" FontFamily="Segoe MDL2 Assets" FontSize="12" Margin="0,0,4,0"/><TextBlock Text="Открыть" FontSize="12"/></StackPanel>
+                                                    ToolTip="{x:Static loc:Localizer.CliInspector_ToolTipOpenFile}">
+                                                <StackPanel Orientation="Horizontal"><TextBlock Text="&#xE8B7;" FontFamily="Segoe MDL2 Assets" FontSize="12" Margin="0,0,4,0"/><TextBlock Text="{x:Static loc:Localizer.CliInspector_Open}" FontSize="12"/></StackPanel>
                                             </Button>
                                         </Grid>
 
