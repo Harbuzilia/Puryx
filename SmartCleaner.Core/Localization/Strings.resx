@@ -2727,4 +2727,137 @@ Remove these entries from the system registry?</value>
   <data name="CliInspector_PsModuleLocation" xml:space="preserve">
     <value>PowerShell module located at: {0}</value>
   </data>
+  <!-- Day 6a, wave 1: SystemScanner -->
+  <data name="Scanner_Progress_Scanning" xml:space="preserve">
+    <value>Scanning {0}...</value>
+  </data>
+  <data name="Scanner_Desc_TempFile" xml:space="preserve">
+    <value>Temporary file</value>
+  </data>
+  <data name="Scanner_Desc_TempFolder" xml:space="preserve">
+    <value>Temporary folder</value>
+  </data>
+  <data name="Scanner_System_Progress_UserTemp" xml:space="preserve">
+    <value>Scanning user temporary files...</value>
+  </data>
+  <data name="Scanner_System_Progress_SystemTemp" xml:space="preserve">
+    <value>Scanning system temporary files...</value>
+  </data>
+  <data name="Scanner_System_Progress_UpdateCache" xml:space="preserve">
+    <value>Scanning Windows Update cache...</value>
+  </data>
+  <data name="Scanner_System_Progress_CrashDumps" xml:space="preserve">
+    <value>Scanning application crash dumps...</value>
+  </data>
+  <data name="Scanner_System_Progress_ErrorReports" xml:space="preserve">
+    <value>Scanning error reports...</value>
+  </data>
+  <data name="Scanner_System_Progress_MemoryDumps" xml:space="preserve">
+    <value>Scanning memory dumps...</value>
+  </data>
+  <data name="Scanner_System_Progress_InstallerCache" xml:space="preserve">
+    <value>Scanning installer cache...</value>
+  </data>
+  <data name="Scanner_System_Progress_FontCache" xml:space="preserve">
+    <value>Scanning font cache...</value>
+  </data>
+  <data name="Scanner_System_Progress_IconCache" xml:space="preserve">
+    <value>Scanning icon cache...</value>
+  </data>
+  <data name="Scanner_System_Desc_SystemTemp" xml:space="preserve">
+    <value>System temporary files (administrator rights required)</value>
+  </data>
+  <data name="Scanner_System_Desc_Prefetch" xml:space="preserve">
+    <value>Application fast-launch cache. Cleaning will slow down the first launch of programs.</value>
+  </data>
+  <data name="Scanner_System_Desc_UpdateCache" xml:space="preserve">
+    <value>Downloaded Windows Update files</value>
+  </data>
+  <data name="Scanner_System_Desc_CrashDump" xml:space="preserve">
+    <value>Application crash dump (AppCrash)</value>
+  </data>
+  <data name="Scanner_System_Desc_ErrorReports" xml:space="preserve">
+    <value>Windows error reports</value>
+  </data>
+  <data name="Scanner_System_Desc_DeliveryOptimization" xml:space="preserve">
+    <value>Delivery Optimization cache (P2P updates)</value>
+  </data>
+  <data name="Scanner_System_Expl_DeliveryOptimization" xml:space="preserve">
+    <value>Windows uses P2P to deliver updates to other PCs. The cache is safe to delete</value>
+  </data>
+  <data name="Scanner_System_HowTo_DeliveryOptimization" xml:space="preserve">
+    <value>Re-downloaded automatically on the next Windows update</value>
+  </data>
+  <data name="Scanner_System_Desc_ShaderCache" xml:space="preserve">
+    <value>DirectX Shader Cache</value>
+  </data>
+  <data name="Scanner_System_Expl_ShaderCache" xml:space="preserve">
+    <value>Precompiled GPU shaders. They speed up game launches but are safe to delete</value>
+  </data>
+  <data name="Scanner_System_HowTo_ShaderCache" xml:space="preserve">
+    <value>Recompiled automatically when a game starts (may hang for 10-30 seconds)</value>
+  </data>
+  <data name="Scanner_System_Desc_WindowsOld" xml:space="preserve">
+    <value>⚠️ Windows.old — previous Windows installation</value>
+  </data>
+  <data name="Scanner_System_Expl_WindowsOld" xml:space="preserve">
+    <value>Contains files from the previous Windows version. Can take up 10-30 GB. After deletion, rolling back to the previous Windows version is IMPOSSIBLE</value>
+  </data>
+  <data name="Scanner_System_HowTo_WindowsOld" xml:space="preserve">
+    <value>⛔ IRRECOVERABLE. Delete only if you are sure the current Windows is stable</value>
+  </data>
+  <data name="Scanner_System_Desc_MemoryDump" xml:space="preserve">
+    <value>Full memory dump (MEMORY.DMP)</value>
+  </data>
+  <data name="Scanner_System_Expl_MemoryDump" xml:space="preserve">
+    <value>The dump is created on a BSOD. Size = RAM size. Needed only to investigate the cause</value>
+  </data>
+  <data name="Scanner_System_HowTo_MemoryDump" xml:space="preserve">
+    <value>A new one is created on the next BSOD (if one happens)</value>
+  </data>
+  <data name="Scanner_System_Desc_Minidumps" xml:space="preserve">
+    <value>BSOD minidumps (Minidump)</value>
+  </data>
+  <data name="Scanner_System_Expl_Minidumps" xml:space="preserve">
+    <value>Small blue-screen dumps. Useful for diagnostics but usually not needed</value>
+  </data>
+  <data name="Scanner_System_HowTo_Minidumps" xml:space="preserve">
+    <value>Created on the next BSOD</value>
+  </data>
+  <data name="Scanner_System_Desc_PatchCache" xml:space="preserve">
+    <value>Windows Installer patch cache ($PatchCache$)</value>
+  </data>
+  <data name="Scanner_System_Expl_PatchCache" xml:space="preserve">
+    <value>Cache for fast application of MSI package updates. Deleting it is safe, but updating/repairing programs will request installation media</value>
+  </data>
+  <data name="Scanner_System_HowTo_PatchCache" xml:space="preserve">
+    <value>Re-created when programs are installed/updated via MSI</value>
+  </data>
+  <data name="Scanner_System_Desc_FontCache" xml:space="preserve">
+    <value>Windows font cache</value>
+  </data>
+  <data name="Scanner_System_Expl_FontCache" xml:space="preserve">
+    <value>Font index to speed up text rendering</value>
+  </data>
+  <data name="Scanner_System_HowTo_FontCache" xml:space="preserve">
+    <value>Re-created automatically. The first launch of applications may be slightly slower</value>
+  </data>
+  <data name="Scanner_System_Desc_IconCache" xml:space="preserve">
+    <value>Windows icon cache (IconCache.db)</value>
+  </data>
+  <data name="Scanner_System_Expl_IconCache" xml:space="preserve">
+    <value>Explorer icon cache. If it is corrupted, icons display incorrectly</value>
+  </data>
+  <data name="Scanner_System_HowTo_IconCache" xml:space="preserve">
+    <value>Re-created after a reboot. Icons may temporarily appear as white squares</value>
+  </data>
+  <data name="Scanner_System_Desc_Thumbcache" xml:space="preserve">
+    <value>Explorer thumbnail cache (thumbcache)</value>
+  </data>
+  <data name="Scanner_System_Expl_Thumbcache" xml:space="preserve">
+    <value>Cached previews of images/videos in Explorer</value>
+  </data>
+  <data name="Scanner_System_HowTo_Thumbcache" xml:space="preserve">
+    <value>Re-created when browsing folders. The first opening of a photo folder will be slower</value>
+  </data>
 </root>

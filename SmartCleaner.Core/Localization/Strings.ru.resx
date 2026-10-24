@@ -2727,4 +2727,137 @@ Windows может использовать эти драйверы прямо �
   <data name="CliInspector_PsModuleLocation" xml:space="preserve">
     <value>PowerShell модуль, расположенный в: {0}</value>
   </data>
+  <!-- День 6а, волна 1: SystemScanner -->
+  <data name="Scanner_Progress_Scanning" xml:space="preserve">
+    <value>Сканирование {0}...</value>
+  </data>
+  <data name="Scanner_Desc_TempFile" xml:space="preserve">
+    <value>Временный файл</value>
+  </data>
+  <data name="Scanner_Desc_TempFolder" xml:space="preserve">
+    <value>Временная папка</value>
+  </data>
+  <data name="Scanner_System_Progress_UserTemp" xml:space="preserve">
+    <value>Сканирование временных файлов пользователя...</value>
+  </data>
+  <data name="Scanner_System_Progress_SystemTemp" xml:space="preserve">
+    <value>Сканирование системных временных файлов...</value>
+  </data>
+  <data name="Scanner_System_Progress_UpdateCache" xml:space="preserve">
+    <value>Сканирование кэша обновлений...</value>
+  </data>
+  <data name="Scanner_System_Progress_CrashDumps" xml:space="preserve">
+    <value>Сканирование дампов приложений...</value>
+  </data>
+  <data name="Scanner_System_Progress_ErrorReports" xml:space="preserve">
+    <value>Сканирование отчётов об ошибках...</value>
+  </data>
+  <data name="Scanner_System_Progress_MemoryDumps" xml:space="preserve">
+    <value>Сканирование дампов памяти...</value>
+  </data>
+  <data name="Scanner_System_Progress_InstallerCache" xml:space="preserve">
+    <value>Сканирование кэша установщика...</value>
+  </data>
+  <data name="Scanner_System_Progress_FontCache" xml:space="preserve">
+    <value>Сканирование кэша шрифтов...</value>
+  </data>
+  <data name="Scanner_System_Progress_IconCache" xml:space="preserve">
+    <value>Сканирование кэша иконок...</value>
+  </data>
+  <data name="Scanner_System_Desc_SystemTemp" xml:space="preserve">
+    <value>Системные временные файлы (требуются права администратора)</value>
+  </data>
+  <data name="Scanner_System_Desc_Prefetch" xml:space="preserve">
+    <value>Кэш быстрого запуска приложений. Очистка замедлит первый запуск программ.</value>
+  </data>
+  <data name="Scanner_System_Desc_UpdateCache" xml:space="preserve">
+    <value>Загруженные файлы обновлений Windows</value>
+  </data>
+  <data name="Scanner_System_Desc_CrashDump" xml:space="preserve">
+    <value>Дамп сбоя приложения (AppCrash)</value>
+  </data>
+  <data name="Scanner_System_Desc_ErrorReports" xml:space="preserve">
+    <value>Отчёты об ошибках Windows</value>
+  </data>
+  <data name="Scanner_System_Desc_DeliveryOptimization" xml:space="preserve">
+    <value>Кэш Delivery Optimization (P2P обновления)</value>
+  </data>
+  <data name="Scanner_System_Expl_DeliveryOptimization" xml:space="preserve">
+    <value>Windows использует P2P для раздачи обновлений другим ПК. Кэш безопасен для удаления</value>
+  </data>
+  <data name="Scanner_System_HowTo_DeliveryOptimization" xml:space="preserve">
+    <value>Перекачается автоматически при следующем обновлении Windows</value>
+  </data>
+  <data name="Scanner_System_Desc_ShaderCache" xml:space="preserve">
+    <value>DirectX Shader Cache</value>
+  </data>
+  <data name="Scanner_System_Expl_ShaderCache" xml:space="preserve">
+    <value>Предкомпилированные шейдеры GPU. Ускоряют запуск игр, но безопасны для удаления</value>
+  </data>
+  <data name="Scanner_System_HowTo_ShaderCache" xml:space="preserve">
+    <value>Перекомпилируются автоматически при запуске игр (может быть подвисание 10-30 сек)</value>
+  </data>
+  <data name="Scanner_System_Desc_WindowsOld" xml:space="preserve">
+    <value>⚠️ Windows.old — предыдущая установка Windows</value>
+  </data>
+  <data name="Scanner_System_Expl_WindowsOld" xml:space="preserve">
+    <value>Содержит файлы предыдущей версии Windows. Может занимать 10-30 ГБ. После удаления откат к предыдущей версии Windows НЕВОЗМОЖЕН</value>
+  </data>
+  <data name="Scanner_System_HowTo_WindowsOld" xml:space="preserve">
+    <value>⛔ НЕВОССТАНОВИМО. Удаляйте только если уверены, что текущая Windows работает стабильно</value>
+  </data>
+  <data name="Scanner_System_Desc_MemoryDump" xml:space="preserve">
+    <value>Полный дамп памяти (MEMORY.DMP)</value>
+  </data>
+  <data name="Scanner_System_Expl_MemoryDump" xml:space="preserve">
+    <value>Дамп создаётся при BSOD. Размер = объём RAM. Нужен только для расследования причины</value>
+  </data>
+  <data name="Scanner_System_HowTo_MemoryDump" xml:space="preserve">
+    <value>Создастся новый при следующем BSOD (если случится)</value>
+  </data>
+  <data name="Scanner_System_Desc_Minidumps" xml:space="preserve">
+    <value>Мини-дампы BSOD (Minidump)</value>
+  </data>
+  <data name="Scanner_System_Expl_Minidumps" xml:space="preserve">
+    <value>Маленькие дампы при синих экранах. Полезны для диагностики, но обычно не нужны</value>
+  </data>
+  <data name="Scanner_System_HowTo_Minidumps" xml:space="preserve">
+    <value>Создадутся при следующем BSOD</value>
+  </data>
+  <data name="Scanner_System_Desc_PatchCache" xml:space="preserve">
+    <value>Кэш патчей Windows Installer ($PatchCache$)</value>
+  </data>
+  <data name="Scanner_System_Expl_PatchCache" xml:space="preserve">
+    <value>Кэш для быстрого применения обновлений MSI-пакетов. Удаление безопасно, но обновление/ремонт программ будет запрашивать диск</value>
+  </data>
+  <data name="Scanner_System_HowTo_PatchCache" xml:space="preserve">
+    <value>Пересоздаётся при установке/обновлении программ через MSI</value>
+  </data>
+  <data name="Scanner_System_Desc_FontCache" xml:space="preserve">
+    <value>Кэш шрифтов Windows</value>
+  </data>
+  <data name="Scanner_System_Expl_FontCache" xml:space="preserve">
+    <value>Индекс шрифтов для ускорения рендеринга текста</value>
+  </data>
+  <data name="Scanner_System_HowTo_FontCache" xml:space="preserve">
+    <value>Пересоздаётся автоматически. Первый запуск приложений может быть чуть медленнее</value>
+  </data>
+  <data name="Scanner_System_Desc_IconCache" xml:space="preserve">
+    <value>Кэш иконок Windows (IconCache.db)</value>
+  </data>
+  <data name="Scanner_System_Expl_IconCache" xml:space="preserve">
+    <value>Кэш иконок проводника. При повреждении иконки отображаются неправильно</value>
+  </data>
+  <data name="Scanner_System_HowTo_IconCache" xml:space="preserve">
+    <value>Пересоздаётся после перезагрузки. Иконки могут временно отображаться как белые квадраты</value>
+  </data>
+  <data name="Scanner_System_Desc_Thumbcache" xml:space="preserve">
+    <value>Кэш миниатюр Explorer (thumbcache)</value>
+  </data>
+  <data name="Scanner_System_Expl_Thumbcache" xml:space="preserve">
+    <value>Кэшированные превью изображений/видео в проводнике</value>
+  </data>
+  <data name="Scanner_System_HowTo_Thumbcache" xml:space="preserve">
+    <value>Пересоздаётся при просмотре папок. Первое открытие папки с фото будет медленнее</value>
+  </data>
 </root>

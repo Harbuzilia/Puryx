@@ -1,3 +1,4 @@
+using SmartCleaner.Core.Localization;
 using SmartCleaner.Core.Models;
 using SmartCleaner.Core.Safety;
 
@@ -26,55 +27,55 @@ public class SystemScanner : ScannerBase
         await Task.Run(() =>
         {
             // 1. Пользовательская папка Temp
-            progress?.Report("Сканирование временных файлов пользователя...");
+            progress?.Report(Localizer.GetString("Scanner_System_Progress_UserTemp"));
             ScanUserTemp(items, ct);
 
             // 2. Системная папка Temp (если есть доступ)
-            progress?.Report("Сканирование системных временных файлов...");
+            progress?.Report(Localizer.GetString("Scanner_System_Progress_SystemTemp"));
             ScanSystemTemp(items, ct);
 
             // 3. Prefetch
-            progress?.Report("Сканирование Prefetch...");
+            progress?.Report(Localizer.GetString("Scanner_Progress_Scanning", "Prefetch"));
             ScanPrefetch(items, ct);
 
             // 4. Windows Update Downloads
-            progress?.Report("Сканирование кэша обновлений...");
+            progress?.Report(Localizer.GetString("Scanner_System_Progress_UpdateCache"));
             ScanWindowsUpdateCache(items, ct);
 
             // 5. Crash Dumps (приложений — не путать с BSOD дампами в пункте 11)
-            progress?.Report("Сканирование дампов приложений...");
+            progress?.Report(Localizer.GetString("Scanner_System_Progress_CrashDumps"));
             ScanCrashDumps(items, ct);
 
             // 7. Windows Error Reports
-            progress?.Report("Сканирование отчётов об ошибках...");
+            progress?.Report(Localizer.GetString("Scanner_System_Progress_ErrorReports"));
             ScanErrorReports(items, ct);
 
             // 8. Delivery Optimization
-            progress?.Report("Сканирование Delivery Optimization...");
+            progress?.Report(Localizer.GetString("Scanner_Progress_Scanning", "Delivery Optimization"));
             ScanDeliveryOptimization(items, ct);
 
             // 9. DirectX Shader Cache
-            progress?.Report("Сканирование DirectX Shader Cache...");
+            progress?.Report(Localizer.GetString("Scanner_Progress_Scanning", "DirectX Shader Cache"));
             ScanDirectXShaderCache(items, ct);
 
             // 10. Windows.old
-            progress?.Report("Сканирование Windows.old...");
+            progress?.Report(Localizer.GetString("Scanner_Progress_Scanning", "Windows.old"));
             ScanWindowsOld(items, ct);
 
             // 11. Memory Dumps (большие дампы памяти)
-            progress?.Report("Сканирование дампов памяти...");
+            progress?.Report(Localizer.GetString("Scanner_System_Progress_MemoryDumps"));
             ScanMemoryDumps(items, ct);
 
             // 12. Windows Installer Temp
-            progress?.Report("Сканирование кэша установщика...");
+            progress?.Report(Localizer.GetString("Scanner_System_Progress_InstallerCache"));
             ScanInstallerCache(items, ct);
 
             // 13. Font Cache
-            progress?.Report("Сканирование кэша шрифтов...");
+            progress?.Report(Localizer.GetString("Scanner_System_Progress_FontCache"));
             ScanFontCache(items, ct);
 
             // 14. Кэш DNS (FlushDNS)
-            progress?.Report("Сканирование кэша иконок...");
+            progress?.Report(Localizer.GetString("Scanner_System_Progress_IconCache"));
             ScanIconCache(items, ct);
 
         }, ct);
@@ -106,7 +107,7 @@ public class SystemScanner : ScannerBase
                 {
                     if (!_safety.IsWithinProtectedPeriod(file) && !_safety.IsWhitelisted(file))
                     {
-                        items.Add(CreateFileItem(file, RiskCategory.SafeToDelete, "Временный файл"));
+                        items.Add(CreateFileItem(file, RiskCategory.SafeToDelete, Localizer.GetString("Scanner_Desc_TempFile")));
                     }
                 }
             }
@@ -124,7 +125,7 @@ public class SystemScanner : ScannerBase
 
                 if (!_safety.IsWithinProtectedPeriod(dir) && !_safety.IsWhitelisted(dir))
                 {
-                    items.Add(CreateDirectoryItem(dir, RiskCategory.SafeToDelete, "Временная папка"));
+                    items.Add(CreateDirectoryItem(dir, RiskCategory.SafeToDelete, Localizer.GetString("Scanner_Desc_TempFolder")));
                 }
             }
         }
@@ -151,7 +152,7 @@ public class SystemScanner : ScannerBase
                     Size = size,
                     LastAccess = GetLastAccess(systemTemp),
                     Risk = RiskCategory.SafeToDelete,
-                    Description = "Системные временные файлы (требуются права администратора)",
+                    Description = Localizer.GetString("Scanner_System_Desc_SystemTemp"),
                     IsDirectory = true,
                     IsSelected = false // Не выбираем по умолчанию — требует elevation
                 });
@@ -180,7 +181,7 @@ public class SystemScanner : ScannerBase
                     Size = size,
                     LastAccess = GetLastAccess(prefetchPath),
                     Risk = RiskCategory.PerformanceCache,
-                    Description = "Кэш быстрого запуска приложений. Очистка замедлит первый запуск программ.",
+                    Description = Localizer.GetString("Scanner_System_Desc_Prefetch"),
                     IsDirectory = true,
                     IsSelected = false
                 });
@@ -209,7 +210,7 @@ public class SystemScanner : ScannerBase
                     Size = size,
                     LastAccess = GetLastAccess(updatePath),
                     Risk = RiskCategory.SafeToDelete,
-                    Description = "Загруженные файлы обновлений Windows",
+                    Description = Localizer.GetString("Scanner_System_Desc_UpdateCache"),
                     IsDirectory = true,
                     IsSelected = false
                 });
@@ -238,7 +239,7 @@ public class SystemScanner : ScannerBase
             foreach (var file in Directory.EnumerateFiles(dumpPath, "*.dmp"))
             {
                 ct.ThrowIfCancellationRequested();
-                items.Add(CreateFileItem(file, RiskCategory.SafeToDelete, "Дамп сбоя приложения (AppCrash)"));
+                items.Add(CreateFileItem(file, RiskCategory.SafeToDelete, Localizer.GetString("Scanner_System_Desc_CrashDump")));
             }
         }
         catch (UnauthorizedAccessException) { }
@@ -258,7 +259,7 @@ public class SystemScanner : ScannerBase
             var size = CalculateDirectorySize(werPath);
             if (size > 1024 * 1024) // > 1 MB
             {
-                items.Add(CreateDirectoryItem(werPath, RiskCategory.SafeToDelete, "Отчёты об ошибках Windows"));
+                items.Add(CreateDirectoryItem(werPath, RiskCategory.SafeToDelete, Localizer.GetString("Scanner_System_Desc_ErrorReports")));
             }
         }
         catch (UnauthorizedAccessException) { }
@@ -294,9 +295,9 @@ public class SystemScanner : ScannerBase
                         Size = size,
                         LastAccess = GetLastAccess(path),
                         Risk = RiskCategory.SafeToDelete,
-                        Description = "Кэш Delivery Optimization (P2P обновления)",
-                        Explanation = "Windows использует P2P для раздачи обновлений другим ПК. Кэш безопасен для удаления",
-                        HowToRestore = "Перекачается автоматически при следующем обновлении Windows",
+                        Description = Localizer.GetString("Scanner_System_Desc_DeliveryOptimization"),
+                        Explanation = Localizer.GetString("Scanner_System_Expl_DeliveryOptimization"),
+                        HowToRestore = Localizer.GetString("Scanner_System_HowTo_DeliveryOptimization"),
                         IsDirectory = true,
                         IsSelected = true
                     });
@@ -331,9 +332,9 @@ public class SystemScanner : ScannerBase
                     Size = size,
                     LastAccess = GetLastAccess(d3dCache),
                     Risk = RiskCategory.SafeToDelete,
-                    Description = "DirectX Shader Cache",
-                    Explanation = "Предкомпилированные шейдеры GPU. Ускоряют запуск игр, но безопасны для удаления",
-                    HowToRestore = "Перекомпилируются автоматически при запуске игр (может быть подвисание 10-30 сек)",
+                    Description = Localizer.GetString("Scanner_System_Desc_ShaderCache"),
+                    Explanation = Localizer.GetString("Scanner_System_Expl_ShaderCache"),
+                    HowToRestore = Localizer.GetString("Scanner_System_HowTo_ShaderCache"),
                     IsDirectory = true,
                     IsSelected = true
                 });
@@ -364,10 +365,9 @@ public class SystemScanner : ScannerBase
                     Size = size,
                     LastAccess = GetLastAccess(windowsOld),
                     Risk = RiskCategory.PerformanceCache, // НЕ SafeToDelete — нужно подтверждение
-                    Description = "⚠️ Windows.old — предыдущая установка Windows",
-                    Explanation = "Содержит файлы предыдущей версии Windows. Может занимать 10-30 ГБ. " +
-                                  "После удаления откат к предыдущей версии Windows НЕВОЗМОЖЕН",
-                    HowToRestore = "⛔ НЕВОССТАНОВИМО. Удаляйте только если уверены, что текущая Windows работает стабильно",
+                    Description = Localizer.GetString("Scanner_System_Desc_WindowsOld"),
+                    Explanation = Localizer.GetString("Scanner_System_Expl_WindowsOld"),
+                    HowToRestore = Localizer.GetString("Scanner_System_HowTo_WindowsOld"),
                     IsDirectory = true,
                     IsSelected = false // Не выбирать автоматически!
                 });
@@ -398,9 +398,9 @@ public class SystemScanner : ScannerBase
                     Size = GetFileSize(fullDump),
                     LastAccess = GetLastAccess(fullDump),
                     Risk = RiskCategory.SafeToDelete,
-                    Description = "Полный дамп памяти (MEMORY.DMP)",
-                    Explanation = "Дамп создаётся при BSOD. Размер = объём RAM. Нужен только для расследования причины",
-                    HowToRestore = "Создастся новый при следующем BSOD (если случится)",
+                    Description = Localizer.GetString("Scanner_System_Desc_MemoryDump"),
+                    Explanation = Localizer.GetString("Scanner_System_Expl_MemoryDump"),
+                    HowToRestore = Localizer.GetString("Scanner_System_HowTo_MemoryDump"),
                     IsDirectory = false,
                     IsSelected = true
                 });
@@ -424,9 +424,9 @@ public class SystemScanner : ScannerBase
                         Size = size,
                         LastAccess = GetLastAccess(miniDumpDir),
                         Risk = RiskCategory.SafeToDelete,
-                        Description = "Мини-дампы BSOD (Minidump)",
-                        Explanation = "Маленькие дампы при синих экранах. Полезны для диагностики, но обычно не нужны",
-                        HowToRestore = "Создадутся при следующем BSOD",
+                        Description = Localizer.GetString("Scanner_System_Desc_Minidumps"),
+                        Explanation = Localizer.GetString("Scanner_System_Expl_Minidumps"),
+                        HowToRestore = Localizer.GetString("Scanner_System_HowTo_Minidumps"),
                         IsDirectory = true,
                         IsSelected = true
                     });
@@ -459,9 +459,9 @@ public class SystemScanner : ScannerBase
                         Size = size,
                         LastAccess = GetLastAccess(patchCache),
                         Risk = RiskCategory.PerformanceCache,
-                        Description = "Кэш патчей Windows Installer ($PatchCache$)",
-                        Explanation = "Кэш для быстрого применения обновлений MSI-пакетов. Удаление безопасно, но обновление/ремонт программ будет запрашивать диск",
-                        HowToRestore = "Пересоздаётся при установке/обновлении программ через MSI",
+                        Description = Localizer.GetString("Scanner_System_Desc_PatchCache"),
+                        Explanation = Localizer.GetString("Scanner_System_Expl_PatchCache"),
+                        HowToRestore = Localizer.GetString("Scanner_System_HowTo_PatchCache"),
                         IsDirectory = true,
                         IsSelected = false
                     });
@@ -495,9 +495,9 @@ public class SystemScanner : ScannerBase
                     Size = size,
                     LastAccess = GetLastAccess(fontCache),
                     Risk = RiskCategory.SafeToDelete,
-                    Description = "Кэш шрифтов Windows",
-                    Explanation = "Индекс шрифтов для ускорения рендеринга текста",
-                    HowToRestore = "Пересоздаётся автоматически. Первый запуск приложений может быть чуть медленнее",
+                    Description = Localizer.GetString("Scanner_System_Desc_FontCache"),
+                    Explanation = Localizer.GetString("Scanner_System_Expl_FontCache"),
+                    HowToRestore = Localizer.GetString("Scanner_System_HowTo_FontCache"),
                     IsDirectory = true,
                     IsSelected = true
                 });
@@ -530,9 +530,9 @@ public class SystemScanner : ScannerBase
                         Size = size,
                         LastAccess = GetLastAccess(iconCache),
                         Risk = RiskCategory.SafeToDelete,
-                        Description = "Кэш иконок Windows (IconCache.db)",
-                        Explanation = "Кэш иконок проводника. При повреждении иконки отображаются неправильно",
-                        HowToRestore = "Пересоздаётся после перезагрузки. Иконки могут временно отображаться как белые квадраты",
+                        Description = Localizer.GetString("Scanner_System_Desc_IconCache"),
+                        Explanation = Localizer.GetString("Scanner_System_Expl_IconCache"),
+                        HowToRestore = Localizer.GetString("Scanner_System_HowTo_IconCache"),
                         IsDirectory = false,
                         IsSelected = true
                     });
@@ -561,9 +561,9 @@ public class SystemScanner : ScannerBase
                         Size = totalThumb,
                         LastAccess = GetLastAccess(explorerCache),
                         Risk = RiskCategory.SafeToDelete,
-                        Description = "Кэш миниатюр Explorer (thumbcache)",
-                        Explanation = "Кэшированные превью изображений/видео в проводнике",
-                        HowToRestore = "Пересоздаётся при просмотре папок. Первое открытие папки с фото будет медленнее",
+                        Description = Localizer.GetString("Scanner_System_Desc_Thumbcache"),
+                        Explanation = Localizer.GetString("Scanner_System_Expl_Thumbcache"),
+                        HowToRestore = Localizer.GetString("Scanner_System_HowTo_Thumbcache"),
                         IsDirectory = true,
                         IsSelected = true
                     });
