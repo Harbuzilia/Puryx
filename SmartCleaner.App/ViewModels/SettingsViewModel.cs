@@ -9,6 +9,7 @@ using SmartCleaner.Core.Safety;
 using SmartCleaner.Core.Services;
 using SmartCleaner.Core.Shell;
 using SmartCleaner.Core.SystemOpt;
+using SmartCleaner.Core.Localization;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Windows;
@@ -39,7 +40,12 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty]
     private int _selectedThemeIndex;
 
-    public IReadOnlyList<string> ThemeOptions { get; } = ["Системная", "Тёмная", "Светлая"];
+    public IReadOnlyList<string> ThemeOptions { get; } =
+    [
+        Localizer.GetString("Settings_ThemeSystem"),
+        Localizer.GetString("Settings_ThemeDark"),
+        Localizer.GetString("Settings_ThemeLight")
+    ];
 
     // ─── Язык интерфейса (ROADMAP v3.1, фаза L) ───
 
@@ -168,7 +174,7 @@ public partial class SettingsViewModel : ObservableObject
                 AvailableDrives.Add(new DriveInfoViewModel
                 {
                     Path = drive.RootDirectory.FullName,
-                    Label = $"{drive.Name} ({drive.VolumeLabel}) - Свободно {free} из {total}",
+                    Label = Localizer.GetString("Settings_DriveLabel", drive.Name, drive.VolumeLabel, free, total),
                     IsSelected = true
                 });
             }
@@ -218,7 +224,7 @@ public partial class SettingsViewModel : ObservableObject
         if (IsAnalyzeMenuEnabled)
         {
             var (ok, msg) = _shellManager.RegisterAnalyzeFolder();
-            if (!ok) MessageBox.Show(msg, "Интеграция в Проводник", MessageBoxButton.OK, MessageBoxImage.Warning);
+            if (!ok) MessageBox.Show(msg, Localizer.GetString("Settings_Caption_ExplorerIntegration"), MessageBoxButton.OK, MessageBoxImage.Warning);
         }
         else
         {
@@ -232,7 +238,7 @@ public partial class SettingsViewModel : ObservableObject
         if (IsShredMenuEnabled)
         {
             var (ok, msg) = _shellManager.RegisterShredder();
-            if (!ok) MessageBox.Show(msg, "Интеграция в Проводник", MessageBoxButton.OK, MessageBoxImage.Warning);
+            if (!ok) MessageBox.Show(msg, Localizer.GetString("Settings_Caption_ExplorerIntegration"), MessageBoxButton.OK, MessageBoxImage.Warning);
         }
         else
         {
@@ -246,7 +252,7 @@ public partial class SettingsViewModel : ObservableObject
         if (IsCompactMenuEnabled)
         {
             var (ok, msg) = _shellManager.RegisterCompact();
-            if (!ok) MessageBox.Show(msg, "Интеграция в Проводник", MessageBoxButton.OK, MessageBoxImage.Warning);
+            if (!ok) MessageBox.Show(msg, Localizer.GetString("Settings_Caption_ExplorerIntegration"), MessageBoxButton.OK, MessageBoxImage.Warning);
         }
         else
         {
@@ -268,7 +274,7 @@ public partial class SettingsViewModel : ObservableObject
                 TotalRamBytes = totalRam > 0
                     ? totalRam
                     : (long)GC.GetGCMemoryInfo().TotalAvailableMemoryBytes,
-                TotalFreedFormatted = "Анализ системы завершен"
+                TotalFreedFormatted = Localizer.GetString("Settings_Report_AnalysisComplete")
             };
 
             await _reportGenerator.GenerateAndOpenReportAsync(reportData);
@@ -276,7 +282,7 @@ public partial class SettingsViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Ошибка генерации отчета: {ex.Message}", "Отчет системы", MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show(Localizer.GetString("Settings_Status_ReportError", ex.Message), Localizer.GetString("Settings_Caption_Report"), MessageBoxButton.OK, MessageBoxImage.Warning);
         }
     }
 
@@ -323,7 +329,7 @@ public partial class SettingsViewModel : ObservableObject
     {
         var dialog = new Microsoft.Win32.OpenFolderDialog
         {
-            Title = "Выберите папку для сканирования"
+            Title = Localizer.GetString("Common_SelectFolderForScan")
         };
 
         if (dialog.ShowDialog() == true)

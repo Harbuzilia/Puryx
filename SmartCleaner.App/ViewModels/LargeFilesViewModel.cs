@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
 using SmartCleaner.Core.Helpers;
 using SmartCleaner.Core.LargeFiles;
+using SmartCleaner.Core.Localization;
 using SmartCleaner.Core.Models;
 using SmartCleaner.Core.Safety;
 
@@ -26,7 +27,7 @@ public partial class LargeFilesViewModel : ObservableObject
     }
 
     [ObservableProperty] private bool _isScanning;
-    [ObservableProperty] private string _statusText = "Укажите папку и нажмите «Найти»";
+    [ObservableProperty] private string _statusText = Localizer.GetString("LargeFiles_Status_PressFind");
     [ObservableProperty] private string _scanPath = "";
     [ObservableProperty] private string _topNText = "50";
     [ObservableProperty] private string _minSizeText = "1"; // MB
@@ -37,7 +38,7 @@ public partial class LargeFilesViewModel : ObservableObject
     [RelayCommand]
     private void BrowseFolder()
     {
-        var dlg = new OpenFolderDialog { Title = "Выберите папку для поиска" };
+        var dlg = new OpenFolderDialog { Title = Localizer.GetString("LargeFiles_SelectFolderDialog") };
         if (dlg.ShowDialog() == true)
             ScanPath = dlg.FolderName;
     }
@@ -47,7 +48,7 @@ public partial class LargeFilesViewModel : ObservableObject
     {
         if (string.IsNullOrWhiteSpace(ScanPath) || !System.IO.Directory.Exists(ScanPath))
         {
-            StatusText = "⚠️ Укажите существующую папку";
+            StatusText = Localizer.GetString("Common_Status_InvalidFolder");
             return;
         }
 
@@ -71,10 +72,10 @@ public partial class LargeFilesViewModel : ObservableObject
 
             long totalSize = result.Sum(f => f.Size);
             TotalSizeFormatted = SizeFormatter.Format(totalSize);
-            StatusText = $"Найдено {result.Count} файлов, общий размер: {TotalSizeFormatted}";
+            StatusText = Localizer.GetString("LargeFiles_Status_Found", result.Count, TotalSizeFormatted);
         }
-        catch (OperationCanceledException) { StatusText = "Поиск отменён"; }
-        catch (Exception ex) { StatusText = $"Ошибка: {ex.Message}"; }
+        catch (OperationCanceledException) { StatusText = Localizer.GetString("Common_Status_SearchCancelled"); }
+        catch (Exception ex) { StatusText = Localizer.GetString("Common_Status_Error", ex.Message); }
         finally { IsScanning = false; _cts?.Dispose(); _cts = null; }
     }
 
@@ -82,7 +83,7 @@ public partial class LargeFilesViewModel : ObservableObject
     private void CancelScan()
     {
         _cts?.Cancel();
-        StatusText = "Отмена...";
+        StatusText = Localizer.GetString("Common_Status_Cancelling");
     }
 
     /// <summary>
@@ -129,13 +130,13 @@ public partial class LargeFilesViewModel : ObservableObject
 
         if (!validation.CanDelete)
         {
-            StatusText = $"⚠️ Заблокировано: {validation.BlockReason}";
+            StatusText = Localizer.GetString("LargeFiles_Status_Blocked", validation.BlockReason ?? "");
             return;
         }
 
         if (validation.RequiresElevation)
         {
-            StatusText = "⚠️ Файл требует прав администратора — удалите через контекстное меню проводника";
+            StatusText = Localizer.GetString("LargeFiles_Status_ElevationRequired");
             return;
         }
 
@@ -150,11 +151,11 @@ public partial class LargeFilesViewModel : ObservableObject
             });
 
             Files.Remove(file);
-            StatusText = $"🗑️ Удалено: {file.Name} ({file.SizeFormatted})";
+            StatusText = Localizer.GetString("LargeFiles_Status_Deleted", file.Name, file.SizeFormatted);
         }
         catch (Exception ex)
         {
-            StatusText = $"⚠️ Ошибка: {ex.Message}";
+            StatusText = Localizer.GetString("LargeFiles_Status_Error", ex.Message);
         }
     }
 }

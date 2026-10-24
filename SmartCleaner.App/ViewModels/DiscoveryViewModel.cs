@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SmartCleaner.Core.Helpers;
 using SmartCleaner.Core.Knowledge;
+using SmartCleaner.Core.Localization;
 using SmartCleaner.Core.Models;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -16,7 +17,7 @@ public partial class DiscoveryViewModel : ObservableObject
     private bool _isScanning;
 
     [ObservableProperty]
-    private string _statusText = "Выберите папку для сканирования";
+    private string _statusText = Localizer.GetString("Common_SelectFolderForScan");
 
     [ObservableProperty]
     private string _scanPath = "";
@@ -38,7 +39,7 @@ public partial class DiscoveryViewModel : ObservableObject
             return;
 
         IsScanning = true;
-        StatusText = $"Сканирование {ScanPath}...";
+        StatusText = Localizer.GetString("Discovery_Status_Scanning", ScanPath);
         DiscoveredApps.Clear();
 
         try
@@ -46,7 +47,7 @@ public partial class DiscoveryViewModel : ObservableObject
             var rootPath = Path.GetFullPath(ScanPath);
             if (!Directory.Exists(rootPath))
             {
-                StatusText = "Папка не существует";
+                StatusText = Localizer.GetString("Discovery_Status_FolderMissing");
                 return;
             }
 
@@ -62,11 +63,11 @@ public partial class DiscoveryViewModel : ObservableObject
                 }
             });
 
-            StatusText = $"Найдено {DiscoveredApps.Count} неизвестных приложений";
+            StatusText = Localizer.GetString("Discovery_Status_FoundApps", DiscoveredApps.Count);
         }
         catch (Exception ex)
         {
-            StatusText = $"Ошибка: {ex.Message}";
+            StatusText = Localizer.GetString("Common_Status_Error", ex.Message);
         }
         finally
         {

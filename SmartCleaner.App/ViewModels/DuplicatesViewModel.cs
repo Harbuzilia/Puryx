@@ -377,7 +377,7 @@ public partial class DuplicatesViewModel : ObservableObject
             IsProgressIndeterminate = false;
             StatusText = Localizer.GetString("Duplicates_Status_FoundCopies", found.Count, Path.GetFileName(SampleFilePath));
         }
-        catch (OperationCanceledException) { StatusText = Localizer.GetString("Duplicates_Status_SearchCancelled"); }
+        catch (OperationCanceledException) { StatusText = Localizer.GetString("Common_Status_SearchCancelled"); }
         catch (Exception ex) { StatusText = Localizer.GetString("Common_Status_Error", ex.Message); }
         finally { IsScanning = false; IsProgressIndeterminate = false; _cts?.Dispose(); _cts = null; }
     }

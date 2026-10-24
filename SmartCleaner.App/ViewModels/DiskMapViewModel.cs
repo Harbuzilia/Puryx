@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
 using SmartCleaner.Core.DiskMap;
 using SmartCleaner.Core.Helpers;
+using SmartCleaner.Core.Localization;
 
 namespace SmartCleaner.App.ViewModels;
 
@@ -21,7 +22,7 @@ public partial class DiskMapViewModel : ObservableObject
     }
 
     [ObservableProperty] private bool _isScanning;
-    [ObservableProperty] private string _statusText = "Выберите папку или диск для анализа";
+    [ObservableProperty] private string _statusText = Localizer.GetString("DiskMap_Status_PressAnalyze");
     [ObservableProperty] private string _scanPath = "";
     [ObservableProperty] private int _maxDepth = 5;
     [ObservableProperty] private DiskNode? _rootNode;
@@ -63,7 +64,7 @@ public partial class DiskMapViewModel : ObservableObject
 
         RootNode = tile.Node;
         RefreshTreemap();
-        StatusText = $"Переход в папку: {tile.DisplayName} ({SizeFormatter.Format(tile.Node.Size)})";
+        StatusText = Localizer.GetString("DiskMap_Status_DrillDown", tile.DisplayName, SizeFormatter.Format(tile.Node.Size));
     }
 
     [RelayCommand]
@@ -73,13 +74,13 @@ public partial class DiskMapViewModel : ObservableObject
         {
             RootNode = BreadcrumbHistory.Pop();
             RefreshTreemap();
-            StatusText = $"Возврат на уровень: {RootNode.Name}";
+            StatusText = Localizer.GetString("DiskMap_Status_DrillUp", RootNode.Name);
         }
         else if (OriginalRoot != null && RootNode != OriginalRoot)
         {
             RootNode = OriginalRoot;
             RefreshTreemap();
-            StatusText = $"Корень: {OriginalRoot.FullPath}";
+            StatusText = Localizer.GetString("DiskMap_Status_Root", OriginalRoot.FullPath);
         }
     }
 
@@ -97,16 +98,18 @@ public partial class DiskMapViewModel : ObservableObject
         }
 
         SelectedNodeInfo = $"📁 {value.Name}\n" +
-                          $"Размер: {SizeFormatter.Format(value.Size)}\n" +
-                          $"Доля: {value.Percentage:F1}%\n" +
-                          (value.IsFile ? "Файл" : $"Папка ({value.Children.Count} элементов)") +
+                          Localizer.GetString("DiskMap_NodeInfo_Size", SizeFormatter.Format(value.Size)) + "\n" +
+                          Localizer.GetString("DiskMap_NodeInfo_Share", value.Percentage.ToString("F1")) + "\n" +
+                          (value.IsFile
+                              ? Localizer.GetString("DiskMap_NodeInfo_File")
+                              : Localizer.GetString("DiskMap_NodeInfo_Folder", value.Children.Count)) +
                           $"\n{value.FullPath}";
     }
 
     [RelayCommand]
     private void BrowseFolder()
     {
-        var dlg = new OpenFolderDialog { Title = "Выберите папку для анализа" };
+        var dlg = new OpenFolderDialog { Title = Localizer.GetString("DiskMap_SelectFolderDialog") };
         if (dlg.ShowDialog() == true)
             ScanPath = dlg.FolderName;
     }
@@ -116,7 +119,7 @@ public partial class DiskMapViewModel : ObservableObject
     {
         if (string.IsNullOrWhiteSpace(ScanPath) || !System.IO.Directory.Exists(ScanPath))
         {
-            StatusText = "⚠️ Укажите существующую папку";
+            StatusText = Localizer.GetString("Common_Status_InvalidFolder");
             return;
         }
 
@@ -132,10 +135,10 @@ public partial class DiskMapViewModel : ObservableObject
             OriginalRoot = root;
             BreadcrumbHistory.Clear();
             RefreshTreemap();
-            StatusText = $"Готово • {SizeFormatter.Format(root.Size)} • {root.Children.Count} элементов";
+            StatusText = Localizer.GetString("DiskMap_Status_Done", SizeFormatter.Format(root.Size), root.Children.Count);
         }
-        catch (OperationCanceledException) { StatusText = "Сканирование отменено"; }
-        catch (Exception ex) { StatusText = $"Ошибка: {ex.Message}"; }
+        catch (OperationCanceledException) { StatusText = Localizer.GetString("Common_Status_ScanCancelled"); }
+        catch (Exception ex) { StatusText = Localizer.GetString("Common_Status_Error", ex.Message); }
         finally { IsScanning = false; _cts?.Dispose(); _cts = null; }
     }
 
@@ -143,7 +146,7 @@ public partial class DiskMapViewModel : ObservableObject
     private void CancelScan()
     {
         _cts?.Cancel();
-        StatusText = "Отмена...";
+        StatusText = Localizer.GetString("Common_Status_Cancelling");
     }
 
     /// <summary>
@@ -155,7 +158,7 @@ public partial class DiskMapViewModel : ObservableObject
         if (OriginalRoot != null)
         {
             RootNode = OriginalRoot;
-            StatusText = $"Корень: {OriginalRoot.FullPath}";
+            StatusText = Localizer.GetString("DiskMap_Status_Root", OriginalRoot.FullPath);
         }
     }
 

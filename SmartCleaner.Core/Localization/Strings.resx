@@ -1255,9 +1255,6 @@ Path: {6}</value>
   <data name="Duplicates_Status_FoundCopies" xml:space="preserve">
     <value>Found {0} copies of "{1}"</value>
   </data>
-  <data name="Duplicates_Status_SearchCancelled" xml:space="preserve">
-    <value>Search cancelled</value>
-  </data>
   <data name="Duplicates_Status_FolderAMissing" xml:space="preserve">
     <value>⚠️ Folder A does not exist</value>
   </data>
@@ -1785,5 +1782,95 @@ The file will be overwritten with zeros and random bytes in 3 passes. Recovery w
   </data>
   <data name="RamOptimizer_Status_Shredding" xml:space="preserve">
     <value>Irreversibly destroying the file (DoD 5220.22-M 3-Pass)...</value>
+  </data>
+  <data name="Common_Status_InvalidFolder" xml:space="preserve">
+    <value>⚠️ Specify an existing folder</value>
+  </data>
+  <data name="Discovery_Status_Scanning" xml:space="preserve">
+    <value>Scanning {0}...</value>
+  </data>
+  <data name="Discovery_Status_FolderMissing" xml:space="preserve">
+    <value>Folder does not exist</value>
+  </data>
+  <data name="Discovery_Status_FoundApps" xml:space="preserve">
+    <value>Found {0} unknown applications</value>
+  </data>
+  <data name="DiskMap_Status_PressAnalyze" xml:space="preserve">
+    <value>Select a folder or drive to analyze</value>
+  </data>
+  <data name="DiskMap_Status_DrillDown" xml:space="preserve">
+    <value>Entering folder: {0} ({1})</value>
+  </data>
+  <data name="DiskMap_Status_DrillUp" xml:space="preserve">
+    <value>Going back one level: {0}</value>
+  </data>
+  <data name="DiskMap_Status_Root" xml:space="preserve">
+    <value>Root: {0}</value>
+  </data>
+  <data name="DiskMap_Status_Done" xml:space="preserve">
+    <value>Done • {0} • {1} items</value>
+  </data>
+  <data name="DiskMap_NodeInfo_Size" xml:space="preserve">
+    <value>Size: {0}</value>
+  </data>
+  <data name="DiskMap_NodeInfo_Share" xml:space="preserve">
+    <value>Share: {0}%</value>
+  </data>
+  <data name="DiskMap_NodeInfo_File" xml:space="preserve">
+    <value>File</value>
+  </data>
+  <data name="DiskMap_NodeInfo_Folder" xml:space="preserve">
+    <value>Folder ({0} items)</value>
+  </data>
+  <data name="DiskMap_SelectFolderDialog" xml:space="preserve">
+    <value>Select a folder to analyze</value>
+  </data>
+  <data name="LargeFiles_Status_PressFind" xml:space="preserve">
+    <value>Select a folder and press "Find"</value>
+  </data>
+  <data name="LargeFiles_SelectFolderDialog" xml:space="preserve">
+    <value>Select a folder to search</value>
+  </data>
+  <data name="LargeFiles_Status_Found" xml:space="preserve">
+    <value>Found {0} files, total size: {1}</value>
+  </data>
+  <data name="Common_Status_SearchCancelled" xml:space="preserve">
+    <value>Search cancelled</value>
+  </data>
+  <data name="LargeFiles_Status_Blocked" xml:space="preserve">
+    <value>⚠️ Blocked: {0}</value>
+  </data>
+  <data name="LargeFiles_Status_ElevationRequired" xml:space="preserve">
+    <value>⚠️ The file requires administrator rights — delete it via the Explorer context menu</value>
+  </data>
+  <data name="LargeFiles_Status_Deleted" xml:space="preserve">
+    <value>🗑️ Deleted: {0} ({1})</value>
+  </data>
+  <data name="LargeFiles_Status_Error" xml:space="preserve">
+    <value>⚠️ Error: {0}</value>
+  </data>
+  <data name="Settings_ThemeSystem" xml:space="preserve">
+    <value>System</value>
+  </data>
+  <data name="Settings_ThemeDark" xml:space="preserve">
+    <value>Dark</value>
+  </data>
+  <data name="Settings_ThemeLight" xml:space="preserve">
+    <value>Light</value>
+  </data>
+  <data name="Settings_DriveLabel" xml:space="preserve">
+    <value>{0} ({1}) - {2} free of {3}</value>
+  </data>
+  <data name="Settings_Caption_ExplorerIntegration" xml:space="preserve">
+    <value>Explorer Integration</value>
+  </data>
+  <data name="Settings_Report_AnalysisComplete" xml:space="preserve">
+    <value>System analysis complete</value>
+  </data>
+  <data name="Settings_Status_ReportError" xml:space="preserve">
+    <value>Report generation error: {0}</value>
+  </data>
+  <data name="Settings_Caption_Report" xml:space="preserve">
+    <value>System Report</value>
   </data>
 </root>
