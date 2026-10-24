@@ -1,3 +1,4 @@
+using SmartCleaner.Core.Localization;
 using SmartCleaner.Core.Models;
 using SmartCleaner.Core.Safety;
 using SmartCleaner.Core.Services;
@@ -61,7 +62,7 @@ public class DiskUsageScanner : ScannerBase
                     continue;
                 }
 
-                progress?.Report($"Анализ диска: {root}");
+                progress?.Report(Localizer.GetString("Scanner_DiskUsage_Progress", root));
                 AnalyzeRoot(root, candidates, ct);
             }
         }, ct);
@@ -221,7 +222,7 @@ public class DiskUsageScanner : ScannerBase
             Risk = risk,
             Description = BuildDescription(directory.Name, size, risk, isDirectory: true),
             IsDirectory = true,
-            ParentApp = $"Корень: {rootPath}",
+            ParentApp = Localizer.GetString("Scanner_DiskUsage_Root", rootPath),
             IsSelected = risk == RiskCategory.SafeToDelete
         };
     }
@@ -239,7 +240,7 @@ public class DiskUsageScanner : ScannerBase
             Description = BuildDescription(file.Name, size, risk, isDirectory: false),
             IsDirectory = false,
             IsLocked = isLocked,
-            ParentApp = $"Корень: {rootPath}",
+            ParentApp = Localizer.GetString("Scanner_DiskUsage_Root", rootPath),
             IsSelected = risk == RiskCategory.SafeToDelete && !isLocked
         };
     }
@@ -279,15 +280,16 @@ public class DiskUsageScanner : ScannerBase
 
     private static string BuildDescription(string name, long size, RiskCategory risk, bool isDirectory)
     {
-        var prefix = isDirectory ? "Крупная папка" : "Крупный файл";
         var riskHint = risk switch
         {
-            RiskCategory.SafeToDelete => "можно удалить безопасно",
-            RiskCategory.PerformanceCache => "кэш/временные данные, удаление может замедлить первый запуск",
-            RiskCategory.UserData => "пользовательские данные, автоматическое удаление не рекомендуется",
-            _ => "требуется дополнительная проверка"
+            RiskCategory.SafeToDelete => Localizer.GetString("Scanner_DiskUsage_Hint_Safe"),
+            RiskCategory.PerformanceCache => Localizer.GetString("Scanner_DiskUsage_Hint_Performance"),
+            RiskCategory.UserData => Localizer.GetString("Scanner_DiskUsage_Hint_UserData"),
+            _ => Localizer.GetString("Scanner_DiskUsage_Hint_Default")
         };
 
-        return $"{prefix}: {name} ({FormatSize(size)}) — {riskHint}";
+        return Localizer.GetString(
+            isDirectory ? "Scanner_DiskUsage_Desc_Dir" : "Scanner_DiskUsage_Desc_File",
+            name, FormatSize(size), riskHint);
     }
 }

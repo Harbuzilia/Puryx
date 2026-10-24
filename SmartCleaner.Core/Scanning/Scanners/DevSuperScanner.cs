@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using SmartCleaner.Core.Helpers;
+using SmartCleaner.Core.Localization;
 using SmartCleaner.Core.Models;
 using SmartCleaner.Core.Safety;
 using System.IO;
@@ -41,7 +42,7 @@ public class DevSuperScanner : ScannerBase
         var userHome = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
         var localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
 
-        progress?.Report("Сканирование виртуальных дисков WSL2 и кэшей сборщика...");
+        progress?.Report(Localizer.GetString("Scanner_Dev_Progress"));
 
         // 1. WSL2 VHDX Virtual Disks
         try
@@ -65,9 +66,9 @@ public class DevSuperScanner : ScannerBase
                             Path = vhdx,
                             Size = fi.Length,
                             LastAccess = fi.LastWriteTime,
-                            Description = $"Виртуальный диск Linux WSL2 ({Path.GetFileName(dir)})",
-                            Explanation = "Файл образа диска WSL2. Занимает место на диске даже после удаления файлов внутри Linux. Подлежит сжатию.",
-                            HowToRestore = "Используйте встроенную функцию сжатия WSL для высвобождения неиспользуемых блоков без потери данных.",
+                            Description = Localizer.GetString("Scanner_Dev_Desc_WslVhdx", Path.GetFileName(dir)),
+                            Explanation = Localizer.GetString("Scanner_Dev_Expl_WslPackages"),
+                            HowToRestore = Localizer.GetString("Scanner_Dev_HowTo_Wsl"),
                             Risk = RiskCategory.PerformanceCache,
                             IsDirectory = false
                         });
@@ -90,8 +91,8 @@ public class DevSuperScanner : ScannerBase
                         Path = vhdx,
                         Size = fi.Length,
                         LastAccess = fi.LastWriteTime,
-                        Description = $"Виртуальный диск Linux WSL2 ({Path.GetFileName(Path.GetDirectoryName(vhdx))})",
-                        Explanation = "Образ диска дистрибутива WSL2.",
+                        Description = Localizer.GetString("Scanner_Dev_Desc_WslVhdx", Path.GetFileName(Path.GetDirectoryName(vhdx)) ?? string.Empty),
+                        Explanation = Localizer.GetString("Scanner_Dev_Expl_WslDirect"),
                         Risk = RiskCategory.PerformanceCache,
                         IsDirectory = false
                     });
@@ -105,35 +106,35 @@ public class DevSuperScanner : ScannerBase
 
         // 2. Rust Cargo Caches
         var cargoCache = Path.Combine(userHome, ".cargo", "registry", "cache");
-        AddDirectoryIfFound(items, cargoCache, "Rust Cargo Registry Cache", "Кэшированные .crate архивы пакетов Rust", "Скачиваются автоматически командой cargo build", RiskCategory.SafeToDelete);
+        AddDirectoryIfFound(items, cargoCache, "Rust Cargo Registry Cache", "Scanner_Dev_Desc_CargoCache", "Scanner_Dev_HowTo_CargoCache", RiskCategory.SafeToDelete);
 
         var cargoGitDb = Path.Combine(userHome, ".cargo", "git", "db");
-        AddDirectoryIfFound(items, cargoGitDb, "Rust Cargo Git Database", "Git-репозитории зависимостей Cargo", "Склонируются заново при следующей сборке", RiskCategory.SafeToDelete);
+        AddDirectoryIfFound(items, cargoGitDb, "Rust Cargo Git Database", "Scanner_Dev_Desc_CargoGitDb", "Scanner_Dev_HowTo_CargoGitDb", RiskCategory.SafeToDelete);
 
         // 3. Gradle Caches & Daemons
         var gradleCaches = Path.Combine(userHome, ".gradle", "caches");
-        AddDirectoryIfFound(items, gradleCaches, "Gradle Build Caches", "Кэшированные зависимости и артефакты сборки Gradle", "Загружаются заново при запуске сборки gradle", RiskCategory.SafeToDelete);
+        AddDirectoryIfFound(items, gradleCaches, "Gradle Build Caches", "Scanner_Dev_Desc_GradleCaches", "Scanner_Dev_HowTo_GradleCaches", RiskCategory.SafeToDelete);
 
         var gradleDaemon = Path.Combine(userHome, ".gradle", "daemon");
-        AddDirectoryIfFound(items, gradleDaemon, "Gradle Daemon Logs", "Логи и временные файлы фоновых процессов Gradle", "Не влияют на сборку", RiskCategory.SafeToDelete);
+        AddDirectoryIfFound(items, gradleDaemon, "Gradle Daemon Logs", "Scanner_Dev_Desc_GradleDaemon", "Scanner_Dev_HowTo_GradleDaemon", RiskCategory.SafeToDelete);
 
         var gradleWrapper = Path.Combine(userHome, ".gradle", "wrapper", "dists");
-        AddDirectoryIfFound(items, gradleWrapper, "Gradle Wrapper Dists", "Старые распакованные дистрибутивы Gradle Wrapper", "Wrapper скачает нужную версию при необходимости", RiskCategory.PerformanceCache);
+        AddDirectoryIfFound(items, gradleWrapper, "Gradle Wrapper Dists", "Scanner_Dev_Desc_GradleWrapper", "Scanner_Dev_HowTo_GradleWrapper", RiskCategory.PerformanceCache);
 
         // 4. Maven Repository
         var m2Repo = Path.Combine(userHome, ".m2", "repository");
-        AddDirectoryIfFound(items, m2Repo, "Maven Local Repository", "Локальный кэш Java зависимостей Maven (.m2)", "Maven загрузит зависимости из репозиториев при сборке", RiskCategory.PerformanceCache);
+        AddDirectoryIfFound(items, m2Repo, "Maven Local Repository", "Scanner_Dev_Desc_M2Repo", "Scanner_Dev_HowTo_M2Repo", RiskCategory.PerformanceCache);
 
         // 5. Go Build & Module Caches
         var goBuild = Path.Combine(localAppData, "go-build");
-        AddDirectoryIfFound(items, goBuild, "Go Build Cache", "Кэш инкрементальной сборки компилятора Go", "Создается автоматически", RiskCategory.SafeToDelete);
+        AddDirectoryIfFound(items, goBuild, "Go Build Cache", "Scanner_Dev_Desc_GoBuild", "Scanner_Dev_HowTo_GoBuild", RiskCategory.SafeToDelete);
 
         var goPkgMod = Path.Combine(userHome, "go", "pkg", "mod", "cache");
-        AddDirectoryIfFound(items, goPkgMod, "Go Module Cache", "Кэшированные исходные коды модулей Go", "Загружаются командой go mod download", RiskCategory.SafeToDelete);
+        AddDirectoryIfFound(items, goPkgMod, "Go Module Cache", "Scanner_Dev_Desc_GoPkgMod", "Scanner_Dev_HowTo_GoPkgMod", RiskCategory.SafeToDelete);
 
         // 6. Android SDK Temp & Snapshots
         var androidTemp = Path.Combine(localAppData, "Android", "Sdk", ".temp");
-        AddDirectoryIfFound(items, androidTemp, "Android SDK Temp", "Временные файлы загрузки компонентов Android SDK", "Удаление безопасно", RiskCategory.SafeToDelete);
+        AddDirectoryIfFound(items, androidTemp, "Android SDK Temp", "Scanner_Dev_Desc_AndroidTemp", "Scanner_Dev_HowTo_AndroidTemp", RiskCategory.SafeToDelete);
 
         var androidAvdSnapshots = AndroidAvdSnapshotsDirectory;
         if (Directory.Exists(androidAvdSnapshots))
@@ -144,7 +145,7 @@ public class DevSuperScanner : ScannerBase
                 // циклический junction под корнем AVD не рывает перечисление снапшотов.
                 foreach (var snapDir in SafeEnumerateDirectoriesRecursive(androidAvdSnapshots, "snapshots"))
                 {
-                    AddDirectoryIfFound(items, snapDir, "Android Emulator Snapshot", "Снимки состояния эмуляторов Android", "Снимок пересоздастся при закрытии эмулятора", RiskCategory.PerformanceCache);
+                    AddDirectoryIfFound(items, snapDir, "Android Emulator Snapshot", "Scanner_Dev_Desc_AndroidSnapshot", "Scanner_Dev_HowTo_AndroidSnapshot", RiskCategory.PerformanceCache);
                 }
             }
             catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[DevSuperScanner] Android snapshot enumeration error: {ex.Message}"); }
@@ -152,14 +153,14 @@ public class DevSuperScanner : ScannerBase
 
         // 7. Dart / Flutter Pub Cache
         var pubCache = Path.Combine(localAppData, "Pub", "Cache");
-        AddDirectoryIfFound(items, pubCache, "Flutter / Dart Pub Cache", "Кэш пакетов Flutter и Dart", "Пакеты загружаются командой flutter pub get", RiskCategory.PerformanceCache);
+        AddDirectoryIfFound(items, pubCache, "Flutter / Dart Pub Cache", "Scanner_Dev_Desc_PubCache", "Scanner_Dev_HowTo_PubCache", RiskCategory.PerformanceCache);
 
         // 8. Unity & Unreal Engine Caches
         var unityCache = Path.Combine(localAppData, "Unity", "cache");
-        AddDirectoryIfFound(items, unityCache, "Unity Editor Cache", "Кэши ассетов и шейдеров Unity", "Пересоздаются редактором Unity", RiskCategory.SafeToDelete);
+        AddDirectoryIfFound(items, unityCache, "Unity Editor Cache", "Scanner_Dev_Desc_UnityCache", "Scanner_Dev_HowTo_UnityCache", RiskCategory.SafeToDelete);
 
         var unrealDdc = Path.Combine(localAppData, "UnrealEngine", "Common", "DerivedDataCache");
-        AddDirectoryIfFound(items, unrealDdc, "Unreal Engine Derived Data Cache (DDC)", "Скомпилированные ассеты и шейдеры Unreal Engine", "Перегенерируются движком", RiskCategory.SafeToDelete);
+        AddDirectoryIfFound(items, unrealDdc, "Unreal Engine Derived Data Cache (DDC)", "Scanner_Dev_Desc_UnrealDdc", "Scanner_Dev_HowTo_UnrealDdc", RiskCategory.SafeToDelete);
 
         var result = new ScanResult
         {
@@ -171,7 +172,7 @@ public class DevSuperScanner : ScannerBase
         return Task.FromResult(result);
     }
 
-    private void AddDirectoryIfFound(List<ScannedItem> items, string path, string name, string desc, string howToRestore, RiskCategory risk)
+    private void AddDirectoryIfFound(List<ScannedItem> items, string path, string name, string descKey, string howToRestoreKey, RiskCategory risk)
     {
         if (string.IsNullOrWhiteSpace(path) || !Directory.Exists(path)) return;
         if (IsProtectedScanTarget(path)) return; // гейт выдачи по реальному пути (findings M1)
@@ -181,6 +182,7 @@ public class DevSuperScanner : ScannerBase
             var size = CalculateDirectorySize(path);
             if (size > 0)
             {
+                var desc = Localizer.GetString(descKey);
                 items.Add(new ScannedItem
                 {
                     Path = path,
@@ -188,7 +190,7 @@ public class DevSuperScanner : ScannerBase
                     LastAccess = Directory.GetLastWriteTime(path),
                     Description = $"{name}: {desc}",
                     Explanation = desc,
-                    HowToRestore = howToRestore,
+                    HowToRestore = Localizer.GetString(howToRestoreKey),
                     Risk = risk,
                     IsDirectory = true
                 });

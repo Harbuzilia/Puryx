@@ -1,3 +1,4 @@
+using SmartCleaner.Core.Localization;
 using SmartCleaner.Core.Models;
 using SmartCleaner.Core.Safety;
 
@@ -46,82 +47,82 @@ public class CustomFolderScanner : ScannerBase
 
         await Task.Run(() =>
         {
-            progress?.Report($"Сканирование: {rootPath}");
+            progress?.Report(Localizer.GetString("Scanner_Custom_Progress", rootPath));
 
             // 1. node_modules
             ScanPattern(rootPath, "node_modules", items, ct,
                 RiskCategory.SafeToDelete,
-                "node_modules — зависимости Node.js проекта",
-                "Зависимости npm/yarn/pnpm. Восстанавливаются из package.json",
-                "Содержимое восстановится командой npm install",
+                "Scanner_Custom_Desc_NodeModules",
+                "Scanner_Custom_Expl_NodeModules",
+                "Scanner_Custom_HowTo_NodeModules",
                 "npm install");
 
             // 2. __pycache__
             ScanPattern(rootPath, "__pycache__", items, ct,
                 RiskCategory.SafeToDelete,
-                "__pycache__ — скомпилированные .pyc файлы Python",
-                "Python кэш байткода. Пересоздаётся автоматически при запуске",
-                "Создаётся автоматически при следующем запуске Python");
+                "Scanner_Custom_Desc_PyCache",
+                "Scanner_Custom_Expl_PyCache",
+                "Scanner_Custom_HowTo_PyCache");
 
             // 3. .pytest_cache
             ScanPattern(rootPath, ".pytest_cache", items, ct,
                 RiskCategory.SafeToDelete,
-                ".pytest_cache — кэш тестов pytest",
-                "Кэш результатов тестирования. Безопасен для удаления",
-                "Создаётся автоматически при запуске pytest");
+                "Scanner_Custom_Desc_PytestCache",
+                "Scanner_Custom_Expl_PytestCache",
+                "Scanner_Custom_HowTo_PytestCache");
 
             // 4. bin/obj (.NET artifacts)
             ScanPattern(rootPath, "bin", items, ct,
                 RiskCategory.SafeToDelete,
-                "bin — скомпилированные .NET артефакты",
-                "Результат сборки .NET проекта. Пересоздаётся при dotnet build",
-                "Пересоберётся при dotnet build / Visual Studio Build",
+                "Scanner_Custom_Desc_Bin",
+                "Scanner_Custom_Expl_Bin",
+                "Scanner_Custom_HowTo_Bin",
                 "dotnet build",
                 requireSibling: "*.csproj");
 
             ScanPattern(rootPath, "obj", items, ct,
                 RiskCategory.SafeToDelete,
-                "obj — промежуточные .NET артефакты",
-                "Промежуточные файлы сборки. Безопасны для удаления",
-                "Пересоздаются при dotnet build",
+                "Scanner_Custom_Desc_Obj",
+                "Scanner_Custom_Expl_Obj",
+                "Scanner_Custom_HowTo_Obj",
                 "dotnet build",
                 requireSibling: "*.csproj");
 
             // 5. dist / build output
             ScanPattern(rootPath, "dist", items, ct,
                 RiskCategory.SafeToDelete,
-                "dist — папка сборки проекта",
-                "Скомпилированный вывод фронтенда/бэкенда",
-                "Пересоберётся командой npm run build / vite build",
+                "Scanner_Custom_Desc_Dist",
+                "Scanner_Custom_Expl_Dist",
+                "Scanner_Custom_HowTo_Dist",
                 requireSibling: "package.json");
 
             ScanPattern(rootPath, "build", items, ct,
                 RiskCategory.SafeToDelete,
-                "build — папка сборки проекта",
-                "Результат сборки проекта",
-                "Пересоберётся при следующей сборке",
+                "Scanner_Custom_Desc_Build",
+                "Scanner_Custom_Expl_Build",
+                "Scanner_Custom_HowTo_Build",
                 requireSibling: "package.json");
 
             // 6. .cache
             ScanPattern(rootPath, ".cache", items, ct,
                 RiskCategory.SafeToDelete,
-                ".cache — папка кэша инструментов",
-                "Общий кэш сборщиков (Parcel, Babel, ESLint и др.)",
-                "Создаётся автоматически при запуске инструмента");
+                "Scanner_Custom_Desc_Cache",
+                "Scanner_Custom_Expl_Cache",
+                "Scanner_Custom_HowTo_Cache");
 
             // 7. .venv / venv / env
             ScanPattern(rootPath, ".venv", items, ct,
                 RiskCategory.PerformanceCache,
-                ".venv — виртуальное окружение Python",
-                "Python virtual environment. Содержит установленные зависимости",
-                "Воссоздаётся: python -m venv .venv && pip install -r requirements.txt",
+                "Scanner_Custom_Desc_DotVenv",
+                "Scanner_Custom_Expl_VenvFull",
+                "Scanner_Custom_HowTo_VenvFull",
                 "python -m venv .venv && pip install -r requirements.txt");
 
             ScanPattern(rootPath, "venv", items, ct,
                 RiskCategory.PerformanceCache,
-                "venv — виртуальное окружение Python",
-                "Python virtual environment",
-                "Воссоздаётся: python -m venv venv",
+                "Scanner_Custom_Desc_Venv",
+                "Scanner_Custom_Expl_Venv",
+                "Scanner_Custom_HowTo_Venv",
                 "python -m venv venv");
 
             // 8. Temp/tmp файлы в корне
@@ -130,27 +131,27 @@ public class CustomFolderScanner : ScannerBase
             // 9. .next (Next.js cache)
             ScanPattern(rootPath, ".next", items, ct,
                 RiskCategory.SafeToDelete,
-                ".next — кэш сборки Next.js",
-                "Кэш сборки и HMR Next.js фреймворка",
-                "Пересоздаётся при npm run dev / npm run build",
+                "Scanner_Custom_Desc_Next",
+                "Scanner_Custom_Expl_Next",
+                "Scanner_Custom_HowTo_Next",
                 "npm run build",
                 requireSibling: "next.config.*");
 
             // 10. .nuxt (Nuxt.js cache)
             ScanPattern(rootPath, ".nuxt", items, ct,
                 RiskCategory.SafeToDelete,
-                ".nuxt — кэш сборки Nuxt.js",
-                "Кэш сборки Nuxt.js фреймворка",
-                "Пересоздаётся при npm run dev",
+                "Scanner_Custom_Desc_Nuxt",
+                "Scanner_Custom_Expl_Nuxt",
+                "Scanner_Custom_HowTo_Nuxt",
                 "npm run dev",
                 requireSibling: "nuxt.config.*");
 
             // 11. coverage
             ScanPattern(rootPath, "coverage", items, ct,
                 RiskCategory.SafeToDelete,
-                "coverage — отчёты покрытия тестами",
-                "Сгенерированные отчёты coverage. Безопасны для удаления",
-                "Пересоздаются при запуске тестов с --coverage");
+                "Scanner_Custom_Desc_Coverage",
+                "Scanner_Custom_Expl_Coverage",
+                "Scanner_Custom_HowTo_Coverage");
 
         }, ct);
 
@@ -171,15 +172,15 @@ public class CustomFolderScanner : ScannerBase
     /// <param name="items">Список результатов</param>
     /// <param name="ct">Токен отмены</param>
     /// <param name="risk">Категория риска</param>
-    /// <param name="description">Описание</param>
-    /// <param name="explanation">Что это и зачем</param>
-    /// <param name="howToRestore">Как восстановить</param>
+    /// <param name="descKey">Ключ описания</param>
+    /// <param name="explKey">Ключ пояснения (что это и зачем)</param>
+    /// <param name="howToKey">Ключ восстановления</param>
     /// <param name="restoreCommand">Команда восстановления</param>
     /// <param name="requireSibling">Паттерн файла-соседа (*.csproj, package.json)</param>
     private void ScanPattern(
         string rootPath, string folderName, List<ScannedItem> items,
-        CancellationToken ct, RiskCategory risk, string description,
-        string? explanation = null, string? howToRestore = null,
+        CancellationToken ct, RiskCategory risk, string descKey,
+        string? explKey = null, string? howToKey = null,
         string? restoreCommand = null, string? requireSibling = null)
     {
         try
@@ -221,9 +222,9 @@ public class CustomFolderScanner : ScannerBase
                             Size = size,
                             LastAccess = GetLastAccess(subDir),
                             Risk = risk,
-                            Description = description,
-                            Explanation = explanation,
-                            HowToRestore = howToRestore,
+                            Description = Localizer.GetString(descKey),
+                            Explanation = explKey is null ? null : Localizer.GetString(explKey),
+                            HowToRestore = howToKey is null ? null : Localizer.GetString(howToKey),
                             RestoreCommand = restoreCommand,
                             IsDirectory = true,
                             IsSelected = risk == RiskCategory.SafeToDelete
@@ -284,8 +285,8 @@ public class CustomFolderScanner : ScannerBase
                         Size = size,
                         LastAccess = GetLastAccess(file),
                         Risk = RiskCategory.SafeToDelete,
-                        Description = $"Временный файл: {Path.GetFileName(file)}",
-                        Explanation = "Временный/резервный файл. Безопасен для удаления",
+                        Description = Localizer.GetString("Scanner_Custom_Desc_TempFile", Path.GetFileName(file)),
+                        Explanation = Localizer.GetString("Scanner_Custom_Expl_TempFile"),
                         IsDirectory = false,
                         IsSelected = true
                     });

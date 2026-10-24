@@ -3256,4 +3256,244 @@ Windows может использовать эти драйверы прямо �
   <data name="Scanner_AppCache_Expl_OfficeRecent" xml:space="preserve">
     <value>Ярлыки к недавно открытым документам. Документы НЕ удаляются</value>
   </data>
+  <data name="Scanner_Dev_Progress" xml:space="preserve">
+    <value>Сканирование виртуальных дисков WSL2 и кэшей сборщика...</value>
+  </data>
+  <data name="Scanner_Dev_Desc_WslVhdx" xml:space="preserve">
+    <value>Виртуальный диск Linux WSL2 ({0})</value>
+  </data>
+  <data name="Scanner_Dev_Expl_WslPackages" xml:space="preserve">
+    <value>Файл образа диска WSL2. Занимает место на диске даже после удаления файлов внутри Linux. Подлежит сжатию.</value>
+  </data>
+  <data name="Scanner_Dev_HowTo_Wsl" xml:space="preserve">
+    <value>Используйте встроенную функцию сжатия WSL для высвобождения неиспользуемых блоков без потери данных.</value>
+  </data>
+  <data name="Scanner_Dev_Expl_WslDirect" xml:space="preserve">
+    <value>Образ диска дистрибутива WSL2.</value>
+  </data>
+  <data name="Scanner_Dev_Desc_CargoCache" xml:space="preserve">
+    <value>Кэшированные .crate архивы пакетов Rust</value>
+  </data>
+  <data name="Scanner_Dev_HowTo_CargoCache" xml:space="preserve">
+    <value>Скачиваются автоматически командой cargo build</value>
+  </data>
+  <data name="Scanner_Dev_Desc_CargoGitDb" xml:space="preserve">
+    <value>Git-репозитории зависимостей Cargo</value>
+  </data>
+  <data name="Scanner_Dev_HowTo_CargoGitDb" xml:space="preserve">
+    <value>Склонируются заново при следующей сборке</value>
+  </data>
+  <data name="Scanner_Dev_Desc_GradleCaches" xml:space="preserve">
+    <value>Кэшированные зависимости и артефакты сборки Gradle</value>
+  </data>
+  <data name="Scanner_Dev_HowTo_GradleCaches" xml:space="preserve">
+    <value>Загружаются заново при запуске сборки gradle</value>
+  </data>
+  <data name="Scanner_Dev_Desc_GradleDaemon" xml:space="preserve">
+    <value>Логи и временные файлы фоновых процессов Gradle</value>
+  </data>
+  <data name="Scanner_Dev_HowTo_GradleDaemon" xml:space="preserve">
+    <value>Не влияют на сборку</value>
+  </data>
+  <data name="Scanner_Dev_Desc_GradleWrapper" xml:space="preserve">
+    <value>Старые распакованные дистрибутивы Gradle Wrapper</value>
+  </data>
+  <data name="Scanner_Dev_HowTo_GradleWrapper" xml:space="preserve">
+    <value>Wrapper скачает нужную версию при необходимости</value>
+  </data>
+  <data name="Scanner_Dev_Desc_M2Repo" xml:space="preserve">
+    <value>Локальный кэш Java зависимостей Maven (.m2)</value>
+  </data>
+  <data name="Scanner_Dev_HowTo_M2Repo" xml:space="preserve">
+    <value>Maven загрузит зависимости из репозиториев при сборке</value>
+  </data>
+  <data name="Scanner_Dev_Desc_GoBuild" xml:space="preserve">
+    <value>Кэш инкрементальной сборки компилятора Go</value>
+  </data>
+  <data name="Scanner_Dev_HowTo_GoBuild" xml:space="preserve">
+    <value>Создается автоматически</value>
+  </data>
+  <data name="Scanner_Dev_Desc_GoPkgMod" xml:space="preserve">
+    <value>Кэшированные исходные коды модулей Go</value>
+  </data>
+  <data name="Scanner_Dev_HowTo_GoPkgMod" xml:space="preserve">
+    <value>Загружаются командой go mod download</value>
+  </data>
+  <data name="Scanner_Dev_Desc_AndroidTemp" xml:space="preserve">
+    <value>Временные файлы загрузки компонентов Android SDK</value>
+  </data>
+  <data name="Scanner_Dev_HowTo_AndroidTemp" xml:space="preserve">
+    <value>Удаление безопасно</value>
+  </data>
+  <data name="Scanner_Dev_Desc_AndroidSnapshot" xml:space="preserve">
+    <value>Снимки состояния эмуляторов Android</value>
+  </data>
+  <data name="Scanner_Dev_HowTo_AndroidSnapshot" xml:space="preserve">
+    <value>Снимок пересоздастся при закрытии эмулятора</value>
+  </data>
+  <data name="Scanner_Dev_Desc_PubCache" xml:space="preserve">
+    <value>Кэш пакетов Flutter и Dart</value>
+  </data>
+  <data name="Scanner_Dev_HowTo_PubCache" xml:space="preserve">
+    <value>Пакеты загружаются командой flutter pub get</value>
+  </data>
+  <data name="Scanner_Dev_Desc_UnityCache" xml:space="preserve">
+    <value>Кэши ассетов и шейдеров Unity</value>
+  </data>
+  <data name="Scanner_Dev_HowTo_UnityCache" xml:space="preserve">
+    <value>Пересоздаются редактором Unity</value>
+  </data>
+  <data name="Scanner_Dev_Desc_UnrealDdc" xml:space="preserve">
+    <value>Скомпилированные ассеты и шейдеры Unreal Engine</value>
+  </data>
+  <data name="Scanner_Dev_HowTo_UnrealDdc" xml:space="preserve">
+    <value>Перегенерируются движком</value>
+  </data>
+  <data name="Scanner_DiskUsage_Progress" xml:space="preserve">
+    <value>Анализ диска: {0}</value>
+  </data>
+  <data name="Scanner_DiskUsage_Root" xml:space="preserve">
+    <value>Корень: {0}</value>
+  </data>
+  <data name="Scanner_DiskUsage_Desc_Dir" xml:space="preserve">
+    <value>Крупная папка: {0} ({1}) — {2}</value>
+  </data>
+  <data name="Scanner_DiskUsage_Desc_File" xml:space="preserve">
+    <value>Крупный файл: {0} ({1}) — {2}</value>
+  </data>
+  <data name="Scanner_DiskUsage_Hint_Safe" xml:space="preserve">
+    <value>можно удалить безопасно</value>
+  </data>
+  <data name="Scanner_DiskUsage_Hint_Performance" xml:space="preserve">
+    <value>кэш/временные данные, удаление может замедлить первый запуск</value>
+  </data>
+  <data name="Scanner_DiskUsage_Hint_UserData" xml:space="preserve">
+    <value>пользовательские данные, автоматическое удаление не рекомендуется</value>
+  </data>
+  <data name="Scanner_DiskUsage_Hint_Default" xml:space="preserve">
+    <value>требуется дополнительная проверка</value>
+  </data>
+  <data name="Scanner_Custom_Progress" xml:space="preserve">
+    <value>Сканирование: {0}</value>
+  </data>
+  <data name="Scanner_Custom_Desc_TempFile" xml:space="preserve">
+    <value>Временный файл: {0}</value>
+  </data>
+  <data name="Scanner_Custom_Expl_TempFile" xml:space="preserve">
+    <value>Временный/резервный файл. Безопасен для удаления</value>
+  </data>
+  <data name="Scanner_Custom_Desc_NodeModules" xml:space="preserve">
+    <value>node_modules — зависимости Node.js проекта</value>
+  </data>
+  <data name="Scanner_Custom_Expl_NodeModules" xml:space="preserve">
+    <value>Зависимости npm/yarn/pnpm. Восстанавливаются из package.json</value>
+  </data>
+  <data name="Scanner_Custom_HowTo_NodeModules" xml:space="preserve">
+    <value>Содержимое восстановится командой npm install</value>
+  </data>
+  <data name="Scanner_Custom_Desc_PyCache" xml:space="preserve">
+    <value>__pycache__ — скомпилированные .pyc файлы Python</value>
+  </data>
+  <data name="Scanner_Custom_Expl_PyCache" xml:space="preserve">
+    <value>Python кэш байткода. Пересоздаётся автоматически при запуске</value>
+  </data>
+  <data name="Scanner_Custom_HowTo_PyCache" xml:space="preserve">
+    <value>Создаётся автоматически при следующем запуске Python</value>
+  </data>
+  <data name="Scanner_Custom_Desc_PytestCache" xml:space="preserve">
+    <value>.pytest_cache — кэш тестов pytest</value>
+  </data>
+  <data name="Scanner_Custom_Expl_PytestCache" xml:space="preserve">
+    <value>Кэш результатов тестирования. Безопасен для удаления</value>
+  </data>
+  <data name="Scanner_Custom_HowTo_PytestCache" xml:space="preserve">
+    <value>Создаётся автоматически при запуске pytest</value>
+  </data>
+  <data name="Scanner_Custom_Desc_Bin" xml:space="preserve">
+    <value>bin — скомпилированные .NET артефакты</value>
+  </data>
+  <data name="Scanner_Custom_Expl_Bin" xml:space="preserve">
+    <value>Результат сборки .NET проекта. Пересоздаётся при dotnet build</value>
+  </data>
+  <data name="Scanner_Custom_HowTo_Bin" xml:space="preserve">
+    <value>Пересоберётся при dotnet build / Visual Studio Build</value>
+  </data>
+  <data name="Scanner_Custom_Desc_Obj" xml:space="preserve">
+    <value>obj — промежуточные .NET артефакты</value>
+  </data>
+  <data name="Scanner_Custom_Expl_Obj" xml:space="preserve">
+    <value>Промежуточные файлы сборки. Безопасны для удаления</value>
+  </data>
+  <data name="Scanner_Custom_HowTo_Obj" xml:space="preserve">
+    <value>Пересоздаются при dotnet build</value>
+  </data>
+  <data name="Scanner_Custom_Desc_Dist" xml:space="preserve">
+    <value>dist — папка сборки проекта</value>
+  </data>
+  <data name="Scanner_Custom_Expl_Dist" xml:space="preserve">
+    <value>Скомпилированный вывод фронтенда/бэкенда</value>
+  </data>
+  <data name="Scanner_Custom_HowTo_Dist" xml:space="preserve">
+    <value>Пересоберётся командой npm run build / vite build</value>
+  </data>
+  <data name="Scanner_Custom_Desc_Build" xml:space="preserve">
+    <value>build — папка сборки проекта</value>
+  </data>
+  <data name="Scanner_Custom_Expl_Build" xml:space="preserve">
+    <value>Результат сборки проекта</value>
+  </data>
+  <data name="Scanner_Custom_HowTo_Build" xml:space="preserve">
+    <value>Пересоберётся при следующей сборке</value>
+  </data>
+  <data name="Scanner_Custom_Desc_Cache" xml:space="preserve">
+    <value>.cache — папка кэша инструментов</value>
+  </data>
+  <data name="Scanner_Custom_Expl_Cache" xml:space="preserve">
+    <value>Общий кэш сборщиков (Parcel, Babel, ESLint и др.)</value>
+  </data>
+  <data name="Scanner_Custom_HowTo_Cache" xml:space="preserve">
+    <value>Создаётся автоматически при запуске инструмента</value>
+  </data>
+  <data name="Scanner_Custom_Desc_DotVenv" xml:space="preserve">
+    <value>.venv — виртуальное окружение Python</value>
+  </data>
+  <data name="Scanner_Custom_Expl_VenvFull" xml:space="preserve">
+    <value>Python virtual environment. Содержит установленные зависимости</value>
+  </data>
+  <data name="Scanner_Custom_HowTo_VenvFull" xml:space="preserve">
+    <value>Воссоздаётся: python -m venv .venv &amp;&amp; pip install -r requirements.txt</value>
+  </data>
+  <data name="Scanner_Custom_Expl_Venv" xml:space="preserve">
+    <value>Python virtual environment</value>
+  </data>
+  <data name="Scanner_Custom_HowTo_Venv" xml:space="preserve">
+    <value>Воссоздаётся: python -m venv venv</value>
+  </data>
+  <data name="Scanner_Custom_Desc_Next" xml:space="preserve">
+    <value>.next — кэш сборки Next.js</value>
+  </data>
+  <data name="Scanner_Custom_Expl_Next" xml:space="preserve">
+    <value>Кэш сборки и HMR Next.js фреймворка</value>
+  </data>
+  <data name="Scanner_Custom_HowTo_Next" xml:space="preserve">
+    <value>Пересоздаётся при npm run dev / npm run build</value>
+  </data>
+  <data name="Scanner_Custom_Desc_Nuxt" xml:space="preserve">
+    <value>.nuxt — кэш сборки Nuxt.js</value>
+  </data>
+  <data name="Scanner_Custom_Expl_Nuxt" xml:space="preserve">
+    <value>Кэш сборки Nuxt.js фреймворка</value>
+  </data>
+  <data name="Scanner_Custom_HowTo_Nuxt" xml:space="preserve">
+    <value>Пересоздаётся при npm run dev</value>
+  </data>
+  <data name="Scanner_Custom_Desc_Coverage" xml:space="preserve">
+    <value>coverage — отчёты покрытия тестами</value>
+  </data>
+  <data name="Scanner_Custom_Expl_Coverage" xml:space="preserve">
+    <value>Сгенерированные отчёты coverage. Безопасны для удаления</value>
+  </data>
+  <data name="Scanner_Custom_HowTo_Coverage" xml:space="preserve">
+    <value>Пересоздаются при запуске тестов с --coverage</value>
+  </data>
 </root>
