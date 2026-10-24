@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using SmartCleaner.Core.Localization;
 using SmartCleaner.Core.Startup;
 
 namespace SmartCleaner.App.ViewModels;
@@ -21,7 +22,7 @@ public partial class StartupViewModel : ObservableObject
     public ObservableCollection<StartupItemViewModel> Items { get; } = [];
 
     [ObservableProperty] private bool _isLoading;
-    [ObservableProperty] private string _statusText = "Нажмите «Обновить» для сканирования";
+    [ObservableProperty] private string _statusText = Localizer.GetString("Startup_Status_PressRefresh");
     [ObservableProperty] private StartupItemViewModel? _selectedItem;
     [ObservableProperty] private int _totalCount;
     [ObservableProperty] private int _enabledCount;
@@ -39,7 +40,7 @@ public partial class StartupViewModel : ObservableObject
     private async Task RefreshAsync()
     {
         IsLoading = true;
-        StatusText = "Сканирование автозагрузки...";
+        StatusText = Localizer.GetString("Startup_Status_Scanning");
 
         try
         {
@@ -49,13 +50,13 @@ public partial class StartupViewModel : ObservableObject
 
             TotalCount = _allItems.Count;
             EnabledCount = _allItems.Count(i => i.IsEnabled);
-            StatusText = $"Найдено {TotalCount} элементов ({EnabledCount} активных)";
+            StatusText = Localizer.GetString("Startup_Status_Found", TotalCount, EnabledCount);
 
             ApplyFilter();
         }
         catch (Exception ex)
         {
-            StatusText = $"Ошибка: {ex.Message}";
+            StatusText = Localizer.GetString("Common_Status_Error", ex.Message);
         }
         finally
         {
@@ -80,11 +81,13 @@ public partial class StartupViewModel : ObservableObject
         {
             itemVm.IsEnabled = itemVm.Item.IsEnabled;
             EnabledCount = _allItems.Count(i => i.IsEnabled);
-            StatusText = $"{(itemVm.IsEnabled ? "✅ Включено" : "⛔ Отключено")}: {itemVm.Name}";
+            StatusText = itemVm.IsEnabled
+                ? Localizer.GetString("Startup_Status_Enabled", itemVm.Name)
+                : Localizer.GetString("Startup_Status_Disabled", itemVm.Name);
         }
         else
         {
-            StatusText = $"⚠️ Ошибка: не удалось изменить «{itemVm.Name}». Требуются права администратора?";
+            StatusText = Localizer.GetString("Startup_Status_ToggleFailed", itemVm.Name);
         }
     }
 
@@ -100,11 +103,11 @@ public partial class StartupViewModel : ObservableObject
             _allItems.Remove(itemVm.Item);
             TotalCount = _allItems.Count;
             EnabledCount = _allItems.Count(i => i.IsEnabled);
-            StatusText = $"🗑️ Удалено: {itemVm.Name}";
+            StatusText = Localizer.GetString("Startup_Status_Deleted", itemVm.Name);
         }
         else
         {
-            StatusText = $"⚠️ Ошибка удаления «{itemVm.Name}». Требуются права администратора?";
+            StatusText = Localizer.GetString("Startup_Status_DeleteFailed", itemVm.Name);
         }
     }
 

@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using SmartCleaner.Core.Localization;
 using SmartCleaner.Core.Scheduler;
 
 namespace SmartCleaner.App.ViewModels;
@@ -23,7 +24,7 @@ public partial class SchedulerViewModel : ObservableObject
     [ObservableProperty] private int _selectedProfileIndex; // 0=Быстрая, 1=Разработка, 2=Полное
     [ObservableProperty] private string _statusText = "";
     [ObservableProperty] private bool _isTaskRegistered;
-    [ObservableProperty] private string _lastRunText = "Нет данных";
+    [ObservableProperty] private string _lastRunText = Localizer.GetString("Scheduler_NoData");
 
     /// <summary>
     /// Ограничивает час диапазоном 0-23.
@@ -43,8 +44,25 @@ public partial class SchedulerViewModel : ObservableObject
         else if (value > 59) Minute = 59;
     }
 
-    public string[] Intervals { get; } = ["Ежедневно", "Еженедельно", "Ежемесячно"];
-    public string[] DaysOfWeek { get; } = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"];
+    // Названия интервалов и дней недели — display-only (в настройки
+    // персистятся индексы/"Daily"/"Weekly"/"Monthly"), поэтому локализуются.
+    // Profiles — функциональные токены Core (CleaningProfileMap), не переводятся.
+    public string[] Intervals { get; } =
+    [
+        Localizer.GetString("Scheduler_IntervalDaily"),
+        Localizer.GetString("Scheduler_IntervalWeekly"),
+        Localizer.GetString("Scheduler_IntervalMonthly")
+    ];
+    public string[] DaysOfWeek { get; } =
+    [
+        Localizer.GetString("Scheduler_DayMonday"),
+        Localizer.GetString("Scheduler_DayTuesday"),
+        Localizer.GetString("Scheduler_DayWednesday"),
+        Localizer.GetString("Scheduler_DayThursday"),
+        Localizer.GetString("Scheduler_DayFriday"),
+        Localizer.GetString("Scheduler_DaySaturday"),
+        Localizer.GetString("Scheduler_DaySunday")
+    ];
     public string[] Profiles { get; } = ["Быстрая", "Разработка", "Полное"];
 
     /// <summary>
@@ -61,7 +79,7 @@ public partial class SchedulerViewModel : ObservableObject
         Hour = s.Hour;
         Minute = s.Minute;
         SelectedProfileIndex = s.Profile switch { "Разработка" => 1, "Полное" => 2, _ => 0 };
-        LastRunText = s.LastRun?.ToString("dd.MM.yyyy HH:mm") ?? "Нет данных";
+        LastRunText = s.LastRun?.ToString("dd.MM.yyyy HH:mm") ?? Localizer.GetString("Scheduler_NoData");
         _ = RefreshRegistrationStatusAsync();
     }
 
@@ -70,7 +88,9 @@ public partial class SchedulerViewModel : ObservableObject
         try
         {
             IsTaskRegistered = await _scheduler.IsTaskRegisteredAsync();
-            StatusText = IsTaskRegistered ? "✅ Задача зарегистрирована в планировщике" : "Задача не зарегистрирована";
+            StatusText = IsTaskRegistered
+                ? Localizer.GetString("Scheduler_Status_TaskRegistered")
+                : Localizer.GetString("Scheduler_Status_TaskNotRegistered");
         }
         catch (Exception ex)
         {
@@ -100,12 +120,12 @@ public partial class SchedulerViewModel : ObservableObject
         {
             IsTaskRegistered = IsEnabled;
             StatusText = IsEnabled
-                ? "✅ Расписание сохранено и задача зарегистрирована!"
-                : "ℹ️ Планировщик отключён, задача удалена.";
+                ? Localizer.GetString("Scheduler_Status_Saved")
+                : Localizer.GetString("Scheduler_Status_Disabled");
         }
         else
         {
-            StatusText = "⚠️ Ошибка регистрации задачи. Попробуйте от имени администратора.";
+            StatusText = Localizer.GetString("Scheduler_Status_RegisterError");
         }
     }
 
@@ -119,6 +139,6 @@ public partial class SchedulerViewModel : ObservableObject
         await _scheduler.UnregisterTaskAsync();
         _scheduler.SaveSettings(new ScheduleSettings { IsEnabled = false });
         IsTaskRegistered = false;
-        StatusText = "🗑️ Задача удалена из планировщика.";
+        StatusText = Localizer.GetString("Scheduler_Status_TaskRemoved");
     }
 }

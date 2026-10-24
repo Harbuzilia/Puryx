@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SmartCleaner.Core.Helpers;
+using SmartCleaner.Core.Localization;
 using SmartCleaner.Core.Safety;
 using System.Collections.ObjectModel;
 using System.Windows;
@@ -15,7 +16,7 @@ public partial class QuarantineViewModel : ObservableObject
     private bool _isBusy;
 
     [ObservableProperty]
-    private string _statusText = "Управление изолированными объектами и точками отката";
+    private string _statusText = Localizer.GetString("Quarantine_Status_Ready");
 
     [ObservableProperty]
     private int _quarantinedCount;
@@ -47,11 +48,11 @@ public partial class QuarantineViewModel : ObservableObject
 
             QuarantinedCount = Items.Count;
             TotalSizeFormatted = SizeFormatter.Format(totalBytes);
-            StatusText = $"В карантине: {QuarantinedCount} элементов ({TotalSizeFormatted})";
+            StatusText = Localizer.GetString("Quarantine_Status_Items", QuarantinedCount, TotalSizeFormatted);
         }
         catch (Exception ex)
         {
-            StatusText = $"Ошибка загрузки: {ex.Message}";
+            StatusText = Localizer.GetString("Quarantine_Status_LoadError", ex.Message);
         }
         finally
         {
@@ -65,8 +66,8 @@ public partial class QuarantineViewModel : ObservableObject
         if (item == null) return;
 
         var result = MessageBox.Show(
-            $"Восстановить элемент '{item.Name}' на его исходное место:\n\n{item.OriginalPath}?",
-            "Восстановление из карантина",
+            Localizer.GetString("Quarantine_RestoreConfirmBody", item.Name, item.OriginalPath),
+            Localizer.GetString("Quarantine_RestoreConfirmTitle"),
             MessageBoxButton.YesNo,
             MessageBoxImage.Question);
 
@@ -81,17 +82,17 @@ public partial class QuarantineViewModel : ObservableObject
             {
                 Items.Remove(item);
                 QuarantinedCount = Items.Count;
-                MessageBox.Show(msg, "Восстановлено", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show(msg, Localizer.GetString("Quarantine_Caption_Restored"), MessageBoxButton.OK, MessageBoxImage.Information);
             }
             else
             {
-                MessageBox.Show(msg, "Ошибка восстановления", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(msg, Localizer.GetString("Quarantine_Caption_RestoreError"), MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
         catch (Exception ex)
         {
-            StatusText = $"Ошибка восстановления: {ex.Message}";
-            MessageBox.Show(ex.Message, "Ошибка восстановления", MessageBoxButton.OK, MessageBoxImage.Error);
+            StatusText = Localizer.GetString("Quarantine_Status_RestoreError", ex.Message);
+            MessageBox.Show(ex.Message, Localizer.GetString("Quarantine_Caption_RestoreError"), MessageBoxButton.OK, MessageBoxImage.Error);
         }
         finally
         {
@@ -105,8 +106,8 @@ public partial class QuarantineViewModel : ObservableObject
         if (item == null) return;
 
         var result = MessageBox.Show(
-            $"Удалить элемент '{item.Name}' из карантина НАВСЕГДА без возможности восстановления?",
-            "Удаление навсегда",
+            Localizer.GetString("Quarantine_PurgeConfirmBody", item.Name),
+            Localizer.GetString("Quarantine_PurgeConfirmTitle"),
             MessageBoxButton.YesNo,
             MessageBoxImage.Warning);
 
@@ -124,14 +125,14 @@ public partial class QuarantineViewModel : ObservableObject
             }
             else
             {
-                MessageBox.Show(message, "Ошибка удаления",
+                MessageBox.Show(message, Localizer.GetString("Quarantine_Caption_DeleteError"),
                     MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
         catch (Exception ex)
         {
-            StatusText = $"Ошибка удаления: {ex.Message}";
-            MessageBox.Show(ex.Message, "Ошибка удаления", MessageBoxButton.OK, MessageBoxImage.Error);
+            StatusText = Localizer.GetString("Quarantine_Status_DeleteError", ex.Message);
+            MessageBox.Show(ex.Message, Localizer.GetString("Quarantine_Caption_DeleteError"), MessageBoxButton.OK, MessageBoxImage.Error);
         }
         finally
         {

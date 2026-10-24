@@ -1334,4 +1334,199 @@ Physical space freed: {1}</value>
   <data name="Duplicates_Status_SampleSet" xml:space="preserve">
     <value>📄 Sample file: {0}</value>
   </data>
+  <data name="Startup_Status_PressRefresh" xml:space="preserve">
+    <value>Click "Refresh" to scan</value>
+  </data>
+  <data name="Startup_Status_Scanning" xml:space="preserve">
+    <value>Scanning startup entries...</value>
+  </data>
+  <data name="Startup_Status_Found" xml:space="preserve">
+    <value>Found {0} items ({1} active)</value>
+  </data>
+  <data name="Startup_Status_Enabled" xml:space="preserve">
+    <value>✅ Enabled: {0}</value>
+  </data>
+  <data name="Startup_Status_Disabled" xml:space="preserve">
+    <value>⛔ Disabled: {0}</value>
+  </data>
+  <data name="Startup_Status_ToggleFailed" xml:space="preserve">
+    <value>⚠️ Error: failed to change "{0}". Administrator privileges required?</value>
+  </data>
+  <data name="Startup_Status_Deleted" xml:space="preserve">
+    <value>🗑️ Deleted: {0}</value>
+  </data>
+  <data name="Startup_Status_DeleteFailed" xml:space="preserve">
+    <value>⚠️ Error deleting "{0}". Administrator privileges required?</value>
+  </data>
+  <data name="Uninstaller_Status_PressRefresh" xml:space="preserve">
+    <value>Click "Refresh list" to load installed apps</value>
+  </data>
+  <data name="Uninstaller_Status_ReadingRegistry" xml:space="preserve">
+    <value>Reading the registry and the list of installed programs...</value>
+  </data>
+  <data name="Uninstaller_Status_Found" xml:space="preserve">
+    <value>Found {0} installed apps ({1})</value>
+  </data>
+  <data name="Uninstaller_Status_LoadError" xml:space="preserve">
+    <value>Error loading apps: {0}</value>
+  </data>
+  <data name="Uninstaller_UninstallConfirmBody" xml:space="preserve">
+    <value>Start uninstalling the application:
+
+{0}
+Version: {1}
+Publisher: {2}
+
+After it finishes, an automatic search for leftover files and registry entries will run.</value>
+  </data>
+  <data name="Uninstaller_UninstallConfirmTitle" xml:space="preserve">
+    <value>Program Uninstall</value>
+  </data>
+  <data name="Uninstaller_Status_Launching" xml:space="preserve">
+    <value>Launching the uninstaller for {0}...</value>
+  </data>
+  <data name="Uninstaller_Caption_Uninstall" xml:space="preserve">
+    <value>Uninstall</value>
+  </data>
+  <data name="Uninstaller_Status_SearchingLeftovers" xml:space="preserve">
+    <value>Searching for leftover files ("tails") of {0}...</value>
+  </data>
+  <data name="Uninstaller_Status_FoundLeftovers" xml:space="preserve">
+    <value>Found {0} leftover files/registry entries for {1}</value>
+  </data>
+  <data name="Uninstaller_Status_DoneNoLeftovers" xml:space="preserve">
+    <value>Uninstall complete. No leftovers detected.</value>
+  </data>
+  <data name="Uninstaller_Status_UninstallError" xml:space="preserve">
+    <value>Uninstall error: {0}</value>
+  </data>
+  <data name="Uninstaller_Status_ScanningLeftovers" xml:space="preserve">
+    <value>Scanning for leftovers of {0}...</value>
+  </data>
+  <data name="Uninstaller_Status_FoundLeftoverItems" xml:space="preserve">
+    <value>Found {0} leftover items for {1}</value>
+  </data>
+  <data name="Uninstaller_Status_NoLeftovers" xml:space="preserve">
+    <value>No leftover files or registry entries found.</value>
+  </data>
+  <data name="Uninstaller_Status_LeftoversError" xml:space="preserve">
+    <value>Leftover search error: {0}</value>
+  </data>
+  <data name="Uninstaller_Status_CleaningLeftovers" xml:space="preserve">
+    <value>Cleaning leftover files and registry entries...</value>
+  </data>
+  <data name="Uninstaller_Status_LeftoversCleaned" xml:space="preserve">
+    <value>Successfully cleaned {0} leftover items (Freed: {1})!</value>
+  </data>
+  <data name="Uninstaller_LeftoversDoneBody" xml:space="preserve">
+    <value>Cleaned {0} items ({1}).</value>
+  </data>
+  <data name="Uninstaller_LeftoversSkippedPrefix" xml:space="preserve">
+    <value>
+
+Skipped {0}:
+</value>
+  </data>
+  <data name="Uninstaller_LeftoversSkippedMoreSuffix" xml:space="preserve">
+    <value>
+… and {0} more</value>
+  </data>
+  <data name="Uninstaller_Caption_CleanLeftovers" xml:space="preserve">
+    <value>Leftover Cleanup</value>
+  </data>
+  <data name="Uninstaller_Status_CleanLeftoversError" xml:space="preserve">
+    <value>Leftover cleanup error: {0}</value>
+  </data>
+  <data name="Uninstaller_Msg_CleanLeftoversFailed" xml:space="preserve">
+    <value>Failed to clean leftovers: {0}</value>
+  </data>
+  <data name="Quarantine_Status_Ready" xml:space="preserve">
+    <value>Managing quarantined items and restore points</value>
+  </data>
+  <data name="Quarantine_Status_Items" xml:space="preserve">
+    <value>In quarantine: {0} items ({1})</value>
+  </data>
+  <data name="Quarantine_Status_LoadError" xml:space="preserve">
+    <value>Load error: {0}</value>
+  </data>
+  <data name="Quarantine_RestoreConfirmBody" xml:space="preserve">
+    <value>Restore item '{0}' to its original location:
+
+{1}?</value>
+  </data>
+  <data name="Quarantine_RestoreConfirmTitle" xml:space="preserve">
+    <value>Restore from Quarantine</value>
+  </data>
+  <data name="Quarantine_Caption_Restored" xml:space="preserve">
+    <value>Restored</value>
+  </data>
+  <data name="Quarantine_Caption_RestoreError" xml:space="preserve">
+    <value>Restore Error</value>
+  </data>
+  <data name="Quarantine_Status_RestoreError" xml:space="preserve">
+    <value>Restore error: {0}</value>
+  </data>
+  <data name="Quarantine_PurgeConfirmBody" xml:space="preserve">
+    <value>Delete item '{0}' from quarantine FOREVER with no way to recover?</value>
+  </data>
+  <data name="Quarantine_PurgeConfirmTitle" xml:space="preserve">
+    <value>Permanent Deletion</value>
+  </data>
+  <data name="Quarantine_Caption_DeleteError" xml:space="preserve">
+    <value>Delete Error</value>
+  </data>
+  <data name="Quarantine_Status_DeleteError" xml:space="preserve">
+    <value>Delete error: {0}</value>
+  </data>
+  <data name="Scheduler_NoData" xml:space="preserve">
+    <value>No data</value>
+  </data>
+  <data name="Scheduler_IntervalDaily" xml:space="preserve">
+    <value>Daily</value>
+  </data>
+  <data name="Scheduler_IntervalWeekly" xml:space="preserve">
+    <value>Weekly</value>
+  </data>
+  <data name="Scheduler_IntervalMonthly" xml:space="preserve">
+    <value>Monthly</value>
+  </data>
+  <data name="Scheduler_DayMonday" xml:space="preserve">
+    <value>Monday</value>
+  </data>
+  <data name="Scheduler_DayTuesday" xml:space="preserve">
+    <value>Tuesday</value>
+  </data>
+  <data name="Scheduler_DayWednesday" xml:space="preserve">
+    <value>Wednesday</value>
+  </data>
+  <data name="Scheduler_DayThursday" xml:space="preserve">
+    <value>Thursday</value>
+  </data>
+  <data name="Scheduler_DayFriday" xml:space="preserve">
+    <value>Friday</value>
+  </data>
+  <data name="Scheduler_DaySaturday" xml:space="preserve">
+    <value>Saturday</value>
+  </data>
+  <data name="Scheduler_DaySunday" xml:space="preserve">
+    <value>Sunday</value>
+  </data>
+  <data name="Scheduler_Status_TaskRegistered" xml:space="preserve">
+    <value>✅ Task is registered in Task Scheduler</value>
+  </data>
+  <data name="Scheduler_Status_TaskNotRegistered" xml:space="preserve">
+    <value>Task is not registered</value>
+  </data>
+  <data name="Scheduler_Status_Saved" xml:space="preserve">
+    <value>✅ Schedule saved and task registered!</value>
+  </data>
+  <data name="Scheduler_Status_Disabled" xml:space="preserve">
+    <value>ℹ️ Scheduler disabled, task removed.</value>
+  </data>
+  <data name="Scheduler_Status_RegisterError" xml:space="preserve">
+    <value>⚠️ Task registration error. Try running as administrator.</value>
+  </data>
+  <data name="Scheduler_Status_TaskRemoved" xml:space="preserve">
+    <value>🗑️ Task removed from Task Scheduler.</value>
+  </data>
 </root>

@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SmartCleaner.Core.Helpers;
+using SmartCleaner.Core.Localization;
 using SmartCleaner.Core.Uninstaller;
 using System.Collections.ObjectModel;
 using System.Windows;
@@ -16,7 +17,7 @@ public partial class UninstallerViewModel : ObservableObject
     private bool _isLoading;
 
     [ObservableProperty]
-    private string _statusText = "Нажмите «Обновить список» для загрузки установленных приложений";
+    private string _statusText = Localizer.GetString("Uninstaller_Status_PressRefresh");
 
     [ObservableProperty]
     private string _searchText = string.Empty;
@@ -49,7 +50,7 @@ public partial class UninstallerViewModel : ObservableObject
         if (IsLoading) return;
 
         IsLoading = true;
-        StatusText = "Чтение реестра и списка установленных программ...";
+        StatusText = Localizer.GetString("Uninstaller_Status_ReadingRegistry");
 
         try
         {
@@ -67,11 +68,11 @@ public partial class UninstallerViewModel : ObservableObject
             TotalSizeFormatted = SizeFormatter.Format(totalBytes);
             ApplyFilter();
 
-            StatusText = $"Найдено {TotalAppsCount} установленных приложений ({TotalSizeFormatted})";
+            StatusText = Localizer.GetString("Uninstaller_Status_Found", TotalAppsCount, TotalSizeFormatted);
         }
         catch (Exception ex)
         {
-            StatusText = $"Ошибка загрузки приложений: {ex.Message}";
+            StatusText = Localizer.GetString("Uninstaller_Status_LoadError", ex.Message);
         }
         finally
         {
@@ -110,8 +111,8 @@ public partial class UninstallerViewModel : ObservableObject
         if (app == null || IsLoading) return;
 
         var result = MessageBox.Show(
-            $"Запустить деинсталляцию приложения:\n\n{app.DisplayName}\nВерсия: {app.DisplayVersion}\nИздатель: {app.Publisher}\n\nПосле завершения будет выполнен автоматический поиск оставшихся файлов и записей реестра («хвостов»).",
-            "Деинсталляция программы",
+            Localizer.GetString("Uninstaller_UninstallConfirmBody", app.DisplayName, app.DisplayVersion, app.Publisher),
+            Localizer.GetString("Uninstaller_UninstallConfirmTitle"),
             MessageBoxButton.YesNo,
             MessageBoxImage.Question);
 
@@ -120,17 +121,17 @@ public partial class UninstallerViewModel : ObservableObject
         IsLoading = true;
         try
         {
-            StatusText = $"Запуск деинсталлятора для {app.DisplayName}...";
+            StatusText = Localizer.GetString("Uninstaller_Status_Launching", app.DisplayName);
             var (success, msg) = await _engine.UninstallAppAsync(app);
 
             if (!success)
             {
                 // H1: честная причина отказа/кода завершения доходит до пользователя
-                MessageBox.Show(msg, "Деинсталляция", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(msg, Localizer.GetString("Uninstaller_Caption_Uninstall"), MessageBoxButton.OK, MessageBoxImage.Warning);
             }
 
             // Scan for leftovers regardless: даже при ненулевом коде выхода часть файлов могла удалиться
-            StatusText = $"Поиск остаточных файлов («хвостов») для {app.DisplayName}...";
+            StatusText = Localizer.GetString("Uninstaller_Status_SearchingLeftovers", app.DisplayName);
             var leftovers = await _hunter.FindLeftoversAsync(app);
 
             if (leftovers.Count > 0)
@@ -138,11 +139,11 @@ public partial class UninstallerViewModel : ObservableObject
                 CurrentLeftovers.Clear();
                 foreach (var l in leftovers) CurrentLeftovers.Add(l);
                 IsLeftoversVisible = true;
-                StatusText = $"Найдено {leftovers.Count} остаточных файлов/ключей реестра для {app.DisplayName}";
+                StatusText = Localizer.GetString("Uninstaller_Status_FoundLeftovers", leftovers.Count, app.DisplayName);
             }
             else if (success)
             {
-                StatusText = $"Деинсталляция завершена. Хвостов не обнаружено.";
+                StatusText = Localizer.GetString("Uninstaller_Status_DoneNoLeftovers");
                 AllApps.Remove(app);
                 FilteredApps.Remove(app);
                 TotalAppsCount = AllApps.Count;
@@ -155,7 +156,7 @@ public partial class UninstallerViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            StatusText = $"Ошибка деинсталляции: {ex.Message}";
+            StatusText = Localizer.GetString("Uninstaller_Status_UninstallError", ex.Message);
         }
         finally
         {
@@ -171,7 +172,7 @@ public partial class UninstallerViewModel : ObservableObject
         IsLoading = true;
         try
         {
-            StatusText = $"Поиск хвостов для {app.DisplayName}...";
+            StatusText = Localizer.GetString("Uninstaller_Status_ScanningLeftovers", app.DisplayName);
             var leftovers = await _hunter.FindLeftoversAsync(app);
 
             CurrentLeftovers.Clear();
@@ -179,12 +180,12 @@ public partial class UninstallerViewModel : ObservableObject
             IsLeftoversVisible = true;
 
             StatusText = leftovers.Count > 0
-                ? $"Найдено {leftovers.Count} остаточных элементов для {app.DisplayName}"
-                : $"Остаточных файлов и записей реестра не найдено.";
+                ? Localizer.GetString("Uninstaller_Status_FoundLeftoverItems", leftovers.Count, app.DisplayName)
+                : Localizer.GetString("Uninstaller_Status_NoLeftovers");
         }
         catch (Exception ex)
         {
-            StatusText = $"Ошибка поиска хвостов: {ex.Message}";
+            StatusText = Localizer.GetString("Uninstaller_Status_LeftoversError", ex.Message);
         }
         finally
         {
@@ -201,7 +202,7 @@ public partial class UninstallerViewModel : ObservableObject
         IsLoading = true;
         try
         {
-            StatusText = "Очистка остаточных файлов и записей реестра...";
+            StatusText = Localizer.GetString("Uninstaller_Status_CleaningLeftovers");
             var cleanResult = await _hunter.CleanLeftoversAsync(selected);
 
             // Из списка убираем только реально удалённые элементы
@@ -215,24 +216,26 @@ public partial class UninstallerViewModel : ObservableObject
                 IsLeftoversVisible = false;
             }
 
-            StatusText = $"Успешно вычищено {cleanResult.CleanedCount} остаточных элементов (Освобождено: {SizeFormatter.Format(cleanResult.SavedBytes)})!";
+            StatusText = Localizer.GetString("Uninstaller_Status_LeftoversCleaned", cleanResult.CleanedCount, SizeFormatter.Format(cleanResult.SavedBytes));
 
-            var summary = $"Очищено {cleanResult.CleanedCount} элементов ({SizeFormatter.Format(cleanResult.SavedBytes)}).";
+            var summary = Localizer.GetString("Uninstaller_LeftoversDoneBody", cleanResult.CleanedCount, SizeFormatter.Format(cleanResult.SavedBytes));
             if (cleanResult.SkippedMessages.Count > 0)
             {
-                summary += $"\n\nПропущено {cleanResult.SkippedMessages.Count}:\n" +
-                           string.Join("\n", cleanResult.SkippedMessages.Take(10));
+                summary += Localizer.GetString("Uninstaller_LeftoversSkippedPrefix", cleanResult.SkippedMessages.Count)
+                           + string.Join("\n", cleanResult.SkippedMessages.Take(10));
                 if (cleanResult.SkippedMessages.Count > 10)
-                    summary += $"\n… и ещё {cleanResult.SkippedMessages.Count - 10}";
+                    summary += Localizer.GetString("Uninstaller_LeftoversSkippedMoreSuffix", cleanResult.SkippedMessages.Count - 10);
             }
 
-            MessageBox.Show(summary, "Очистка хвостов", MessageBoxButton.OK,
+            MessageBox.Show(summary, Localizer.GetString("Uninstaller_Caption_CleanLeftovers"), MessageBoxButton.OK,
                 cleanResult.SkippedMessages.Count > 0 ? MessageBoxImage.Warning : MessageBoxImage.Information);
         }
         catch (Exception ex)
         {
-            StatusText = $"Ошибка очистки хвостов: {ex.Message}";
-            MessageBox.Show($"Не удалось очистить хвосты: {ex.Message}", "Очистка хвостов",
+            StatusText = Localizer.GetString("Uninstaller_Status_CleanLeftoversError", ex.Message);
+            MessageBox.Show(
+                Localizer.GetString("Uninstaller_Msg_CleanLeftoversFailed", ex.Message),
+                Localizer.GetString("Uninstaller_Caption_CleanLeftovers"),
                 MessageBoxButton.OK, MessageBoxImage.Warning);
         }
         finally

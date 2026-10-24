@@ -1334,4 +1334,199 @@
   <data name="Duplicates_Status_SampleSet" xml:space="preserve">
     <value>📄 Файл-образец: {0}</value>
   </data>
+  <data name="Startup_Status_PressRefresh" xml:space="preserve">
+    <value>Нажмите «Обновить» для сканирования</value>
+  </data>
+  <data name="Startup_Status_Scanning" xml:space="preserve">
+    <value>Сканирование автозагрузки...</value>
+  </data>
+  <data name="Startup_Status_Found" xml:space="preserve">
+    <value>Найдено {0} элементов ({1} активных)</value>
+  </data>
+  <data name="Startup_Status_Enabled" xml:space="preserve">
+    <value>✅ Включено: {0}</value>
+  </data>
+  <data name="Startup_Status_Disabled" xml:space="preserve">
+    <value>⛔ Отключено: {0}</value>
+  </data>
+  <data name="Startup_Status_ToggleFailed" xml:space="preserve">
+    <value>⚠️ Ошибка: не удалось изменить «{0}». Требуются права администратора?</value>
+  </data>
+  <data name="Startup_Status_Deleted" xml:space="preserve">
+    <value>🗑️ Удалено: {0}</value>
+  </data>
+  <data name="Startup_Status_DeleteFailed" xml:space="preserve">
+    <value>⚠️ Ошибка удаления «{0}». Требуются права администратора?</value>
+  </data>
+  <data name="Uninstaller_Status_PressRefresh" xml:space="preserve">
+    <value>Нажмите «Обновить список» для загрузки установленных приложений</value>
+  </data>
+  <data name="Uninstaller_Status_ReadingRegistry" xml:space="preserve">
+    <value>Чтение реестра и списка установленных программ...</value>
+  </data>
+  <data name="Uninstaller_Status_Found" xml:space="preserve">
+    <value>Найдено {0} установленных приложений ({1})</value>
+  </data>
+  <data name="Uninstaller_Status_LoadError" xml:space="preserve">
+    <value>Ошибка загрузки приложений: {0}</value>
+  </data>
+  <data name="Uninstaller_UninstallConfirmBody" xml:space="preserve">
+    <value>Запустить деинсталляцию приложения:
+
+{0}
+Версия: {1}
+Издатель: {2}
+
+После завершения будет выполнен автоматический поиск оставшихся файлов и записей реестра («хвостов»).</value>
+  </data>
+  <data name="Uninstaller_UninstallConfirmTitle" xml:space="preserve">
+    <value>Деинсталляция программы</value>
+  </data>
+  <data name="Uninstaller_Status_Launching" xml:space="preserve">
+    <value>Запуск деинсталлятора для {0}...</value>
+  </data>
+  <data name="Uninstaller_Caption_Uninstall" xml:space="preserve">
+    <value>Деинсталляция</value>
+  </data>
+  <data name="Uninstaller_Status_SearchingLeftovers" xml:space="preserve">
+    <value>Поиск остаточных файлов («хвостов») для {0}...</value>
+  </data>
+  <data name="Uninstaller_Status_FoundLeftovers" xml:space="preserve">
+    <value>Найдено {0} остаточных файлов/ключей реестра для {1}</value>
+  </data>
+  <data name="Uninstaller_Status_DoneNoLeftovers" xml:space="preserve">
+    <value>Деинсталляция завершена. Хвостов не обнаружено.</value>
+  </data>
+  <data name="Uninstaller_Status_UninstallError" xml:space="preserve">
+    <value>Ошибка деинсталляции: {0}</value>
+  </data>
+  <data name="Uninstaller_Status_ScanningLeftovers" xml:space="preserve">
+    <value>Поиск хвостов для {0}...</value>
+  </data>
+  <data name="Uninstaller_Status_FoundLeftoverItems" xml:space="preserve">
+    <value>Найдено {0} остаточных элементов для {1}</value>
+  </data>
+  <data name="Uninstaller_Status_NoLeftovers" xml:space="preserve">
+    <value>Остаточных файлов и записей реестра не найдено.</value>
+  </data>
+  <data name="Uninstaller_Status_LeftoversError" xml:space="preserve">
+    <value>Ошибка поиска хвостов: {0}</value>
+  </data>
+  <data name="Uninstaller_Status_CleaningLeftovers" xml:space="preserve">
+    <value>Очистка остаточных файлов и записей реестра...</value>
+  </data>
+  <data name="Uninstaller_Status_LeftoversCleaned" xml:space="preserve">
+    <value>Успешно вычищено {0} остаточных элементов (Освобождено: {1})!</value>
+  </data>
+  <data name="Uninstaller_LeftoversDoneBody" xml:space="preserve">
+    <value>Очищено {0} элементов ({1}).</value>
+  </data>
+  <data name="Uninstaller_LeftoversSkippedPrefix" xml:space="preserve">
+    <value>
+
+Пропущено {0}:
+</value>
+  </data>
+  <data name="Uninstaller_LeftoversSkippedMoreSuffix" xml:space="preserve">
+    <value>
+… и ещё {0}</value>
+  </data>
+  <data name="Uninstaller_Caption_CleanLeftovers" xml:space="preserve">
+    <value>Очистка хвостов</value>
+  </data>
+  <data name="Uninstaller_Status_CleanLeftoversError" xml:space="preserve">
+    <value>Ошибка очистки хвостов: {0}</value>
+  </data>
+  <data name="Uninstaller_Msg_CleanLeftoversFailed" xml:space="preserve">
+    <value>Не удалось очистить хвосты: {0}</value>
+  </data>
+  <data name="Quarantine_Status_Ready" xml:space="preserve">
+    <value>Управление изолированными объектами и точками отката</value>
+  </data>
+  <data name="Quarantine_Status_Items" xml:space="preserve">
+    <value>В карантине: {0} элементов ({1})</value>
+  </data>
+  <data name="Quarantine_Status_LoadError" xml:space="preserve">
+    <value>Ошибка загрузки: {0}</value>
+  </data>
+  <data name="Quarantine_RestoreConfirmBody" xml:space="preserve">
+    <value>Восстановить элемент '{0}' на его исходное место:
+
+{1}?</value>
+  </data>
+  <data name="Quarantine_RestoreConfirmTitle" xml:space="preserve">
+    <value>Восстановление из карантина</value>
+  </data>
+  <data name="Quarantine_Caption_Restored" xml:space="preserve">
+    <value>Восстановлено</value>
+  </data>
+  <data name="Quarantine_Caption_RestoreError" xml:space="preserve">
+    <value>Ошибка восстановления</value>
+  </data>
+  <data name="Quarantine_Status_RestoreError" xml:space="preserve">
+    <value>Ошибка восстановления: {0}</value>
+  </data>
+  <data name="Quarantine_PurgeConfirmBody" xml:space="preserve">
+    <value>Удалить элемент '{0}' из карантина НАВСЕГДА без возможности восстановления?</value>
+  </data>
+  <data name="Quarantine_PurgeConfirmTitle" xml:space="preserve">
+    <value>Удаление навсегда</value>
+  </data>
+  <data name="Quarantine_Caption_DeleteError" xml:space="preserve">
+    <value>Ошибка удаления</value>
+  </data>
+  <data name="Quarantine_Status_DeleteError" xml:space="preserve">
+    <value>Ошибка удаления: {0}</value>
+  </data>
+  <data name="Scheduler_NoData" xml:space="preserve">
+    <value>Нет данных</value>
+  </data>
+  <data name="Scheduler_IntervalDaily" xml:space="preserve">
+    <value>Ежедневно</value>
+  </data>
+  <data name="Scheduler_IntervalWeekly" xml:space="preserve">
+    <value>Еженедельно</value>
+  </data>
+  <data name="Scheduler_IntervalMonthly" xml:space="preserve">
+    <value>Ежемесячно</value>
+  </data>
+  <data name="Scheduler_DayMonday" xml:space="preserve">
+    <value>Понедельник</value>
+  </data>
+  <data name="Scheduler_DayTuesday" xml:space="preserve">
+    <value>Вторник</value>
+  </data>
+  <data name="Scheduler_DayWednesday" xml:space="preserve">
+    <value>Среда</value>
+  </data>
+  <data name="Scheduler_DayThursday" xml:space="preserve">
+    <value>Четверг</value>
+  </data>
+  <data name="Scheduler_DayFriday" xml:space="preserve">
+    <value>Пятница</value>
+  </data>
+  <data name="Scheduler_DaySaturday" xml:space="preserve">
+    <value>Суббота</value>
+  </data>
+  <data name="Scheduler_DaySunday" xml:space="preserve">
+    <value>Воскресенье</value>
+  </data>
+  <data name="Scheduler_Status_TaskRegistered" xml:space="preserve">
+    <value>✅ Задача зарегистрирована в планировщике</value>
+  </data>
+  <data name="Scheduler_Status_TaskNotRegistered" xml:space="preserve">
+    <value>Задача не зарегистрирована</value>
+  </data>
+  <data name="Scheduler_Status_Saved" xml:space="preserve">
+    <value>✅ Расписание сохранено и задача зарегистрирована!</value>
+  </data>
+  <data name="Scheduler_Status_Disabled" xml:space="preserve">
+    <value>ℹ️ Планировщик отключён, задача удалена.</value>
+  </data>
+  <data name="Scheduler_Status_RegisterError" xml:space="preserve">
+    <value>⚠️ Ошибка регистрации задачи. Попробуйте от имени администратора.</value>
+  </data>
+  <data name="Scheduler_Status_TaskRemoved" xml:space="preserve">
+    <value>🗑️ Задача удалена из планировщика.</value>
+  </data>
 </root>
