@@ -2178,4 +2178,205 @@ Windows может использовать эти драйверы прямо �
   <data name="Shredder_Error" xml:space="preserve">
     <value>Ошибка шредера: {0}</value>
   </data>
+  <data name="Services_StatusRunning" xml:space="preserve">
+    <value>🟢 Работает</value>
+  </data>
+  <data name="Services_StatusStopped" xml:space="preserve">
+    <value>⚪ Остановлена</value>
+  </data>
+  <data name="Services_StartupAuto" xml:space="preserve">
+    <value>Авто</value>
+  </data>
+  <data name="Services_StartupManual" xml:space="preserve">
+    <value>Вручную</value>
+  </data>
+  <data name="Services_StartupDisabled" xml:space="preserve">
+    <value>Отключена</value>
+  </data>
+  <data name="Services_StartupUnknown" xml:space="preserve">
+    <value>Неизвестно</value>
+  </data>
+  <data name="Services_RiskSafe" xml:space="preserve">
+    <value>Безопасно</value>
+  </data>
+  <data name="Services_RiskModerate" xml:space="preserve">
+    <value>Внимание</value>
+  </data>
+  <data name="Services_RiskCritical" xml:space="preserve">
+    <value>Критическая</value>
+  </data>
+  <data name="Services_Cat_Hardware" xml:space="preserve">
+    <value>Оборудование</value>
+  </data>
+  <data name="Services_Cat_System" xml:space="preserve">
+    <value>Система</value>
+  </data>
+  <data name="Services_Cat_Diagnostics" xml:space="preserve">
+    <value>Диагностика</value>
+  </data>
+  <data name="Services_Cat_Network" xml:space="preserve">
+    <value>Сеть и удаленный доступ</value>
+  </data>
+  <data name="Services_Cat_Xbox" xml:space="preserve">
+    <value>Xbox и игры</value>
+  </data>
+  <data name="Services_Fax_Name" xml:space="preserve">
+    <value>Служба факсов (Fax)</value>
+  </data>
+  <data name="Services_Fax_Description" xml:space="preserve">
+    <value>Отправка и прием факсов. Бесполезна на 99.9% современных домашних и игровых ПК.</value>
+  </data>
+  <data name="Services_RemoteRegistry_Name" xml:space="preserve">
+    <value>Дистанционный реестр (RemoteRegistry)</value>
+  </data>
+  <data name="Services_RemoteRegistry_Description" xml:space="preserve">
+    <value>Позволяет удаленным пользователям изменять системный реестр. Отключение повышает безопасность.</value>
+  </data>
+  <data name="Services_RetailDemo_Name" xml:space="preserve">
+    <value>Служба демонстрации (RetailDemo)</value>
+  </data>
+  <data name="Services_RetailDemo_Description" xml:space="preserve">
+    <value>Режим витрины для демонстрации возможностей Windows в магазинах электроники.</value>
+  </data>
+  <data name="Services_MapsBroker_Name" xml:space="preserve">
+    <value>Диспетчер скачанных карт (MapsBroker)</value>
+  </data>
+  <data name="Services_MapsBroker_Description" xml:space="preserve">
+    <value>Фоновая синхронизация и доступ к автономным офлайн-картам Windows Maps.</value>
+  </data>
+  <data name="Services_DiagTrack_Name" xml:space="preserve">
+    <value>Телеметрия и сбор событий (DiagTrack)</value>
+  </data>
+  <data name="Services_DiagTrack_Description" xml:space="preserve">
+    <value>Connected User Experiences and Telemetry. Сбор и передача логов на сервера Microsoft.</value>
+  </data>
+  <data name="Services_Dmwappush_Name" xml:space="preserve">
+    <value>Маршрутизация WAP Push (dmwappushservice)</value>
+  </data>
+  <data name="Services_Dmwappush_Description" xml:space="preserve">
+    <value>Служба маршрутизации push-сообщений телеметрии и диагностических данных.</value>
+  </data>
+  <data name="Services_AllJoynRouter_Name" xml:space="preserve">
+    <value>Маршрутизатор AllJoyn (AllJoynRouter)</value>
+  </data>
+  <data name="Services_AllJoynRouter_Description" xml:space="preserve">
+    <value>Служба взаимодействия с устройствами умного дома IoT по протоколу AllJoyn.</value>
+  </data>
+  <data name="Services_WerSvc_Name" xml:space="preserve">
+    <value>Служба отчетов об ошибках (WerSvc)</value>
+  </data>
+  <data name="Services_WerSvc_Description" xml:space="preserve">
+    <value>Формирование и фоновая отправка дампов и отчетов о крашах программ.</value>
+  </data>
+  <data name="Services_SysMain_Name" xml:space="preserve">
+    <value>Оптимизация запуска SysMain (SuperFetch)</value>
+  </data>
+  <data name="Services_SysMain_Description" xml:space="preserve">
+    <value>Кэширование часто используемых программ в RAM. На быстрых NVMe/SSD и в играх может вызывать микрофризы.</value>
+  </data>
+  <data name="Services_WSearch_Name" xml:space="preserve">
+    <value>Индексатор Windows Search (WSearch)</value>
+  </data>
+  <data name="Services_WSearch_Description" xml:space="preserve">
+    <value>Индексация содержимого файлов на дисках. В тяжелых играх периодически нагружает SSD/дисковый стек.</value>
+  </data>
+  <data name="Services_WbioSrvc_Name" xml:space="preserve">
+    <value>Биометрическая служба (WbioSrvc)</value>
+  </data>
+  <data name="Services_WbioSrvc_Description" xml:space="preserve">
+    <value>Обеспечивает работу сканера отпечатков пальцев и распознавания лица Windows Hello.</value>
+  </data>
+  <data name="Services_XblAuthManager_Name" xml:space="preserve">
+    <value>Аутентификация Xbox Live (XblAuthManager)</value>
+  </data>
+  <data name="Services_XblAuthManager_Description" xml:space="preserve">
+    <value>Управление учетными записями Xbox Live. Не требуется, если вы не играете в игры из Microsoft Store.</value>
+  </data>
+  <data name="Services_XboxGipSvc_Name" xml:space="preserve">
+    <value>Аксессуары Xbox (XboxGipSvc)</value>
+  </data>
+  <data name="Services_XboxGipSvc_Description" xml:space="preserve">
+    <value>Поддержка беспроводных геймпадов и аксессуаров Xbox. Не требуется при игре с мыши/клавиатуры.</value>
+  </data>
+  <data name="Services_Spooler_Name" xml:space="preserve">
+    <value>Диспетчер печати (Spooler)</value>
+  </data>
+  <data name="Services_Spooler_Description" xml:space="preserve">
+    <value>Очередь печати документов. Если к компьютеру не подключен принтер, служба не используется.</value>
+  </data>
+  <data name="Services_Progress_Configuring" xml:space="preserve">
+    <value>Настройка службы {0}...</value>
+  </data>
+  <data name="Services_Progress_Restoring" xml:space="preserve">
+    <value>Восстановление службы {0}...</value>
+  </data>
+  <data name="Network_Dns_Cloudflare" xml:space="preserve">
+    <value>Cloudflare (1.1.1.1) — Быстрый и приватный</value>
+  </data>
+  <data name="Network_Dns_Google" xml:space="preserve">
+    <value>Google Public DNS (8.8.8.8) — Надежный</value>
+  </data>
+  <data name="Network_Dns_Quad9" xml:space="preserve">
+    <value>Quad9 (9.9.9.9) — Защита от вредоносных сайтов</value>
+  </data>
+  <data name="Network_Dns_AdGuard" xml:space="preserve">
+    <value>AdGuard DNS — Блокировка рекламы</value>
+  </data>
+  <data name="Network_Progress_Resetting" xml:space="preserve">
+    <value>Сброс DNS-кэша и сокетов Winsock...</value>
+  </data>
+  <data name="Network_Error_FlushDns" xml:space="preserve">
+    <value>Не удалось очистить DNS-кэш (код {0}): {1}</value>
+  </data>
+  <data name="Network_Error_ArpReset" xml:space="preserve">
+    <value>Не удалось сбросить ARP-таблицу (код {0}): {1}</value>
+  </data>
+  <data name="Network_Success_Flush" xml:space="preserve">
+    <value>DNS-кэш успешно очищен, сетевые сокеты и ARP-таблица сброшены!</value>
+  </data>
+  <data name="Network_Error_ResetFailed" xml:space="preserve">
+    <value>Ошибка сброса сети: {0}</value>
+  </data>
+  <data name="Network_Error_InvalidPrimaryDns" xml:space="preserve">
+    <value>Недопустимый primary DNS: '{0}' (ожидается IP-адрес)</value>
+  </data>
+  <data name="Network_Error_InvalidSecondaryDns" xml:space="preserve">
+    <value>Недопустимый secondary DNS: '{0}' (ожидается IP-адрес)</value>
+  </data>
+  <data name="Network_Progress_ApplyingDns" xml:space="preserve">
+    <value>Установка DNS ({0}, {1})...</value>
+  </data>
+  <data name="Network_Error_ApplyDns" xml:space="preserve">
+    <value>Не удалось изменить DNS (код {0}): {1}</value>
+  </data>
+  <data name="Network_Success_DnsApplied" xml:space="preserve">
+    <value>DNS успешно изменен на {0} / {1}!</value>
+  </data>
+  <data name="Network_Error_DnsChangeFailed" xml:space="preserve">
+    <value>Ошибка смены DNS: {0}</value>
+  </data>
+  <data name="Network_Progress_ResettingDhcp" xml:space="preserve">
+    <value>Сброс DNS на автоматическое получение (DHCP)...</value>
+  </data>
+  <data name="Network_Error_ResetDns" xml:space="preserve">
+    <value>Не удалось сбросить DNS (код {0}): {1}</value>
+  </data>
+  <data name="Network_Success_DnsReset" xml:space="preserve">
+    <value>DNS успешно сброшен на автоматический (DHCP)!</value>
+  </data>
+  <data name="Network_Error_DnsResetFailed" xml:space="preserve">
+    <value>Ошибка сброса DNS: {0}</value>
+  </data>
+  <data name="Network_Error_InterfacesKeyMissing" xml:space="preserve">
+    <value>Ключ реестра сетевых интерфейсов не найден</value>
+  </data>
+  <data name="Network_Success_NoDelayEnabled" xml:space="preserve">
+    <value>Игровой твик TCP NoDelay (отключение алгоритма Нагла) успешно активирован!</value>
+  </data>
+  <data name="Network_Success_NoDelayDisabled" xml:space="preserve">
+    <value>Настройки TCP возвращены к стандартным значениям Windows.</value>
+  </data>
+  <data name="Network_Error_TcpRegistry" xml:space="preserve">
+    <value>Ошибка настройки реестра TCP: {0}</value>
+  </data>
 </root>

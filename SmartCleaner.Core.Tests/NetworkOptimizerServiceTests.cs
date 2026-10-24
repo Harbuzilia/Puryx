@@ -60,7 +60,7 @@ public class NetworkOptimizerServiceTests
         var result = await service.FlushDnsAndResetWinsockAsync();
 
         Assert.False(result.Success);
-        Assert.Contains("код 1", result.Message);
+        Assert.Contains("code 1", result.Message);
         Assert.Contains("flush failed", result.Message);
         Assert.Single(executor.Requests);
     }
@@ -96,7 +96,7 @@ public class NetworkOptimizerServiceTests
         var result = await service.ApplyDnsAsync("1.1.1.1", "1.0.0.1");
 
         Assert.False(result.Success);
-        Assert.Contains("код 1", result.Message);
+        Assert.Contains("code 1", result.Message);
         Assert.Contains("no active network adapters", result.Message);
     }
 
@@ -133,7 +133,7 @@ public class NetworkOptimizerServiceTests
         var result = await service.FlushDnsAndResetWinsockAsync();
 
         Assert.False(result.Success);
-        Assert.Contains("код 1", result.Message);
+        Assert.Contains("code 1", result.Message);
         Assert.Contains("ARP", result.Message);
         Assert.Contains("arp reset failed", result.Message);
         Assert.Equal(2, executor.Requests.Count);
@@ -155,7 +155,7 @@ public class NetworkOptimizerServiceTests
         var result = await service.FlushDnsAndResetWinsockAsync();
 
         Assert.False(result.Success);
-        Assert.Contains("код 1", result.Message);
+        Assert.Contains("code 1", result.Message);
         Assert.Contains("Access is denied (stdout)", result.Message);
         Assert.Single(executor.Requests);
     }
@@ -172,7 +172,7 @@ public class NetworkOptimizerServiceTests
         var result = await service.ResetDnsToDhcpAsync();
 
         Assert.False(result.Success);
-        Assert.Contains("код 1", result.Message);
+        Assert.Contains("code 1", result.Message);
         Assert.Contains("no active network adapters", result.Message);
     }
 
@@ -190,7 +190,7 @@ public class NetworkOptimizerServiceTests
         var result = await service.ApplyDnsAsync("'; Remove-Item -Recurse C:", "1.0.0.1");
 
         Assert.False(result.Success);
-        Assert.Contains("Недопустимый", result.Message);
+        Assert.Contains("Invalid", result.Message);
         Assert.Empty(executor.Requests); // команда не выполнялась вовсе
     }
 
@@ -203,7 +203,7 @@ public class NetworkOptimizerServiceTests
         var result = await service.ApplyDnsAsync("1.1.1.1", "not-an-ip");
 
         Assert.False(result.Success);
-        Assert.Contains("Недопустимый", result.Message);
+        Assert.Contains("Invalid", result.Message);
         Assert.Empty(executor.Requests);
     }
 

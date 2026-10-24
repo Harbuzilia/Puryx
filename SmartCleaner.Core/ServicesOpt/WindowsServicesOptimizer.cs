@@ -1,5 +1,6 @@
 using SmartCleaner.Core.Cleaning;
 using SmartCleaner.Core.Helpers;
+using SmartCleaner.Core.Localization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Win32;
@@ -23,113 +24,113 @@ public class WindowsServicesOptimizer
         new()
         {
             ServiceName = "Fax",
-            DisplayName = "Служба факсов (Fax)",
-            Description = "Отправка и прием факсов. Бесполезна на 99.9% современных домашних и игровых ПК.",
-            Category = "Оборудование",
+            DisplayName = Localizer.GetString("Services_Fax_Name"),
+            Description = Localizer.GetString("Services_Fax_Description"),
+            Category = Localizer.GetString("Services_Cat_Hardware"),
             RiskLevel = ServiceRiskLevel.SafeToDisable
         },
         new()
         {
             ServiceName = "RemoteRegistry",
-            DisplayName = "Дистанционный реестр (RemoteRegistry)",
-            Description = "Позволяет удаленным пользователям изменять системный реестр. Отключение повышает безопасность.",
-            Category = "Сеть и удаленный доступ",
+            DisplayName = Localizer.GetString("Services_RemoteRegistry_Name"),
+            Description = Localizer.GetString("Services_RemoteRegistry_Description"),
+            Category = Localizer.GetString("Services_Cat_Network"),
             RiskLevel = ServiceRiskLevel.SafeToDisable
         },
         new()
         {
             ServiceName = "RetailDemo",
-            DisplayName = "Служба демонстрации (RetailDemo)",
-            Description = "Режим витрины для демонстрации возможностей Windows в магазинах электроники.",
-            Category = "Система",
+            DisplayName = Localizer.GetString("Services_RetailDemo_Name"),
+            Description = Localizer.GetString("Services_RetailDemo_Description"),
+            Category = Localizer.GetString("Services_Cat_System"),
             RiskLevel = ServiceRiskLevel.SafeToDisable
         },
         new()
         {
             ServiceName = "MapsBroker",
-            DisplayName = "Диспетчер скачанных карт (MapsBroker)",
-            Description = "Фоновая синхронизация и доступ к автономным офлайн-картам Windows Maps.",
-            Category = "Система",
+            DisplayName = Localizer.GetString("Services_MapsBroker_Name"),
+            Description = Localizer.GetString("Services_MapsBroker_Description"),
+            Category = Localizer.GetString("Services_Cat_System"),
             RiskLevel = ServiceRiskLevel.SafeToDisable
         },
         new()
         {
             ServiceName = "DiagTrack",
-            DisplayName = "Телеметрия и сбор событий (DiagTrack)",
-            Description = "Connected User Experiences and Telemetry. Сбор и передача логов на сервера Microsoft.",
-            Category = "Диагностика",
+            DisplayName = Localizer.GetString("Services_DiagTrack_Name"),
+            Description = Localizer.GetString("Services_DiagTrack_Description"),
+            Category = Localizer.GetString("Services_Cat_Diagnostics"),
             RiskLevel = ServiceRiskLevel.SafeToDisable
         },
         new()
         {
             ServiceName = "dmwappushservice",
-            DisplayName = "Маршрутизация WAP Push (dmwappushservice)",
-            Description = "Служба маршрутизации push-сообщений телеметрии и диагностических данных.",
-            Category = "Диагностика",
+            DisplayName = Localizer.GetString("Services_Dmwappush_Name"),
+            Description = Localizer.GetString("Services_Dmwappush_Description"),
+            Category = Localizer.GetString("Services_Cat_Diagnostics"),
             RiskLevel = ServiceRiskLevel.SafeToDisable
         },
         new()
         {
             ServiceName = "AllJoynRouter",
-            DisplayName = "Маршрутизатор AllJoyn (AllJoynRouter)",
-            Description = "Служба взаимодействия с устройствами умного дома IoT по протоколу AllJoyn.",
-            Category = "Сеть и удаленный доступ",
+            DisplayName = Localizer.GetString("Services_AllJoynRouter_Name"),
+            Description = Localizer.GetString("Services_AllJoynRouter_Description"),
+            Category = Localizer.GetString("Services_Cat_Network"),
             RiskLevel = ServiceRiskLevel.SafeToDisable
         },
         new()
         {
             ServiceName = "WerSvc",
-            DisplayName = "Служба отчетов об ошибках (WerSvc)",
-            Description = "Формирование и фоновая отправка дампов и отчетов о крашах программ.",
-            Category = "Диагностика",
+            DisplayName = Localizer.GetString("Services_WerSvc_Name"),
+            Description = Localizer.GetString("Services_WerSvc_Description"),
+            Category = Localizer.GetString("Services_Cat_Diagnostics"),
             RiskLevel = ServiceRiskLevel.SafeToDisable
         },
         new()
         {
             ServiceName = "SysMain",
-            DisplayName = "Оптимизация запуска SysMain (SuperFetch)",
-            Description = "Кэширование часто используемых программ в RAM. На быстрых NVMe/SSD и в играх может вызывать микрофризы.",
-            Category = "Система",
+            DisplayName = Localizer.GetString("Services_SysMain_Name"),
+            Description = Localizer.GetString("Services_SysMain_Description"),
+            Category = Localizer.GetString("Services_Cat_System"),
             RiskLevel = ServiceRiskLevel.Moderate
         },
         new()
         {
             ServiceName = "WSearch",
-            DisplayName = "Индексатор Windows Search (WSearch)",
-            Description = "Индексация содержимого файлов на дисках. В тяжелых играх периодически нагружает SSD/дисковый стек.",
-            Category = "Система",
+            DisplayName = Localizer.GetString("Services_WSearch_Name"),
+            Description = Localizer.GetString("Services_WSearch_Description"),
+            Category = Localizer.GetString("Services_Cat_System"),
             RiskLevel = ServiceRiskLevel.Moderate
         },
         new()
         {
             ServiceName = "WbioSrvc",
-            DisplayName = "Биометрическая служба (WbioSrvc)",
-            Description = "Обеспечивает работу сканера отпечатков пальцев и распознавания лица Windows Hello.",
-            Category = "Оборудование",
+            DisplayName = Localizer.GetString("Services_WbioSrvc_Name"),
+            Description = Localizer.GetString("Services_WbioSrvc_Description"),
+            Category = Localizer.GetString("Services_Cat_Hardware"),
             RiskLevel = ServiceRiskLevel.Moderate
         },
         new()
         {
             ServiceName = "XblAuthManager",
-            DisplayName = "Аутентификация Xbox Live (XblAuthManager)",
-            Description = "Управление учетными записями Xbox Live. Не требуется, если вы не играете в игры из Microsoft Store.",
-            Category = "Xbox и игры",
+            DisplayName = Localizer.GetString("Services_XblAuthManager_Name"),
+            Description = Localizer.GetString("Services_XblAuthManager_Description"),
+            Category = Localizer.GetString("Services_Cat_Xbox"),
             RiskLevel = ServiceRiskLevel.Moderate
         },
         new()
         {
             ServiceName = "XboxGipSvc",
-            DisplayName = "Аксессуары Xbox (XboxGipSvc)",
-            Description = "Поддержка беспроводных геймпадов и аксессуаров Xbox. Не требуется при игре с мыши/клавиатуры.",
-            Category = "Xbox и игры",
+            DisplayName = Localizer.GetString("Services_XboxGipSvc_Name"),
+            Description = Localizer.GetString("Services_XboxGipSvc_Description"),
+            Category = Localizer.GetString("Services_Cat_Xbox"),
             RiskLevel = ServiceRiskLevel.Moderate
         },
         new()
         {
             ServiceName = "Spooler",
-            DisplayName = "Диспетчер печати (Spooler)",
-            Description = "Очередь печати документов. Если к компьютеру не подключен принтер, служба не используется.",
-            Category = "Оборудование",
+            DisplayName = Localizer.GetString("Services_Spooler_Name"),
+            Description = Localizer.GetString("Services_Spooler_Description"),
+            Category = Localizer.GetString("Services_Cat_Hardware"),
             RiskLevel = ServiceRiskLevel.Moderate
         }
     ];
@@ -261,7 +262,7 @@ public class WindowsServicesOptimizer
         foreach (var svcName in targetServices)
         {
             ct.ThrowIfCancellationRequested();
-            progress?.Report($"Настройка службы {svcName}...");
+            progress?.Report(Localizer.GetString("Services_Progress_Configuring", svcName));
             if (await SetServiceStartupAsync(svcName, ServiceStartupType.Disabled, ct))
             {
                 modifiedCount++;
@@ -283,7 +284,7 @@ public class WindowsServicesOptimizer
         foreach (var svc in _knownServices)
         {
             ct.ThrowIfCancellationRequested();
-            progress?.Report($"Восстановление службы {svc.ServiceName}...");
+            progress?.Report(Localizer.GetString("Services_Progress_Restoring", svc.ServiceName));
             var targetType = ServiceStartupType.Manual;
 
             if (backup.TryGetValue(svc.ServiceName, out var savedTypeInt) && Enum.IsDefined(typeof(ServiceStartupType), savedTypeInt))

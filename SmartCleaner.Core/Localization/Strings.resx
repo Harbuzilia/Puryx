@@ -2178,4 +2178,205 @@ Remove these entries from the system registry?</value>
   <data name="Shredder_Error" xml:space="preserve">
     <value>Shredder error: {0}</value>
   </data>
+  <data name="Services_StatusRunning" xml:space="preserve">
+    <value>🟢 Running</value>
+  </data>
+  <data name="Services_StatusStopped" xml:space="preserve">
+    <value>⚪ Stopped</value>
+  </data>
+  <data name="Services_StartupAuto" xml:space="preserve">
+    <value>Auto</value>
+  </data>
+  <data name="Services_StartupManual" xml:space="preserve">
+    <value>Manual</value>
+  </data>
+  <data name="Services_StartupDisabled" xml:space="preserve">
+    <value>Disabled</value>
+  </data>
+  <data name="Services_StartupUnknown" xml:space="preserve">
+    <value>Unknown</value>
+  </data>
+  <data name="Services_RiskSafe" xml:space="preserve">
+    <value>Safe</value>
+  </data>
+  <data name="Services_RiskModerate" xml:space="preserve">
+    <value>Caution</value>
+  </data>
+  <data name="Services_RiskCritical" xml:space="preserve">
+    <value>Critical</value>
+  </data>
+  <data name="Services_Cat_Hardware" xml:space="preserve">
+    <value>Hardware</value>
+  </data>
+  <data name="Services_Cat_System" xml:space="preserve">
+    <value>System</value>
+  </data>
+  <data name="Services_Cat_Diagnostics" xml:space="preserve">
+    <value>Diagnostics</value>
+  </data>
+  <data name="Services_Cat_Network" xml:space="preserve">
+    <value>Network and remote access</value>
+  </data>
+  <data name="Services_Cat_Xbox" xml:space="preserve">
+    <value>Xbox and games</value>
+  </data>
+  <data name="Services_Fax_Name" xml:space="preserve">
+    <value>Fax service (Fax)</value>
+  </data>
+  <data name="Services_Fax_Description" xml:space="preserve">
+    <value>Sends and receives faxes. Useless on 99.9% of modern home and gaming PCs.</value>
+  </data>
+  <data name="Services_RemoteRegistry_Name" xml:space="preserve">
+    <value>Remote Registry (RemoteRegistry)</value>
+  </data>
+  <data name="Services_RemoteRegistry_Description" xml:space="preserve">
+    <value>Allows remote users to modify the system registry. Disabling improves security.</value>
+  </data>
+  <data name="Services_RetailDemo_Name" xml:space="preserve">
+    <value>Retail demo service (RetailDemo)</value>
+  </data>
+  <data name="Services_RetailDemo_Description" xml:space="preserve">
+    <value>Store-display mode for showcasing Windows in electronics stores.</value>
+  </data>
+  <data name="Services_MapsBroker_Name" xml:space="preserve">
+    <value>Downloaded Maps Manager (MapsBroker)</value>
+  </data>
+  <data name="Services_MapsBroker_Description" xml:space="preserve">
+    <value>Background sync and access to offline Windows Maps.</value>
+  </data>
+  <data name="Services_DiagTrack_Name" xml:space="preserve">
+    <value>Telemetry and event collection (DiagTrack)</value>
+  </data>
+  <data name="Services_DiagTrack_Description" xml:space="preserve">
+    <value>Connected User Experiences and Telemetry. Collects and uploads logs to Microsoft servers.</value>
+  </data>
+  <data name="Services_Dmwappush_Name" xml:space="preserve">
+    <value>WAP Push routing (dmwappushservice)</value>
+  </data>
+  <data name="Services_Dmwappush_Description" xml:space="preserve">
+    <value>Routes push messages carrying telemetry and diagnostic data.</value>
+  </data>
+  <data name="Services_AllJoynRouter_Name" xml:space="preserve">
+    <value>AllJoyn Router (AllJoynRouter)</value>
+  </data>
+  <data name="Services_AllJoynRouter_Description" xml:space="preserve">
+    <value>Communicates with IoT smart-home devices over the AllJoyn protocol.</value>
+  </data>
+  <data name="Services_WerSvc_Name" xml:space="preserve">
+    <value>Windows Error Reporting (WerSvc)</value>
+  </data>
+  <data name="Services_WerSvc_Description" xml:space="preserve">
+    <value>Creates and sends crash dumps and error reports in the background.</value>
+  </data>
+  <data name="Services_SysMain_Name" xml:space="preserve">
+    <value>SysMain startup optimization (SuperFetch)</value>
+  </data>
+  <data name="Services_SysMain_Description" xml:space="preserve">
+    <value>Caches frequently used programs in RAM. Can cause micro-stutters on fast NVMe/SSD drives and in games.</value>
+  </data>
+  <data name="Services_WSearch_Name" xml:space="preserve">
+    <value>Windows Search indexer (WSearch)</value>
+  </data>
+  <data name="Services_WSearch_Description" xml:space="preserve">
+    <value>Indexes file contents on disks. Periodically stresses the SSD/disk stack in heavy games.</value>
+  </data>
+  <data name="Services_WbioSrvc_Name" xml:space="preserve">
+    <value>Biometric service (WbioSrvc)</value>
+  </data>
+  <data name="Services_WbioSrvc_Description" xml:space="preserve">
+    <value>Provides fingerprint scanner and Windows Hello facial recognition.</value>
+  </data>
+  <data name="Services_XblAuthManager_Name" xml:space="preserve">
+    <value>Xbox Live authentication (XblAuthManager)</value>
+  </data>
+  <data name="Services_XblAuthManager_Description" xml:space="preserve">
+    <value>Manages Xbox Live accounts. Not needed unless you play Microsoft Store games.</value>
+  </data>
+  <data name="Services_XboxGipSvc_Name" xml:space="preserve">
+    <value>Xbox accessories (XboxGipSvc)</value>
+  </data>
+  <data name="Services_XboxGipSvc_Description" xml:space="preserve">
+    <value>Supports wireless Xbox controllers and accessories. Not needed when playing with mouse and keyboard.</value>
+  </data>
+  <data name="Services_Spooler_Name" xml:space="preserve">
+    <value>Print Spooler (Spooler)</value>
+  </data>
+  <data name="Services_Spooler_Description" xml:space="preserve">
+    <value>Print document queue. Unused if no printer is connected.</value>
+  </data>
+  <data name="Services_Progress_Configuring" xml:space="preserve">
+    <value>Configuring service {0}...</value>
+  </data>
+  <data name="Services_Progress_Restoring" xml:space="preserve">
+    <value>Restoring service {0}...</value>
+  </data>
+  <data name="Network_Dns_Cloudflare" xml:space="preserve">
+    <value>Cloudflare (1.1.1.1) — Fast and private</value>
+  </data>
+  <data name="Network_Dns_Google" xml:space="preserve">
+    <value>Google Public DNS (8.8.8.8) — Reliable</value>
+  </data>
+  <data name="Network_Dns_Quad9" xml:space="preserve">
+    <value>Quad9 (9.9.9.9) — Malware protection</value>
+  </data>
+  <data name="Network_Dns_AdGuard" xml:space="preserve">
+    <value>AdGuard DNS — Ad blocking</value>
+  </data>
+  <data name="Network_Progress_Resetting" xml:space="preserve">
+    <value>Resetting DNS cache and Winsock sockets...</value>
+  </data>
+  <data name="Network_Error_FlushDns" xml:space="preserve">
+    <value>Failed to flush the DNS cache (code {0}): {1}</value>
+  </data>
+  <data name="Network_Error_ArpReset" xml:space="preserve">
+    <value>Failed to reset the ARP table (code {0}): {1}</value>
+  </data>
+  <data name="Network_Success_Flush" xml:space="preserve">
+    <value>DNS cache flushed, network sockets and ARP table reset!</value>
+  </data>
+  <data name="Network_Error_ResetFailed" xml:space="preserve">
+    <value>Network reset error: {0}</value>
+  </data>
+  <data name="Network_Error_InvalidPrimaryDns" xml:space="preserve">
+    <value>Invalid primary DNS: '{0}' (an IP address is expected)</value>
+  </data>
+  <data name="Network_Error_InvalidSecondaryDns" xml:space="preserve">
+    <value>Invalid secondary DNS: '{0}' (an IP address is expected)</value>
+  </data>
+  <data name="Network_Progress_ApplyingDns" xml:space="preserve">
+    <value>Applying DNS ({0}, {1})...</value>
+  </data>
+  <data name="Network_Error_ApplyDns" xml:space="preserve">
+    <value>Failed to change DNS (code {0}): {1}</value>
+  </data>
+  <data name="Network_Success_DnsApplied" xml:space="preserve">
+    <value>DNS successfully changed to {0} / {1}!</value>
+  </data>
+  <data name="Network_Error_DnsChangeFailed" xml:space="preserve">
+    <value>DNS change error: {0}</value>
+  </data>
+  <data name="Network_Progress_ResettingDhcp" xml:space="preserve">
+    <value>Resetting DNS to automatic (DHCP)...</value>
+  </data>
+  <data name="Network_Error_ResetDns" xml:space="preserve">
+    <value>Failed to reset DNS (code {0}): {1}</value>
+  </data>
+  <data name="Network_Success_DnsReset" xml:space="preserve">
+    <value>DNS successfully reset to automatic (DHCP)!</value>
+  </data>
+  <data name="Network_Error_DnsResetFailed" xml:space="preserve">
+    <value>DNS reset error: {0}</value>
+  </data>
+  <data name="Network_Error_InterfacesKeyMissing" xml:space="preserve">
+    <value>Network interfaces registry key not found</value>
+  </data>
+  <data name="Network_Success_NoDelayEnabled" xml:space="preserve">
+    <value>TCP NoDelay gaming tweak (Nagle algorithm disabled) activated!</value>
+  </data>
+  <data name="Network_Success_NoDelayDisabled" xml:space="preserve">
+    <value>TCP settings restored to Windows defaults.</value>
+  </data>
+  <data name="Network_Error_TcpRegistry" xml:space="preserve">
+    <value>TCP registry configuration error: {0}</value>
+  </data>
 </root>

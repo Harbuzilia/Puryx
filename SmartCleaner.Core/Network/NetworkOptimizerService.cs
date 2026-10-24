@@ -1,5 +1,6 @@
 ﻿using SmartCleaner.Core.Cleaning;
 using SmartCleaner.Core.Helpers;
+using SmartCleaner.Core.Localization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Win32;
@@ -45,10 +46,10 @@ public class NetworkOptimizerService
 
     public List<DnsPreset> Presets { get; } =
     [
-        new DnsPreset { Name = "Cloudflare (1.1.1.1) — Быстрый и приватный", Primary = "1.1.1.1", Secondary = "1.0.0.1" },
-        new DnsPreset { Name = "Google Public DNS (8.8.8.8) — Надежный", Primary = "8.8.8.8", Secondary = "8.8.4.4" },
-        new DnsPreset { Name = "Quad9 (9.9.9.9) — Защита от вредоносных сайтов", Primary = "9.9.9.9", Secondary = "149.112.112.112" },
-        new DnsPreset { Name = "AdGuard DNS — Блокировка рекламы", Primary = "94.140.14.14", Secondary = "94.140.15.15" }
+        new DnsPreset { Name = Localizer.GetString("Network_Dns_Cloudflare"), Primary = "1.1.1.1", Secondary = "1.0.0.1" },
+        new DnsPreset { Name = Localizer.GetString("Network_Dns_Google"), Primary = "8.8.8.8", Secondary = "8.8.4.4" },
+        new DnsPreset { Name = Localizer.GetString("Network_Dns_Quad9"), Primary = "9.9.9.9", Secondary = "149.112.112.112" },
+        new DnsPreset { Name = Localizer.GetString("Network_Dns_AdGuard"), Primary = "94.140.14.14", Secondary = "94.140.15.15" }
     ];
 
     public async Task<long> PingHostAsync(string hostOrIp)
@@ -77,7 +78,7 @@ public class NetworkOptimizerService
 
     public async Task<(bool Success, string Message)> FlushDnsAndResetWinsockAsync(IProgress<string>? progress = null)
     {
-        progress?.Report("Сброс DNS-кэша и сокетов Winsock...");
+        progress?.Report(Localizer.GetString("Network_Progress_Resetting"));
 
         return await Task.Run(async () =>
         {
@@ -95,7 +96,7 @@ public class NetworkOptimizerService
                 });
                 if (dns.ExitCode != 0)
                 {
-                    return (false, $"Не удалось очистить DNS-кэш (код {dns.ExitCode}): {ToolOutput(dns)}");
+                    return (false, Localizer.GetString("Network_Error_FlushDns", dns.ExitCode, ToolOutput(dns)));
                 }
 
                 // 2. Clear ARP
@@ -109,14 +110,14 @@ public class NetworkOptimizerService
                 });
                 if (arp.ExitCode != 0)
                 {
-                    return (false, $"Не удалось сбросить ARP-таблицу (код {arp.ExitCode}): {ToolOutput(arp)}");
+                    return (false, Localizer.GetString("Network_Error_ArpReset", arp.ExitCode, ToolOutput(arp)));
                 }
 
-                return (true, "DNS-кэш успешно очищен, сетевые сокеты и ARP-таблица сброшены!");
+                return (true, Localizer.GetString("Network_Success_Flush"));
             }
             catch (Exception ex)
             {
-                return (false, $"Ошибка сброса сети: {ex.Message}");
+                return (false, Localizer.GetString("Network_Error_ResetFailed", ex.Message));
             }
         });
     }
@@ -128,14 +129,14 @@ public class NetworkOptimizerService
         // безопасны, но API публичный: произвольная строка до скрипта не доходит
         if (!System.Net.IPAddress.TryParse(primaryDns, out _))
         {
-            return (false, $"Недопустимый primary DNS: '{primaryDns}' (ожидается IP-адрес)");
+            return (false, Localizer.GetString("Network_Error_InvalidPrimaryDns", primaryDns));
         }
         if (!System.Net.IPAddress.TryParse(secondaryDns, out _))
         {
-            return (false, $"Недопустимый secondary DNS: '{secondaryDns}' (ожидается IP-адрес)");
+            return (false, Localizer.GetString("Network_Error_InvalidSecondaryDns", secondaryDns));
         }
 
-        progress?.Report($"Установка DNS ({primaryDns}, {secondaryDns})...");
+        progress?.Report(Localizer.GetString("Network_Progress_ApplyingDns", primaryDns, secondaryDns));
 
         return await Task.Run(async () =>
         {
@@ -158,21 +159,21 @@ public class NetworkOptimizerService
                 });
                 if (result.ExitCode != 0)
                 {
-                    return (false, $"Не удалось изменить DNS (код {result.ExitCode}): {ToolOutput(result)}");
+                    return (false, Localizer.GetString("Network_Error_ApplyDns", result.ExitCode, ToolOutput(result)));
                 }
 
-                return (true, $"DNS успешно изменен на {primaryDns} / {secondaryDns}!");
+                return (true, Localizer.GetString("Network_Success_DnsApplied", primaryDns, secondaryDns));
             }
             catch (Exception ex)
             {
-                return (false, $"Ошибка смены DNS: {ex.Message}");
+                return (false, Localizer.GetString("Network_Error_DnsChangeFailed", ex.Message));
             }
         });
     }
 
     public async Task<(bool Success, string Message)> ResetDnsToDhcpAsync(IProgress<string>? progress = null)
     {
-        progress?.Report("Сброс DNS на автоматическое получение (DHCP)...");
+        progress?.Report(Localizer.GetString("Network_Progress_ResettingDhcp"));
 
         return await Task.Run(async () =>
         {
@@ -193,14 +194,14 @@ public class NetworkOptimizerService
                 });
                 if (result.ExitCode != 0)
                 {
-                    return (false, $"Не удалось сбросить DNS (код {result.ExitCode}): {ToolOutput(result)}");
+                    return (false, Localizer.GetString("Network_Error_ResetDns", result.ExitCode, ToolOutput(result)));
                 }
 
-                return (true, "DNS успешно сброшен на автоматический (DHCP)!");
+                return (true, Localizer.GetString("Network_Success_DnsReset"));
             }
             catch (Exception ex)
             {
-                return (false, $"Ошибка сброса DNS: {ex.Message}");
+                return (false, Localizer.GetString("Network_Error_DnsResetFailed", ex.Message));
             }
         });
     }
@@ -212,7 +213,7 @@ public class NetworkOptimizerService
             try
             {
                 using var rootKey = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces", true);
-                if (rootKey == null) return (false, "Ключ реестра сетевых интерфейсов не найден");
+                if (rootKey == null) return (false, Localizer.GetString("Network_Error_InterfacesKeyMissing"));
 
                 foreach (var subKeyName in rootKey.GetSubKeyNames())
                 {
@@ -237,12 +238,12 @@ public class NetworkOptimizerService
                     }
 
                 return (true, enable
-                    ? "Игровой твик TCP NoDelay (отключение алгоритма Нагла) успешно активирован!"
-                    : "Настройки TCP возвращены к стандартным значениям Windows.");
+                    ? Localizer.GetString("Network_Success_NoDelayEnabled")
+                    : Localizer.GetString("Network_Success_NoDelayDisabled"));
             }
             catch (Exception ex)
             {
-                return (false, $"Ошибка настройки реестра TCP: {ex.Message}");
+                return (false, Localizer.GetString("Network_Error_TcpRegistry", ex.Message));
             }
         });
     }
