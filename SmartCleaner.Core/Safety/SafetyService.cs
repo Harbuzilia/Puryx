@@ -2,6 +2,7 @@ using System.IO;
 using System.Text.Json;
 using DotNet.Globbing;
 using SmartCleaner.Core.Knowledge;
+using SmartCleaner.Core.Localization;
 using SmartCleaner.Core.Models;
 using SmartCleaner.Core.Services;
 
@@ -154,7 +155,7 @@ public class SafetyService : ISafetyService
             return new DeleteValidation
             {
                 CanDelete = false,
-                BlockReason = "Путь не удалось проверить: цепочка junction/reparse-точек не разрешается"
+                BlockReason = Localizer.GetString("Safety_BlockUnresolvedPath")
             };
         }
 
@@ -166,7 +167,7 @@ public class SafetyService : ISafetyService
             return new DeleteValidation
             {
                 CanDelete = false,
-                BlockReason = "Файл в белом списке защиты"
+                BlockReason = Localizer.GetString("Safety_BlockWhitelist")
             };
         }
 
@@ -181,7 +182,7 @@ public class SafetyService : ISafetyService
             return new DeleteValidation
             {
                 CanDelete = false,
-                BlockReason = $"Защищённые данные приложения {classification.AppName}: {classification.Reason}"
+                BlockReason = Localizer.GetString("Safety_BlockAppData", classification.AppName ?? string.Empty, classification.Reason)
             };
         }
 
@@ -191,7 +192,7 @@ public class SafetyService : ISafetyService
             return new DeleteValidation
             {
                 CanDelete = false,
-                BlockReason = "Файл заблокирован другим процессом"
+                BlockReason = Localizer.GetString("Safety_BlockLocked")
             };
         }
 
@@ -202,7 +203,7 @@ public class SafetyService : ISafetyService
             return new DeleteValidation
             {
                 CanDelete = false,
-                BlockReason = $"Файл создан/изменён менее {ProtectedPeriod.TotalHours:0} часов назад"
+                BlockReason = Localizer.GetString("Safety_BlockProtectedPeriod", ProtectedPeriod.TotalHours)
             };
         }
 

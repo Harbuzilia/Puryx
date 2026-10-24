@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using SmartCleaner.Core.Helpers;
+using SmartCleaner.Core.Localization;
 using SmartCleaner.Core.Services;
 using System.IO;
 using System.Text.Json;
@@ -17,7 +18,7 @@ public class QuarantinedItem
     public string SizeFormatted { get; set; } = "0 B";
     public DateTime QuarantinedAt { get; set; } = DateTime.Now;
     public bool IsDirectory { get; set; }
-    public string Category { get; set; } = "Мусор";
+    public string Category { get; set; } = Localizer.GetString("Quarantine_CategoryJunk");
 }
 
 public class QuarantineManifest
@@ -186,14 +187,11 @@ public class QuarantineService
         switch (trust)
         {
             case ManifestTrust.UnsignedLegacy:
-                return "Манифест карантина устаревшего формата (без подписи); " +
-                       $"восстановите файлы вручную из папки карантина: {_storageDir}";
+                return Localizer.GetString("Quarantine_RefusalLegacy", _storageDir);
             case ManifestTrust.InvalidSignature:
-                return "Подпись манифеста карантина недействительна (манифест изменён " +
-                       "или ключ подписи недоступен). Операция отклонена из соображений безопасности.";
+                return Localizer.GetString("Quarantine_RefusalInvalidSignature");
             case ManifestTrust.Corrupt:
-                return "Манифест карантина повреждён и не может быть прочитан. " +
-                       "Операция отклонена из соображений безопасности.";
+                return Localizer.GetString("Quarantine_RefusalCorrupt");
             default:
                 return null; // Missing/Valid — операции разрешены (элемент может не найтись)
         }
@@ -250,7 +248,7 @@ public class QuarantineService
         return items;
     }
 
-    public async Task<bool> MoveToQuarantineAsync(string path, string category = "Очистка")
+    public async Task<bool> MoveToQuarantineAsync(string path, string? category = null)
     {
         if (!File.Exists(path) && !Directory.Exists(path)) return false;
 
@@ -286,7 +284,7 @@ public class QuarantineService
                 SizeFormatted = SizeFormatter.Format(size),
                 QuarantinedAt = DateTime.Now,
                 IsDirectory = isDir,
-                Category = category
+                Category = category ?? Localizer.GetString("Quarantine_CategoryCleaning")
             };
 
             // В новый подписанный манифест переносятся ТОЛЬКО элементы из валидно
@@ -326,16 +324,15 @@ public class QuarantineService
         }
 
         var item = items.FirstOrDefault(i => i.Id == id);
-        if (item == null) return (false, "Элемент не найден в манифесте");
+        if (item == null) return (false, Localizer.GetString("Quarantine_ItemNotFound"));
 
         if (!IsStoredPathWithinStorage(item.StoredPath))
         {
-            return (false, "Путь хранения элемента находится вне каталога карантина — " +
-                           "операция отклонена из соображений безопасности.");
+            return (false, Localizer.GetString("Quarantine_StoredPathOutside"));
         }
 
         if (!File.Exists(item.StoredPath) && !Directory.Exists(item.StoredPath))
-            return (false, "Файл не найден в хранилище карантина");
+            return (false, Localizer.GetString("Quarantine_FileNotFoundInStorage"));
 
         try
         {
@@ -361,11 +358,11 @@ public class QuarantineService
             items.Remove(item);
             await SaveManifestAsync(items);
 
-            return (true, $"Элемент '{item.Name}' успешно восстановлен в {item.OriginalPath}!");
+            return (true, Localizer.GetString("Quarantine_RestoreSuccess", item.Name, item.OriginalPath));
         }
         catch (Exception ex)
         {
-            return (false, $"Ошибка восстановления: {ex.Message}");
+            return (false, Localizer.GetString("Common_Status_RestoreError", ex.Message));
         }
     }
 
@@ -386,12 +383,11 @@ public class QuarantineService
         }
 
         var item = items.FirstOrDefault(i => i.Id == id);
-        if (item == null) return (false, "Элемент не найден в манифесте");
+        if (item == null) return (false, Localizer.GetString("Quarantine_ItemNotFound"));
 
         if (!IsStoredPathWithinStorage(item.StoredPath))
         {
-            return (false, "Путь хранения элемента находится вне каталога карантина — " +
-                           "операция отклонена из соображений безопасности.");
+            return (false, Localizer.GetString("Quarantine_StoredPathOutside"));
         }
 
         try
@@ -401,12 +397,12 @@ public class QuarantineService
 
             items.Remove(item);
             await SaveManifestAsync(items);
-            return (true, $"Элемент '{item.Name}' удалён из карантина без возможности восстановления.");
+            return (true, Localizer.GetString("Quarantine_PurgeSuccess", item.Name));
         }
         catch (Exception ex)
         {
             _logger.LogWarning(ex, "Purge failed for {Id}: {Error}", id, ex.Message);
-            return (false, $"Ошибка удаления: {ex.Message}");
+            return (false, Localizer.GetString("Quarantine_PurgeError", ex.Message));
         }
     }
 

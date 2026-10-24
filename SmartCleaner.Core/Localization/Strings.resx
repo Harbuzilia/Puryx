@@ -2073,4 +2073,109 @@ Remove these entries from the system registry?</value>
   <data name="Common_Status_RestoreError" xml:space="preserve">
     <value>Restore error: {0}</value>
   </data>
+  <data name="Safety_BlockUnresolvedPath" xml:space="preserve">
+    <value>Path could not be verified: junction/reparse chain does not resolve</value>
+  </data>
+  <data name="Safety_BlockWhitelist" xml:space="preserve">
+    <value>File is in the protection whitelist</value>
+  </data>
+  <data name="Safety_BlockAppData" xml:space="preserve">
+    <value>Protected data of application {0}: {1}</value>
+  </data>
+  <data name="Safety_BlockLocked" xml:space="preserve">
+    <value>File is locked by another process</value>
+  </data>
+  <data name="Safety_BlockProtectedPeriod" xml:space="preserve">
+    <value>File was created/modified less than {0} hours ago</value>
+  </data>
+  <data name="Cleaning_ErrorCannotDelete" xml:space="preserve">
+    <value>Cannot delete</value>
+  </data>
+  <data name="Cleaning_ElevatedPolicyRejected" xml:space="preserve">
+    <value>Path does not match the elevated-clean policy</value>
+  </data>
+  <data name="Cleaning_ElevatedStartFailed" xml:space="preserve">
+    <value>Failed to start the elevated-clean process</value>
+  </data>
+  <data name="Cleaning_ElevatedExitCode" xml:space="preserve">
+    <value>Elevated-clean exited with code {0}, result not received</value>
+  </data>
+  <data name="Cleaning_ErrorAccessDenied" xml:space="preserve">
+    <value>No access to the file</value>
+  </data>
+  <data name="Cleaning_ErrorLocked" xml:space="preserve">
+    <value>File is locked: {0}</value>
+  </data>
+  <data name="Cleaning_ErrorUnknown" xml:space="preserve">
+    <value>Unknown error</value>
+  </data>
+  <data name="Cleaning_DockerInvalidImageId" xml:space="preserve">
+    <value>Invalid Docker image identifier</value>
+  </data>
+  <data name="Cleaning_DockerInvalidContainerId" xml:space="preserve">
+    <value>Invalid Docker container identifier</value>
+  </data>
+  <data name="Cleaning_DockerUnknownCommand" xml:space="preserve">
+    <value>Unknown docker command</value>
+  </data>
+  <data name="Quarantine_ItemNotFound" xml:space="preserve">
+    <value>Item not found in the manifest</value>
+  </data>
+  <data name="Quarantine_StoredPathOutside" xml:space="preserve">
+    <value>The item's storage path is outside the quarantine directory — the operation is rejected for security reasons.</value>
+  </data>
+  <data name="Quarantine_FileNotFoundInStorage" xml:space="preserve">
+    <value>File not found in the quarantine storage</value>
+  </data>
+  <data name="Quarantine_RestoreSuccess" xml:space="preserve">
+    <value>Item '{0}' successfully restored to {1}!</value>
+  </data>
+  <data name="Quarantine_PurgeSuccess" xml:space="preserve">
+    <value>Item '{0}' has been deleted from quarantine beyond recovery.</value>
+  </data>
+  <data name="Quarantine_PurgeError" xml:space="preserve">
+    <value>Deletion error: {0}</value>
+  </data>
+  <data name="Quarantine_RefusalLegacy" xml:space="preserve">
+    <value>The quarantine manifest is in a legacy format (unsigned); restore the files manually from the quarantine folder: {0}</value>
+  </data>
+  <data name="Quarantine_RefusalInvalidSignature" xml:space="preserve">
+    <value>The quarantine manifest signature is invalid (the manifest was modified or the signing key is unavailable). The operation is rejected for security reasons.</value>
+  </data>
+  <data name="Quarantine_RefusalCorrupt" xml:space="preserve">
+    <value>The quarantine manifest is corrupted and cannot be read. The operation is rejected for security reasons.</value>
+  </data>
+  <data name="Quarantine_CategoryJunk" xml:space="preserve">
+    <value>Junk</value>
+  </data>
+  <data name="Quarantine_CategoryCleaning" xml:space="preserve">
+    <value>Cleaning</value>
+  </data>
+  <data name="Shredder_FileNotFound" xml:space="preserve">
+    <value>File not found</value>
+  </data>
+  <data name="Shredder_Blocked" xml:space="preserve">
+    <value>Blocked: {0}</value>
+  </data>
+  <data name="Shredder_RequiresElevation" xml:space="preserve">
+    <value>The file requires administrator rights</value>
+  </data>
+  <data name="Shredder_PassQuick" xml:space="preserve">
+    <value>Shredding 1-pass (zeros): {0}...</value>
+  </data>
+  <data name="Shredder_Pass1" xml:space="preserve">
+    <value>Shredding DoD pass 1/3 (zeros)...</value>
+  </data>
+  <data name="Shredder_Pass2" xml:space="preserve">
+    <value>Shredding DoD pass 2/3 (0xFF)...</value>
+  </data>
+  <data name="Shredder_Pass3" xml:space="preserve">
+    <value>Shredding DoD pass 3/3 (pseudorandom bytes)...</value>
+  </data>
+  <data name="Shredder_Success" xml:space="preserve">
+    <value>File successfully destroyed beyond recovery (DoD 5220.22-M)!</value>
+  </data>
+  <data name="Shredder_Error" xml:space="preserve">
+    <value>Shredder error: {0}</value>
+  </data>
 </root>

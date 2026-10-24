@@ -2073,4 +2073,109 @@ Windows может использовать эти драйверы прямо �
   <data name="Common_Status_RestoreError" xml:space="preserve">
     <value>Ошибка восстановления: {0}</value>
   </data>
+  <data name="Safety_BlockUnresolvedPath" xml:space="preserve">
+    <value>Путь не удалось проверить: цепочка junction/reparse-точек не разрешается</value>
+  </data>
+  <data name="Safety_BlockWhitelist" xml:space="preserve">
+    <value>Файл в белом списке защиты</value>
+  </data>
+  <data name="Safety_BlockAppData" xml:space="preserve">
+    <value>Защищённые данные приложения {0}: {1}</value>
+  </data>
+  <data name="Safety_BlockLocked" xml:space="preserve">
+    <value>Файл заблокирован другим процессом</value>
+  </data>
+  <data name="Safety_BlockProtectedPeriod" xml:space="preserve">
+    <value>Файл создан/изменён менее {0} часов назад</value>
+  </data>
+  <data name="Cleaning_ErrorCannotDelete" xml:space="preserve">
+    <value>Невозможно удалить</value>
+  </data>
+  <data name="Cleaning_ElevatedPolicyRejected" xml:space="preserve">
+    <value>Путь не соответствует политике elevated-clean</value>
+  </data>
+  <data name="Cleaning_ElevatedStartFailed" xml:space="preserve">
+    <value>Не удалось запустить elevated-clean процесс</value>
+  </data>
+  <data name="Cleaning_ElevatedExitCode" xml:space="preserve">
+    <value>Elevated-clean завершился с кодом {0}, результат не получен</value>
+  </data>
+  <data name="Cleaning_ErrorAccessDenied" xml:space="preserve">
+    <value>Нет доступа к файлу</value>
+  </data>
+  <data name="Cleaning_ErrorLocked" xml:space="preserve">
+    <value>Файл заблокирован: {0}</value>
+  </data>
+  <data name="Cleaning_ErrorUnknown" xml:space="preserve">
+    <value>Неизвестная ошибка</value>
+  </data>
+  <data name="Cleaning_DockerInvalidImageId" xml:space="preserve">
+    <value>Недопустимый идентификатор Docker-образа</value>
+  </data>
+  <data name="Cleaning_DockerInvalidContainerId" xml:space="preserve">
+    <value>Недопустимый идентификатор Docker-контейнера</value>
+  </data>
+  <data name="Cleaning_DockerUnknownCommand" xml:space="preserve">
+    <value>Неизвестная docker команда</value>
+  </data>
+  <data name="Quarantine_ItemNotFound" xml:space="preserve">
+    <value>Элемент не найден в манифесте</value>
+  </data>
+  <data name="Quarantine_StoredPathOutside" xml:space="preserve">
+    <value>Путь хранения элемента находится вне каталога карантина — операция отклонена из соображений безопасности.</value>
+  </data>
+  <data name="Quarantine_FileNotFoundInStorage" xml:space="preserve">
+    <value>Файл не найден в хранилище карантина</value>
+  </data>
+  <data name="Quarantine_RestoreSuccess" xml:space="preserve">
+    <value>Элемент '{0}' успешно восстановлен в {1}!</value>
+  </data>
+  <data name="Quarantine_PurgeSuccess" xml:space="preserve">
+    <value>Элемент '{0}' удалён из карантина без возможности восстановления.</value>
+  </data>
+  <data name="Quarantine_PurgeError" xml:space="preserve">
+    <value>Ошибка удаления: {0}</value>
+  </data>
+  <data name="Quarantine_RefusalLegacy" xml:space="preserve">
+    <value>Манифест карантина устаревшего формата (без подписи); восстановите файлы вручную из папки карантина: {0}</value>
+  </data>
+  <data name="Quarantine_RefusalInvalidSignature" xml:space="preserve">
+    <value>Подпись манифеста карантина недействительна (манифест изменён или ключ подписи недоступен). Операция отклонена из соображений безопасности.</value>
+  </data>
+  <data name="Quarantine_RefusalCorrupt" xml:space="preserve">
+    <value>Манифест карантина повреждён и не может быть прочитан. Операция отклонена из соображений безопасности.</value>
+  </data>
+  <data name="Quarantine_CategoryJunk" xml:space="preserve">
+    <value>Мусор</value>
+  </data>
+  <data name="Quarantine_CategoryCleaning" xml:space="preserve">
+    <value>Очистка</value>
+  </data>
+  <data name="Shredder_FileNotFound" xml:space="preserve">
+    <value>Файл не найден</value>
+  </data>
+  <data name="Shredder_Blocked" xml:space="preserve">
+    <value>Заблокировано: {0}</value>
+  </data>
+  <data name="Shredder_RequiresElevation" xml:space="preserve">
+    <value>Файл требует прав администратора</value>
+  </data>
+  <data name="Shredder_PassQuick" xml:space="preserve">
+    <value>Стирание 1-pass (нули): {0}...</value>
+  </data>
+  <data name="Shredder_Pass1" xml:space="preserve">
+    <value>Стирание DoD Pass 1/3 (нули)...</value>
+  </data>
+  <data name="Shredder_Pass2" xml:space="preserve">
+    <value>Стирание DoD Pass 2/3 (0xFF)...</value>
+  </data>
+  <data name="Shredder_Pass3" xml:space="preserve">
+    <value>Стирание DoD Pass 3/3 (псевдослучайные байты)...</value>
+  </data>
+  <data name="Shredder_Success" xml:space="preserve">
+    <value>Файл успешно безвозвратно уничтожен (DoD 5220.22-M)!</value>
+  </data>
+  <data name="Shredder_Error" xml:space="preserve">
+    <value>Ошибка шредера: {0}</value>
+  </data>
 </root>

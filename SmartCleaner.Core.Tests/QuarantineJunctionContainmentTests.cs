@@ -118,7 +118,7 @@ public class QuarantineJunctionContainmentTests : IDisposable
 
             Assert.False(success,
                 "Restore обязан отклонять StoredPath, уходящий из Storage через junction, даже при валидной подписи");
-            Assert.Contains("вне каталога карантина", message);
+            Assert.Contains("outside the quarantine directory", message);
             Assert.True(File.Exists(victimFile), "Файл жертвы не должен быть перемещён из каталога вне карантина");
             Assert.False(File.Exists(restoreTarget), "Файл не должен появиться по crafted OriginalPath");
         }
@@ -152,7 +152,7 @@ public class QuarantineJunctionContainmentTests : IDisposable
 
             Assert.False(success,
                 "Purge обязан отклонять StoredPath, уходящий из Storage через junction, даже при валидной подписи");
-            Assert.Contains("вне каталога карантина", message);
+            Assert.Contains("outside the quarantine directory", message);
             Assert.True(File.Exists(victimFile), "Файлы жертвы не должны быть рекурсивно удалены через junction");
         }
         finally
@@ -179,6 +179,6 @@ public class QuarantineJunctionContainmentTests : IDisposable
         var (success, message) = await service.RestoreItemAsync("junction0003");
 
         Assert.False(success, "Нерезолвуемая цепочка reparse-точек в StoredPath — fail-closed отказ");
-        Assert.Contains("вне каталога карантина", message);
+        Assert.Contains("outside the quarantine directory", message);
     }
 }

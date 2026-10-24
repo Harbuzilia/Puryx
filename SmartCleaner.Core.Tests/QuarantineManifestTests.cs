@@ -253,8 +253,8 @@ public class QuarantineManifestTests : IDisposable
         var (success, message) = await service.RestoreItemAsync("legacy0001");
 
         Assert.False(success, "Манифест устаревшего формата не должен исполняться молча");
-        Assert.Contains("устаревшего формата", message);
-        Assert.Contains("вручную", message);
+        Assert.Contains("legacy format", message);
+        Assert.Contains("manually", message);
         Assert.True(File.Exists(storedPath), "Файл должен остаться в хранилище для восстановления вручную");
     }
 
@@ -284,7 +284,7 @@ public class QuarantineManifestTests : IDisposable
             var (success, message) = await service.PurgeItemAsync("forged0001");
 
             Assert.False(success, "Purge обязан отклонять StoredPath вне Storage даже при валидной подписи");
-            Assert.Contains("вне каталога карантина", message);
+            Assert.Contains("outside the quarantine directory", message);
             Assert.True(Directory.Exists(victimDir), "Каталог жертвы не должен быть удалён");
             Assert.True(File.Exists(victimFile), "Файл жертвы не должен быть удалён");
         }
@@ -308,7 +308,7 @@ public class QuarantineManifestTests : IDisposable
             var (success, message) = await service.RestoreItemAsync("forged0002");
 
             Assert.False(success, "Restore обязан отклонять StoredPath вне Storage даже при валидной подписи");
-            Assert.Contains("вне каталога карантина", message);
+            Assert.Contains("outside the quarantine directory", message);
             Assert.True(File.Exists(victimFile), "Файл жертвы не должен быть перемещён");
             Assert.False(File.Exists(craftedTarget), "Файл не должен появиться по crafted OriginalPath");
         }
@@ -367,8 +367,8 @@ public class QuarantineManifestTests : IDisposable
             var (success, message) = await service.PurgeItemAsync("legacy0002");
 
             Assert.False(success, "Purge по манифесту без подписи должен быть отклонён");
-            Assert.Contains("устаревшего формата", message);
-            Assert.Contains("вручную", message);
+            Assert.Contains("legacy format", message);
+            Assert.Contains("manually", message);
             Assert.True(Directory.Exists(victimDir), "Каталог жертвы не должен быть удалён");
         }
         finally

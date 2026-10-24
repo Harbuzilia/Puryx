@@ -112,7 +112,7 @@ public class SafetyServiceTests
         var validation = service.ValidateForDeletion(MakeItem(@"C:\repos\myproject\.git\config"));
 
         Assert.False(validation.CanDelete);
-        Assert.Equal("Файл в белом списке защиты", validation.BlockReason);
+        Assert.Equal("File is in the protection whitelist", validation.BlockReason);
     }
 
     // ─── Per-app защита (KnowledgeBase.ProtectedPatterns) ──
@@ -165,7 +165,7 @@ public class SafetyServiceTests
             var validation = service.ValidateForDeletion(MakeItem(file, RiskCategory.UserData));
 
             Assert.False(validation.CanDelete);
-            Assert.Contains("часов", validation.BlockReason);
+            Assert.Contains("hours ago", validation.BlockReason);
         }
         finally
         {
@@ -235,7 +235,7 @@ public class SafetyServiceTests
             Assert.True(service.IsFileLocked(file));
             var validation = service.ValidateForDeletion(MakeItem(file));
             Assert.False(validation.CanDelete);
-            Assert.Equal("Файл заблокирован другим процессом", validation.BlockReason);
+            Assert.Equal("File is locked by another process", validation.BlockReason);
         }
         finally
         {
@@ -251,7 +251,7 @@ public class SafetyServiceTests
         var validation = service.ValidateForDeletion(MakeItem(@"C:\anything\file.tmp") with { IsLocked = true });
 
         Assert.False(validation.CanDelete);
-        Assert.Equal("Файл заблокирован другим процессом", validation.BlockReason);
+        Assert.Equal("File is locked by another process", validation.BlockReason);
     }
 
     // ─── RequiresElevation (регрессия префикса) ───
@@ -446,7 +446,7 @@ public class SafetyServiceTests
 
             Assert.False(validation.CanDelete, "путь в циклическом junction должен блокироваться");
             Assert.NotNull(validation.BlockReason);
-            Assert.Contains("не удалось проверить", validation.BlockReason);
+            Assert.Contains("could not be verified", validation.BlockReason);
         }
         finally
         {
@@ -478,7 +478,7 @@ public class SafetyServiceTests
 
             Assert.False(validation.CanDelete, "файл .git за junction обязан блокироваться whitelist по реальному пути");
             Assert.NotNull(validation.BlockReason);
-            Assert.Contains("белом списке", validation.BlockReason);
+            Assert.Contains("protection whitelist", validation.BlockReason);
         }
         finally
         {

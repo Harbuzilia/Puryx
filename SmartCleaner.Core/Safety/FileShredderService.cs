@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging.Abstractions;
 using System.IO;
 using System.Security.Cryptography;
+using SmartCleaner.Core.Localization;
 using SmartCleaner.Core.Models;
 
 namespace SmartCleaner.Core.Safety;
@@ -31,7 +32,7 @@ public class FileShredderService
     public async Task<(bool Success, string Message)> ShredFileAsync(string filePath, ShredMethod method = ShredMethod.DoD522022M3Pass, IProgress<string>? progress = null)
     {
         if (!File.Exists(filePath))
-            return (false, "Файл не найден");
+            return (false, Localizer.GetString("Shredder_FileNotFound"));
 
         // Безвозвратное удаление — обязательный whitelist-гейт.
         // PerformanceCache: явное действие пользователя, защищённый период не применяется,
@@ -46,12 +47,12 @@ public class FileShredderService
 
         if (!validation.CanDelete)
         {
-            return (false, $"Заблокировано: {validation.BlockReason}");
+            return (false, Localizer.GetString("Shredder_Blocked", validation.BlockReason ?? string.Empty));
         }
 
         if (validation.RequiresElevation)
         {
-            return (false, "Файл требует прав администратора");
+            return (false, Localizer.GetString("Shredder_RequiresElevation"));
         }
 
         try
@@ -71,7 +72,7 @@ public class FileShredderService
 
                         if (method == ShredMethod.QuickZero1Pass)
                         {
-                            progress?.Report($"Стирание 1-pass (нули): {Path.GetFileName(filePath)}...");
+                            progress?.Report(Localizer.GetString("Shredder_PassQuick", Path.GetFileName(filePath)));
                             Array.Clear(buffer, 0, buffer.Length);
                             WritePass(stream, buffer, length);
                         }
@@ -79,19 +80,19 @@ public class FileShredderService
                         {
                             // DoD 5220.22-M 3-Pass:
                             // Pass 1: 0x00
-                            progress?.Report($"Стирание DoD Pass 1/3 (нули)...");
+                            progress?.Report(Localizer.GetString("Shredder_Pass1"));
                             Array.Clear(buffer, 0, buffer.Length);
                             stream.Position = 0;
                             WritePass(stream, buffer, length);
 
                             // Pass 2: 0xFF
-                            progress?.Report($"Стирание DoD Pass 2/3 (0xFF)...");
+                            progress?.Report(Localizer.GetString("Shredder_Pass2"));
                             for (int i = 0; i < buffer.Length; i++) buffer[i] = 0xFF;
                             stream.Position = 0;
                             WritePass(stream, buffer, length);
 
                             // Pass 3: Random Cryptographic Bytes
-                            progress?.Report($"Стирание DoD Pass 3/3 (псевдослучайные байты)...");
+                            progress?.Report(Localizer.GetString("Shredder_Pass3"));
                             stream.Position = 0;
                             long written = 0;
                             while (written < length)
@@ -115,11 +116,11 @@ public class FileShredderService
                 File.Delete(scrambled);
             });
 
-            return (true, "Файл успешно безвозвратно уничтожен (DoD 5220.22-M)!");
+            return (true, Localizer.GetString("Shredder_Success"));
         }
         catch (Exception ex)
         {
-            return (false, $"Ошибка шредера: {ex.Message}");
+            return (false, Localizer.GetString("Shredder_Error", ex.Message));
         }
     }
 

@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Microsoft.VisualBasic.FileIO;
+using SmartCleaner.Core.Localization;
 using SmartCleaner.Core.Models;
 using SmartCleaner.Core.Safety;
 
@@ -64,7 +65,7 @@ public class CleaningService : ICleaningService
                 errors.Add(new CleaningError
                 {
                     Path = item.Path,
-                    Message = validation.BlockReason ?? "Невозможно удалить",
+                    Message = validation.BlockReason ?? Localizer.GetString("Cleaning_ErrorCannotDelete"),
                     IsLocked = item.IsLocked,
                     RequiresElevation = validation.RequiresElevation
                 });
@@ -87,7 +88,7 @@ public class CleaningService : ICleaningService
                     errors.Add(new CleaningError
                     {
                         Path = item.Path,
-                        Message = error ?? "Неизвестная ошибка"
+                        Message = error ?? Localizer.GetString("Cleaning_ErrorUnknown")
                     });
                 }
             }
@@ -148,7 +149,7 @@ public class CleaningService : ICleaningService
                 errors.Add(new CleaningError
                 {
                     Path = item.Path,
-                    Message = "Путь не соответствует политике elevated-clean"
+                    Message = Localizer.GetString("Cleaning_ElevatedPolicyRejected")
                 });
                 continue;
             }
@@ -196,7 +197,7 @@ public class CleaningService : ICleaningService
             var process = Process.Start(startInfo);
             if (process is null)
             {
-                return BuildFailedStartResult(eligibleItems, errors, "Не удалось запустить elevated-clean процесс");
+                return BuildFailedStartResult(eligibleItems, errors, Localizer.GetString("Cleaning_ElevatedStartFailed"));
             }
 
             await process.WaitForExitAsync(ct);
@@ -209,7 +210,7 @@ public class CleaningService : ICleaningService
                     errors.Add(new CleaningError
                     {
                         Path = launchData.RequestFile,
-                        Message = $"Elevated-clean завершился с кодом {process.ExitCode}, результат не получен"
+                        Message = Localizer.GetString("Cleaning_ElevatedExitCode", process.ExitCode)
                     });
                 }
 
@@ -298,11 +299,11 @@ public class CleaningService : ICleaningService
             }
             catch (UnauthorizedAccessException)
             {
-                return (false, "Нет доступа к файлу");
+                return (false, Localizer.GetString("Cleaning_ErrorAccessDenied"));
             }
             catch (IOException ex)
             {
-                return (false, $"Файл заблокирован: {ex.Message}");
+                return (false, Localizer.GetString("Cleaning_ErrorLocked", ex.Message));
             }
             catch (Exception ex)
             {
@@ -321,7 +322,7 @@ public class CleaningService : ICleaningService
                 var imageId = dockerPath["docker:image:".Length..];
                 if (!IsSafeDockerIdentifier(imageId))
                 {
-                    return (false, "Недопустимый идентификатор Docker-образа");
+                    return (false, Localizer.GetString("Cleaning_DockerInvalidImageId"));
                 }
                 arguments = $"rmi -f {imageId}";
             }
@@ -330,7 +331,7 @@ public class CleaningService : ICleaningService
                 var containerId = dockerPath["docker:container:".Length..];
                 if (!IsSafeDockerIdentifier(containerId))
                 {
-                    return (false, "Недопустимый идентификатор Docker-контейнера");
+                    return (false, Localizer.GetString("Cleaning_DockerInvalidContainerId"));
                 }
                 arguments = $"rm -f {containerId}";
             }
@@ -340,7 +341,7 @@ public class CleaningService : ICleaningService
             }
             else
             {
-                return (false, "Неизвестная docker команда");
+                return (false, Localizer.GetString("Cleaning_DockerUnknownCommand"));
             }
 
             // Обоснованное исключение (День 24): docker — внешний dev-инструмент,
