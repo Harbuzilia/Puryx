@@ -1,3 +1,4 @@
+using SmartCleaner.Core.Localization;
 using SmartCleaner.Core.Models;
 using SmartCleaner.Core.Safety;
 
@@ -49,7 +50,7 @@ public class DotnetArtifactsScanner : ScannerBase
                     continue;
 
                 ct.ThrowIfCancellationRequested();
-                progress?.Report($"Поиск артефактов .NET в {root}...");
+                progress?.Report(Localizer.GetString("Scanner_Dotnet_Progress_Searching", root));
 
                 FindArtifactFolders(root, result.Items, progress, ct, maxDepth: 6, currentDepth: 0);
             }
@@ -127,7 +128,7 @@ public class DotnetArtifactsScanner : ScannerBase
         items.Add(CreateDirectoryItem(
             path,
             risk,
-            $"{folderType}/ артефакты проекта «{projectName}» — можно пересобрать через dotnet build",
+            Localizer.GetString("Scanner_Dotnet_Desc_Artifacts", folderType, projectName),
             parentApp: projectName,
             restoreCommand: $"dotnet build \"{projectDir}\""));
     }

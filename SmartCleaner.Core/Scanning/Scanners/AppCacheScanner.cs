@@ -1,3 +1,4 @@
+using SmartCleaner.Core.Localization;
 using SmartCleaner.Core.Models;
 using SmartCleaner.Core.Safety;
 
@@ -31,104 +32,101 @@ public class AppCacheScanner : ScannerBase
 
             // ═══════════════ МЕССЕНДЖЕРЫ ═══════════════
 
-            progress?.Report("Сканирование: Discord...");
+            progress?.Report(Localizer.GetString("Scanner_Progress_Scanning", "Discord"));
             ScanElectronApp(items, appData, "discord", "Discord",
-                "Кэш чатов, аватаров, вложений Discord",
-                "Перекачается автоматически при открытии чатов");
+                "Scanner_AppCache_Expl_Discord",
+                "Scanner_AppCache_HowTo_Discord");
 
-            progress?.Report("Сканирование: Telegram...");
+            progress?.Report(Localizer.GetString("Scanner_Progress_Scanning", "Telegram"));
             ScanDir(items, Path.Combine(appData, "Telegram Desktop", "tdata", "user_data", "cache"),
-                "Telegram", "Кэш медиа Telegram (фото, видео, стикеры)",
-                "Медиа перекачается из облака при просмотре");
+                "Telegram", "Scanner_AppCache_Expl_TelegramMedia",
+                "Scanner_AppCache_HowTo_TelegramMedia");
             ScanDir(items, Path.Combine(appData, "Telegram Desktop", "tdata", "user_data", "media_cache"),
-                "Telegram", "Кэш медиа Telegram",
-                "Перекачается автоматически");
+                "Telegram", "Scanner_AppCache_Expl_TelegramMediaCache",
+                "Scanner_AppCache_HowTo_Auto");
 
-            progress?.Report("Сканирование: WhatsApp...");
+            progress?.Report(Localizer.GetString("Scanner_Progress_Scanning", "WhatsApp"));
             ScanElectronApp(items, localAppData, "WhatsApp", "WhatsApp",
-                "Кэш WhatsApp Desktop",
-                "Перекачается при синхронизации с телефоном");
+                "Scanner_AppCache_Expl_WhatsApp",
+                "Scanner_AppCache_HowTo_WhatsApp");
 
-            progress?.Report("Сканирование: Slack...");
+            progress?.Report(Localizer.GetString("Scanner_Progress_Scanning", "Slack"));
             ScanElectronApp(items, appData, "Slack", "Slack",
-                "Кэш рабочих пространств Slack",
-                "Перекачается при открытии каналов");
+                "Scanner_AppCache_Expl_Slack",
+                "Scanner_AppCache_HowTo_Slack");
 
-            progress?.Report("Сканирование: Teams...");
+            progress?.Report(Localizer.GetString("Scanner_Progress_Scanning", "Teams"));
             ScanElectronApp(items, appData, @"Microsoft\Teams", "Microsoft Teams",
-                "Кэш чатов и файлов Teams",
-                "Перекачается при открытии чатов");
+                "Scanner_AppCache_Expl_Teams",
+                "Scanner_AppCache_HowTo_Chats");
             // Новый Teams
             ScanElectronApp(items, localAppData, @"Packages\MSTeams_8wekyb3d8bbwe\LocalCache", "Teams (new)",
-                "Кэш нового Microsoft Teams",
-                "Перекачается автоматически");
+                "Scanner_AppCache_Expl_TeamsNew",
+                "Scanner_AppCache_HowTo_Auto");
 
-            progress?.Report("Сканирование: Zoom...");
+            progress?.Report(Localizer.GetString("Scanner_Progress_Scanning", "Zoom"));
             ScanDir(items, Path.Combine(appData, "Zoom", "data"),
-                "Zoom", "Кэш данных Zoom",
-                "Перекачается при следующем звонке");
+                "Zoom", "Scanner_AppCache_Expl_Zoom",
+                "Scanner_AppCache_HowTo_Zoom");
 
-            progress?.Report("Сканирование: Skype...");
+            progress?.Report(Localizer.GetString("Scanner_Progress_Scanning", "Skype"));
             ScanElectronApp(items, appData, @"Microsoft\Skype for Desktop", "Skype",
-                "Кэш Skype Desktop",
-                "Перекачается при открытии чатов");
+                "Scanner_AppCache_Expl_Skype",
+                "Scanner_AppCache_HowTo_Chats");
 
             // ═══════════════ МЕДИА ═══════════════
 
-            progress?.Report("Сканирование: Spotify...");
+            progress?.Report(Localizer.GetString("Scanner_Progress_Scanning", "Spotify"));
             ScanDir(items, Path.Combine(localAppData, "Spotify", "Storage"),
-                "Spotify", "Оффлайн-кэш музыки Spotify",
-                "Музыка перекачается при прослушивании. Оффлайн-плейлисты нужно пересохранить",
-                howToRestore: "Оффлайн-плейлисты: заново скачать в настройках Spotify");
+                "Spotify", "Scanner_AppCache_Expl_SpotifyStorage",
+                "Scanner_AppCache_HowTo_SpotifyStorage");
             ScanDir(items, Path.Combine(localAppData, "Spotify", "Data"),
-                "Spotify", "Кэш данных Spotify",
-                "Перекачается автоматически");
+                "Spotify", "Scanner_AppCache_Expl_SpotifyData",
+                "Scanner_AppCache_HowTo_Auto");
 
-            progress?.Report("Сканирование: Steam...");
+            progress?.Report(Localizer.GetString("Scanner_Progress_Scanning", "Steam"));
             ScanDir(items, Path.Combine(localAppData, "Steam", "htmlcache"),
-                "Steam", "Кэш HTML/веб-контента Steam",
-                "Перекачается при открытии магазина");
+                "Steam", "Scanner_AppCache_Expl_SteamHtml",
+                "Scanner_AppCache_HowTo_SteamHtml");
             // Steam shader cache (в каждой игре)
             var steamPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), 
                 "Steam", "steamapps", "shadercache");
             ScanDir(items, steamPath,
-                "Steam", "Предкомпилированные шейдеры игр Steam",
-                "Перекомпилируются при первом запуске каждой игры (может быть подвисание 1-2 мин)");
+                "Steam", "Scanner_AppCache_Expl_SteamShaders",
+                "Scanner_AppCache_HowTo_SteamShaders");
 
-            progress?.Report("Сканирование: Epic Games...");
+            progress?.Report(Localizer.GetString("Scanner_Progress_Scanning", "Epic Games"));
             ScanDir(items, Path.Combine(localAppData, "EpicGamesLauncher", "Saved", "webcache"),
-                "Epic Games", "Кэш веб-контента Epic Games Launcher",
-                "Перекачается при открытии лаунчера");
+                "Epic Games", "Scanner_AppCache_Expl_EpicWebcache",
+                "Scanner_AppCache_HowTo_EpicWebcache");
             ScanDir(items, Path.Combine(localAppData, "EpicGamesLauncher", "Saved", "Logs"),
-                "Epic Games", "Логи Epic Games Launcher",
-                "Создадутся заново при следующем запуске");
+                "Epic Games", "Scanner_AppCache_HowTo_EpicLogs");
 
-            progress?.Report("Сканирование: Adobe...");
+            progress?.Report(Localizer.GetString("Scanner_Progress_Scanning", "Adobe"));
             ScanAdobeCaches(items, appData, localAppData);
 
-            progress?.Report("Сканирование: VLC...");
+            progress?.Report(Localizer.GetString("Scanner_Progress_Scanning", "VLC"));
             ScanDir(items, Path.Combine(appData, "vlc", "art", "artistalbum"),
-                "VLC", "Кэш обложек VLC",
-                "Перекачается при воспроизведении");
+                "VLC", "Scanner_AppCache_Expl_VlcArt",
+                "Scanner_AppCache_HowTo_VlcArt");
 
             // ═══════════════ IDE / РЕДАКТОРЫ ═══════════════
 
-            progress?.Report("Сканирование: JetBrains IDE...");
+            progress?.Report(Localizer.GetString("Scanner_Progress_Scanning", "JetBrains IDE"));
             ScanJetBrainsCaches(items, localAppData);
 
-            progress?.Report("Сканирование: Visual Studio...");
+            progress?.Report(Localizer.GetString("Scanner_Progress_Scanning", "Visual Studio"));
             ScanVisualStudioCaches(items, localAppData);
 
-            progress?.Report("Сканирование: Android Studio...");
+            progress?.Report(Localizer.GetString("Scanner_Progress_Scanning", "Android Studio"));
             var androidCache = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".android", "cache");
             ScanDir(items, androidCache,
-                "Android Studio", "Кэш Android SDK",
-                "Перекачается при следующей сборке");
+                "Android Studio", "Scanner_AppCache_HowTo_NextBuild");
 
             // ═══════════════ ОФИС ═══════════════
 
-            progress?.Report("Сканирование: Microsoft Office...");
+            progress?.Report(Localizer.GetString("Scanner_Progress_Scanning", "Microsoft Office"));
             ScanOfficeCaches(items, localAppData);
 
         }, ct);
@@ -148,10 +146,10 @@ public class AppCacheScanner : ScannerBase
     /// <param name="basePath">Базовый путь (AppData или LocalAppData)</param>
     /// <param name="appFolder">Подпапка приложения</param>
     /// <param name="appName">Отображаемое имя</param>
-    /// <param name="description">Описание кэша</param>
-    /// <param name="howToRestore">Инструкция восстановления</param>
+    /// <param name="explanationKey">Ключ описания кэша</param>
+    /// <param name="howToRestoreKey">Ключ инструкции восстановления</param>
     private void ScanElectronApp(List<ScannedItem> items, string basePath, string appFolder,
-        string appName, string description, string howToRestore)
+        string appName, string explanationKey, string howToRestoreKey)
     {
         var appPath = Path.Combine(basePath, appFolder);
         if (!Directory.Exists(appPath)) return;
@@ -174,8 +172,8 @@ public class AppCacheScanner : ScannerBase
                 LastAccess = GetLastAccess(fullPath),
                 Risk = RiskCategory.SafeToDelete,
                 Description = $"{appName}: {folder}",
-                Explanation = description,
-                HowToRestore = howToRestore,
+                Explanation = Localizer.GetString(explanationKey),
+                HowToRestore = Localizer.GetString(howToRestoreKey),
                 IsDirectory = true,
                 ParentApp = appName,
                 IsSelected = true
@@ -187,7 +185,7 @@ public class AppCacheScanner : ScannerBase
     /// Сканирует одну конкретную директорию и добавляет если существует и достаточно большая.
     /// </summary>
     private void ScanDir(List<ScannedItem> items, string path, string appName,
-        string description, string explanation, string? howToRestore = null, 
+        string explanationKey, string? howToRestoreKey = null, 
         long minSize = 1024 * 1024)
     {
         if (!Directory.Exists(path)) return;
@@ -202,8 +200,10 @@ public class AppCacheScanner : ScannerBase
             LastAccess = GetLastAccess(path),
             Risk = RiskCategory.SafeToDelete,
             Description = $"{appName}: {Path.GetFileName(path)}",
-            Explanation = explanation,
-            HowToRestore = howToRestore ?? "Пересоздаётся автоматически при запуске приложения",
+            Explanation = Localizer.GetString(explanationKey),
+            HowToRestore = howToRestoreKey is not null
+                ? Localizer.GetString(howToRestoreKey)
+                : Localizer.GetString("Scanner_AppCache_HowTo_Default"),
             IsDirectory = true,
             ParentApp = appName,
             IsSelected = true
@@ -238,8 +238,7 @@ public class AppCacheScanner : ScannerBase
                 {
                     var cachePath = Path.Combine(productDir, cacheName);
                     ScanDir(items, cachePath, $"Adobe {productName}",
-                        $"Кэш Adobe {productName}",
-                        "Медиа-кэш Adobe. Перестроится при открытии проектов",
+                        "Scanner_AppCache_Expl_Adobe",
                         minSize: 512 * 1024);
                 }
             }
@@ -265,9 +264,8 @@ public class AppCacheScanner : ScannerBase
             {
                 var path = Path.Combine(ideDir, folder);
                 ScanDir(items, path, $"JetBrains {ideName}",
-                    $"Кэш/логи {ideName}",
-                    "Кэш индексов и логи IDE. Переиндексация при первом запуске (2-5 мин)",
-                    howToRestore: "Пересоздастся при запуске IDE. Первая индексация займёт несколько минут",
+                    "Scanner_AppCache_Expl_JetBrains",
+                    "Scanner_AppCache_HowTo_JetBrains",
                     minSize: 5 * 1024 * 1024); // JetBrains кэши > 5MB
             }
         }
@@ -292,16 +290,15 @@ public class AppCacheScanner : ScannerBase
             {
                 var path = Path.Combine(versionDir, folder);
                 ScanDir(items, path, $"Visual Studio {version}",
-                    $"Кэш {folder} Visual Studio",
-                    "Кэш компонентов VS. Пересоздаётся при первом запуске после удаления",
+                    "Scanner_AppCache_Expl_VS",
                     minSize: 2 * 1024 * 1024);
             }
         }
 
         // MEF ComponentModelCache в Exp
         var mefCache = Path.Combine(vsRoot, "MeowComponent");
-        ScanDir(items, mefCache, "Visual Studio", "MEF кэш", 
-            "Кэш MEF-компонентов Visual Studio");
+        ScanDir(items, mefCache, "Visual Studio",
+            "Scanner_AppCache_Expl_MEF");
     }
 
     /// <summary>
@@ -320,8 +317,7 @@ public class AppCacheScanner : ScannerBase
                 {
                     var path = Path.Combine(versionDir, folder);
                     ScanDir(items, path, "Microsoft Office",
-                        $"Кэш Office ({folder})",
-                        "Кэш файлов Office. Документы не пострадают",
+                        "Scanner_AppCache_Expl_Office",
                         minSize: 512 * 1024);
                 }
             }
@@ -330,8 +326,7 @@ public class AppCacheScanner : ScannerBase
         // Outlook кэш
         var outlookCache = Path.Combine(localAppData, "Microsoft", "Outlook", "RoamCache");
         ScanDir(items, outlookCache, "Outlook",
-            "Кэш Outlook (RoamCache)",
-            "Кэш вложений и превью. Перекачается при открытии писем");
+            "Scanner_AppCache_Expl_Outlook");
 
         // OneNote кэш
         var onenoteCache = Path.Combine(localAppData, "Microsoft", "OneNote");
@@ -342,8 +337,8 @@ public class AppCacheScanner : ScannerBase
                 var name = Path.GetFileName(dir);
                 if (name.Equals("cache", StringComparison.OrdinalIgnoreCase))
                 {
-                    ScanDir(items, dir, "OneNote", "Кэш OneNote",
-                        "Кэш синхронизации. Записи синхронизируются из облака");
+                    ScanDir(items, dir, "OneNote",
+                        "Scanner_AppCache_Expl_OneNote");
                 }
             }
         }
@@ -352,8 +347,7 @@ public class AppCacheScanner : ScannerBase
         var recentDocs = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
             "Microsoft", "Office", "Recent");
         ScanDir(items, recentDocs, "Office",
-            "Список последних файлов Office",
-            "Ярлыки к недавно открытым документам. Документы НЕ удаляются",
+            "Scanner_AppCache_Expl_OfficeRecent",
             minSize: 0);
     }
 }

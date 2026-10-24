@@ -3081,4 +3081,179 @@ Windows может использовать эти драйверы прямо �
   <data name="Scanner_PackageCache_HowTo_Electron" xml:space="preserve">
     <value>Автоматически: скачается при сборке Electron-проектов.</value>
   </data>
+  <!-- День 6а, волна 4: DotnetArtifacts/Docker/AppCache/ShaderCache -->
+  <data name="Scanner_Dotnet_Progress_Searching" xml:space="preserve">
+    <value>Поиск артефактов .NET в {0}...</value>
+  </data>
+  <data name="Scanner_Dotnet_Desc_Artifacts" xml:space="preserve">
+    <value>{0}/ артефакты проекта «{1}» — можно пересобрать через dotnet build</value>
+  </data>
+  <data name="Scanner_Docker_Progress_Analyzing" xml:space="preserve">
+    <value>Анализ Docker...</value>
+  </data>
+  <data name="Scanner_Docker_Progress_Dangling" xml:space="preserve">
+    <value>Docker: поиск dangling images...</value>
+  </data>
+  <data name="Scanner_Docker_Progress_BuildCache" xml:space="preserve">
+    <value>Docker: анализ build cache...</value>
+  </data>
+  <data name="Scanner_Docker_Progress_Stopped" xml:space="preserve">
+    <value>Docker: поиск остановленных контейнеров...</value>
+  </data>
+  <data name="Scanner_Docker_Desc_DanglingImage" xml:space="preserve">
+    <value>Dangling Docker image {0} ({1}) — без тегов, можно безопасно удалить</value>
+  </data>
+  <data name="Scanner_Docker_Desc_BuildCache" xml:space="preserve">
+    <value>Docker build cache ({0}) — безопасно очистить через 'docker builder prune'</value>
+  </data>
+  <data name="Scanner_Docker_Desc_StoppedContainer" xml:space="preserve">
+    <value>Остановленный контейнер «{0}» — можно удалить через 'docker rm'</value>
+  </data>
+  <data name="Scanner_Shader_Progress_Searching" xml:space="preserve">
+    <value>Поиск кэшей шейдеров видеокарт и DirectX...</value>
+  </data>
+  <data name="Scanner_Shader_Desc_DirectX" xml:space="preserve">
+    <value>Системный кэш скомпилированных шейдеров DirectX 11/12</value>
+  </data>
+  <data name="Scanner_Shader_Desc_NvDx" xml:space="preserve">
+    <value>Скомпилированные шейдеры драйвера NVIDIA для DirectX игр</value>
+  </data>
+  <data name="Scanner_Shader_Desc_NvGl" xml:space="preserve">
+    <value>Скомпилированные шейдеры OpenGL и Vulkan драйвера NVIDIA</value>
+  </data>
+  <data name="Scanner_Shader_Desc_NvCompute" xml:space="preserve">
+    <value>Временный кэш вычислений NVIDIA CUDA/DirectX</value>
+  </data>
+  <data name="Scanner_Shader_Desc_AmdDx" xml:space="preserve">
+    <value>Кэш шейдеров видеокарт AMD Radeon</value>
+  </data>
+  <data name="Scanner_Shader_Desc_AmdGl" xml:space="preserve">
+    <value>Кэш шейдеров Vulkan/OpenGL AMD</value>
+  </data>
+  <data name="Scanner_Shader_Desc_Intel" xml:space="preserve">
+    <value>Кэш шейдеров интегрированной графики Intel</value>
+  </data>
+  <data name="Scanner_Shader_Desc_Steam" xml:space="preserve">
+    <value>Предварительно скомпилированные шейдеры игр в Steam</value>
+  </data>
+  <data name="Scanner_Shader_HowTo_Default" xml:space="preserve">
+    <value>Шейдеры автоматически перекомпилируются графическим драйвером при следующем запуске игры.</value>
+  </data>
+  <data name="Scanner_AppCache_HowTo_Default" xml:space="preserve">
+    <value>Перекачается автоматически при запуске приложения</value>
+  </data>
+  <data name="Scanner_AppCache_HowTo_Auto" xml:space="preserve">
+    <value>Перекачается автоматически</value>
+  </data>
+  <data name="Scanner_AppCache_HowTo_Chats" xml:space="preserve">
+    <value>Перекачается при открытии чатов</value>
+  </data>
+  <data name="Scanner_AppCache_Expl_Discord" xml:space="preserve">
+    <value>Кэш чатов, аватаров, вложений Discord</value>
+  </data>
+  <data name="Scanner_AppCache_HowTo_Discord" xml:space="preserve">
+    <value>Перекачается автоматически при открытии чатов</value>
+  </data>
+  <data name="Scanner_AppCache_Expl_TelegramMedia" xml:space="preserve">
+    <value>Кэш медиа Telegram (фото, видео, стикеры)</value>
+  </data>
+  <data name="Scanner_AppCache_HowTo_TelegramMedia" xml:space="preserve">
+    <value>Медиа перекачается из облака при просмотре</value>
+  </data>
+  <data name="Scanner_AppCache_Expl_TelegramMediaCache" xml:space="preserve">
+    <value>Кэш медиа Telegram</value>
+  </data>
+  <data name="Scanner_AppCache_Expl_WhatsApp" xml:space="preserve">
+    <value>Кэш WhatsApp Desktop</value>
+  </data>
+  <data name="Scanner_AppCache_HowTo_WhatsApp" xml:space="preserve">
+    <value>Перекачается при синхронизации с телефоном</value>
+  </data>
+  <data name="Scanner_AppCache_Expl_Slack" xml:space="preserve">
+    <value>Кэш рабочих пространств Slack</value>
+  </data>
+  <data name="Scanner_AppCache_HowTo_Slack" xml:space="preserve">
+    <value>Перекачается при открытии каналов</value>
+  </data>
+  <data name="Scanner_AppCache_Expl_Teams" xml:space="preserve">
+    <value>Кэш чатов и файлов Teams</value>
+  </data>
+  <data name="Scanner_AppCache_Expl_TeamsNew" xml:space="preserve">
+    <value>Кэш нового Microsoft Teams</value>
+  </data>
+  <data name="Scanner_AppCache_Expl_Zoom" xml:space="preserve">
+    <value>Кэш данных Zoom</value>
+  </data>
+  <data name="Scanner_AppCache_HowTo_Zoom" xml:space="preserve">
+    <value>Перекачается при следующем звонке</value>
+  </data>
+  <data name="Scanner_AppCache_Expl_Skype" xml:space="preserve">
+    <value>Кэш Skype Desktop</value>
+  </data>
+  <data name="Scanner_AppCache_Expl_SpotifyStorage" xml:space="preserve">
+    <value>Музыка перекачается при прослушивании. Оффлайн-плейлисты нужно пересохранить</value>
+  </data>
+  <data name="Scanner_AppCache_HowTo_SpotifyStorage" xml:space="preserve">
+    <value>Оффлайн-плейлисты: заново скачать в настройках Spotify</value>
+  </data>
+  <data name="Scanner_AppCache_Expl_SpotifyData" xml:space="preserve">
+    <value>Кэш данных Spotify</value>
+  </data>
+  <data name="Scanner_AppCache_Expl_SteamHtml" xml:space="preserve">
+    <value>Кэш HTML/веб-контента Steam</value>
+  </data>
+  <data name="Scanner_AppCache_HowTo_SteamHtml" xml:space="preserve">
+    <value>Перекачается при открытии магазина</value>
+  </data>
+  <data name="Scanner_AppCache_Expl_SteamShaders" xml:space="preserve">
+    <value>Предкомпилированные шейдеры игр Steam</value>
+  </data>
+  <data name="Scanner_AppCache_HowTo_SteamShaders" xml:space="preserve">
+    <value>Перекомпилируются при первом запуске каждой игры (может быть подвисание 1-2 мин)</value>
+  </data>
+  <data name="Scanner_AppCache_Expl_EpicWebcache" xml:space="preserve">
+    <value>Кэш веб-контента Epic Games Launcher</value>
+  </data>
+  <data name="Scanner_AppCache_HowTo_EpicWebcache" xml:space="preserve">
+    <value>Перекачается при открытии лаунчера</value>
+  </data>
+  <data name="Scanner_AppCache_HowTo_EpicLogs" xml:space="preserve">
+    <value>Создадутся заново при следующем запуске</value>
+  </data>
+  <data name="Scanner_AppCache_HowTo_NextBuild" xml:space="preserve">
+    <value>Перекачается при следующей сборке</value>
+  </data>
+  <data name="Scanner_AppCache_Expl_VlcArt" xml:space="preserve">
+    <value>Кэш обложек VLC</value>
+  </data>
+  <data name="Scanner_AppCache_HowTo_VlcArt" xml:space="preserve">
+    <value>Перекачается при воспроизведении</value>
+  </data>
+  <data name="Scanner_AppCache_Expl_Adobe" xml:space="preserve">
+    <value>Медиа-кэш Adobe. Перестроится при открытии проектов</value>
+  </data>
+  <data name="Scanner_AppCache_Expl_JetBrains" xml:space="preserve">
+    <value>Кэш индексов и логи IDE. Переиндексация при первом запуске (2-5 мин)</value>
+  </data>
+  <data name="Scanner_AppCache_HowTo_JetBrains" xml:space="preserve">
+    <value>Пересоздастся при запуске IDE. Первая индексация займёт несколько минут</value>
+  </data>
+  <data name="Scanner_AppCache_Expl_VS" xml:space="preserve">
+    <value>Кэш компонентов VS. Пересоздаётся при первом запуске после удаления</value>
+  </data>
+  <data name="Scanner_AppCache_Expl_MEF" xml:space="preserve">
+    <value>Кэш MEF-компонентов Visual Studio</value>
+  </data>
+  <data name="Scanner_AppCache_Expl_Office" xml:space="preserve">
+    <value>Кэш файлов Office. Документы не пострадают</value>
+  </data>
+  <data name="Scanner_AppCache_Expl_Outlook" xml:space="preserve">
+    <value>Кэш вложений и превью. Перекачается при открытии писем</value>
+  </data>
+  <data name="Scanner_AppCache_Expl_OneNote" xml:space="preserve">
+    <value>Кэш синхронизации. Записи синхронизируются из облака</value>
+  </data>
+  <data name="Scanner_AppCache_Expl_OfficeRecent" xml:space="preserve">
+    <value>Ярлыки к недавно открытым документам. Документы НЕ удаляются</value>
+  </data>
 </root>

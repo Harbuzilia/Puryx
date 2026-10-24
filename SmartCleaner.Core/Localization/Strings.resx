@@ -3081,4 +3081,179 @@ Remove these entries from the system registry?</value>
   <data name="Scanner_PackageCache_HowTo_Electron" xml:space="preserve">
     <value>Automatically: re-downloaded when Electron projects are built.</value>
   </data>
+  <!-- День 6а, волна 4: DotnetArtifacts/Docker/AppCache/ShaderCache -->
+  <data name="Scanner_Dotnet_Progress_Searching" xml:space="preserve">
+    <value>Searching .NET build artifacts in {0}...</value>
+  </data>
+  <data name="Scanner_Dotnet_Desc_Artifacts" xml:space="preserve">
+    <value>{0}/ artifacts of project '{1}' - can be rebuilt via dotnet build</value>
+  </data>
+  <data name="Scanner_Docker_Progress_Analyzing" xml:space="preserve">
+    <value>Analyzing Docker...</value>
+  </data>
+  <data name="Scanner_Docker_Progress_Dangling" xml:space="preserve">
+    <value>Docker: searching for dangling images...</value>
+  </data>
+  <data name="Scanner_Docker_Progress_BuildCache" xml:space="preserve">
+    <value>Docker: analyzing build cache...</value>
+  </data>
+  <data name="Scanner_Docker_Progress_Stopped" xml:space="preserve">
+    <value>Docker: searching for stopped containers...</value>
+  </data>
+  <data name="Scanner_Docker_Desc_DanglingImage" xml:space="preserve">
+    <value>Dangling Docker image {0} ({1}) - untagged, safe to delete</value>
+  </data>
+  <data name="Scanner_Docker_Desc_BuildCache" xml:space="preserve">
+    <value>Docker build cache ({0}) - safe to clean via 'docker builder prune'</value>
+  </data>
+  <data name="Scanner_Docker_Desc_StoppedContainer" xml:space="preserve">
+    <value>Stopped container '{0}' - removable via 'docker rm'</value>
+  </data>
+  <data name="Scanner_Shader_Progress_Searching" xml:space="preserve">
+    <value>Searching GPU and DirectX shader caches...</value>
+  </data>
+  <data name="Scanner_Shader_Desc_DirectX" xml:space="preserve">
+    <value>System cache of compiled DirectX 11/12 shaders</value>
+  </data>
+  <data name="Scanner_Shader_Desc_NvDx" xml:space="preserve">
+    <value>Compiled NVIDIA driver shaders for DirectX games</value>
+  </data>
+  <data name="Scanner_Shader_Desc_NvGl" xml:space="preserve">
+    <value>Compiled OpenGL and Vulkan shaders of the NVIDIA driver</value>
+  </data>
+  <data name="Scanner_Shader_Desc_NvCompute" xml:space="preserve">
+    <value>Temporary NVIDIA CUDA/DirectX compute cache</value>
+  </data>
+  <data name="Scanner_Shader_Desc_AmdDx" xml:space="preserve">
+    <value>AMD Radeon GPU shader cache</value>
+  </data>
+  <data name="Scanner_Shader_Desc_AmdGl" xml:space="preserve">
+    <value>AMD Vulkan/OpenGL shader cache</value>
+  </data>
+  <data name="Scanner_Shader_Desc_Intel" xml:space="preserve">
+    <value>Intel integrated graphics shader cache</value>
+  </data>
+  <data name="Scanner_Shader_Desc_Steam" xml:space="preserve">
+    <value>Precompiled shaders of Steam games</value>
+  </data>
+  <data name="Scanner_Shader_HowTo_Default" xml:space="preserve">
+    <value>Shaders are automatically recompiled by the graphics driver on the next game launch.</value>
+  </data>
+  <data name="Scanner_AppCache_HowTo_Default" xml:space="preserve">
+    <value>Re-created automatically when the application starts</value>
+  </data>
+  <data name="Scanner_AppCache_HowTo_Auto" xml:space="preserve">
+    <value>Re-downloaded automatically</value>
+  </data>
+  <data name="Scanner_AppCache_HowTo_Chats" xml:space="preserve">
+    <value>Re-downloaded when chats are opened</value>
+  </data>
+  <data name="Scanner_AppCache_Expl_Discord" xml:space="preserve">
+    <value>Discord chats, avatars and attachments cache</value>
+  </data>
+  <data name="Scanner_AppCache_HowTo_Discord" xml:space="preserve">
+    <value>Re-downloaded automatically when chats are opened</value>
+  </data>
+  <data name="Scanner_AppCache_Expl_TelegramMedia" xml:space="preserve">
+    <value>Telegram media cache (photos, videos, stickers)</value>
+  </data>
+  <data name="Scanner_AppCache_HowTo_TelegramMedia" xml:space="preserve">
+    <value>Media is re-downloaded from the cloud when viewed</value>
+  </data>
+  <data name="Scanner_AppCache_Expl_TelegramMediaCache" xml:space="preserve">
+    <value>Telegram media cache</value>
+  </data>
+  <data name="Scanner_AppCache_Expl_WhatsApp" xml:space="preserve">
+    <value>WhatsApp Desktop cache</value>
+  </data>
+  <data name="Scanner_AppCache_HowTo_WhatsApp" xml:space="preserve">
+    <value>Re-downloaded when syncing with the phone</value>
+  </data>
+  <data name="Scanner_AppCache_Expl_Slack" xml:space="preserve">
+    <value>Slack workspace cache</value>
+  </data>
+  <data name="Scanner_AppCache_HowTo_Slack" xml:space="preserve">
+    <value>Re-downloaded when channels are opened</value>
+  </data>
+  <data name="Scanner_AppCache_Expl_Teams" xml:space="preserve">
+    <value>Teams chats and files cache</value>
+  </data>
+  <data name="Scanner_AppCache_Expl_TeamsNew" xml:space="preserve">
+    <value>New Microsoft Teams cache</value>
+  </data>
+  <data name="Scanner_AppCache_Expl_Zoom" xml:space="preserve">
+    <value>Zoom data cache</value>
+  </data>
+  <data name="Scanner_AppCache_HowTo_Zoom" xml:space="preserve">
+    <value>Re-downloaded on the next call</value>
+  </data>
+  <data name="Scanner_AppCache_Expl_Skype" xml:space="preserve">
+    <value>Skype Desktop cache</value>
+  </data>
+  <data name="Scanner_AppCache_Expl_SpotifyStorage" xml:space="preserve">
+    <value>Music is re-downloaded while listening. Offline playlists need to be re-saved</value>
+  </data>
+  <data name="Scanner_AppCache_HowTo_SpotifyStorage" xml:space="preserve">
+    <value>Offline playlists: re-download them in Spotify settings</value>
+  </data>
+  <data name="Scanner_AppCache_Expl_SpotifyData" xml:space="preserve">
+    <value>Spotify data cache</value>
+  </data>
+  <data name="Scanner_AppCache_Expl_SteamHtml" xml:space="preserve">
+    <value>Steam HTML/web content cache</value>
+  </data>
+  <data name="Scanner_AppCache_HowTo_SteamHtml" xml:space="preserve">
+    <value>Re-downloaded when the store is opened</value>
+  </data>
+  <data name="Scanner_AppCache_Expl_SteamShaders" xml:space="preserve">
+    <value>Precompiled shaders of Steam games</value>
+  </data>
+  <data name="Scanner_AppCache_HowTo_SteamShaders" xml:space="preserve">
+    <value>Recompiled on each game's first launch (possible 1-2 min freeze)</value>
+  </data>
+  <data name="Scanner_AppCache_Expl_EpicWebcache" xml:space="preserve">
+    <value>Epic Games Launcher web content cache</value>
+  </data>
+  <data name="Scanner_AppCache_HowTo_EpicWebcache" xml:space="preserve">
+    <value>Re-downloaded when the launcher is opened</value>
+  </data>
+  <data name="Scanner_AppCache_HowTo_EpicLogs" xml:space="preserve">
+    <value>Re-created on the next launch</value>
+  </data>
+  <data name="Scanner_AppCache_HowTo_NextBuild" xml:space="preserve">
+    <value>Re-downloaded on the next build</value>
+  </data>
+  <data name="Scanner_AppCache_Expl_VlcArt" xml:space="preserve">
+    <value>VLC cover art cache</value>
+  </data>
+  <data name="Scanner_AppCache_HowTo_VlcArt" xml:space="preserve">
+    <value>Re-downloaded during playback</value>
+  </data>
+  <data name="Scanner_AppCache_Expl_Adobe" xml:space="preserve">
+    <value>Adobe media cache. Rebuilt when projects are opened</value>
+  </data>
+  <data name="Scanner_AppCache_Expl_JetBrains" xml:space="preserve">
+    <value>IDE index cache and logs. Re-indexed on first launch (2-5 min)</value>
+  </data>
+  <data name="Scanner_AppCache_HowTo_JetBrains" xml:space="preserve">
+    <value>Re-created when the IDE starts. First indexing takes a few minutes</value>
+  </data>
+  <data name="Scanner_AppCache_Expl_VS" xml:space="preserve">
+    <value>VS component cache. Re-created on first launch after removal</value>
+  </data>
+  <data name="Scanner_AppCache_Expl_MEF" xml:space="preserve">
+    <value>Visual Studio MEF component cache</value>
+  </data>
+  <data name="Scanner_AppCache_Expl_Office" xml:space="preserve">
+    <value>Office file cache. Documents are not affected</value>
+  </data>
+  <data name="Scanner_AppCache_Expl_Outlook" xml:space="preserve">
+    <value>Attachment and preview cache. Re-downloaded when emails are opened</value>
+  </data>
+  <data name="Scanner_AppCache_Expl_OneNote" xml:space="preserve">
+    <value>Sync cache. Notes are synced from the cloud</value>
+  </data>
+  <data name="Scanner_AppCache_Expl_OfficeRecent" xml:space="preserve">
+    <value>Shortcuts to recently opened documents. Documents are NOT deleted</value>
+  </data>
 </root>

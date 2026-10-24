@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using SmartCleaner.Core.Helpers;
+using SmartCleaner.Core.Localization;
 using SmartCleaner.Core.Models;
 using SmartCleaner.Core.Safety;
 using System.IO;
@@ -26,36 +27,36 @@ public class ShaderCacheScanner : ScannerBase
         var localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
         var programFilesX86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
 
-        progress?.Report("Поиск кэшей шейдеров видеокарт и DirectX...");
+        progress?.Report(Localizer.GetString("Scanner_Shader_Progress_Searching"));
 
         // 1. DirectX D3DS Shader Cache
         var d3dsCache = Path.Combine(localAppData, "D3DSCache");
-        AddShaderDirectory(items, d3dsCache, "DirectX Shader Cache", "Системный кэш скомпилированных шейдеров DirectX 11/12", RiskCategory.SafeToDelete);
+        AddShaderDirectory(items, d3dsCache, "DirectX Shader Cache", "Scanner_Shader_Desc_DirectX", RiskCategory.SafeToDelete);
 
         // 2. NVIDIA Shader Caches
         var nvDxCache = Path.Combine(localAppData, "NVIDIA", "DXCache");
-        AddShaderDirectory(items, nvDxCache, "NVIDIA DirectX Shader Cache (DXCache)", "Скомпилированные шейдеры драйвера NVIDIA для DirectX игр", RiskCategory.SafeToDelete);
+        AddShaderDirectory(items, nvDxCache, "NVIDIA DirectX Shader Cache (DXCache)", "Scanner_Shader_Desc_NvDx", RiskCategory.SafeToDelete);
 
         var nvGlCache = Path.Combine(localAppData, "NVIDIA", "GLCache");
-        AddShaderDirectory(items, nvGlCache, "NVIDIA OpenGL/Vulkan Cache (GLCache)", "Скомпилированные шейдеры OpenGL и Vulkan драйвера NVIDIA", RiskCategory.SafeToDelete);
+        AddShaderDirectory(items, nvGlCache, "NVIDIA OpenGL/Vulkan Cache (GLCache)", "Scanner_Shader_Desc_NvGl", RiskCategory.SafeToDelete);
 
         var nvComputeCache = Path.Combine(localAppData, "NVIDIA Corporation", "NV_Cache");
-        AddShaderDirectory(items, nvComputeCache, "NVIDIA Compute Cache", "Временный кэш вычислений NVIDIA CUDA/DirectX", RiskCategory.SafeToDelete);
+        AddShaderDirectory(items, nvComputeCache, "NVIDIA Compute Cache", "Scanner_Shader_Desc_NvCompute", RiskCategory.SafeToDelete);
 
         // 3. AMD Shader Caches
         var amdDxCache = Path.Combine(localAppData, "AMD", "DxCache");
-        AddShaderDirectory(items, amdDxCache, "AMD Radeon Shader Cache (DxCache)", "Кэш шейдеров видеокарт AMD Radeon", RiskCategory.SafeToDelete);
+        AddShaderDirectory(items, amdDxCache, "AMD Radeon Shader Cache (DxCache)", "Scanner_Shader_Desc_AmdDx", RiskCategory.SafeToDelete);
 
         var amdGlCache = Path.Combine(localAppData, "AMD", "GLCache");
-        AddShaderDirectory(items, amdGlCache, "AMD OpenGL/Vulkan Shader Cache", "Кэш шейдеров Vulkan/OpenGL AMD", RiskCategory.SafeToDelete);
+        AddShaderDirectory(items, amdGlCache, "AMD OpenGL/Vulkan Shader Cache", "Scanner_Shader_Desc_AmdGl", RiskCategory.SafeToDelete);
 
         // 4. Intel Shader Cache
         var intelCache = Path.Combine(localAppData, "Intel", "ShaderCache");
-        AddShaderDirectory(items, intelCache, "Intel Graphics Shader Cache", "Кэш шейдеров интегрированной графики Intel", RiskCategory.SafeToDelete);
+        AddShaderDirectory(items, intelCache, "Intel Graphics Shader Cache", "Scanner_Shader_Desc_Intel", RiskCategory.SafeToDelete);
 
         // 5. Steam Shader Pre-Caching
         var steamShaderCache = Path.Combine(programFilesX86, "Steam", "steamapps", "shadercache");
-        AddShaderDirectory(items, steamShaderCache, "Steam Shader Pre-Caching", "Предварительно скомпилированные шейдеры игр в Steam", RiskCategory.PerformanceCache);
+        AddShaderDirectory(items, steamShaderCache, "Steam Shader Pre-Caching", "Scanner_Shader_Desc_Steam", RiskCategory.PerformanceCache);
 
         var result = new ScanResult
         {
@@ -67,7 +68,7 @@ public class ShaderCacheScanner : ScannerBase
         return Task.FromResult(result);
     }
 
-    private void AddShaderDirectory(List<ScannedItem> items, string path, string name, string desc, RiskCategory risk)
+    private void AddShaderDirectory(List<ScannedItem> items, string path, string name, string descKey, RiskCategory risk)
     {
         if (string.IsNullOrWhiteSpace(path) || !Directory.Exists(path)) return;
 
@@ -76,6 +77,7 @@ public class ShaderCacheScanner : ScannerBase
             var size = CalculateDirectorySize(path);
             if (size > 0)
             {
+                var desc = Localizer.GetString(descKey);
                 items.Add(new ScannedItem
                 {
                     Path = path,
@@ -83,7 +85,7 @@ public class ShaderCacheScanner : ScannerBase
                     LastAccess = Directory.GetLastWriteTime(path),
                     Description = $"{name}: {desc}",
                     Explanation = desc,
-                    HowToRestore = "Шейдеры автоматически перекомпилируются графическим драйвером при следующем запуске игры.",
+                    HowToRestore = Localizer.GetString("Scanner_Shader_HowTo_Default"),
                     Risk = risk,
                     IsDirectory = true
                 });

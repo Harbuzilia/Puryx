@@ -1,3 +1,4 @@
+using SmartCleaner.Core.Localization;
 using SmartCleaner.Core.Models;
 using SmartCleaner.Core.Safety;
 
@@ -32,7 +33,7 @@ public class DockerScanner : ScannerBase
             return result;
         }
 
-        progress?.Report("Анализ Docker...");
+        progress?.Report(Localizer.GetString("Scanner_Docker_Progress_Analyzing"));
 
         // 1. Dangling images (без тегов)
         await ScanDanglingImagesAsync(result.Items, progress, ct);
@@ -67,7 +68,7 @@ public class DockerScanner : ScannerBase
     /// </summary>
     private async Task ScanDanglingImagesAsync(IList<ScannedItem> items, IProgress<string>? progress, CancellationToken ct)
     {
-        progress?.Report("Docker: поиск dangling images...");
+        progress?.Report(Localizer.GetString("Scanner_Docker_Progress_Dangling"));
 
         var (exitCode, output) = await RunDockerCommandAsync("images -f dangling=true --format \"{{.ID}} {{.Size}}\"", ct);
         if (exitCode != 0 || string.IsNullOrWhiteSpace(output))
@@ -90,7 +91,7 @@ public class DockerScanner : ScannerBase
                 Path = $"docker:image:{imageId}",
                 Size = estimatedSize,
                 Risk = RiskCategory.SafeToDelete,
-                Description = $"Dangling Docker image {imageId[..12]} ({sizeStr}) — без тегов, можно безопасно удалить",
+                Description = Localizer.GetString("Scanner_Docker_Desc_DanglingImage", imageId[..12], sizeStr),
                 IsDirectory = false,
                 ParentApp = "Docker",
                 IsSelected = true,
@@ -104,7 +105,7 @@ public class DockerScanner : ScannerBase
     /// </summary>
     private async Task ScanBuildCacheAsync(IList<ScannedItem> items, IProgress<string>? progress, CancellationToken ct)
     {
-        progress?.Report("Docker: анализ build cache...");
+        progress?.Report(Localizer.GetString("Scanner_Docker_Progress_BuildCache"));
 
         var (exitCode, output) = await RunDockerCommandAsync("system df --format \"{{.Type}} {{.Size}} {{.Reclaimable}}\"", ct);
         if (exitCode != 0 || string.IsNullOrWhiteSpace(output))
@@ -131,7 +132,7 @@ public class DockerScanner : ScannerBase
                         Path = "docker:build-cache",
                         Size = estimatedSize,
                         Risk = RiskCategory.PerformanceCache,
-                        Description = $"Docker build cache ({sizeStr}) — безопасно очистить через 'docker builder prune'",
+                        Description = Localizer.GetString("Scanner_Docker_Desc_BuildCache", sizeStr),
                         IsDirectory = false,
                         ParentApp = "Docker",
                         IsSelected = false,
@@ -147,7 +148,7 @@ public class DockerScanner : ScannerBase
     /// </summary>
     private async Task ScanStoppedContainersAsync(IList<ScannedItem> items, IProgress<string>? progress, CancellationToken ct)
     {
-        progress?.Report("Docker: поиск остановленных контейнеров...");
+        progress?.Report(Localizer.GetString("Scanner_Docker_Progress_Stopped"));
 
         var (exitCode, output) = await RunDockerCommandAsync("ps -a -f status=exited --format \"{{.ID}} {{.Names}} {{.Size}}\"", ct);
         if (exitCode != 0 || string.IsNullOrWhiteSpace(output))
@@ -171,7 +172,7 @@ public class DockerScanner : ScannerBase
                 Path = $"docker:container:{containerId}",
                 Size = estimatedSize,
                 Risk = RiskCategory.SafeToDelete,
-                Description = $"Остановленный контейнер «{containerName}» — можно удалить через 'docker rm'",
+                Description = Localizer.GetString("Scanner_Docker_Desc_StoppedContainer", containerName),
                 IsDirectory = false,
                 ParentApp = "Docker",
                 IsSelected = true,
