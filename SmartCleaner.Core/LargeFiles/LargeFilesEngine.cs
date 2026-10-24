@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using SmartCleaner.Core.Helpers;
+using SmartCleaner.Core.Localization;
 
 namespace SmartCleaner.Core.LargeFiles;
 
@@ -38,7 +39,7 @@ public sealed class LargeFilesEngine
         IProgress<string>? progress = null,
         CancellationToken ct = default)
     {
-        progress?.Report($"Сканирование: {rootPath}...");
+        progress?.Report(Localizer.GetString("LargeFiles_Progress_Scanning", rootPath));
 
         // Используем SortedSet с ограничением по размеру для эффективности
         var result = new SortedSet<LargeFileInfo>(Comparer<LargeFileInfo>.Create(
@@ -56,7 +57,7 @@ public sealed class LargeFilesEngine
             ScanDirectory(rootPath, result, topN, ref minThreshold, ref totalScanned, progress, ct);
         }, ct);
 
-        progress?.Report($"Готово. Просканировано {totalScanned:N0} файлов.");
+        progress?.Report(Localizer.GetString("LargeFiles_Progress_Done", totalScanned));
         return result.Take(topN).ToList();
     }
 
@@ -107,7 +108,7 @@ public sealed class LargeFilesEngine
                 catch (Exception ex) { Debug.WriteLine($"[LargeFiles] Skip file: {ex.Message}"); }
 
                 if (totalScanned % 5000 == 0)
-                    progress?.Report($"Просканировано {totalScanned:N0} файлов...");
+                    progress?.Report(Localizer.GetString("LargeFiles_Progress_Scanned", totalScanned));
             }
 
             // Подкаталоги

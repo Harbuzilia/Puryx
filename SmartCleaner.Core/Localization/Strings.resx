@@ -2534,4 +2534,197 @@ Remove these entries from the system registry?</value>
   <data name="Uninstall_Error_StartFailed" xml:space="preserve">
     <value>Failed to start the uninstaller: {0}</value>
   </data>
+  <!-- Day 5, wave 3: PluginEngine / DuplicateEngine / LargeFilesEngine / DiskMapEngine / KnowledgeBase / CliInspectorEngine -->
+  <data name="Plugin_Progress_Scanning" xml:space="preserve">
+    <value>Scanning plugin: {0}...</value>
+  </data>
+  <data name="Plugin_Skipped_Blocked" xml:space="preserve">
+    <value>{0}: {1}</value>
+  </data>
+  <data name="Plugin_Skipped_BlockedByPolicy" xml:space="preserve">
+    <value>Blocked by the security policy</value>
+  </data>
+  <data name="Plugin_Skipped_ElevationRequired" xml:space="preserve">
+    <value>{0}: administrator rights are required, skipped</value>
+  </data>
+  <data name="Plugin_Progress_Cleaning" xml:space="preserve">
+    <value>Cleaning {0} -&gt; {1}...</value>
+  </data>
+  <data name="Duplicate_Progress_Scanning" xml:space="preserve">
+    <value>Scanning files...</value>
+  </data>
+  <data name="Duplicate_Progress_FoundFiles" xml:space="preserve">
+    <value>Found {0} files, filtering by size...</value>
+  </data>
+  <data name="Duplicate_Progress_PotentialDuplicates" xml:space="preserve">
+    <value>{0} potential duplicates out of {1} files</value>
+  </data>
+  <data name="Duplicate_Progress_Hashing" xml:space="preserve">
+    <value>Computing hashes...</value>
+  </data>
+  <data name="Duplicate_Progress_HashingProgress" xml:space="preserve">
+    <value>Hashing {0}/{1}...</value>
+  </data>
+  <data name="Duplicate_Progress_ByteVerification" xml:space="preserve">
+    <value>Byte-by-byte verification...</value>
+  </data>
+  <data name="Duplicate_Progress_Done" xml:space="preserve">
+    <value>Done. {0} duplicate groups.</value>
+  </data>
+  <data name="Duplicate_Progress_CheckedMatches" xml:space="preserve">
+    <value>Checked {0} files, {1} matches found...</value>
+  </data>
+  <data name="Duplicate_Progress_CopiesDone" xml:space="preserve">
+    <value>Done. {0} copies found.</value>
+  </data>
+  <data name="Duplicate_Progress_IndexingFolders" xml:space="preserve">
+    <value>Indexing folders...</value>
+  </data>
+  <data name="Duplicate_Progress_Comparing" xml:space="preserve">
+    <value>Comparing {0}/{1}...</value>
+  </data>
+  <data name="Duplicate_Progress_CompareDone" xml:space="preserve">
+    <value>Done. A: {0} unique, B: {1} unique, common: {2}</value>
+  </data>
+  <data name="Duplicate_Progress_FilesFound" xml:space="preserve">
+    <value>Found {0} files...</value>
+  </data>
+  <data name="Duplicate_Progress_VerifyingGroup" xml:space="preserve">
+    <value>Verifying group {0}/{1} ({2} files)...</value>
+  </data>
+  <data name="Duplicate_Hardlink_SkippedGroupMutable" xml:space="preserve">
+    <value>Group skipped: mutable format (a hardlink corrupts both copies): '{0}'</value>
+  </data>
+  <data name="Duplicate_Hardlink_CrossVolume" xml:space="preserve">
+    <value>A hardlink is not possible across different volumes: '{0}' and '{1}'</value>
+  </data>
+  <data name="Duplicate_Hardlink_SkippedMutable" xml:space="preserve">
+    <value>Skipped: mutable format (a hardlink corrupts both copies): '{0}'</value>
+  </data>
+  <data name="Duplicate_Hardlink_ReasonElevation" xml:space="preserve">
+    <value>administrator rights are required</value>
+  </data>
+  <data name="Duplicate_Hardlink_ReasonBlocked" xml:space="preserve">
+    <value>blocked by the safety service</value>
+  </data>
+  <data name="Duplicate_Hardlink_BlockedBySafetyGate" xml:space="preserve">
+    <value>Blocked by the safety gate ({0}): '{1}'</value>
+  </data>
+  <data name="Duplicate_Hardlink_Creating" xml:space="preserve">
+    <value>Creating a hardlink for {0}...</value>
+  </data>
+  <data name="Duplicate_Hardlink_Error" xml:space="preserve">
+    <value>CreateHardLink failed for '{0}'</value>
+  </data>
+  <data name="Duplicate_Hardlink_Exception" xml:space="preserve">
+    <value>Exception while creating a hardlink for '{0}': {1}</value>
+  </data>
+  <data name="Duplicate_Sweep_BackupDeleted" xml:space="preserve">
+    <value>Removed a stale backup: {0}</value>
+  </data>
+  <data name="Duplicate_Sweep_RestoredFromOrphan" xml:space="preserve">
+    <value>File restored from an orphan backup: {0}</value>
+  </data>
+  <data name="Duplicate_Sweep_Error" xml:space="preserve">
+    <value>Failed to clean up orphan backups in '{0}': {1}</value>
+  </data>
+  <data name="LargeFiles_Progress_Scanning" xml:space="preserve">
+    <value>Scanning: {0}...</value>
+  </data>
+  <data name="LargeFiles_Progress_Scanned" xml:space="preserve">
+    <value>Scanned {0:N0} files...</value>
+  </data>
+  <data name="LargeFiles_Progress_Done" xml:space="preserve">
+    <value>Done. Scanned {0:N0} files.</value>
+  </data>
+  <data name="DiskMap_Progress_Scanning" xml:space="preserve">
+    <value>Scanning: {0}</value>
+  </data>
+  <data name="DiskMap_Progress_Subdirectory" xml:space="preserve">
+    <value>Scanning: {0} ({1})</value>
+  </data>
+  <data name="DiskMap_Progress_Done" xml:space="preserve">
+    <value>Done. {0} in {1}</value>
+  </data>
+  <data name="Knowledge_Reason_ProtectedPattern" xml:space="preserve">
+    <value>Matches a protected pattern: {0}</value>
+  </data>
+  <data name="Knowledge_Reason_CachePattern" xml:space="preserve">
+    <value>Matches a cache pattern: {0}</value>
+  </data>
+  <data name="Knowledge_Reason_KnownAppNoPattern" xml:space="preserve">
+    <value>Known application, but the path does not match any patterns</value>
+  </data>
+  <data name="Knowledge_Reason_HeuristicUserData" xml:space="preserve">
+    <value>Heuristic: the file/folder looks like user data</value>
+  </data>
+  <data name="Knowledge_Reason_HeuristicCache" xml:space="preserve">
+    <value>Heuristic: looks like cache or a temporary file</value>
+  </data>
+  <data name="Knowledge_Reason_UnknownPath" xml:space="preserve">
+    <value>Unknown path</value>
+  </data>
+  <data name="Knowledge_Desc_Antigravity" xml:space="preserve">
+    <value>Critical AI agent data — DO NOT DELETE</value>
+  </data>
+  <data name="Knowledge_Desc_Kiro" xml:space="preserve">
+    <value>Kiro settings and data</value>
+  </data>
+  <data name="Knowledge_Desc_Windsurf" xml:space="preserve">
+    <value>cascade contains the chat history!</value>
+  </data>
+  <data name="CliInspector_Desc_UserDirectory" xml:space="preserve">
+    <value>User directory: {0}</value>
+  </data>
+  <data name="CliInspector_Desc_UserUtilitiesFolder" xml:space="preserve">
+    <value>User utilities directory</value>
+  </data>
+  <data name="CliInspector_Desc_Executables" xml:space="preserve">
+    <value>Executables: {0}</value>
+  </data>
+  <data name="CliInspector_Desc_AppDataProgram" xml:space="preserve">
+    <value>Application in AppData/Local/Programs/{0}</value>
+  </data>
+  <data name="CliInspector_Desc_ToolAt" xml:space="preserve">
+    <value>Tool in {0}</value>
+  </data>
+  <data name="CliInspector_Desc_NpmGlobalPackage" xml:space="preserve">
+    <value>Global NPM package</value>
+  </data>
+  <data name="CliInspector_Desc_WithCommand" xml:space="preserve">
+    <value>{0} (Command: {1})</value>
+  </data>
+  <data name="CliInspector_Desc_PipxApp" xml:space="preserve">
+    <value>Isolated pipx Python application: {0}</value>
+  </data>
+  <data name="CliInspector_Desc_ScoopPackage" xml:space="preserve">
+    <value>Scoop package: {0}</value>
+  </data>
+  <data name="CliInspector_Desc_ChocoPackage" xml:space="preserve">
+    <value>Chocolatey package: {0}</value>
+  </data>
+  <data name="CliInspector_Desc_CargoBinary" xml:space="preserve">
+    <value>Rust cargo binary: {0}</value>
+  </data>
+  <data name="CliInspector_Desc_WingetAlias" xml:space="preserve">
+    <value>WinGet command alias: {0}</value>
+  </data>
+  <data name="CliInspector_Desc_PathCommand" xml:space="preserve">
+    <value>Command '{0}' from {1} PATH: {2}</value>
+  </data>
+  <data name="CliInspector_PathStatus_Dead" xml:space="preserve">
+    <value>Dead path (folder not found)</value>
+  </data>
+  <data name="CliInspector_PathStatus_Active" xml:space="preserve">
+    <value>Active</value>
+  </data>
+  <data name="CliInspector_PathStatus_Empty" xml:space="preserve">
+    <value>Empty directory</value>
+  </data>
+  <data name="CliInspector_PsModuleName" xml:space="preserve">
+    <value>Module: {0}</value>
+  </data>
+  <data name="CliInspector_PsModuleLocation" xml:space="preserve">
+    <value>PowerShell module located at: {0}</value>
+  </data>
 </root>

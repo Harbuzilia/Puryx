@@ -2534,4 +2534,197 @@ Windows может использовать эти драйверы прямо �
   <data name="Uninstall_Error_StartFailed" xml:space="preserve">
     <value>Ошибка запуска деинсталлятора: {0}</value>
   </data>
+  <!-- День 5, волна 3: PluginEngine / DuplicateEngine / LargeFilesEngine / DiskMapEngine / KnowledgeBase / CliInspectorEngine -->
+  <data name="Plugin_Progress_Scanning" xml:space="preserve">
+    <value>Сканирование плагина: {0}...</value>
+  </data>
+  <data name="Plugin_Skipped_Blocked" xml:space="preserve">
+    <value>{0}: {1}</value>
+  </data>
+  <data name="Plugin_Skipped_BlockedByPolicy" xml:space="preserve">
+    <value>Заблокировано политикой безопасности</value>
+  </data>
+  <data name="Plugin_Skipped_ElevationRequired" xml:space="preserve">
+    <value>{0}: требует прав администратора, пропущено</value>
+  </data>
+  <data name="Plugin_Progress_Cleaning" xml:space="preserve">
+    <value>Очистка {0} -&gt; {1}...</value>
+  </data>
+  <data name="Duplicate_Progress_Scanning" xml:space="preserve">
+    <value>Сканирование файлов...</value>
+  </data>
+  <data name="Duplicate_Progress_FoundFiles" xml:space="preserve">
+    <value>Найдено {0} файлов, фильтрация по размеру...</value>
+  </data>
+  <data name="Duplicate_Progress_PotentialDuplicates" xml:space="preserve">
+    <value>{0} потенциальных дубликатов из {1} файлов</value>
+  </data>
+  <data name="Duplicate_Progress_Hashing" xml:space="preserve">
+    <value>Вычисление хэшей...</value>
+  </data>
+  <data name="Duplicate_Progress_HashingProgress" xml:space="preserve">
+    <value>Хэширование {0}/{1}...</value>
+  </data>
+  <data name="Duplicate_Progress_ByteVerification" xml:space="preserve">
+    <value>Побайтовая верификация...</value>
+  </data>
+  <data name="Duplicate_Progress_Done" xml:space="preserve">
+    <value>Готово. {0} групп дубликатов.</value>
+  </data>
+  <data name="Duplicate_Progress_CheckedMatches" xml:space="preserve">
+    <value>Проверено {0} файлов, найдено {1} совпадений...</value>
+  </data>
+  <data name="Duplicate_Progress_CopiesDone" xml:space="preserve">
+    <value>Готово. Найдено {0} копий.</value>
+  </data>
+  <data name="Duplicate_Progress_IndexingFolders" xml:space="preserve">
+    <value>Индексация папок...</value>
+  </data>
+  <data name="Duplicate_Progress_Comparing" xml:space="preserve">
+    <value>Сравнение {0}/{1}...</value>
+  </data>
+  <data name="Duplicate_Progress_CompareDone" xml:space="preserve">
+    <value>Готово. A: {0} уникальных, B: {1} уникальных, общих: {2}</value>
+  </data>
+  <data name="Duplicate_Progress_FilesFound" xml:space="preserve">
+    <value>Найдено {0} файлов...</value>
+  </data>
+  <data name="Duplicate_Progress_VerifyingGroup" xml:space="preserve">
+    <value>Верификация группы {0}/{1} ({2} файлов)...</value>
+  </data>
+  <data name="Duplicate_Hardlink_SkippedGroupMutable" xml:space="preserve">
+    <value>Группа пропущена: мутабельный формат (hardlink портит обе копии): '{0}'</value>
+  </data>
+  <data name="Duplicate_Hardlink_CrossVolume" xml:space="preserve">
+    <value>Хардлинк невозможен между разными дисками: '{0}' и '{1}'</value>
+  </data>
+  <data name="Duplicate_Hardlink_SkippedMutable" xml:space="preserve">
+    <value>Пропущен: мутабельный формат (hardlink портит обе копии): '{0}'</value>
+  </data>
+  <data name="Duplicate_Hardlink_ReasonElevation" xml:space="preserve">
+    <value>требуются права администратора</value>
+  </data>
+  <data name="Duplicate_Hardlink_ReasonBlocked" xml:space="preserve">
+    <value>заблокировано safety-сервисом</value>
+  </data>
+  <data name="Duplicate_Hardlink_BlockedBySafetyGate" xml:space="preserve">
+    <value>Заблокировано safety-гейтом ({0}): '{1}'</value>
+  </data>
+  <data name="Duplicate_Hardlink_Creating" xml:space="preserve">
+    <value>Создание хардлинка для {0}...</value>
+  </data>
+  <data name="Duplicate_Hardlink_Error" xml:space="preserve">
+    <value>Ошибка CreateHardLink для '{0}'</value>
+  </data>
+  <data name="Duplicate_Hardlink_Exception" xml:space="preserve">
+    <value>Исключение при создании хардлинка для '{0}': {1}</value>
+  </data>
+  <data name="Duplicate_Sweep_BackupDeleted" xml:space="preserve">
+    <value>Удалён остаточный бэкап: {0}</value>
+  </data>
+  <data name="Duplicate_Sweep_RestoredFromOrphan" xml:space="preserve">
+    <value>Восстановлен файл из бэкапа-сироты: {0}</value>
+  </data>
+  <data name="Duplicate_Sweep_Error" xml:space="preserve">
+    <value>Не удалось подчистить бэкапы-сироты в '{0}': {1}</value>
+  </data>
+  <data name="LargeFiles_Progress_Scanning" xml:space="preserve">
+    <value>Сканирование: {0}...</value>
+  </data>
+  <data name="LargeFiles_Progress_Scanned" xml:space="preserve">
+    <value>Просканировано {0:N0} файлов...</value>
+  </data>
+  <data name="LargeFiles_Progress_Done" xml:space="preserve">
+    <value>Готово. Просканировано {0:N0} файлов.</value>
+  </data>
+  <data name="DiskMap_Progress_Scanning" xml:space="preserve">
+    <value>Сканирование: {0}</value>
+  </data>
+  <data name="DiskMap_Progress_Subdirectory" xml:space="preserve">
+    <value>Сканирование: {0} ({1})</value>
+  </data>
+  <data name="DiskMap_Progress_Done" xml:space="preserve">
+    <value>Готово. {0} в {1}</value>
+  </data>
+  <data name="Knowledge_Reason_ProtectedPattern" xml:space="preserve">
+    <value>Совпадает с защищённым паттерном: {0}</value>
+  </data>
+  <data name="Knowledge_Reason_CachePattern" xml:space="preserve">
+    <value>Совпадает с паттерном кэша: {0}</value>
+  </data>
+  <data name="Knowledge_Reason_KnownAppNoPattern" xml:space="preserve">
+    <value>Известное приложение, но путь не соответствует паттернам</value>
+  </data>
+  <data name="Knowledge_Reason_HeuristicUserData" xml:space="preserve">
+    <value>Эвристика: файл/папка выглядит как пользовательские данные</value>
+  </data>
+  <data name="Knowledge_Reason_HeuristicCache" xml:space="preserve">
+    <value>Эвристика: выглядит как кэш или временный файл</value>
+  </data>
+  <data name="Knowledge_Reason_UnknownPath" xml:space="preserve">
+    <value>Неизвестный путь</value>
+  </data>
+  <data name="Knowledge_Desc_Antigravity" xml:space="preserve">
+    <value>Критичные данные AI-агента — НЕ УДАЛЯТЬ</value>
+  </data>
+  <data name="Knowledge_Desc_Kiro" xml:space="preserve">
+    <value>Настройки и данные Kiro</value>
+  </data>
+  <data name="Knowledge_Desc_Windsurf" xml:space="preserve">
+    <value>cascade содержит историю чатов!</value>
+  </data>
+  <data name="CliInspector_Desc_UserDirectory" xml:space="preserve">
+    <value>Пользовательская директория: {0}</value>
+  </data>
+  <data name="CliInspector_Desc_UserUtilitiesFolder" xml:space="preserve">
+    <value>Пользовательская директория утилит</value>
+  </data>
+  <data name="CliInspector_Desc_Executables" xml:space="preserve">
+    <value>Исполняемые файлы: {0}</value>
+  </data>
+  <data name="CliInspector_Desc_AppDataProgram" xml:space="preserve">
+    <value>Приложение в AppData/Local/Programs/{0}</value>
+  </data>
+  <data name="CliInspector_Desc_ToolAt" xml:space="preserve">
+    <value>Инструмент в {0}</value>
+  </data>
+  <data name="CliInspector_Desc_NpmGlobalPackage" xml:space="preserve">
+    <value>Глобальный NPM пакет</value>
+  </data>
+  <data name="CliInspector_Desc_WithCommand" xml:space="preserve">
+    <value>{0} (Команда: {1})</value>
+  </data>
+  <data name="CliInspector_Desc_PipxApp" xml:space="preserve">
+    <value>Изолированное Python-приложение pipx: {0}</value>
+  </data>
+  <data name="CliInspector_Desc_ScoopPackage" xml:space="preserve">
+    <value>Пакет Scoop: {0}</value>
+  </data>
+  <data name="CliInspector_Desc_ChocoPackage" xml:space="preserve">
+    <value>Пакет Chocolatey: {0}</value>
+  </data>
+  <data name="CliInspector_Desc_CargoBinary" xml:space="preserve">
+    <value>Rust cargo бинарник: {0}</value>
+  </data>
+  <data name="CliInspector_Desc_WingetAlias" xml:space="preserve">
+    <value>WinGet алиас команды: {0}</value>
+  </data>
+  <data name="CliInspector_Desc_PathCommand" xml:space="preserve">
+    <value>Команда '{0}' из {1} PATH: {2}</value>
+  </data>
+  <data name="CliInspector_PathStatus_Dead" xml:space="preserve">
+    <value>Мертвый путь (Папка не найдена)</value>
+  </data>
+  <data name="CliInspector_PathStatus_Active" xml:space="preserve">
+    <value>Активен</value>
+  </data>
+  <data name="CliInspector_PathStatus_Empty" xml:space="preserve">
+    <value>Пустая директория</value>
+  </data>
+  <data name="CliInspector_PsModuleName" xml:space="preserve">
+    <value>Модуль: {0}</value>
+  </data>
+  <data name="CliInspector_PsModuleLocation" xml:space="preserve">
+    <value>PowerShell модуль, расположенный в: {0}</value>
+  </data>
 </root>

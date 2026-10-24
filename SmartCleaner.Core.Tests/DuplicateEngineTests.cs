@@ -428,7 +428,7 @@ public class DuplicateEngineTests
 
             Assert.Equal(0, replaced);
             Assert.Equal(0, saved);
-            Assert.Contains(errors, e => e.Contains(fileB) && e.Contains("Заблокировано safety-гейтом"));
+            Assert.Contains(errors, e => e.Contains(fileB) && e.Contains("Blocked by the safety gate"));
 
             // Заменяемый файл обязан остаться независимым (не хардлинком):
             // запись в дубликат не должна менять мастер-источник
@@ -543,7 +543,9 @@ public class DuplicateEngineTests
 
             Assert.False(File.Exists(stale), "остаточный .bak должен быть подчищен");
             Assert.True(File.Exists(dup), "заменяемый файл должен остаться по своему пути");
-            Assert.DoesNotContain(errors, e => e.Contains("бэкап"));
+            // Гвард смысла: после i18n sweep-ошибка — EN-текст («orphan backup»),
+            // ассерт обязан проверять его, а не ставший вакуумным RU-литерал
+            Assert.DoesNotContain(errors, e => e.Contains("orphan backup"));
         }
         finally
         {

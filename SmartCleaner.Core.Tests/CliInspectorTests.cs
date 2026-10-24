@@ -50,7 +50,7 @@ public class CliInspectorTests
             Assert.True(dead.IsDead);
             Assert.False(dead.Exists);
             Assert.Equal("System", dead.Scope);
-            Assert.Contains("Мертвый путь", dead.Status);
+            Assert.Contains("Dead path", dead.Status);
 
             var live = Assert.Single(result.PathHealth, p => p.Path == tempDir);
             Assert.True(live.Exists);

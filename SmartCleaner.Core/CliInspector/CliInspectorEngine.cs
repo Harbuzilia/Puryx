@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
 using SmartCleaner.Core.Helpers;
+using SmartCleaner.Core.Localization;
 
 namespace SmartCleaner.Core.CliInspector;
 
@@ -147,7 +148,7 @@ public class CliInspectorEngine
                     {
                         var (size, mtime, count) = GetDirSizeAndMTime(dir, maxDepth: 3);
                         var toolName = isMatched ? sig.Name : name[1..] + " Config/Tool";
-                        var toolDesc = isMatched ? sig.Desc : $"Пользовательская директория: {name}";
+                        var toolDesc = isMatched ? sig.Desc : Localizer.GetString("CliInspector_Desc_UserDirectory", name);
                         var toolCat = isMatched ? sig.Cat : "User Dotfolder / Tool";
                         var uninstall = isMatched ? sig.Uninstall : $"rmdir /s /q \"{dir}\"";
 
@@ -201,7 +202,7 @@ public class CliInspectorEngine
             {
                 var (size, mtime, count) = GetDirSizeAndMTime(pdir, maxDepth: 2);
                 var exes = GetExecutablesInDir(pdir);
-                var exeListStr = exes.Count > 0 ? string.Join(", ", exes.Take(6)) + (exes.Count > 6 ? "..." : "") : "Пользовательская директория утилит";
+                var exeListStr = exes.Count > 0 ? string.Join(", ", exes.Take(6)) + (exes.Count > 6 ? "..." : "") : Localizer.GetString("CliInspector_Desc_UserUtilitiesFolder");
 
                 tools.Add(new CliToolItem
                 {
@@ -209,7 +210,7 @@ public class CliInspectorEngine
                     Name = $"User Binaries ({parentName}/{dirName})",
                     FolderName = pdir,
                     Category = "CLI Binaries",
-                    Description = $"Исполняемые файлы: {exeListStr}",
+                    Description = Localizer.GetString("CliInspector_Desc_Executables", exeListStr),
                     Path = pdir,
                     SizeBytes = size,
                     SizeFormatted = SizeFormatter.Format(size),
@@ -236,7 +237,7 @@ public class CliInspectorEngine
                             Name = subName,
                             FolderName = subName,
                             Category = "User Program / AppData",
-                            Description = $"Приложение в AppData/Local/Programs/{subName}",
+                            Description = Localizer.GetString("CliInspector_Desc_AppDataProgram", subName),
                             Path = sub,
                             SizeBytes = size,
                             SizeFormatted = SizeFormatter.Format(size),
@@ -260,7 +261,7 @@ public class CliInspectorEngine
                     Name = dirName,
                     FolderName = dirName,
                     Category = "CLI Tools & Agents",
-                    Description = $"Инструмент в {pdir}",
+                    Description = Localizer.GetString("CliInspector_Desc_ToolAt", pdir),
                     Path = pdir,
                     SizeBytes = size,
                     SizeFormatted = SizeFormatter.Format(size),
@@ -294,7 +295,7 @@ public class CliInspectorEngine
 
                     var pkgJson = Path.Combine(item, "package.json");
                     var version = "";
-                    var desc = "Глобальный NPM пакет";
+                    var desc = Localizer.GetString("CliInspector_Desc_NpmGlobalPackage");
                     var homepage = "";
                     var binInfo = "";
 
@@ -331,7 +332,7 @@ public class CliInspectorEngine
                         FolderName = name,
                         Version = version,
                         Category = "NPM Global",
-                        Description = $"{desc}" + (!string.IsNullOrEmpty(binInfo) ? $" (Команда: {binInfo})" : ""),
+                        Description = string.IsNullOrEmpty(binInfo) ? desc : Localizer.GetString("CliInspector_Desc_WithCommand", desc, binInfo),
                         Path = item,
                         SizeBytes = size,
                         SizeFormatted = SizeFormatter.Format(size),
@@ -372,7 +373,7 @@ public class CliInspectorEngine
                         Name = name,
                         FolderName = name,
                         Category = "Pipx CLI App",
-                        Description = $"Изолированное Python-приложение pipx: {name}",
+                        Description = Localizer.GetString("CliInspector_Desc_PipxApp", name),
                         Path = venv,
                         SizeBytes = size,
                         SizeFormatted = SizeFormatter.Format(size),
@@ -414,7 +415,7 @@ public class CliInspectorEngine
                         Name = name,
                         FolderName = name,
                         Category = "Scoop App",
-                        Description = $"Пакет Scoop: {name}",
+                        Description = Localizer.GetString("CliInspector_Desc_ScoopPackage", name),
                         Path = appDir,
                         SizeBytes = size,
                         SizeFormatted = SizeFormatter.Format(size),
@@ -449,7 +450,7 @@ public class CliInspectorEngine
                         Name = name,
                         FolderName = name,
                         Category = "Chocolatey",
-                        Description = $"Пакет Chocolatey: {name}",
+                        Description = Localizer.GetString("CliInspector_Desc_ChocoPackage", name),
                         Path = pkg,
                         SizeBytes = size,
                         SizeFormatted = SizeFormatter.Format(size),
@@ -483,7 +484,7 @@ public class CliInspectorEngine
                         Name = stem,
                         FolderName = fi.Name,
                         Category = "Cargo (Rust)",
-                        Description = $"Rust cargo бинарник: {fi.Name}",
+                        Description = Localizer.GetString("CliInspector_Desc_CargoBinary", fi.Name),
                         Path = exe,
                         SizeBytes = fi.Length,
                         SizeFormatted = SizeFormatter.Format(fi.Length),
@@ -517,7 +518,7 @@ public class CliInspectorEngine
                         Name = stem,
                         FolderName = fi.Name,
                         Category = "WinGet CLI Link",
-                        Description = $"WinGet алиас команды: {fi.Name}",
+                        Description = Localizer.GetString("CliInspector_Desc_WingetAlias", fi.Name),
                         Path = link,
                         SizeBytes = fi.Length,
                         SizeFormatted = SizeFormatter.Format(fi.Length),
@@ -587,7 +588,7 @@ public class CliInspectorEngine
                                     Name = fi.Name,
                                     FolderName = Path.GetFileName(pathDir),
                                     Category = "PATH Executable",
-                                    Description = $"Команда '{Path.GetFileNameWithoutExtension(fi.Name)}' из {scope} PATH: {pathDir}",
+                                    Description = Localizer.GetString("CliInspector_Desc_PathCommand", Path.GetFileNameWithoutExtension(fi.Name), scope, pathDir),
                                     Path = file,
                                     SizeBytes = fi.Length,
                                     SizeFormatted = SizeFormatter.Format(fi.Length),
@@ -605,7 +606,8 @@ public class CliInspectorEngine
                 catch (Exception ex) { Debug.WriteLine($"[CliInspectorEngine] PATH dir enumeration error: {ex.Message}"); }
             }
 
-            var status = !exists ? "Мертвый путь (Папка не найдена)" : (exes.Count > 0 ? "Активен" : "Пустая директория");
+            var status = !exists ? Localizer.GetString("CliInspector_PathStatus_Dead")
+                : (exes.Count > 0 ? Localizer.GetString("CliInspector_PathStatus_Active") : Localizer.GetString("CliInspector_PathStatus_Empty"));
 
             pathHealth.Add(new PathHealthItem
             {
@@ -681,11 +683,11 @@ public class CliInspectorEngine
                         profiles.Add(new PowerShellProfileItem
                         {
                             Path = mod,
-                            Name = $"Модуль: {name}",
+                            Name = Localizer.GetString("CliInspector_PsModuleName", name),
                             SizeFormatted = SizeFormatter.Format(size),
                             LastModified = mtime?.ToString("yyyy-MM-dd HH:mm") ?? "Unknown",
                             IsModule = true,
-                            Content = $"PowerShell модуль, расположенный в: {mod}"
+                            Content = Localizer.GetString("CliInspector_PsModuleLocation", mod)
                         });
                     }
                 }

@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using DotNet.Globbing;
+using SmartCleaner.Core.Localization;
 using SmartCleaner.Core.Models;
 using SmartCleaner.Core.Safety;
 
@@ -70,7 +71,7 @@ public sealed class DuplicateEngine
         var excludeGlobs = BuildGlobs(options.ExcludePatterns);
 
         // Pass 1: Собираем все файлы, группируем по размеру (0-30%)
-        progress?.Report("Сканирование файлов...");
+        progress?.Report(Localizer.GetString("Duplicate_Progress_Scanning"));
         percentProgress?.Report(0);
         var filesBySize = new Dictionary<long, List<DuplicateFile>>();
         int totalFiles = 0;
@@ -85,7 +86,7 @@ public sealed class DuplicateEngine
         }, ct);
 
         percentProgress?.Report(20);
-        progress?.Report($"Найдено {totalFiles} файлов, фильтрация по размеру...");
+        progress?.Report(Localizer.GetString("Duplicate_Progress_FoundFiles", totalFiles));
 
         // Оставляем только группы с ≥2 файлами одного размера
         var potentialDuplicates = filesBySize
@@ -94,7 +95,7 @@ public sealed class DuplicateEngine
             .ToList();
 
         int numPotential = potentialDuplicates.Count;
-        progress?.Report($"{numPotential} потенциальных дубликатов из {totalFiles} файлов");
+        progress?.Report(Localizer.GetString("Duplicate_Progress_PotentialDuplicates", numPotential, totalFiles));
         percentProgress?.Report(30);
 
         // Если нужен только размер — возвращаем сразу
@@ -105,7 +106,7 @@ public sealed class DuplicateEngine
         }
 
         // Pass 2: Группируем по ключу (размер + имя + хэш) (30-80%)
-        progress?.Report("Вычисление хэшей...");
+        progress?.Report(Localizer.GetString("Duplicate_Progress_Hashing"));
         int processed = 0;
 
         await Task.Run(() =>
@@ -124,7 +125,7 @@ public sealed class DuplicateEngine
                 processed++;
                 if (processed % 50 == 0)
                 {
-                    progress?.Report($"Хэширование {processed}/{numPotential}...");
+                    progress?.Report(Localizer.GetString("Duplicate_Progress_HashingProgress", processed, numPotential));
                     percentProgress?.Report(30 + (int)(50.0 * processed / numPotential));
                 }
             }
@@ -138,12 +139,12 @@ public sealed class DuplicateEngine
         // Pass 3: Побайтовая верификация (если включена) (80-100%)
         if (options.ByByte)
         {
-            progress?.Report("Побайтовая верификация...");
+            progress?.Report(Localizer.GetString("Duplicate_Progress_ByteVerification"));
             groups = await VerifyByteByByteAsync(groups, progress, ct);
         }
 
         percentProgress?.Report(100);
-        progress?.Report($"Готово. {groups.Count} групп дубликатов.");
+        progress?.Report(Localizer.GetString("Duplicate_Progress_Done", groups.Count));
         return groups;
     }
 
@@ -193,7 +194,7 @@ public sealed class DuplicateEngine
                     scanned++;
 
                     if (scanned % 200 == 0)
-                        progress?.Report($"Проверено {scanned} файлов, найдено {found.Count} совпадений...");
+                        progress?.Report(Localizer.GetString("Duplicate_Progress_CheckedMatches", scanned, found.Count));
 
                     // Пропускаем сам образец
                     if (Path.GetFullPath(filePath).Equals(sampleFullPath, StringComparison.OrdinalIgnoreCase))
@@ -233,7 +234,7 @@ public sealed class DuplicateEngine
             }
         }, ct);
 
-        progress?.Report($"Готово. Найдено {found.Count} копий.");
+        progress?.Report(Localizer.GetString("Duplicate_Progress_CopiesDone", found.Count));
         return found;
     }
 
@@ -255,7 +256,7 @@ public sealed class DuplicateEngine
         IProgress<string>? progress = null,
         CancellationToken ct = default)
     {
-        progress?.Report("Индексация папок...");
+        progress?.Report(Localizer.GetString("Duplicate_Progress_IndexingFolders"));
 
         var filesA = new Dictionary<string, DuplicateFile>(StringComparer.OrdinalIgnoreCase);
         var filesB = new Dictionary<string, DuplicateFile>(StringComparer.OrdinalIgnoreCase);
@@ -282,7 +283,7 @@ public sealed class DuplicateEngine
             ct.ThrowIfCancellationRequested();
             processed++;
             if (processed % 100 == 0)
-                progress?.Report($"Сравнение {processed}/{total}...");
+                progress?.Report(Localizer.GetString("Duplicate_Progress_Comparing", processed, total));
 
             bool inA = filesA.TryGetValue(relPath, out var fileA);
             bool inB = filesB.TryGetValue(relPath, out var fileB);
@@ -323,7 +324,7 @@ public sealed class DuplicateEngine
             }
         }
 
-        progress?.Report($"Готово. A: {uniqueA.Count} уникальных, B: {uniqueB.Count} уникальных, общих: {common.Count}");
+        progress?.Report(Localizer.GetString("Duplicate_Progress_CompareDone", uniqueA.Count, uniqueB.Count, common.Count));
 
         return new FolderCompareResult
         {
@@ -507,7 +508,7 @@ public sealed class DuplicateEngine
 
                         totalFiles++;
                         if (totalFiles % 500 == 0)
-                            progress?.Report($"Найдено {totalFiles} файлов...");
+                            progress?.Report(Localizer.GetString("Duplicate_Progress_FilesFound", totalFiles));
                     }
                     catch (Exception) { /* skip inaccessible */ }
                 }
@@ -624,7 +625,7 @@ public sealed class DuplicateEngine
             {
                 ct.ThrowIfCancellationRequested();
                 groupIdx++;
-                progress?.Report($"Верификация группы {groupIdx}/{groups.Count} ({group.Files.Count} файлов)...");
+                progress?.Report(Localizer.GetString("Duplicate_Progress_VerifyingGroup", groupIdx, groups.Count, group.Files.Count));
 
                 var remaining = new List<DuplicateFile>(group.Files);
                 int subGroupIdx = 0;
@@ -730,7 +731,7 @@ public sealed class DuplicateEngine
                 // каждый hardlink на него — запись через дубликат портит мастер
                 if (IsMutableFormat(primary.Path))
                 {
-                    errors.Add($"Группа пропущена: мутабельный формат (hardlink портит обе копии): '{primary.Path}'");
+                    errors.Add(Localizer.GetString("Duplicate_Hardlink_SkippedGroupMutable", primary.Path));
                     continue;
                 }
 
@@ -745,13 +746,13 @@ public sealed class DuplicateEngine
                     var dupRoot = Path.GetPathRoot(dup.Path)?.ToUpperInvariant();
                     if (!string.Equals(primaryRoot, dupRoot, StringComparison.OrdinalIgnoreCase))
                     {
-                        errors.Add($"Хардлинк невозможен между разными дисками: '{primary.Path}' и '{dup.Path}'");
+                        errors.Add(Localizer.GetString("Duplicate_Hardlink_CrossVolume", primary.Path, dup.Path));
                         continue;
                     }
 
                     if (IsMutableFormat(dup.Path))
                     {
-                        errors.Add($"Пропущен: мутабельный формат (hardlink портит обе копии): '{dup.Path}'");
+                        errors.Add(Localizer.GetString("Duplicate_Hardlink_SkippedMutable", dup.Path));
                         continue;
                     }
 
@@ -767,14 +768,16 @@ public sealed class DuplicateEngine
                     if (!validation.CanDelete || validation.RequiresElevation)
                     {
                         var reason = validation.BlockReason
-                                     ?? (validation.RequiresElevation ? "требуются права администратора" : "заблокировано safety-сервисом");
-                        errors.Add($"Заблокировано safety-гейтом ({reason}): '{dup.Path}'");
+                                     ?? (validation.RequiresElevation
+                                         ? Localizer.GetString("Duplicate_Hardlink_ReasonElevation")
+                                         : Localizer.GetString("Duplicate_Hardlink_ReasonBlocked"));
+                        errors.Add(Localizer.GetString("Duplicate_Hardlink_BlockedBySafetyGate", reason, dup.Path));
                         continue;
                     }
 
                     try
                     {
-                        progress?.Report($"Создание хардлинка для {Path.GetFileName(dup.Path)}...");
+                        progress?.Report(Localizer.GetString("Duplicate_Hardlink_Creating", Path.GetFileName(dup.Path)));
                         var tempBackup = dup.Path + $".{Guid.NewGuid():N}.bak";
                         File.Move(dup.Path, tempBackup);
 
@@ -787,12 +790,12 @@ public sealed class DuplicateEngine
                         else
                         {
                             File.Move(tempBackup, dup.Path);
-                            errors.Add($"Ошибка CreateHardLink для '{dup.Path}'");
+                            errors.Add(Localizer.GetString("Duplicate_Hardlink_Error", dup.Path));
                         }
                     }
                     catch (Exception ex)
                     {
-                        errors.Add($"Исключение при создании хардлинка для '{dup.Path}': {ex.Message}");
+                        errors.Add(Localizer.GetString("Duplicate_Hardlink_Exception", dup.Path, ex.Message));
                     }
                 }
             }
@@ -836,18 +839,18 @@ public sealed class DuplicateEngine
                     if (File.Exists(target))
                     {
                         File.Delete(orphan);
-                        progress?.Report($"Удалён остаточный бэкап: {Path.GetFileName(orphan)}");
+                        progress?.Report(Localizer.GetString("Duplicate_Sweep_BackupDeleted", Path.GetFileName(orphan)));
                     }
                     else
                     {
                         File.Move(orphan, target);
-                        progress?.Report($"Восстановлен файл из бэкапа-сироты: {target}");
+                        progress?.Report(Localizer.GetString("Duplicate_Sweep_RestoredFromOrphan", target));
                     }
                 }
             }
             catch (Exception ex)
             {
-                errors.Add($"Не удалось подчистить бэкапы-сироты в '{dir}': {ex.Message}");
+                errors.Add(Localizer.GetString("Duplicate_Sweep_Error", dir, ex.Message));
             }
         }
     }

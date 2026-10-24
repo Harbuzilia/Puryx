@@ -1,5 +1,6 @@
 using Microsoft.VisualBasic.FileIO;
 using SmartCleaner.Core.Helpers;
+using SmartCleaner.Core.Localization;
 using SmartCleaner.Core.Models;
 using SmartCleaner.Core.Safety;
 using System.Diagnostics;
@@ -82,7 +83,7 @@ public class PluginEngine
             foreach (var plugin in plugins.Where(p => p.IsEnabled))
             {
                 ct.ThrowIfCancellationRequested();
-                progress?.Report($"Сканирование плагина: {plugin.Name}...");
+                progress?.Report(Localizer.GetString("Plugin_Progress_Scanning", plugin.Name));
 
                 foreach (var rule in plugin.Rules)
                 {
@@ -127,17 +128,18 @@ public class PluginEngine
 
                     if (!validation.CanDelete)
                     {
-                        skippedMessages.Add($"{item.Path}: {validation.BlockReason ?? "Заблокировано политикой безопасности"}");
+                        skippedMessages.Add(Localizer.GetString("Plugin_Skipped_Blocked", item.Path,
+                            validation.BlockReason ?? Localizer.GetString("Plugin_Skipped_BlockedByPolicy")));
                         continue;
                     }
 
                     if (validation.RequiresElevation)
                     {
-                        skippedMessages.Add($"{item.Path}: требует прав администратора, пропущено");
+                        skippedMessages.Add(Localizer.GetString("Plugin_Skipped_ElevationRequired", item.Path));
                         continue;
                     }
 
-                    progress?.Report($"Очистка {item.PluginName} -> {Path.GetFileName(item.Path)}...");
+                    progress?.Report(Localizer.GetString("Plugin_Progress_Cleaning", item.PluginName, Path.GetFileName(item.Path)));
 
                     // Плагины — сторонний код, поэтому удаление только в Корзину, без перманентного режима.
                     if (isDirectory)

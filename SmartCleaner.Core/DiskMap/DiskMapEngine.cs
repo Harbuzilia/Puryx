@@ -1,4 +1,5 @@
 using SmartCleaner.Core.Helpers;
+using SmartCleaner.Core.Localization;
 
 namespace SmartCleaner.Core.DiskMap;
 
@@ -22,14 +23,14 @@ public sealed class DiskMapEngine
         IProgress<string>? progress = null,
         CancellationToken ct = default)
     {
-        progress?.Report($"Сканирование: {rootPath}");
+        progress?.Report(Localizer.GetString("DiskMap_Progress_Scanning", rootPath));
 
         var root = await Task.Run(() => BuildNode(rootPath, 0, maxDepth, progress, ct), ct);
 
         // Вычисляем проценты
         CalculatePercentages(root);
 
-        progress?.Report($"Готово. {SizeFormatter.Format(root.Size)} в {root.FullPath}");
+        progress?.Report(Localizer.GetString("DiskMap_Progress_Done", SizeFormatter.Format(root.Size), root.FullPath));
         return root;
     }
 
@@ -88,7 +89,7 @@ public sealed class DiskMapEngine
                         node.Size += child.Size;
 
                         if (depth == 0)
-                            progress?.Report($"Сканирование: {subDir.Name} ({SizeFormatter.Format(child.Size)})");
+                            progress?.Report(Localizer.GetString("DiskMap_Progress_Subdirectory", subDir.Name, SizeFormatter.Format(child.Size)));
                     }
                     catch { /* пропускаем недоступные подкаталоги */ }
                 }

@@ -1,3 +1,4 @@
+using SmartCleaner.Core.Localization;
 using SmartCleaner.Core.Models;
 using SmartCleaner.Core.Services;
 using System.Text.Json;
@@ -173,7 +174,7 @@ public class KnowledgeBase : IKnowledgeBase
                             IsKnownApp = true,
                             AppName = app.DisplayName,
                             SuggestedRisk = RiskCategory.UserData,
-                            Reason = $"Совпадает с защищённым паттерном: {pattern}"
+                            Reason = Localizer.GetString("Knowledge_Reason_ProtectedPattern", pattern)
                         };
                     }
                 }
@@ -188,7 +189,7 @@ public class KnowledgeBase : IKnowledgeBase
                             IsKnownApp = true,
                             AppName = app.DisplayName,
                             SuggestedRisk = RiskCategory.PerformanceCache,
-                            Reason = $"Совпадает с паттерном кэша: {pattern}"
+                            Reason = Localizer.GetString("Knowledge_Reason_CachePattern", pattern)
                         };
                     }
                 }
@@ -198,7 +199,7 @@ public class KnowledgeBase : IKnowledgeBase
                     IsKnownApp = true,
                     AppName = app.DisplayName,
                     SuggestedRisk = RiskCategory.PerformanceCache,
-                    Reason = "Известное приложение, но путь не соответствует паттернам"
+                    Reason = Localizer.GetString("Knowledge_Reason_KnownAppNoPattern")
                 };
             }
         }
@@ -213,7 +214,7 @@ public class KnowledgeBase : IKnowledgeBase
             {
                 IsKnownApp = false,
                 SuggestedRisk = RiskCategory.UserData,
-                Reason = "Эвристика: файл/папка выглядит как пользовательские данные"
+                Reason = Localizer.GetString("Knowledge_Reason_HeuristicUserData")
             };
         }
 
@@ -223,7 +224,7 @@ public class KnowledgeBase : IKnowledgeBase
             {
                 IsKnownApp = false,
                 SuggestedRisk = RiskCategory.SafeToDelete,
-                Reason = "Эвристика: выглядит как кэш или временный файл"
+                Reason = Localizer.GetString("Knowledge_Reason_HeuristicCache")
             };
         }
 
@@ -231,7 +232,7 @@ public class KnowledgeBase : IKnowledgeBase
         {
             IsKnownApp = false,
             SuggestedRisk = RiskCategory.PerformanceCache,
-            Reason = "Неизвестный путь"
+            Reason = Localizer.GetString("Knowledge_Reason_UnknownPath")
         };
     }
 
@@ -365,7 +366,7 @@ public class KnowledgeBase : IKnowledgeBase
             RootPaths = [@"%USERPROFILE%\.gemini"],
             CachePatterns = [],
             ProtectedPatterns = ["**"],
-            Description = "Критичные данные AI-агента — НЕ УДАЛЯТЬ"
+            Description = Localizer.GetString("Knowledge_Desc_Antigravity")
         },
         new AppDefinition
         {
@@ -374,7 +375,7 @@ public class KnowledgeBase : IKnowledgeBase
             RootPaths = [@"%USERPROFILE%\.kiro"],
             CachePatterns = [],
             ProtectedPatterns = ["settings/**", "**/*.json"],
-            Description = "Настройки и данные Kiro"
+            Description = Localizer.GetString("Knowledge_Desc_Kiro")
         },
         
         // AI Agents - с кэшем
@@ -393,7 +394,7 @@ public class KnowledgeBase : IKnowledgeBase
             RootPaths = [@"%USERPROFILE%\.codeium"],
             CachePatterns = ["cache"],
             ProtectedPatterns = ["windsurf/cascade"],
-            Description = "cascade содержит историю чатов!"
+            Description = Localizer.GetString("Knowledge_Desc_Windsurf")
         },
         new AppDefinition
         {
