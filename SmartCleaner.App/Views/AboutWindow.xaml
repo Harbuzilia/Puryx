@@ -62,7 +62,7 @@
                            Margin="0,12,0,0"/>
 
                 <!-- Close Button -->
-                <Button Content="{x:Static loc:Localizer.About_CloseButton}" 
+                <Button Content="{x:Static loc:Localizer.Common_Close}" 
                         HorizontalAlignment="Center"
                         Margin="0,18,0,0"
                         Padding="28,7"

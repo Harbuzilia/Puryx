@@ -171,7 +171,7 @@
                                 <DataGridTextColumn Binding="{Binding Name}" Header="{x:Static loc:Localizer.RamOptimizer_ColDbName}" Width="180"/>
                                 <DataGridTextColumn Binding="{Binding OriginalSizeFormatted}" Header="{x:Static loc:Localizer.RamOptimizer_ColOriginalSize}" Width="120"/>
                                 <DataGridTextColumn Binding="{Binding CompactedSizeFormatted}" Header="{x:Static loc:Localizer.RamOptimizer_ColCompactedSize}" Width="120"/>
-                                <DataGridTextColumn Binding="{Binding Status}" Header="{x:Static loc:Localizer.RamOptimizer_ColStatus}" Width="*"/>
+                                <DataGridTextColumn Binding="{Binding Status}" Header="{x:Static loc:Localizer.Common_ColStatus}" Width="*"/>
                             </DataGrid.Columns>
                         </DataGrid>
                     </Border>

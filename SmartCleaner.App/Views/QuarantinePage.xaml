@@ -101,7 +101,7 @@
                                 <Button Style="{StaticResource PrimaryButton}" 
                                         Command="{Binding DataContext.RestoreItemCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                         CommandParameter="{Binding .}"
-                                        Content="{x:Static loc:Localizer.Quarantine_Restore}" 
+                                        Content="{x:Static loc:Localizer.Common_Restore}" 
                                         Padding="10,5" Margin="0,0,6,0"/>
 
                                 <Button Style="{StaticResource DangerButton}" 

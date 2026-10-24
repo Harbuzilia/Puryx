@@ -172,7 +172,7 @@
                 </ListBox>
 
                 <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
-                    <Button Content="{x:Static loc:Localizer.Uninstaller_CloseLeftovers}" Style="{StaticResource SecondaryButton}" Command="{Binding CloseLeftoversCommand}" Margin="0,0,8,0"/>
+                    <Button Content="{x:Static loc:Localizer.Common_Close}" Style="{StaticResource SecondaryButton}" Command="{Binding CloseLeftoversCommand}" Margin="0,0,8,0"/>
                     <Button Content="{x:Static loc:Localizer.Uninstaller_CleanSelectedLeftovers}" Style="{StaticResource DangerButton}" Command="{Binding CleanSelectedLeftoversCommand}"/>
                 </StackPanel>
             </Grid>

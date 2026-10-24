@@ -92,9 +92,6 @@
   <data name="Nav_Overview" xml:space="preserve">
     <value>Overview</value>
   </data>
-  <data name="Nav_Duplicates" xml:space="preserve">
-    <value>Duplicates</value>
-  </data>
   <data name="Nav_DiskMap" xml:space="preserve">
     <value>Disk Map</value>
   </data>
@@ -169,9 +166,6 @@
   </data>
   <data name="About_Copyright" xml:space="preserve">
     <value>© 2026 Puryx Team. High performance and complete safety.</value>
-  </data>
-  <data name="About_CloseButton" xml:space="preserve">
-    <value>Close</value>
   </data>
   <data name="Settings_Language" xml:space="preserve">
     <value>Language:</value>
@@ -276,9 +270,6 @@
   <data name="Duplicates_Subtitle" xml:space="preserve">
     <value>Fast detection of identical files by size, SHA-256 hash and byte-by-byte comparison</value>
   </data>
-  <data name="Duplicates_TabDuplicates" xml:space="preserve">
-    <value>Duplicates</value>
-  </data>
   <data name="Duplicates_TabBySample" xml:space="preserve">
     <value>By Sample</value>
   </data>
@@ -351,9 +342,6 @@
   <data name="Duplicates_StatCommon" xml:space="preserve">
     <value>Common: </value>
   </data>
-  <data name="Duplicates_ColStatus" xml:space="preserve">
-    <value>Status</value>
-  </data>
   <data name="Duplicates_ColPath" xml:space="preserve">
     <value>Path</value>
   </data>
@@ -383,9 +371,6 @@
   </data>
   <data name="Duplicates_DeleteSelected" xml:space="preserve">
     <value>Delete Selected</value>
-  </data>
-  <data name="Duplicates_Scan" xml:space="preserve">
-    <value>Scan</value>
   </data>
   <data name="Duplicates_FindCopies" xml:space="preserve">
     <value>Find Copies</value>
@@ -450,9 +435,6 @@
   <data name="Uninstaller_LeftoversTitle" xml:space="preserve">
     <value>Detected leftovers (registry and file system)</value>
   </data>
-  <data name="Uninstaller_CloseLeftovers" xml:space="preserve">
-    <value>Close</value>
-  </data>
   <data name="Uninstaller_CleanSelectedLeftovers" xml:space="preserve">
     <value>Clean Selected Leftovers</value>
   </data>
@@ -473,9 +455,6 @@
   </data>
   <data name="Quarantine_QuarantinedAtPrefix" xml:space="preserve">
     <value>Quarantined: </value>
-  </data>
-  <data name="Quarantine_Restore" xml:space="preserve">
-    <value>Restore</value>
   </data>
   <data name="Quarantine_Purge" xml:space="preserve">
     <value>Delete Permanently</value>
@@ -702,9 +681,6 @@
   <data name="RamOptimizer_ColCompactedSize" xml:space="preserve">
     <value>After compaction</value>
   </data>
-  <data name="RamOptimizer_ColStatus" xml:space="preserve">
-    <value>Status</value>
-  </data>
   <data name="RamOptimizer_TabShredder" xml:space="preserve">
     <value>File Shredder</value>
   </data>
@@ -765,9 +741,6 @@
   <data name="NetworkOptimizer_ColLatency" xml:space="preserve">
     <value>Ping (Latency)</value>
   </data>
-  <data name="NetworkOptimizer_ColAction" xml:space="preserve">
-    <value>Action</value>
-  </data>
   <data name="NetworkOptimizer_Apply" xml:space="preserve">
     <value>Apply</value>
   </data>
@@ -806,9 +779,6 @@
   </data>
   <data name="PrivacyDebloat_JsonBackup" xml:space="preserve">
     <value>BACKUP COPY IN JSON</value>
-  </data>
-  <data name="PrivacyDebloat_CategoryLabel" xml:space="preserve">
-    <value>Category:</value>
   </data>
   <data name="PrivacyDebloat_CategoryAll" xml:space="preserve">
     <value>All settings</value>
@@ -906,9 +876,6 @@
   <data name="ServicesOptimizer_ColRisk" xml:space="preserve">
     <value>Risk</value>
   </data>
-  <data name="ServicesOptimizer_ColAction" xml:space="preserve">
-    <value>Action</value>
-  </data>
   <data name="ServicesOptimizer_FooterNote" xml:space="preserve">
     <value>Service changes are fully reversible. The initial state is saved to services_backup.json.</value>
   </data>
@@ -944,9 +911,6 @@
   </data>
   <data name="CliInspector_SearchPlaceholder" xml:space="preserve">
     <value>Search by name, category, path...</value>
-  </data>
-  <data name="CliInspector_CategoryLabel" xml:space="preserve">
-    <value>Category:</value>
   </data>
   <data name="CliInspector_ToolTipOpenInExplorer" xml:space="preserve">
     <value>Open in File Explorer</value>
@@ -1121,5 +1085,20 @@
   </data>
   <data name="Main_Status_Found" xml:space="preserve">
     <value>Found: {0} in {1} items</value>
+  </data>
+  <data name="Common_Close" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="Common_Duplicates" xml:space="preserve">
+    <value>Duplicates</value>
+  </data>
+  <data name="Common_ColStatus" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="Common_ColAction" xml:space="preserve">
+    <value>Action</value>
+  </data>
+  <data name="Common_CategoryLabel" xml:space="preserve">
+    <value>Category:</value>
   </data>
 </root>

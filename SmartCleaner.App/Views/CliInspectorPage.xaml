@@ -120,7 +120,7 @@
                                  Padding="8,6" VerticalAlignment="Center"
                                  Tag="{x:Static loc:Localizer.CliInspector_SearchPlaceholder}"/>
                         
-                        <TextBlock Grid.Column="1" Text="{x:Static loc:Localizer.CliInspector_CategoryLabel}" VerticalAlignment="Center" 
+                        <TextBlock Grid.Column="1" Text="{x:Static loc:Localizer.Common_CategoryLabel}" VerticalAlignment="Center" 
                                    Foreground="{DynamicResource TextSecondaryBrush}" Margin="16,0,8,0"/>
 
                         <ComboBox Grid.Column="2" 

@@ -92,9 +92,6 @@
   <data name="Nav_Overview" xml:space="preserve">
     <value>Обзор</value>
   </data>
-  <data name="Nav_Duplicates" xml:space="preserve">
-    <value>Дубликаты</value>
-  </data>
   <data name="Nav_DiskMap" xml:space="preserve">
     <value>Карта диска</value>
   </data>
@@ -169,9 +166,6 @@
   </data>
   <data name="About_Copyright" xml:space="preserve">
     <value>© 2026 Puryx Team. Высокая производительность и полная безопасность.</value>
-  </data>
-  <data name="About_CloseButton" xml:space="preserve">
-    <value>Закрыть</value>
   </data>
   <data name="Settings_Language" xml:space="preserve">
     <value>Язык интерфейса:</value>
@@ -276,9 +270,6 @@
   <data name="Duplicates_Subtitle" xml:space="preserve">
     <value>Быстрое обнаружение одинаковых файлов по размеру, хэшу SHA-256 и побайтовому сравнению</value>
   </data>
-  <data name="Duplicates_TabDuplicates" xml:space="preserve">
-    <value>Дубликаты</value>
-  </data>
   <data name="Duplicates_TabBySample" xml:space="preserve">
     <value>По образцу</value>
   </data>
@@ -351,9 +342,6 @@
   <data name="Duplicates_StatCommon" xml:space="preserve">
     <value>Общие: </value>
   </data>
-  <data name="Duplicates_ColStatus" xml:space="preserve">
-    <value>Статус</value>
-  </data>
   <data name="Duplicates_ColPath" xml:space="preserve">
     <value>Путь</value>
   </data>
@@ -383,9 +371,6 @@
   </data>
   <data name="Duplicates_DeleteSelected" xml:space="preserve">
     <value>Удалить выбранные</value>
-  </data>
-  <data name="Duplicates_Scan" xml:space="preserve">
-    <value>Сканировать</value>
   </data>
   <data name="Duplicates_FindCopies" xml:space="preserve">
     <value>Найти копии</value>
@@ -450,9 +435,6 @@
   <data name="Uninstaller_LeftoversTitle" xml:space="preserve">
     <value>Обнаруженные остаточные элементы («хвосты» в реестре и на диске)</value>
   </data>
-  <data name="Uninstaller_CloseLeftovers" xml:space="preserve">
-    <value>Закрыть</value>
-  </data>
   <data name="Uninstaller_CleanSelectedLeftovers" xml:space="preserve">
     <value>Очистить выбранные хвосты</value>
   </data>
@@ -473,9 +455,6 @@
   </data>
   <data name="Quarantine_QuarantinedAtPrefix" xml:space="preserve">
     <value>Изолировано: </value>
-  </data>
-  <data name="Quarantine_Restore" xml:space="preserve">
-    <value>Восстановить</value>
   </data>
   <data name="Quarantine_Purge" xml:space="preserve">
     <value>Удалить навсегда</value>
@@ -702,9 +681,6 @@
   <data name="RamOptimizer_ColCompactedSize" xml:space="preserve">
     <value>После сжатия</value>
   </data>
-  <data name="RamOptimizer_ColStatus" xml:space="preserve">
-    <value>Статус</value>
-  </data>
   <data name="RamOptimizer_TabShredder" xml:space="preserve">
     <value>Шредер файлов</value>
   </data>
@@ -765,9 +741,6 @@
   <data name="NetworkOptimizer_ColLatency" xml:space="preserve">
     <value>Пинг (Задержка)</value>
   </data>
-  <data name="NetworkOptimizer_ColAction" xml:space="preserve">
-    <value>Действие</value>
-  </data>
   <data name="NetworkOptimizer_Apply" xml:space="preserve">
     <value>Установить</value>
   </data>
@@ -806,9 +779,6 @@
   </data>
   <data name="PrivacyDebloat_JsonBackup" xml:space="preserve">
     <value>РЕЗЕРВНАЯ КОПИЯ В JSON</value>
-  </data>
-  <data name="PrivacyDebloat_CategoryLabel" xml:space="preserve">
-    <value>Категория:</value>
   </data>
   <data name="PrivacyDebloat_CategoryAll" xml:space="preserve">
     <value>Все параметры</value>
@@ -906,9 +876,6 @@
   <data name="ServicesOptimizer_ColRisk" xml:space="preserve">
     <value>Риск</value>
   </data>
-  <data name="ServicesOptimizer_ColAction" xml:space="preserve">
-    <value>Действие</value>
-  </data>
   <data name="ServicesOptimizer_FooterNote" xml:space="preserve">
     <value>Изменения служб полностью обратимы. Начальное состояние сохраняется в services_backup.json.</value>
   </data>
@@ -944,9 +911,6 @@
   </data>
   <data name="CliInspector_SearchPlaceholder" xml:space="preserve">
     <value>Поиск по имени, категории, пути...</value>
-  </data>
-  <data name="CliInspector_CategoryLabel" xml:space="preserve">
-    <value>Категория:</value>
   </data>
   <data name="CliInspector_ToolTipOpenInExplorer" xml:space="preserve">
     <value>Открыть в Проводнике</value>
@@ -1121,5 +1085,20 @@
   </data>
   <data name="Main_Status_Found" xml:space="preserve">
     <value>Найдено: {0} в {1} элементах</value>
+  </data>
+  <data name="Common_Close" xml:space="preserve">
+    <value>Закрыть</value>
+  </data>
+  <data name="Common_Duplicates" xml:space="preserve">
+    <value>Дубликаты</value>
+  </data>
+  <data name="Common_ColStatus" xml:space="preserve">
+    <value>Статус</value>
+  </data>
+  <data name="Common_ColAction" xml:space="preserve">
+    <value>Действие</value>
+  </data>
+  <data name="Common_CategoryLabel" xml:space="preserve">
+    <value>Категория:</value>
   </data>
 </root>

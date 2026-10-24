@@ -140,7 +140,7 @@
                 <!-- Category Filter Selector -->
                 <DockPanel Grid.Row="0" Margin="0,0,0,12">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <TextBlock Text="{x:Static loc:Localizer.PrivacyDebloat_CategoryLabel}" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,8,0" FontWeight="SemiBold"/>
+                        <TextBlock Text="{x:Static loc:Localizer.Common_CategoryLabel}" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,8,0" FontWeight="SemiBold"/>
                         <ComboBox SelectedIndex="{Binding SelectedCategoryIndex, Mode=TwoWay}" Width="240" Height="32">
                             <ComboBoxItem Content="{x:Static loc:Localizer.PrivacyDebloat_CategoryAll}"/>
                             <ComboBoxItem Content="{x:Static loc:Localizer.PrivacyDebloat_CategoryTelemetry}"/>

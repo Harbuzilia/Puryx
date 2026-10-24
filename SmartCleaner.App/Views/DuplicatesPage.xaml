@@ -37,7 +37,7 @@
                     BorderThickness="0">
 
             <!-- ═══ Tab 1: Поиск дубликатов ═══ -->
-            <TabItem Header="{x:Static loc:Localizer.Duplicates_TabDuplicates}">
+            <TabItem Header="{x:Static loc:Localizer.Common_Duplicates}">
                 <Grid Margin="0,12,0,0">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -352,7 +352,7 @@
                               GridLinesVisibility="Horizontal"
                               HorizontalGridLinesBrush="{DynamicResource BorderBrush}">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="{x:Static loc:Localizer.Duplicates_ColStatus}" Binding="{Binding Status}" Width="140"/>
+                            <DataGridTextColumn Header="{x:Static loc:Localizer.Common_ColStatus}" Binding="{Binding Status}" Width="140"/>
                             <DataGridTextColumn Header="{x:Static loc:Localizer.Duplicates_ColPath}" Binding="{Binding Path}" Width="*"/>
                             <DataGridTextColumn Header="{x:Static loc:Localizer.Duplicates_ColSizeA}" Binding="{Binding SizeA}" Width="90"/>
                             <DataGridTextColumn Header="{x:Static loc:Localizer.Duplicates_ColSizeB}" Binding="{Binding SizeB}" Width="90"/>
@@ -449,7 +449,7 @@
                                 Style="{StaticResource SecondaryButton}"
                                 Visibility="{Binding IsScanning, Converter={StaticResource BoolToVisibilityConverter}}"
                                 Margin="0,0,8,0"/>
-                        <Button Content="{x:Static loc:Localizer.Duplicates_Scan}" 
+                        <Button Content="{x:Static loc:Localizer.Common_Scan}" 
                                 Command="{Binding StartDuplicateScanCommand}"
                                 IsEnabled="{Binding IsScanning, Converter={StaticResource InverseBoolConverter}}"
                                 Style="{StaticResource PrimaryButton}">

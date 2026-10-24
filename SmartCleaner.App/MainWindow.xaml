@@ -153,7 +153,7 @@
                                    Margin="12,18,0,6"/>
 
                         <RadioButton Style="{StaticResource NavButton}" 
-                                     Content="{x:Static loc:Localizer.Nav_Duplicates}" 
+                                     Content="{x:Static loc:Localizer.Common_Duplicates}" 
                                      Tag="&#xE8B7;"
                                      Checked="NavigateToDuplicates"
                                      GroupName="Nav"/>

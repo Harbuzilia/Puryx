@@ -98,7 +98,7 @@
                             <DataGridTextColumn Binding="{Binding Secondary}" Header="{x:Static loc:Localizer.NetworkOptimizer_ColSecondary}" Width="150"/>
                             <DataGridTextColumn Binding="{Binding LatencyFormatted}" Header="{x:Static loc:Localizer.NetworkOptimizer_ColLatency}" Width="130" Foreground="{DynamicResource SafeBrush}"/>
                             
-                            <DataGridTemplateColumn Header="{x:Static loc:Localizer.NetworkOptimizer_ColAction}" Width="*">
+                            <DataGridTemplateColumn Header="{x:Static loc:Localizer.Common_ColAction}" Width="*">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <Button Content="{x:Static loc:Localizer.NetworkOptimizer_Apply}" 

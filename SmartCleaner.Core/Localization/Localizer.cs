@@ -120,7 +120,6 @@ public static class Localizer
     public static string Nav_Overview => GetString(nameof(Nav_Overview));
 
     // Сайдбар: раздел «Инструменты»
-    public static string Nav_Duplicates => GetString(nameof(Nav_Duplicates));
     public static string Nav_DiskMap => GetString(nameof(Nav_DiskMap));
     public static string Nav_LargeFiles => GetString(nameof(Nav_LargeFiles));
     public static string Nav_Startup => GetString(nameof(Nav_Startup));
@@ -152,7 +151,6 @@ public static class Localizer
     public static string About_Subtitle => GetString(nameof(About_Subtitle));
     public static string About_TechSpec => GetString(nameof(About_TechSpec));
     public static string About_Copyright => GetString(nameof(About_Copyright));
-    public static string About_CloseButton => GetString(nameof(About_CloseButton));
 
     // Настройки: язык
     public static string Settings_Language => GetString(nameof(Settings_Language));
@@ -199,7 +197,6 @@ public static class Localizer
     // Дубликаты
     public static string Duplicates_Title => GetString(nameof(Duplicates_Title));
     public static string Duplicates_Subtitle => GetString(nameof(Duplicates_Subtitle));
-    public static string Duplicates_TabDuplicates => GetString(nameof(Duplicates_TabDuplicates));
     public static string Duplicates_TabBySample => GetString(nameof(Duplicates_TabBySample));
     public static string Duplicates_TabCompare => GetString(nameof(Duplicates_TabCompare));
     public static string Duplicates_TabDeletionLog => GetString(nameof(Duplicates_TabDeletionLog));
@@ -224,7 +221,6 @@ public static class Localizer
     public static string Duplicates_StatOnlyInA => GetString(nameof(Duplicates_StatOnlyInA));
     public static string Duplicates_StatOnlyInB => GetString(nameof(Duplicates_StatOnlyInB));
     public static string Duplicates_StatCommon => GetString(nameof(Duplicates_StatCommon));
-    public static string Duplicates_ColStatus => GetString(nameof(Duplicates_ColStatus));
     public static string Duplicates_ColPath => GetString(nameof(Duplicates_ColPath));
     public static string Duplicates_ColSizeA => GetString(nameof(Duplicates_ColSizeA));
     public static string Duplicates_ColSizeB => GetString(nameof(Duplicates_ColSizeB));
@@ -235,7 +231,6 @@ public static class Localizer
     public static string Duplicates_ReplaceWithHardlinks => GetString(nameof(Duplicates_ReplaceWithHardlinks));
     public static string Duplicates_ReplaceWithHardlinksToolTip => GetString(nameof(Duplicates_ReplaceWithHardlinksToolTip));
     public static string Duplicates_DeleteSelected => GetString(nameof(Duplicates_DeleteSelected));
-    public static string Duplicates_Scan => GetString(nameof(Duplicates_Scan));
     public static string Duplicates_FindCopies => GetString(nameof(Duplicates_FindCopies));
     public static string Duplicates_CompareFolders => GetString(nameof(Duplicates_CompareFolders));
 
@@ -261,7 +256,6 @@ public static class Localizer
     public static string Uninstaller_Uninstall => GetString(nameof(Uninstaller_Uninstall));
     public static string Uninstaller_UninstallToolTip => GetString(nameof(Uninstaller_UninstallToolTip));
     public static string Uninstaller_LeftoversTitle => GetString(nameof(Uninstaller_LeftoversTitle));
-    public static string Uninstaller_CloseLeftovers => GetString(nameof(Uninstaller_CloseLeftovers));
     public static string Uninstaller_CleanSelectedLeftovers => GetString(nameof(Uninstaller_CleanSelectedLeftovers));
 
     // Карантин
@@ -271,7 +265,6 @@ public static class Localizer
     public static string Quarantine_SizeMetric => GetString(nameof(Quarantine_SizeMetric));
     public static string Quarantine_OriginalPathPrefix => GetString(nameof(Quarantine_OriginalPathPrefix));
     public static string Quarantine_QuarantinedAtPrefix => GetString(nameof(Quarantine_QuarantinedAtPrefix));
-    public static string Quarantine_Restore => GetString(nameof(Quarantine_Restore));
     public static string Quarantine_Purge => GetString(nameof(Quarantine_Purge));
 
     // Планировщик
@@ -359,7 +352,6 @@ public static class Localizer
     public static string RamOptimizer_ColDbName => GetString(nameof(RamOptimizer_ColDbName));
     public static string RamOptimizer_ColOriginalSize => GetString(nameof(RamOptimizer_ColOriginalSize));
     public static string RamOptimizer_ColCompactedSize => GetString(nameof(RamOptimizer_ColCompactedSize));
-    public static string RamOptimizer_ColStatus => GetString(nameof(RamOptimizer_ColStatus));
     public static string RamOptimizer_TabShredder => GetString(nameof(RamOptimizer_TabShredder));
     public static string RamOptimizer_ShredTitle => GetString(nameof(RamOptimizer_ShredTitle));
     public static string RamOptimizer_ShredDescription => GetString(nameof(RamOptimizer_ShredDescription));
@@ -382,7 +374,6 @@ public static class Localizer
     public static string NetworkOptimizer_ColPrimary => GetString(nameof(NetworkOptimizer_ColPrimary));
     public static string NetworkOptimizer_ColSecondary => GetString(nameof(NetworkOptimizer_ColSecondary));
     public static string NetworkOptimizer_ColLatency => GetString(nameof(NetworkOptimizer_ColLatency));
-    public static string NetworkOptimizer_ColAction => GetString(nameof(NetworkOptimizer_ColAction));
     public static string NetworkOptimizer_Apply => GetString(nameof(NetworkOptimizer_Apply));
 
     // День 3, срез 2: общие строки (новые повторы)
@@ -390,6 +381,13 @@ public static class Localizer
     public static string Common_Disable => GetString(nameof(Common_Disable));
     public static string Common_Enable => GetString(nameof(Common_Enable));
     public static string Common_Scan => GetString(nameof(Common_Scan));
+
+    // День 4, дедуп: одинаковые значения нескольких страниц → единые ключи
+    public static string Common_Close => GetString(nameof(Common_Close));
+    public static string Common_Duplicates => GetString(nameof(Common_Duplicates));
+    public static string Common_ColStatus => GetString(nameof(Common_ColStatus));
+    public static string Common_ColAction => GetString(nameof(Common_ColAction));
+    public static string Common_CategoryLabel => GetString(nameof(Common_CategoryLabel));
 
     // День 3, срез 2: Приватность / Anti-Spy
     public static string PrivacyDebloat_Title => GetString(nameof(PrivacyDebloat_Title));
@@ -400,7 +398,6 @@ public static class Localizer
     public static string PrivacyDebloat_DataCollectionBlocked => GetString(nameof(PrivacyDebloat_DataCollectionBlocked));
     public static string PrivacyDebloat_SafeRollback => GetString(nameof(PrivacyDebloat_SafeRollback));
     public static string PrivacyDebloat_JsonBackup => GetString(nameof(PrivacyDebloat_JsonBackup));
-    public static string PrivacyDebloat_CategoryLabel => GetString(nameof(PrivacyDebloat_CategoryLabel));
     public static string PrivacyDebloat_CategoryAll => GetString(nameof(PrivacyDebloat_CategoryAll));
     public static string PrivacyDebloat_CategoryTelemetry => GetString(nameof(PrivacyDebloat_CategoryTelemetry));
     public static string PrivacyDebloat_CategoryAds => GetString(nameof(PrivacyDebloat_CategoryAds));
@@ -435,7 +432,6 @@ public static class Localizer
     public static string ServicesOptimizer_ColStatus => GetString(nameof(ServicesOptimizer_ColStatus));
     public static string ServicesOptimizer_ColStartupType => GetString(nameof(ServicesOptimizer_ColStartupType));
     public static string ServicesOptimizer_ColRisk => GetString(nameof(ServicesOptimizer_ColRisk));
-    public static string ServicesOptimizer_ColAction => GetString(nameof(ServicesOptimizer_ColAction));
     public static string ServicesOptimizer_FooterNote => GetString(nameof(ServicesOptimizer_FooterNote));
 
     // День 3, срез 2: Инспектор CLI
@@ -450,7 +446,6 @@ public static class Localizer
     public static string CliInspector_FoundUnit => GetString(nameof(CliInspector_FoundUnit));
     public static string CliInspector_TabTools => GetString(nameof(CliInspector_TabTools));
     public static string CliInspector_SearchPlaceholder => GetString(nameof(CliInspector_SearchPlaceholder));
-    public static string CliInspector_CategoryLabel => GetString(nameof(CliInspector_CategoryLabel));
     public static string CliInspector_ToolTipOpenInExplorer => GetString(nameof(CliInspector_ToolTipOpenInExplorer));
     public static string CliInspector_ToolTipOpenTerminal => GetString(nameof(CliInspector_ToolTipOpenTerminal));
     public static string CliInspector_ToolTipCopyUninstall => GetString(nameof(CliInspector_ToolTipCopyUninstall));

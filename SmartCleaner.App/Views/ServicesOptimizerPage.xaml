@@ -213,7 +213,7 @@
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
 
-                        <DataGridTemplateColumn Header="{x:Static loc:Localizer.ServicesOptimizer_ColAction}" Width="*">
+                        <DataGridTemplateColumn Header="{x:Static loc:Localizer.Common_ColAction}" Width="*">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <Button Command="{Binding DataContext.ToggleServiceCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
