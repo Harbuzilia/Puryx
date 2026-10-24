@@ -513,4 +513,44 @@ public static class Localizer
     // День 4: строка со статусом результата сканирования (первый VM-ключ
     // с плейсхолдерами {0}/{1} — форматирование по текущей культуре)
     public static string Main_Status_Found => GetString(nameof(Main_Status_Found));
+
+    // День 6 (часть б), фаза L: MainWindow, контентная зона (профили, статусы,
+    // фильтры, таблица, оверлеи). Токены профилей (CommandParameter) остаются
+    // константами CleaningProfileMap — ключи ниже только для отображения.
+    public static string MainWindow_FreedAllTimePrefix => GetString(nameof(MainWindow_FreedAllTimePrefix));
+    public static string MainWindow_SessionsSuffix => GetString(nameof(MainWindow_SessionsSuffix));
+    public static string MainWindow_ScanConfigButton => GetString(nameof(MainWindow_ScanConfigButton));
+    public static string MainWindow_ScanConfigToolTip => GetString(nameof(MainWindow_ScanConfigToolTip));
+    public static string MainWindow_ProfileLabel => GetString(nameof(MainWindow_ProfileLabel));
+    public static string Nav_Profile_Quick => GetString(nameof(Nav_Profile_Quick));
+    public static string MainWindow_ProfileQuickToolTip => GetString(nameof(MainWindow_ProfileQuickToolTip));
+    public static string Nav_Profile_Dev => GetString(nameof(Nav_Profile_Dev));
+    public static string MainWindow_ProfileDevToolTip => GetString(nameof(MainWindow_ProfileDevToolTip));
+    public static string Nav_Profile_Full => GetString(nameof(Nav_Profile_Full));
+    public static string MainWindow_ProfileFullToolTip => GetString(nameof(MainWindow_ProfileFullToolTip));
+    public static string MainWindow_ScanSectionLabel => GetString(nameof(MainWindow_ScanSectionLabel));
+    public static string MainWindow_CustomFolderLabel => GetString(nameof(MainWindow_CustomFolderLabel));
+    public static string MainWindow_Browse => GetString(nameof(MainWindow_Browse));
+    public static string MainWindow_StatFoundJunk => GetString(nameof(MainWindow_StatFoundJunk));
+    public static string MainWindow_StatSelected => GetString(nameof(MainWindow_StatSelected));
+    public static string MainWindow_StatItems => GetString(nameof(MainWindow_StatItems));
+    public static string MainWindow_ScanButtonSubtitle => GetString(nameof(MainWindow_ScanButtonSubtitle));
+    public static string MainWindow_FilterSource => GetString(nameof(MainWindow_FilterSource));
+    public static string MainWindow_FilterScope => GetString(nameof(MainWindow_FilterScope));
+    public static string MainWindow_ColPath => GetString(nameof(MainWindow_ColPath));
+    public static string MainWindow_ColSize => GetString(nameof(MainWindow_ColSize));
+    public static string MainWindow_ColStatus => GetString(nameof(MainWindow_ColStatus));
+    public static string MainWindow_MenuOpenFolder => GetString(nameof(MainWindow_MenuOpenFolder));
+    public static string MainWindow_MenuCopyPath => GetString(nameof(MainWindow_MenuCopyPath));
+    public static string MainWindow_MenuAddToWhitelist => GetString(nameof(MainWindow_MenuAddToWhitelist));
+    public static string MainWindow_EmptyState => GetString(nameof(MainWindow_EmptyState));
+    public static string MainWindow_SelectSafe => GetString(nameof(MainWindow_SelectSafe));
+    public static string MainWindow_SelectCaches => GetString(nameof(MainWindow_SelectCaches));
+    public static string MainWindow_SelectCachesToolTip => GetString(nameof(MainWindow_SelectCachesToolTip));
+    public static string MainWindow_DeselectAll => GetString(nameof(MainWindow_DeselectAll));
+    public static string MainWindow_Export => GetString(nameof(MainWindow_Export));
+    public static string MainWindow_CleanSelected => GetString(nameof(MainWindow_CleanSelected));
+    public static string MainWindow_ScanOverlayTitle => GetString(nameof(MainWindow_ScanOverlayTitle));
+    public static string MainWindow_CancelScan => GetString(nameof(MainWindow_CancelScan));
+    public static string MainWindow_CleanOverlayTitle => GetString(nameof(MainWindow_CleanOverlayTitle));
 }

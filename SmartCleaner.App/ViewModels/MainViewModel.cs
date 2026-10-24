@@ -121,13 +121,13 @@ public partial class MainViewModel : ObservableObject, IDisposable
     public ObservableCollection<ScannerOptionViewModel> ScannerOptions { get; } = new();
 
     /// <summary>Текущий профиль сканирования</summary>
-    /// <remarks>Функциональный токен (не переводится): значения приходят из
-    /// CleaningProfileMap (кнопки профилей, CLI --profile) и тем же маппингом
-    /// разрешаются в набор категорий — сравнение корректно при любом языке
-    /// интерфейса. Локализация отображаемого имени профиля — День 5/6
-    /// (Core-имена + XAML), до этого в UI виден токен как есть.</remarks>
+    /// <remarks>Отображаемое имя выбранного профиля — локализовано (День 6б,
+    /// фаза L): значение из ProfileDisplayName. Функциональный токен остаётся
+    /// в CommandParameter кнопок (константы CleaningProfileMap) и тем же
+    /// маппингом разрешается в набор категорий — сравнение корректно при любом
+    /// языке интерфейса.</remarks>
     [ObservableProperty]
-    private string _selectedProfile = CleaningProfileMap.Full;
+    private string _selectedProfile = Localizer.Nav_Profile_Full;
 
     /// <summary>Показывать ли панель настроек сканирования</summary>
     [ObservableProperty]
@@ -304,7 +304,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     [RelayCommand]
     private void ApplyProfile(string profileName)
     {
-        SelectedProfile = profileName;
+        SelectedProfile = ProfileDisplayName(profileName);
 
         // Набор категорий — из Core-маппинга (CleaningProfileMap), того же
         // источника, что и для --profile при авто-очистке из CLI.
@@ -316,6 +316,18 @@ public partial class MainViewModel : ObservableObject, IDisposable
             option.IsEnabled = enabledSet == null || enabledSet.Contains(option.CategoryName);
         }
     }
+
+    /// <summary>
+    /// Отображаемое имя профиля: токен CleaningProfileMap → локализованный
+    /// ключ (День 6б, фаза L); неизвестный токен показывается как есть.
+    /// </summary>
+    private static string ProfileDisplayName(string profileName) => profileName switch
+    {
+        CleaningProfileMap.Quick => Localizer.Nav_Profile_Quick,
+        CleaningProfileMap.Development => Localizer.Nav_Profile_Dev,
+        CleaningProfileMap.Full => Localizer.Nav_Profile_Full,
+        _ => profileName
+    };
 
     /// <summary>
     /// Выбрать папку для сканирования через системный диалог

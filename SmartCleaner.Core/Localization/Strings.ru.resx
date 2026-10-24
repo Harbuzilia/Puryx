@@ -3902,4 +3902,113 @@ Windows может использовать эти драйверы прямо �
   <data name="Report_PrintButton" xml:space="preserve">
     <value>🖨️ Печать / Сохранить в PDF</value>
   </data>
+  <!-- День 6 (часть б), фаза L: MainWindow, контентная зона (профили, статусы, фильтры, оверлеи). -->
+  <data name="MainWindow_FreedAllTimePrefix" xml:space="preserve">
+    <value>Освобождено: </value>
+  </data>
+  <data name="MainWindow_SessionsSuffix" xml:space="preserve">
+    <value> сессий)</value>
+  </data>
+  <data name="MainWindow_ScanConfigButton" xml:space="preserve">
+    <value>Параметры</value>
+  </data>
+  <data name="MainWindow_ScanConfigToolTip" xml:space="preserve">
+    <value>Параметры и фильтры сканирования</value>
+  </data>
+  <data name="MainWindow_ProfileLabel" xml:space="preserve">
+    <value>ПРОФИЛЬ</value>
+  </data>
+  <data name="Nav_Profile_Quick" xml:space="preserve">
+    <value>Быстрая</value>
+  </data>
+  <data name="MainWindow_ProfileQuickToolTip" xml:space="preserve">
+    <value>Система + Браузеры</value>
+  </data>
+  <data name="Nav_Profile_Dev" xml:space="preserve">
+    <value>Разработка</value>
+  </data>
+  <data name="MainWindow_ProfileDevToolTip" xml:space="preserve">
+    <value>npm/pip/NuGet кэши, node_modules, venv, bin/obj, Docker</value>
+  </data>
+  <data name="Nav_Profile_Full" xml:space="preserve">
+    <value>Полное</value>
+  </data>
+  <data name="MainWindow_ProfileFullToolTip" xml:space="preserve">
+    <value>Все категории</value>
+  </data>
+  <data name="MainWindow_ScanSectionLabel" xml:space="preserve">
+    <value>СКАНИРОВАТЬ</value>
+  </data>
+  <data name="MainWindow_CustomFolderLabel" xml:space="preserve">
+    <value>ДОПОЛНИТЕЛЬНАЯ ПАПКА</value>
+  </data>
+  <data name="MainWindow_Browse" xml:space="preserve">
+    <value>Обзор</value>
+  </data>
+  <data name="MainWindow_StatFoundJunk" xml:space="preserve">
+    <value>НАЙДЕНО МУСОРА</value>
+  </data>
+  <data name="MainWindow_StatSelected" xml:space="preserve">
+    <value>ВЫБРАНО К ОЧИСТКЕ</value>
+  </data>
+  <data name="MainWindow_StatItems" xml:space="preserve">
+    <value>ОБЪЕКТОВ</value>
+  </data>
+  <data name="MainWindow_ScanButtonSubtitle" xml:space="preserve">
+    <value>Анализ дисков</value>
+  </data>
+  <data name="MainWindow_FilterSource" xml:space="preserve">
+    <value>Источник:</value>
+  </data>
+  <data name="MainWindow_FilterScope" xml:space="preserve">
+    <value>Область:</value>
+  </data>
+  <data name="MainWindow_ColPath" xml:space="preserve">
+    <value>Путь</value>
+  </data>
+  <data name="MainWindow_ColSize" xml:space="preserve">
+    <value>Размер</value>
+  </data>
+  <data name="MainWindow_ColStatus" xml:space="preserve">
+    <value>Статус</value>
+  </data>
+  <data name="MainWindow_MenuOpenFolder" xml:space="preserve">
+    <value>Открыть папку</value>
+  </data>
+  <data name="MainWindow_MenuCopyPath" xml:space="preserve">
+    <value>Копировать путь</value>
+  </data>
+  <data name="MainWindow_MenuAddToWhitelist" xml:space="preserve">
+    <value>Добавить в белый список</value>
+  </data>
+  <data name="MainWindow_EmptyState" xml:space="preserve">
+    <value>Нажмите «Сканировать» для поиска мусора</value>
+  </data>
+  <data name="MainWindow_SelectSafe" xml:space="preserve">
+    <value>Выбрать безопасные</value>
+  </data>
+  <data name="MainWindow_SelectCaches" xml:space="preserve">
+    <value>+ кэши</value>
+  </data>
+  <data name="MainWindow_SelectCachesToolTip" xml:space="preserve">
+    <value>Выбрать SafeToDelete + PerformanceCache</value>
+  </data>
+  <data name="MainWindow_DeselectAll" xml:space="preserve">
+    <value>Снять выбор</value>
+  </data>
+  <data name="MainWindow_Export" xml:space="preserve">
+    <value>Экспорт</value>
+  </data>
+  <data name="MainWindow_CleanSelected" xml:space="preserve">
+    <value>Очистить выбранное</value>
+  </data>
+  <data name="MainWindow_ScanOverlayTitle" xml:space="preserve">
+    <value>Сканирование системы...</value>
+  </data>
+  <data name="MainWindow_CancelScan" xml:space="preserve">
+    <value>Отменить сканирование</value>
+  </data>
+  <data name="MainWindow_CleanOverlayTitle" xml:space="preserve">
+    <value>Выполняется безопасная очистка</value>
+  </data>
 </root>

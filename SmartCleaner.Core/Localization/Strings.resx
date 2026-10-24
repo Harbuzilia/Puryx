@@ -3902,4 +3902,113 @@ What exactly would you like to do?</value>
   <data name="Report_PrintButton" xml:space="preserve">
     <value>🖨️ Print / Save as PDF</value>
   </data>
+  <!-- День 6 (часть б), фаза L: MainWindow content zone (profiles, stats, filters, overlays). -->
+  <data name="MainWindow_FreedAllTimePrefix" xml:space="preserve">
+    <value>Freed all-time: </value>
+  </data>
+  <data name="MainWindow_SessionsSuffix" xml:space="preserve">
+    <value> sessions)</value>
+  </data>
+  <data name="MainWindow_ScanConfigButton" xml:space="preserve">
+    <value>Parameters</value>
+  </data>
+  <data name="MainWindow_ScanConfigToolTip" xml:space="preserve">
+    <value>Scan parameters and filters</value>
+  </data>
+  <data name="MainWindow_ProfileLabel" xml:space="preserve">
+    <value>PROFILE</value>
+  </data>
+  <data name="Nav_Profile_Quick" xml:space="preserve">
+    <value>Quick</value>
+  </data>
+  <data name="MainWindow_ProfileQuickToolTip" xml:space="preserve">
+    <value>System + Browsers</value>
+  </data>
+  <data name="Nav_Profile_Dev" xml:space="preserve">
+    <value>Development</value>
+  </data>
+  <data name="MainWindow_ProfileDevToolTip" xml:space="preserve">
+    <value>npm/pip/NuGet caches, node_modules, venv, bin/obj, Docker</value>
+  </data>
+  <data name="Nav_Profile_Full" xml:space="preserve">
+    <value>Full</value>
+  </data>
+  <data name="MainWindow_ProfileFullToolTip" xml:space="preserve">
+    <value>All categories</value>
+  </data>
+  <data name="MainWindow_ScanSectionLabel" xml:space="preserve">
+    <value>SCAN</value>
+  </data>
+  <data name="MainWindow_CustomFolderLabel" xml:space="preserve">
+    <value>CUSTOM FOLDER</value>
+  </data>
+  <data name="MainWindow_Browse" xml:space="preserve">
+    <value>Browse</value>
+  </data>
+  <data name="MainWindow_StatFoundJunk" xml:space="preserve">
+    <value>JUNK FOUND</value>
+  </data>
+  <data name="MainWindow_StatSelected" xml:space="preserve">
+    <value>SELECTED FOR CLEANUP</value>
+  </data>
+  <data name="MainWindow_StatItems" xml:space="preserve">
+    <value>ITEMS</value>
+  </data>
+  <data name="MainWindow_ScanButtonSubtitle" xml:space="preserve">
+    <value>Disk analysis</value>
+  </data>
+  <data name="MainWindow_FilterSource" xml:space="preserve">
+    <value>Source:</value>
+  </data>
+  <data name="MainWindow_FilterScope" xml:space="preserve">
+    <value>Scope:</value>
+  </data>
+  <data name="MainWindow_ColPath" xml:space="preserve">
+    <value>Path</value>
+  </data>
+  <data name="MainWindow_ColSize" xml:space="preserve">
+    <value>Size</value>
+  </data>
+  <data name="MainWindow_ColStatus" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="MainWindow_MenuOpenFolder" xml:space="preserve">
+    <value>Open folder</value>
+  </data>
+  <data name="MainWindow_MenuCopyPath" xml:space="preserve">
+    <value>Copy path</value>
+  </data>
+  <data name="MainWindow_MenuAddToWhitelist" xml:space="preserve">
+    <value>Add to whitelist</value>
+  </data>
+  <data name="MainWindow_EmptyState" xml:space="preserve">
+    <value>Click "Scan" to search for junk</value>
+  </data>
+  <data name="MainWindow_SelectSafe" xml:space="preserve">
+    <value>Select safe</value>
+  </data>
+  <data name="MainWindow_SelectCaches" xml:space="preserve">
+    <value>+ caches</value>
+  </data>
+  <data name="MainWindow_SelectCachesToolTip" xml:space="preserve">
+    <value>Select SafeToDelete + PerformanceCache</value>
+  </data>
+  <data name="MainWindow_DeselectAll" xml:space="preserve">
+    <value>Deselect all</value>
+  </data>
+  <data name="MainWindow_Export" xml:space="preserve">
+    <value>Export</value>
+  </data>
+  <data name="MainWindow_CleanSelected" xml:space="preserve">
+    <value>Clean selected</value>
+  </data>
+  <data name="MainWindow_ScanOverlayTitle" xml:space="preserve">
+    <value>Scanning system...</value>
+  </data>
+  <data name="MainWindow_CancelScan" xml:space="preserve">
+    <value>Cancel scan</value>
+  </data>
+  <data name="MainWindow_CleanOverlayTitle" xml:space="preserve">
+    <value>Safe cleanup in progress</value>
+  </data>
 </root>

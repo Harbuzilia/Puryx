@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:helpers="clr-namespace:SmartCleaner.App.Helpers"
         xmlns:loc="clr-namespace:SmartCleaner.Core.Localization;assembly=SmartCleaner.Core"
+        xmlns:scheduler="clr-namespace:SmartCleaner.Core.Scheduler;assembly=SmartCleaner.Core"
         mc:Ignorable="d"
         Title="{x:Static loc:Localizer.MainWindow_Title}"
         Height="740" Width="1180"
@@ -97,14 +98,14 @@
                 <!-- Scrollable Navigation Tree -->
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="8,8,8,8">
                     <StackPanel>
-                        <!-- ═══ СЕКЦИЯ: ОЧИСТКА ═══ -->
+                        <!-- ═══ SECTION: CLEANUP ═══ -->
                         <TextBlock Text="{x:Static loc:Localizer.Nav_Section_Cleanup}" 
                                    FontSize="11"
                                    FontWeight="SemiBold"
                                    Foreground="{DynamicResource TextDisabledBrush}"
                                    Margin="12,8,0,6"/>
 
-                        <!-- Кнопка "Обзор" (все категории) -->
+                        <!-- "Overview" button (all categories) -->
                         <RadioButton Style="{StaticResource NavButton}" 
                                      Content="{x:Static loc:Localizer.Nav_Overview}" 
                                      Tag="&#xE80F;"
@@ -112,7 +113,7 @@
                                      Checked="NavigateToAllCategories"
                                      GroupName="Nav"/>
 
-                        <!-- Динамические категории из результатов сканирования -->
+                        <!-- Dynamic categories from scan results -->
                         <ItemsControl ItemsSource="{Binding Categories}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
@@ -145,7 +146,7 @@
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
 
-                        <!-- ═══ СЕКЦИЯ: ИНСТРУМЕНТЫ ═══ -->
+                        <!-- ═══ SECTION: TOOLS ═══ -->
                         <TextBlock Text="{x:Static loc:Localizer.Nav_Section_Tools}" 
                                    FontSize="11"
                                    FontWeight="SemiBold"
@@ -223,7 +224,7 @@
                                      Checked="NavigateToNetworkOptimizer"
                                      GroupName="Nav"/>
 
-                        <!-- ═══ СЕКЦИЯ: СИСТЕМА ═══ -->
+                        <!-- ═══ SECTION: SYSTEM ═══ -->
                         <TextBlock Text="{x:Static loc:Localizer.Nav_Section_System}" 
                                    FontSize="11"
                                    FontWeight="SemiBold"
@@ -293,23 +294,23 @@
                                     <TextBlock Text="&#xE9D9;" FontFamily="Segoe MDL2 Assets" FontSize="12" 
                                                Foreground="{DynamicResource CautionBrush}" VerticalAlignment="Center" Margin="0,0,6,0"/>
                                     <TextBlock Style="{StaticResource Caption}" VerticalAlignment="Center">
-                                        <Run Text="Освобождено: " Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                        <Run Text="{x:Static loc:Localizer.MainWindow_FreedAllTimePrefix}" Foreground="{DynamicResource TextSecondaryBrush}"/>
                                         <Run Text="{Binding TotalFreedAllTime, Mode=OneWay}" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}"/>
                                         <Run Text=" (" Foreground="{DynamicResource TextSecondaryBrush}"/>
                                         <Run Text="{Binding SessionCount, Mode=OneWay}" FontWeight="SemiBold"/>
-                                        <Run Text=" сессий)" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                        <Run Text="{x:Static loc:Localizer.MainWindow_SessionsSuffix}" Foreground="{DynamicResource TextSecondaryBrush}"/>
                                     </TextBlock>
                                 </StackPanel>
                             </Border>
 
-                            <!-- Кнопка настроек сканирования -->
+                            <!-- Scan settings button -->
                             <Button Style="{StaticResource SecondaryButton}"
                                     Command="{Binding ToggleScanConfigCommand}"
                                     Padding="10,6"
-                                    ToolTip="Параметры и фильтры сканирования">
+                                    ToolTip="{x:Static loc:Localizer.MainWindow_ScanConfigToolTip}">
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="&#xE713;" FontFamily="Segoe MDL2 Assets" FontSize="13" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                                    <TextBlock Text="Параметры" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                    <TextBlock Text="{x:Static loc:Localizer.MainWindow_ScanConfigButton}" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Button>
                         </StackPanel>
@@ -320,30 +321,31 @@
                             Style="{StaticResource Card}" Padding="16,14"
                             Visibility="{Binding IsScanConfigVisible, Converter={StaticResource BoolToVisibilityConverter}}">
                         <StackPanel>
-                            <!-- Профили -->
-                            <TextBlock Text="ПРОФИЛЬ" FontSize="11" FontWeight="SemiBold"
+                            <!-- Profiles: CommandParameter is the functional token
+                                 (CleaningProfileMap constants), Content is localized -->
+                            <TextBlock Text="{x:Static loc:Localizer.MainWindow_ProfileLabel}" FontSize="11" FontWeight="SemiBold"
                                        Foreground="{DynamicResource TextDisabledBrush}" Margin="0,0,0,8"/>
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
-                                <Button Style="{StaticResource SecondaryButton}" Content="Быстрая"
-                                        Command="{Binding ApplyProfileCommand}" CommandParameter="Быстрая"
+                                <Button Style="{StaticResource SecondaryButton}" Content="{x:Static loc:Localizer.Nav_Profile_Quick}"
+                                        Command="{Binding ApplyProfileCommand}" CommandParameter="{x:Static scheduler:CleaningProfileMap.Quick}"
                                         Padding="12,6" Margin="0,0,8,0"
-                                        ToolTip="Система + Браузеры"/>
-                                <Button Style="{StaticResource SecondaryButton}" Content="Разработка"
-                                        Command="{Binding ApplyProfileCommand}" CommandParameter="Разработка"
+                                        ToolTip="{x:Static loc:Localizer.MainWindow_ProfileQuickToolTip}"/>
+                                <Button Style="{StaticResource SecondaryButton}" Content="{x:Static loc:Localizer.Nav_Profile_Dev}"
+                                        Command="{Binding ApplyProfileCommand}" CommandParameter="{x:Static scheduler:CleaningProfileMap.Development}"
                                         Padding="12,6" Margin="0,0,8,0"
-                                        ToolTip="npm/pip/NuGet кэши, node_modules, venv, bin/obj, Docker"/>
-                                <Button Style="{StaticResource SecondaryButton}" Content="Полное"
-                                        Command="{Binding ApplyProfileCommand}" CommandParameter="Полное"
+                                        ToolTip="{x:Static loc:Localizer.MainWindow_ProfileDevToolTip}"/>
+                                <Button Style="{StaticResource SecondaryButton}" Content="{x:Static loc:Localizer.Nav_Profile_Full}"
+                                        Command="{Binding ApplyProfileCommand}" CommandParameter="{x:Static scheduler:CleaningProfileMap.Full}"
                                         Padding="12,6"
-                                        ToolTip="Все категории"/>
+                                        ToolTip="{x:Static loc:Localizer.MainWindow_ProfileFullToolTip}"/>
                                 <TextBlock Text="{Binding SelectedProfile}" 
                                            Foreground="{DynamicResource AccentBrush}" 
                                            FontWeight="SemiBold"
                                            VerticalAlignment="Center" Margin="12,0,0,0"/>
                             </StackPanel>
 
-                            <!-- Категории сканирования -->
-                            <TextBlock Text="СКАНИРОВАТЬ" FontSize="11" FontWeight="SemiBold"
+                            <!-- Scan categories -->
+                            <TextBlock Text="{x:Static loc:Localizer.MainWindow_ScanSectionLabel}" FontSize="11" FontWeight="SemiBold"
                                        Foreground="{DynamicResource TextDisabledBrush}" Margin="0,0,0,8"/>
                             <ItemsControl ItemsSource="{Binding ScannerOptions}">
                                 <ItemsControl.ItemsPanel>
@@ -368,8 +370,8 @@
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
 
-                            <!-- Дополнительная папка -->
-                            <TextBlock Text="ДОПОЛНИТЕЛЬНАЯ ПАПКА" FontSize="11" FontWeight="SemiBold"
+                            <!-- Additional folder -->
+                            <TextBlock Text="{x:Static loc:Localizer.MainWindow_CustomFolderLabel}" FontSize="11" FontWeight="SemiBold"
                                        Foreground="{DynamicResource TextDisabledBrush}" Margin="0,8,0,6"/>
                             <DockPanel>
                                 <Button DockPanel.Dock="Right"
@@ -378,7 +380,7 @@
                                         Padding="12,4" Margin="8,0,0,0">
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock Text="&#xED25;" FontFamily="Segoe MDL2 Assets" FontSize="13" Margin="0,0,6,0" VerticalAlignment="Center"/>
-                                        <TextBlock Text="Обзор" VerticalAlignment="Center"/>
+                                        <TextBlock Text="{x:Static loc:Localizer.MainWindow_Browse}" VerticalAlignment="Center"/>
                                     </StackPanel>
                                 </Button>
                                 <Border BorderBrush="{DynamicResource BorderBrush}" 
@@ -411,7 +413,7 @@
                             <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                 <TextBlock Text="{Binding TotalSize, Converter={StaticResource SizeConverter}}" 
                                            FontSize="21" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-                                <TextBlock Text="НАЙДЕНО МУСОРА" FontSize="10" FontWeight="SemiBold"
+                                <TextBlock Text="{x:Static loc:Localizer.MainWindow_StatFoundJunk}" FontSize="10" FontWeight="SemiBold"
                                            Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0"/>
                             </StackPanel>
                         </Grid>
@@ -433,7 +435,7 @@
                             <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                 <TextBlock Text="{Binding SelectedSize, Converter={StaticResource SizeConverter}}" 
                                            FontSize="21" FontWeight="Bold" Foreground="{DynamicResource SafeBrush}"/>
-                                <TextBlock Text="ВЫБРАНО К ОЧИСТКЕ" FontSize="10" FontWeight="SemiBold"
+                                <TextBlock Text="{x:Static loc:Localizer.MainWindow_StatSelected}" FontSize="10" FontWeight="SemiBold"
                                            Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0"/>
                             </StackPanel>
                         </Grid>
@@ -458,7 +460,7 @@
                                     <TextBlock Text="/" FontSize="16" Foreground="{DynamicResource TextSecondaryBrush}" Margin="3,0"/>
                                     <TextBlock Text="{Binding TotalCount}" FontSize="16" Foreground="{DynamicResource TextSecondaryBrush}"/>
                                 </StackPanel>
-                                <TextBlock Text="ОБЪЕКТОВ" FontSize="10" FontWeight="SemiBold"
+                                <TextBlock Text="{x:Static loc:Localizer.MainWindow_StatItems}" FontSize="10" FontWeight="SemiBold"
                                            Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0"/>
                             </StackPanel>
                         </Grid>
@@ -476,10 +478,10 @@
                                        Margin="0,0,12,0"
                                        VerticalAlignment="Center"/>
                             <StackPanel VerticalAlignment="Center">
-                                <TextBlock Text="Сканировать" 
+                                <TextBlock Text="{x:Static loc:Localizer.Common_Scan}" 
                                            FontSize="14"
                                            FontWeight="Bold"/>
-                                <TextBlock Text="Анализ дисков" 
+                                <TextBlock Text="{x:Static loc:Localizer.MainWindow_ScanButtonSubtitle}" 
                                            FontSize="10"
                                            Opacity="0.85"/>
                             </StackPanel>
@@ -520,14 +522,14 @@
                             </Border>
 
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,12,0">
-                                <TextBlock Text="Источник:" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,8,0"/>
+                                <TextBlock Text="{x:Static loc:Localizer.MainWindow_FilterSource}" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,8,0"/>
                                 <ComboBox Width="140" Height="34"
                                           ItemsSource="{Binding SourceFilters}"
                                           SelectedItem="{Binding SelectedSourceFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                             </StackPanel>
 
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <TextBlock Text="Область:" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,8,0"/>
+                                <TextBlock Text="{x:Static loc:Localizer.MainWindow_FilterScope}" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,8,0"/>
                                 <ComboBox Width="150" Height="34"
                                           ItemsSource="{Binding ScopeFilters}"
                                           SelectedItem="{Binding SelectedScopeFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
@@ -546,19 +548,19 @@
                             <TextBlock Grid.Column="1" Cursor="Hand" Margin="0,0,0,0">
                                 <Hyperlink Command="{Binding SortByCommand}" CommandParameter="Name"
                                            TextDecorations="None" Foreground="{DynamicResource TextSecondaryBrush}">
-                                    <Run Text="Путь ↕"/>
+                                    <Run Text="{x:Static loc:Localizer.MainWindow_ColPath}"/><Run Text=" ↕"/>
                                 </Hyperlink>
                             </TextBlock>
                             <TextBlock Grid.Column="2" HorizontalAlignment="Right" Margin="0,0,8,0" Cursor="Hand">
                                 <Hyperlink Command="{Binding SortByCommand}" CommandParameter="Size"
                                            TextDecorations="None" Foreground="{DynamicResource TextSecondaryBrush}">
-                                    <Run Text="Размер ↕"/>
+                                    <Run Text="{x:Static loc:Localizer.MainWindow_ColSize}"/><Run Text=" ↕"/>
                                 </Hyperlink>
                             </TextBlock>
                             <TextBlock Grid.Column="3" HorizontalAlignment="Center" Cursor="Hand">
                                 <Hyperlink Command="{Binding SortByCommand}" CommandParameter="Risk"
                                            TextDecorations="None" Foreground="{DynamicResource TextSecondaryBrush}">
-                                    <Run Text="Статус ↕"/>
+                                    <Run Text="{x:Static loc:Localizer.MainWindow_ColStatus}"/><Run Text=" ↕"/>
                                 </Hyperlink>
                             </TextBlock>
                         </Grid>
@@ -621,14 +623,14 @@
                                         </Grid.ToolTip>
                                         <Grid.ContextMenu>
                                             <ContextMenu>
-                                                <MenuItem Header="Открыть папку" 
+                                                <MenuItem Header="{x:Static loc:Localizer.MainWindow_MenuOpenFolder}" 
                                                           Command="{Binding DataContext.OpenFolderCommand, RelativeSource={RelativeSource AncestorType=ListView}}"
                                                           CommandParameter="{Binding}"/>
-                                                <MenuItem Header="Копировать путь" 
+                                                <MenuItem Header="{x:Static loc:Localizer.MainWindow_MenuCopyPath}" 
                                                           Command="{Binding DataContext.CopyPathCommand, RelativeSource={RelativeSource AncestorType=ListView}}"
                                                           CommandParameter="{Binding}"/>
                                                 <Separator/>
-                                                <MenuItem Header="Добавить в белый список" 
+                                                <MenuItem Header="{x:Static loc:Localizer.MainWindow_MenuAddToWhitelist}" 
                                                           Command="{Binding DataContext.AddToWhitelistCommand, RelativeSource={RelativeSource AncestorType=ListView}}"
                                                           CommandParameter="{Binding}"/>
                                             </ContextMenu>
@@ -701,7 +703,7 @@
                                        FontSize="48"
                                        Foreground="{DynamicResource TextDisabledBrush}"
                                        HorizontalAlignment="Center"/>
-                            <TextBlock Text="Нажмите «Сканировать» для поиска мусора" 
+                            <TextBlock Text="{x:Static loc:Localizer.MainWindow_EmptyState}" 
                                        Style="{StaticResource BodyText}"
                                        Margin="0,12,0,0"/>
                         </StackPanel>
@@ -711,25 +713,25 @@
                 <!-- Footer -->
                 <Grid Grid.Row="3" Margin="0,16,0,0">
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                        <Button Content="Выбрать безопасные" 
+                        <Button Content="{x:Static loc:Localizer.MainWindow_SelectSafe}" 
                                 Style="{StaticResource SecondaryButton}"
                                 Command="{Binding SelectAllCommand}"
                                 Margin="0,0,8,0"/>
-                        <Button Content="+ кэши" 
+                        <Button Content="{x:Static loc:Localizer.MainWindow_SelectCaches}" 
                                 Style="{StaticResource SecondaryButton}"
                                 Command="{Binding SelectCacheCommand}"
-                                ToolTip="Выбрать SafeToDelete + PerformanceCache"
+                                ToolTip="{x:Static loc:Localizer.MainWindow_SelectCachesToolTip}"
                                 Margin="0,0,8,0"/>
-                        <Button Content="Снять выбор" 
+                        <Button Content="{x:Static loc:Localizer.MainWindow_DeselectAll}" 
                                 Style="{StaticResource SecondaryButton}"
                                 Command="{Binding DeselectAllCommand}"
                                 Margin="0,0,8,0"/>
-                        <Button Content="Экспорт" 
+                        <Button Content="{x:Static loc:Localizer.MainWindow_Export}" 
                                 Style="{StaticResource SecondaryButton}"
                                 Command="{Binding ExportResultsCommand}"/>
                     </StackPanel>
 
-                    <Button Content="Очистить выбранное"
+                    <Button Content="{x:Static loc:Localizer.MainWindow_CleanSelected}"
                             Style="{StaticResource DangerButton}"
                             Command="{Binding CleanCommand}"
                             Padding="22,9"
@@ -779,7 +781,7 @@
                         <TextBlock Text="&#xE721;" FontFamily="Segoe MDL2 Assets" FontSize="24" Foreground="{DynamicResource AccentBrush}"
                                    HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
-                    <TextBlock Text="Сканирование системы..." FontSize="17" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" HorizontalAlignment="Center"/>
+                    <TextBlock Text="{x:Static loc:Localizer.MainWindow_ScanOverlayTitle}" FontSize="17" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" HorizontalAlignment="Center"/>
                     <ProgressBar IsIndeterminate="True" Width="260" Height="5" Margin="0,16,0,0" Foreground="{DynamicResource AccentBrush}"/>
                     <TextBlock Text="{Binding StatusText}" 
                                Foreground="{DynamicResource TextSecondaryBrush}"
@@ -787,7 +789,7 @@
                                TextTrimming="CharacterEllipsis"
                                MaxWidth="320"
                                Margin="0,12,0,0"/>
-                    <Button Content="Отменить сканирование"
+                    <Button Content="{x:Static loc:Localizer.MainWindow_CancelScan}"
                             Command="{Binding CancelScanCommand}"
                             Style="{StaticResource SecondaryButton}"
                             HorizontalAlignment="Center"
@@ -831,7 +833,7 @@
                         <TextBlock Text="&#xE74D;" FontFamily="Segoe MDL2 Assets" FontSize="26" Foreground="{DynamicResource DangerBrush}"
                                    HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
-                    <TextBlock Text="Выполняется безопасная очистка" FontSize="17" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" HorizontalAlignment="Center"/>
+                    <TextBlock Text="{x:Static loc:Localizer.MainWindow_CleanOverlayTitle}" FontSize="17" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" HorizontalAlignment="Center"/>
                     <ProgressBar Value="{Binding CleaningProgressValue}" 
                                  Maximum="100" 
                                  Width="320" 
