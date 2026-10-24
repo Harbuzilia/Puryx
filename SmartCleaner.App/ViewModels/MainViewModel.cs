@@ -121,8 +121,13 @@ public partial class MainViewModel : ObservableObject, IDisposable
     public ObservableCollection<ScannerOptionViewModel> ScannerOptions { get; } = new();
 
     /// <summary>Текущий профиль сканирования</summary>
+    /// <remarks>Функциональный токен (не переводится): значения приходят из
+    /// CleaningProfileMap (кнопки профилей, CLI --profile) и тем же маппингом
+    /// разрешаются в набор категорий — сравнение корректно при любом языке
+    /// интерфейса. Локализация отображаемого имени профиля — День 5/6
+    /// (Core-имена + XAML), до этого в UI виден токен как есть.</remarks>
     [ObservableProperty]
-    private string _selectedProfile = "Полное";
+    private string _selectedProfile = CleaningProfileMap.Full;
 
     /// <summary>Показывать ли панель настроек сканирования</summary>
     [ObservableProperty]
@@ -192,7 +197,11 @@ public partial class MainViewModel : ObservableObject, IDisposable
         // Передаём CustomScanPath в общую конфигурацию для CustomFolderScanner
         _scanConfig.CustomScanPath = string.IsNullOrWhiteSpace(CustomScanPath) ? null : CustomScanPath;
 
-        // Автоматически включаем/выключаем чекбокс "Выбранная папка"
+        // Автоматически включаем/выключаем чекбокс "Выбранная папка".
+        // Функциональный токен (не переводится): CategoryName приходит из
+        // Core-сканера (CustomFolderScanner) и сравнивается с тем же
+        // источником — корректно при любом языке интерфейса. Локализация
+        // отображаемых имён категорий сканеров — Core, День 5.
         var customOption = ScannerOptions.FirstOrDefault(o => o.CategoryName == "Выбранная папка");
         if (customOption != null)
             customOption.IsEnabled = !string.IsNullOrWhiteSpace(CustomScanPath);

@@ -56,7 +56,7 @@
                     <!-- Filter -->
                     <TextBlock Text="{x:Static loc:Localizer.Startup_FilterLabel}" VerticalAlignment="Center" Margin="0,0,6,0"/>
                     <ComboBox SelectedIndex="{Binding FilterIndex}" Width="130">
-                        <ComboBoxItem Content="{x:Static loc:Localizer.Startup_FilterAll}"/>
+                        <ComboBoxItem Content="{x:Static loc:Localizer.Common_CategoryAll}"/>
                         <ComboBoxItem Content="{x:Static loc:Localizer.Startup_FilterEnabled}"/>
                         <ComboBoxItem Content="{x:Static loc:Localizer.Startup_FilterDisabled}"/>
                     </ComboBox>

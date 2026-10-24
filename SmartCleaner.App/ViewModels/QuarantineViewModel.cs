@@ -91,7 +91,7 @@ public partial class QuarantineViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            StatusText = Localizer.GetString("Quarantine_Status_RestoreError", ex.Message);
+            StatusText = Localizer.GetString("Common_Status_RestoreError", ex.Message);
             MessageBox.Show(ex.Message, Localizer.GetString("Quarantine_Caption_RestoreError"), MessageBoxButton.OK, MessageBoxImage.Error);
         }
         finally

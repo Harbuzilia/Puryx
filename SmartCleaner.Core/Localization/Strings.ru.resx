@@ -393,9 +393,6 @@
   <data name="Startup_FilterLabel" xml:space="preserve">
     <value>Фильтр:</value>
   </data>
-  <data name="Startup_FilterAll" xml:space="preserve">
-    <value>Все</value>
-  </data>
   <data name="Startup_FilterEnabled" xml:space="preserve">
     <value>Включённые</value>
   </data>
@@ -1460,9 +1457,6 @@
   <data name="Quarantine_Caption_RestoreError" xml:space="preserve">
     <value>Ошибка восстановления</value>
   </data>
-  <data name="Quarantine_Status_RestoreError" xml:space="preserve">
-    <value>Ошибка восстановления: {0}</value>
-  </data>
   <data name="Quarantine_PurgeConfirmBody" xml:space="preserve">
     <value>Удалить элемент '{0}' из карантина НАВСЕГДА без возможности восстановления?</value>
   </data>
@@ -1872,5 +1866,211 @@ Windows может использовать эти драйверы прямо �
   </data>
   <data name="Settings_Caption_Report" xml:space="preserve">
     <value>Отчет системы</value>
+  </data>
+  <data name="NetworkOptimizer_Status_Ready" xml:space="preserve">
+    <value>Готов к оптимизации сетевых задержек и DNS</value>
+  </data>
+  <data name="NetworkOptimizer_Status_Benchmarking" xml:space="preserve">
+    <value>Замер сетевых задержек DNS-серверов (Ping)...</value>
+  </data>
+  <data name="NetworkOptimizer_Status_BenchmarkDone" xml:space="preserve">
+    <value>Замер задержек DNS завершен.</value>
+  </data>
+  <data name="NetworkOptimizer_Status_Flushing" xml:space="preserve">
+    <value>Очистка DNS кэша и сброс сокетов Winsock...</value>
+  </data>
+  <data name="NetworkOptimizer_Status_ApplyingPreset" xml:space="preserve">
+    <value>Установка DNS {0}...</value>
+  </data>
+  <data name="NetworkOptimizer_Status_ResettingDhcp" xml:space="preserve">
+    <value>Сброс DNS на автоматический (DHCP)...</value>
+  </data>
+  <data name="PrivacyDebloat_Status_Ready" xml:space="preserve">
+    <value>Готов к проверке параметров приватности и телеметрии</value>
+  </data>
+  <data name="PrivacyDebloat_Status_Scanning" xml:space="preserve">
+    <value>Сканирование параметров телеметрии и реестра...</value>
+  </data>
+  <data name="PrivacyDebloat_Status_ScanDone" xml:space="preserve">
+    <value>Сканирование завершено: отключено {0} из {1} параметров сбора данных.</value>
+  </data>
+  <data name="PrivacyDebloat_Status_ScanError" xml:space="preserve">
+    <value>Ошибка сканирования: {0}</value>
+  </data>
+  <data name="PrivacyDebloat_Status_Disabling" xml:space="preserve">
+    <value>Отключение {0}...</value>
+  </data>
+  <data name="PrivacyDebloat_Status_Reverting" xml:space="preserve">
+    <value>Восстановление {0}...</value>
+  </data>
+  <data name="PrivacyDebloat_Status_Disabled" xml:space="preserve">
+    <value>Отключено: {0}</value>
+  </data>
+  <data name="PrivacyDebloat_Status_Reverted" xml:space="preserve">
+    <value>Восстановлено: {0}</value>
+  </data>
+  <data name="PrivacyDebloat_Status_ChangeFailedAdmin" xml:space="preserve">
+    <value>Не удалось изменить статус {0}. Требуются права администратора.</value>
+  </data>
+  <data name="PrivacyDebloat_Status_ApplyingRecommended" xml:space="preserve">
+    <value>Отключение всех рекомендуемых параметров телеметрии и рекламы...</value>
+  </data>
+  <data name="PrivacyDebloat_Status_RecommendedDone" xml:space="preserve">
+    <value>Успешно отключено {0} рекомендуемых параметров сбора данных и рекламы.</value>
+  </data>
+  <data name="PrivacyDebloat_Status_Cancelled" xml:space="preserve">
+    <value>Операция отменена. Показано фактическое состояние параметров.</value>
+  </data>
+  <data name="PrivacyDebloat_Status_RestoringDefaults" xml:space="preserve">
+    <value>Восстановление стандартных параметров Windows по умолчанию...</value>
+  </data>
+  <data name="PrivacyDebloat_Status_RestoredCount" xml:space="preserve">
+    <value>Восстановлено {0} параметров в исходное состояние Windows.</value>
+  </data>
+  <data name="ServicesOptimizer_Status_Ready" xml:space="preserve">
+    <value>Готов к сканированию и оптимизации фоновых служб Windows</value>
+  </data>
+  <data name="ServicesOptimizer_Status_Querying" xml:space="preserve">
+    <value>Опрос состояния и типов запуска системных служб...</value>
+  </data>
+  <data name="ServicesOptimizer_Status_ScanDone" xml:space="preserve">
+    <value>Сканирование завершено: {0} из {1} служб отключено.</value>
+  </data>
+  <data name="ServicesOptimizer_Status_QueryError" xml:space="preserve">
+    <value>Ошибка опроса служб: {0}</value>
+  </data>
+  <data name="ServicesOptimizer_Status_ChangingService" xml:space="preserve">
+    <value>Изменение службы {0}...</value>
+  </data>
+  <data name="ServicesOptimizer_Status_ServiceMode" xml:space="preserve">
+    <value>Служба {0} переведена в режим {1}.</value>
+  </data>
+  <data name="ServicesOptimizer_Status_ChangeFailedAdmin" xml:space="preserve">
+    <value>Не удалось изменить службу {0}. Требуются права администратора.</value>
+  </data>
+  <data name="ServicesOptimizer_Status_ApplyingGaming" xml:space="preserve">
+    <value>🎮 Применение игрового профиля (максимум FPS и минимум задержек)...</value>
+  </data>
+  <data name="ServicesOptimizer_Status_ApplyingBalanced" xml:space="preserve">
+    <value>⚡ Применение сбалансированного профиля (безопасное отключение балласта)...</value>
+  </data>
+  <data name="ServicesOptimizer_Status_ApplyingWorkstation" xml:space="preserve">
+    <value>💼 Применение офисного профиля (сохранение сети и принтеров)...</value>
+  </data>
+  <data name="ServicesOptimizer_Status_RestoringDefaults" xml:space="preserve">
+    <value>Восстановление служб по умолчанию из резервной копии...</value>
+  </data>
+  <data name="ServicesOptimizer_Status_RestoredCount" xml:space="preserve">
+    <value>Восстановлено {0} служб в стандартное состояние Windows.</value>
+  </data>
+  <data name="ServicesOptimizer_Status_Cancelled" xml:space="preserve">
+    <value>Операция отменена. Показано фактическое состояние служб.</value>
+  </data>
+  <data name="ServicesOptimizer_Status_ProfileDone" xml:space="preserve">
+    <value>Профиль применен. Настроено {0} служб.</value>
+  </data>
+  <data name="ServicesOptimizer_Status_ProfileCancelled" xml:space="preserve">
+    <value>Профиль отменен. Показано фактическое состояние служб.</value>
+  </data>
+  <data name="ServicesOptimizer_Status_ProfileError" xml:space="preserve">
+    <value>Ошибка применения профиля: {0}</value>
+  </data>
+  <data name="CliInspector_Status_Ready" xml:space="preserve">
+    <value>Нажмите «Сканировать» для инспекции CLI, AI-агентов и переменных PATH</value>
+  </data>
+  <data name="CliInspector_Status_Scanning" xml:space="preserve">
+    <value>Сканирование CLI-инструментов, AI-агентов и системных переменных PATH...</value>
+  </data>
+  <data name="CliInspector_Status_Found" xml:space="preserve">
+    <value>Найдено {0} утилит ({1}), {2} битых путей в PATH, {3} профилей PowerShell</value>
+  </data>
+  <data name="CliInspector_Status_ScanError" xml:space="preserve">
+    <value>Ошибка при сканировании: {0}</value>
+  </data>
+  <data name="CliInspector_Msg_PathNotFound" xml:space="preserve">
+    <value>Путь не найден: {0}</value>
+  </data>
+  <data name="CliInspector_Msg_OpenError" xml:space="preserve">
+    <value>Не удалось открыть: {0}</value>
+  </data>
+  <data name="CliInspector_Msg_TerminalError" xml:space="preserve">
+    <value>Не удалось запустить терминал: {0}</value>
+  </data>
+  <data name="CliInspector_Status_Copied" xml:space="preserve">
+    <value>Команда скопирована в буфер: {0}</value>
+  </data>
+  <data name="CliInspector_Msg_CopyError" xml:space="preserve">
+    <value>Не удалось скопировать: {0}</value>
+  </data>
+  <data name="CliInspector_Msg_DeleteConfirmBody" xml:space="preserve">
+    <value>Удалить инструмент '{0}'?
+Путь: {1}
+Размер: {2}
+
+Файлы будут перемещены в Корзину.</value>
+  </data>
+  <data name="CliInspector_Msg_DeleteConfirmTitle" xml:space="preserve">
+    <value>Подтверждение удаления</value>
+  </data>
+  <data name="CliInspector_Msg_DeleteBlocked" xml:space="preserve">
+    <value>Удаление заблокировано: {0}</value>
+  </data>
+  <data name="CliInspector_Caption_Protection" xml:space="preserve">
+    <value>Защита</value>
+  </data>
+  <data name="CliInspector_Msg_ElevationRequired" xml:space="preserve">
+    <value>Инструмент находится в защищённом каталоге и требует прав администратора.</value>
+  </data>
+  <data name="CliInspector_Status_Deleted" xml:space="preserve">
+    <value>Удалено в Корзину: {0} ({1})</value>
+  </data>
+  <data name="CliInspector_Msg_DeleteError" xml:space="preserve">
+    <value>Ошибка при удалении: {0}</value>
+  </data>
+  <data name="CliInspector_Msg_NoDeadPaths" xml:space="preserve">
+    <value>Мертвых путей в переменной PATH пользователя не обнаружено.</value>
+  </data>
+  <data name="CliInspector_Caption_PathHealth" xml:space="preserve">
+    <value>Здоровье PATH</value>
+  </data>
+  <data name="CliInspector_Msg_CleanDeadPathsConfirm" xml:space="preserve">
+    <value>Найдено {0} несуществующих записей в User PATH:
+
+{1}
+
+Удалить эти записи из системного реестра?</value>
+  </data>
+  <data name="CliInspector_Caption_CleanDeadPaths" xml:space="preserve">
+    <value>Очистка битых путей PATH</value>
+  </data>
+  <data name="CliInspector_Status_DeadPathsCleaned" xml:space="preserve">
+    <value>Успешно вычищено {0} битых путей из переменной PATH пользователя!</value>
+  </data>
+  <data name="CliInspector_Msg_DeadPathsRemoved" xml:space="preserve">
+    <value>Удалено {0} битых путей. Системные переменные обновлены без перезагрузки.</value>
+  </data>
+  <data name="CliInspector_Caption_Success" xml:space="preserve">
+    <value>Успешно</value>
+  </data>
+  <data name="CliInspector_Msg_CleanError" xml:space="preserve">
+    <value>Ошибка при очистке: {0}</value>
+  </data>
+  <data name="CliInspector_Msg_UserScopeOnly" xml:space="preserve">
+    <value>Удаление возможно только для пользовательских записей PATH (User).</value>
+  </data>
+  <data name="CliInspector_Status_PathRemoved" xml:space="preserve">
+    <value>Путь удален из User PATH: {0}</value>
+  </data>
+  <data name="CliInspector_Status_ReportSaved" xml:space="preserve">
+    <value>Отчет успешно сохранен: {0}</value>
+  </data>
+  <data name="CliInspector_Msg_SaveError" xml:space="preserve">
+    <value>Ошибка сохранения: {0}</value>
+  </data>
+  <data name="Common_CategoryAll" xml:space="preserve">
+    <value>Все</value>
+  </data>
+  <data name="Common_Status_RestoreError" xml:space="preserve">
+    <value>Ошибка восстановления: {0}</value>
   </data>
 </root>

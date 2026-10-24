@@ -8,6 +8,7 @@ using Microsoft.VisualBasic.FileIO;
 using Microsoft.Win32;
 using SmartCleaner.Core.CliInspector;
 using SmartCleaner.Core.Helpers;
+using SmartCleaner.Core.Localization;
 using SmartCleaner.Core.Models;
 using SmartCleaner.Core.Safety;
 
@@ -23,13 +24,13 @@ public partial class CliInspectorViewModel : ObservableObject
     private bool _isScanning;
 
     [ObservableProperty]
-    private string _statusText = "Нажмите «Сканировать» для инспекции CLI, AI-агентов и переменных PATH";
+    private string _statusText = Localizer.GetString("CliInspector_Status_Ready");
 
     [ObservableProperty]
     private string _searchText = string.Empty;
 
     [ObservableProperty]
-    private string _selectedCategory = "Все";
+    private string _selectedCategory = Localizer.GetString("Common_CategoryAll");
 
     [ObservableProperty]
     private int _selectedTabIndex;
@@ -52,7 +53,7 @@ public partial class CliInspectorViewModel : ObservableObject
     [ObservableProperty]
     private int _psProfilesCount;
 
-    public ObservableCollection<string> Categories { get; } = ["Все"];
+    public ObservableCollection<string> Categories { get; } = [Localizer.GetString("Common_CategoryAll")];
     public ObservableCollection<CliToolItem> AllTools { get; } = new();
     public ObservableCollection<CliToolItem> FilteredTools { get; } = new();
     public ObservableCollection<PathHealthItem> PathEntries { get; } = new();
@@ -71,7 +72,7 @@ public partial class CliInspectorViewModel : ObservableObject
         if (IsScanning) return;
 
         IsScanning = true;
-        StatusText = "Сканирование CLI-инструментов, AI-агентов и системных переменных PATH...";
+        StatusText = Localizer.GetString("CliInspector_Status_Scanning");
 
         try
         {
@@ -103,7 +104,7 @@ public partial class CliInspectorViewModel : ObservableObject
             PsProfilesCount = result.PsProfilesCount;
 
             Categories.Clear();
-            Categories.Add("Все");
+            Categories.Add(Localizer.GetString("Common_CategoryAll"));
             foreach (var cat in result.CategoriesCount.Keys.OrderBy(c => c))
             {
                 Categories.Add(cat);
@@ -111,11 +112,11 @@ public partial class CliInspectorViewModel : ObservableObject
 
             ApplyFilter();
 
-            StatusText = $"Найдено {TotalToolsCount} утилит ({TotalSizeFormatted}), {DeadPathsCount} битых путей в PATH, {PsProfilesCount} профилей PowerShell";
+            StatusText = Localizer.GetString("CliInspector_Status_Found", TotalToolsCount, TotalSizeFormatted, DeadPathsCount, PsProfilesCount);
         }
         catch (Exception ex)
         {
-            StatusText = $"Ошибка при сканировании: {ex.Message}";
+            StatusText = Localizer.GetString("CliInspector_Status_ScanError", ex.Message);
         }
         finally
         {
@@ -137,7 +138,7 @@ public partial class CliInspectorViewModel : ObservableObject
     {
         var filtered = AllTools.AsEnumerable();
 
-        if (!string.IsNullOrWhiteSpace(SelectedCategory) && SelectedCategory != "Все")
+        if (!string.IsNullOrWhiteSpace(SelectedCategory) && SelectedCategory != Localizer.GetString("Common_CategoryAll"))
         {
             filtered = filtered.Where(t => string.Equals(t.Category, SelectedCategory, StringComparison.OrdinalIgnoreCase));
         }
@@ -164,7 +165,7 @@ public partial class CliInspectorViewModel : ObservableObject
     {
         if (string.IsNullOrWhiteSpace(path) || (!Directory.Exists(path) && !File.Exists(path)))
         {
-            MessageBox.Show($"Путь не найден: {path}", "Puryx", MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show(Localizer.GetString("CliInspector_Msg_PathNotFound", path ?? ""), "Puryx", MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
 
@@ -188,7 +189,7 @@ public partial class CliInspectorViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Не удалось открыть: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show(Localizer.GetString("CliInspector_Msg_OpenError", ex.Message), Localizer.GetString("Common_Caption_Error"), MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 
@@ -225,7 +226,7 @@ public partial class CliInspectorViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Не удалось запустить терминал: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show(Localizer.GetString("CliInspector_Msg_TerminalError", ex.Message), Localizer.GetString("Common_Caption_Error"), MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 
@@ -237,11 +238,11 @@ public partial class CliInspectorViewModel : ObservableObject
         try
         {
             Clipboard.SetText(cmd);
-            StatusText = $"Команда скопирована в буфер: {cmd}";
+            StatusText = Localizer.GetString("CliInspector_Status_Copied", cmd);
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Не удалось скопировать: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show(Localizer.GetString("CliInspector_Msg_CopyError", ex.Message), Localizer.GetString("Common_Caption_Error"), MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 
@@ -251,8 +252,8 @@ public partial class CliInspectorViewModel : ObservableObject
         if (item == null || string.IsNullOrWhiteSpace(item.Path)) return;
 
         var result = MessageBox.Show(
-            $"Удалить инструмент '{item.Name}'?\nПуть: {item.Path}\nРазмер: {item.SizeFormatted}\n\nФайлы будут перемещены в Корзину.",
-            "Подтверждение удаления",
+            Localizer.GetString("CliInspector_Msg_DeleteConfirmBody", item.Name, item.Path, item.SizeFormatted),
+            Localizer.GetString("CliInspector_Msg_DeleteConfirmTitle"),
             MessageBoxButton.YesNo,
             MessageBoxImage.Question);
 
@@ -269,13 +270,13 @@ public partial class CliInspectorViewModel : ObservableObject
 
         if (!validation.CanDelete)
         {
-            MessageBox.Show($"Удаление заблокировано: {validation.BlockReason}", "Защита", MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show(Localizer.GetString("CliInspector_Msg_DeleteBlocked", validation.BlockReason ?? ""), Localizer.GetString("CliInspector_Caption_Protection"), MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
 
         if (validation.RequiresElevation)
         {
-            MessageBox.Show("Инструмент находится в защищённом каталоге и требует прав администратора.", "Защита", MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show(Localizer.GetString("CliInspector_Msg_ElevationRequired"), Localizer.GetString("CliInspector_Caption_Protection"), MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
 
@@ -296,11 +297,11 @@ public partial class CliInspectorViewModel : ObservableObject
             TotalSizeFormatted = SizeFormatter.Format(TotalSizeBytes);
             TotalToolsCount = AllTools.Count;
 
-            StatusText = $"Удалено в Корзину: {item.Name} ({item.SizeFormatted})";
+            StatusText = Localizer.GetString("CliInspector_Status_Deleted", item.Name, item.SizeFormatted);
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Ошибка при удалении: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show(Localizer.GetString("CliInspector_Msg_DeleteError", ex.Message), Localizer.GetString("Common_Caption_Error"), MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 
@@ -310,15 +311,16 @@ public partial class CliInspectorViewModel : ObservableObject
         var deadEntries = PathEntries.Where(p => p.IsDead && p.Scope == "User").ToList();
         if (deadEntries.Count == 0)
         {
-            MessageBox.Show("Мертвых путей в переменной PATH пользователя не обнаружено.", "Здоровье PATH", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show(Localizer.GetString("CliInspector_Msg_NoDeadPaths"), Localizer.GetString("CliInspector_Caption_PathHealth"), MessageBoxButton.OK, MessageBoxImage.Information);
             return;
         }
 
-        var msg = $"Найдено {deadEntries.Count} несуществующих записей в User PATH:\n\n" +
-                  string.Join("\n", deadEntries.Select(d => $"• {d.Path}")) +
-                  "\n\nУдалить эти записи из системного реестра?";
+        var msg = Localizer.GetString(
+            "CliInspector_Msg_CleanDeadPathsConfirm",
+            deadEntries.Count,
+            string.Join("\n", deadEntries.Select(d => $"• {d.Path}")));
 
-        var answer = MessageBox.Show(msg, "Очистка битых путей PATH", MessageBoxButton.YesNo, MessageBoxImage.Question);
+        var answer = MessageBox.Show(msg, Localizer.GetString("CliInspector_Caption_CleanDeadPaths"), MessageBoxButton.YesNo, MessageBoxImage.Question);
         if (answer != MessageBoxResult.Yes) return;
 
         var (success, error, removedCount) = _pathService.CleanDeadUserPaths();
@@ -329,12 +331,12 @@ public partial class CliInspectorViewModel : ObservableObject
                 PathEntries.Remove(d);
             }
             DeadPathsCount = PathEntries.Count(p => p.IsDead);
-            StatusText = $"Успешно вычищено {removedCount} битых путей из переменной PATH пользователя!";
-            MessageBox.Show($"Удалено {removedCount} битых путей. Системные переменные обновлены без перезагрузки.", "Успешно", MessageBoxButton.OK, MessageBoxImage.Information);
+            StatusText = Localizer.GetString("CliInspector_Status_DeadPathsCleaned", removedCount);
+            MessageBox.Show(Localizer.GetString("CliInspector_Msg_DeadPathsRemoved", removedCount), Localizer.GetString("CliInspector_Caption_Success"), MessageBoxButton.OK, MessageBoxImage.Information);
         }
         else
         {
-            MessageBox.Show($"Ошибка при очистке: {error}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show(Localizer.GetString("CliInspector_Msg_CleanError", error ?? ""), Localizer.GetString("Common_Caption_Error"), MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 
@@ -343,7 +345,7 @@ public partial class CliInspectorViewModel : ObservableObject
     {
         if (item == null || item.Scope != "User")
         {
-            MessageBox.Show("Удаление возможно только для пользовательских записей PATH (User).", "Puryx", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show(Localizer.GetString("CliInspector_Msg_UserScopeOnly"), "Puryx", MessageBoxButton.OK, MessageBoxImage.Information);
             return;
         }
 
@@ -352,11 +354,11 @@ public partial class CliInspectorViewModel : ObservableObject
         {
             PathEntries.Remove(item);
             DeadPathsCount = PathEntries.Count(p => p.IsDead);
-            StatusText = $"Путь удален из User PATH: {item.Path}";
+            StatusText = Localizer.GetString("CliInspector_Status_PathRemoved", item.Path);
         }
         else
         {
-            MessageBox.Show($"Ошибка при удалении: {error}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show(Localizer.GetString("CliInspector_Msg_DeleteError", error ?? ""), Localizer.GetString("Common_Caption_Error"), MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 
@@ -395,11 +397,11 @@ public partial class CliInspectorViewModel : ObservableObject
                     File.WriteAllText(sfd.FileName, json);
                 }
 
-                StatusText = $"Отчет успешно сохранен: {sfd.FileName}";
+                StatusText = Localizer.GetString("CliInspector_Status_ReportSaved", sfd.FileName);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка сохранения: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(Localizer.GetString("CliInspector_Msg_SaveError", ex.Message), Localizer.GetString("Common_Caption_Error"), MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }

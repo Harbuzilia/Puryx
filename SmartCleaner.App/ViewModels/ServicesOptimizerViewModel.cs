@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SmartCleaner.App.Services;
+using SmartCleaner.Core.Localization;
 using SmartCleaner.Core.ServicesOpt;
 using System.Collections.ObjectModel;
 
@@ -19,7 +20,7 @@ public partial class ServicesOptimizerViewModel : ObservableObject
     private bool _isBusy;
 
     [ObservableProperty]
-    private string _statusText = "Готов к сканированию и оптимизации фоновых служб Windows";
+    private string _statusText = Localizer.GetString("ServicesOptimizer_Status_Ready");
 
     [ObservableProperty]
     private int _disabledCount;
@@ -44,16 +45,16 @@ public partial class ServicesOptimizerViewModel : ObservableObject
     {
         if (IsBusy) return;
         IsBusy = true;
-        StatusText = "Опрос состояния и типов запуска системных служб...";
+        StatusText = Localizer.GetString("ServicesOptimizer_Status_Querying");
 
         try
         {
             await ReloadServicesAsync();
-            StatusText = $"Сканирование завершено: {DisabledCount} из {TotalCount} служб отключено.";
+            StatusText = Localizer.GetString("ServicesOptimizer_Status_ScanDone", DisabledCount, TotalCount);
         }
         catch (Exception ex)
         {
-            StatusText = $"Ошибка опроса служб: {ex.Message}";
+            StatusText = Localizer.GetString("ServicesOptimizer_Status_QueryError", ex.Message);
         }
         finally
         {
@@ -80,7 +81,7 @@ public partial class ServicesOptimizerViewModel : ObservableObject
 
         IsBusy = true;
         var targetType = service.IsDisabled ? ServiceStartupType.Manual : ServiceStartupType.Disabled;
-        StatusText = $"Изменение службы {service.DisplayName}...";
+        StatusText = Localizer.GetString("ServicesOptimizer_Status_ChangingService", service.DisplayName);
 
         try
         {
@@ -90,11 +91,11 @@ public partial class ServicesOptimizerViewModel : ObservableObject
                 service.StartupType = targetType;
                 service.IsRunning = targetType != ServiceStartupType.Disabled && service.IsRunning;
                 _audioService.PlayScanComplete();
-                StatusText = $"Служба {service.DisplayName} переведена в режим {service.StartupTypeFormatted}.";
+                StatusText = Localizer.GetString("ServicesOptimizer_Status_ServiceMode", service.DisplayName, service.StartupTypeFormatted);
             }
             else
             {
-                StatusText = $"Не удалось изменить службу {service.DisplayName}. Требуются права администратора.";
+                StatusText = Localizer.GetString("ServicesOptimizer_Status_ChangeFailedAdmin", service.DisplayName);
             }
 
             DisabledCount = _allServices.Count(s => s.IsDisabled);
@@ -102,7 +103,7 @@ public partial class ServicesOptimizerViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            StatusText = $"Ошибка: {ex.Message}";
+            StatusText = Localizer.GetString("Common_Status_Error", ex.Message);
         }
         finally
         {
@@ -113,19 +114,19 @@ public partial class ServicesOptimizerViewModel : ObservableObject
     [RelayCommand]
     public async Task ApplyGamingProfileAsync()
     {
-        await ApplyProfileInternalAsync(ServiceProfileType.Gaming, "🎮 Применение игрового профиля (максимум FPS и минимум задержек)...");
+        await ApplyProfileInternalAsync(ServiceProfileType.Gaming, Localizer.GetString("ServicesOptimizer_Status_ApplyingGaming"));
     }
 
     [RelayCommand]
     public async Task ApplyBalancedProfileAsync()
     {
-        await ApplyProfileInternalAsync(ServiceProfileType.Balanced, "⚡ Применение сбалансированного профиля (безопасное отключение балласта)...");
+        await ApplyProfileInternalAsync(ServiceProfileType.Balanced, Localizer.GetString("ServicesOptimizer_Status_ApplyingBalanced"));
     }
 
     [RelayCommand]
     public async Task ApplyWorkstationProfileAsync()
     {
-        await ApplyProfileInternalAsync(ServiceProfileType.Workstation, "💼 Применение офисного профиля (сохранение сети и принтеров)...");
+        await ApplyProfileInternalAsync(ServiceProfileType.Workstation, Localizer.GetString("ServicesOptimizer_Status_ApplyingWorkstation"));
     }
 
     [RelayCommand]
@@ -134,7 +135,7 @@ public partial class ServicesOptimizerViewModel : ObservableObject
         if (IsBusy) return;
         IsBusy = true;
         _cts = new CancellationTokenSource();
-        StatusText = "Восстановление служб по умолчанию из резервной копии...";
+        StatusText = Localizer.GetString("ServicesOptimizer_Status_RestoringDefaults");
 
         try
         {
@@ -142,18 +143,18 @@ public partial class ServicesOptimizerViewModel : ObservableObject
             int restored = await _servicesOptimizer.RestoreDefaultServicesAsync(progress, _cts.Token);
             _audioService.PlayBoostActivated();
             await ReloadServicesAsync();
-            StatusText = $"Восстановлено {restored} служб в стандартное состояние Windows.";
+            StatusText = Localizer.GetString("ServicesOptimizer_Status_RestoredCount", restored);
         }
         catch (OperationCanceledException)
         {
             // Отмена длинного восстановления: часть служб могла быть настроена —
             // перечитываем фактическое состояние
             await ReloadServicesAsync();
-            StatusText = "Операция отменена. Показано фактическое состояние служб.";
+            StatusText = Localizer.GetString("ServicesOptimizer_Status_Cancelled");
         }
         catch (Exception ex)
         {
-            StatusText = $"Ошибка восстановления: {ex.Message}";
+            StatusText = Localizer.GetString("Common_Status_RestoreError", ex.Message);
         }
         finally
         {
@@ -176,16 +177,16 @@ public partial class ServicesOptimizerViewModel : ObservableObject
             int modified = await _servicesOptimizer.ApplyProfileAsync(profileType, progress, _cts.Token);
             _audioService.PlayCleanComplete();
             await ReloadServicesAsync();
-            StatusText = $"Профиль применен. Настроено {modified} служб.";
+            StatusText = Localizer.GetString("ServicesOptimizer_Status_ProfileDone", modified);
         }
         catch (OperationCanceledException)
         {
             await ReloadServicesAsync();
-            StatusText = "Профиль отменен. Показано фактическое состояние служб.";
+            StatusText = Localizer.GetString("ServicesOptimizer_Status_ProfileCancelled");
         }
         catch (Exception ex)
         {
-            StatusText = $"Ошибка применения профиля: {ex.Message}";
+            StatusText = Localizer.GetString("ServicesOptimizer_Status_ProfileError", ex.Message);
         }
         finally
         {

@@ -240,7 +240,6 @@ public static class Localizer
     public static string Startup_StatTotal => GetString(nameof(Startup_StatTotal));
     public static string Startup_StatActive => GetString(nameof(Startup_StatActive));
     public static string Startup_FilterLabel => GetString(nameof(Startup_FilterLabel));
-    public static string Startup_FilterAll => GetString(nameof(Startup_FilterAll));
     public static string Startup_FilterEnabled => GetString(nameof(Startup_FilterEnabled));
     public static string Startup_FilterDisabled => GetString(nameof(Startup_FilterDisabled));
 
@@ -388,6 +387,7 @@ public static class Localizer
     public static string Common_ColStatus => GetString(nameof(Common_ColStatus));
     public static string Common_ColAction => GetString(nameof(Common_ColAction));
     public static string Common_CategoryLabel => GetString(nameof(Common_CategoryLabel));
+    public static string Common_CategoryAll => GetString(nameof(Common_CategoryAll));
 
     // День 3, срез 2: Приватность / Anti-Spy
     public static string PrivacyDebloat_Title => GetString(nameof(PrivacyDebloat_Title));

@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SmartCleaner.App.Services;
+using SmartCleaner.Core.Localization;
 using SmartCleaner.Core.Privacy;
 using System.Collections.ObjectModel;
 
@@ -19,7 +20,7 @@ public partial class PrivacyDebloatViewModel : ObservableObject
     private bool _isBusy;
 
     [ObservableProperty]
-    private string _statusText = "Готов к проверке параметров приватности и телеметрии";
+    private string _statusText = Localizer.GetString("PrivacyDebloat_Status_Ready");
 
     [ObservableProperty]
     private int _appliedCount;
@@ -44,16 +45,16 @@ public partial class PrivacyDebloatViewModel : ObservableObject
     {
         if (IsBusy) return;
         IsBusy = true;
-        StatusText = "Сканирование параметров телеметрии и реестра...";
+        StatusText = Localizer.GetString("PrivacyDebloat_Status_Scanning");
 
         try
         {
             await ReloadTweaksAsync();
-            StatusText = $"Сканирование завершено: отключено {AppliedCount} из {TotalCount} параметров сбора данных.";
+            StatusText = Localizer.GetString("PrivacyDebloat_Status_ScanDone", AppliedCount, TotalCount);
         }
         catch (Exception ex)
         {
-            StatusText = $"Ошибка сканирования: {ex.Message}";
+            StatusText = Localizer.GetString("PrivacyDebloat_Status_ScanError", ex.Message);
         }
         finally
         {
@@ -80,7 +81,7 @@ public partial class PrivacyDebloatViewModel : ObservableObject
 
         IsBusy = true;
         bool targetState = !tweak.IsApplied;
-        StatusText = targetState ? $"Отключение {tweak.Title}..." : $"Восстановление {tweak.Title}...";
+        StatusText = targetState ? Localizer.GetString("PrivacyDebloat_Status_Disabling", tweak.Title) : Localizer.GetString("PrivacyDebloat_Status_Reverting", tweak.Title);
 
         try
         {
@@ -92,18 +93,18 @@ public partial class PrivacyDebloatViewModel : ObservableObject
             {
                 tweak.IsApplied = targetState;
                 _audioService.PlayScanComplete();
-                StatusText = targetState ? $"Отключено: {tweak.Title}" : $"Восстановлено: {tweak.Title}";
+                StatusText = targetState ? Localizer.GetString("PrivacyDebloat_Status_Disabled", tweak.Title) : Localizer.GetString("PrivacyDebloat_Status_Reverted", tweak.Title);
             }
             else
             {
-                StatusText = $"Не удалось изменить статус {tweak.Title}. Требуются права администратора.";
+                StatusText = Localizer.GetString("PrivacyDebloat_Status_ChangeFailedAdmin", tweak.Title);
             }
 
             AppliedCount = _allTweaks.Count(t => t.IsApplied);
         }
         catch (Exception ex)
         {
-            StatusText = $"Ошибка: {ex.Message}";
+            StatusText = Localizer.GetString("Common_Status_Error", ex.Message);
         }
         finally
         {
@@ -117,25 +118,25 @@ public partial class PrivacyDebloatViewModel : ObservableObject
         if (IsBusy) return;
         IsBusy = true;
         _cts = new CancellationTokenSource();
-        StatusText = "Отключение всех рекомендуемых параметров телеметрии и рекламы...";
+        StatusText = Localizer.GetString("PrivacyDebloat_Status_ApplyingRecommended");
 
         try
         {
             int applied = await _privacyService.ApplyAllRecommendedAsync(_cts.Token);
             _audioService.PlayCleanComplete();
             await ReloadTweaksAsync();
-            StatusText = $"Успешно отключено {applied} рекомендуемых параметров сбора данных и рекламы.";
+            StatusText = Localizer.GetString("PrivacyDebloat_Status_RecommendedDone", applied);
         }
         catch (OperationCanceledException)
         {
             // Отмена длинного профиля: часть твиков могла примениться до нажатия —
             // перечитываем фактическое состояние, а не показываем устаревший список
             await ReloadTweaksAsync();
-            StatusText = "Операция отменена. Показано фактическое состояние параметров.";
+            StatusText = Localizer.GetString("PrivacyDebloat_Status_Cancelled");
         }
         catch (Exception ex)
         {
-            StatusText = $"Ошибка: {ex.Message}";
+            StatusText = Localizer.GetString("Common_Status_Error", ex.Message);
         }
         finally
         {
@@ -151,23 +152,23 @@ public partial class PrivacyDebloatViewModel : ObservableObject
         if (IsBusy) return;
         IsBusy = true;
         _cts = new CancellationTokenSource();
-        StatusText = "Восстановление стандартных параметров Windows по умолчанию...";
+        StatusText = Localizer.GetString("PrivacyDebloat_Status_RestoringDefaults");
 
         try
         {
             int restored = await _privacyService.RestoreAllDefaultsAsync(_cts.Token);
             _audioService.PlayBoostActivated();
             await ReloadTweaksAsync();
-            StatusText = $"Восстановлено {restored} параметров в исходное состояние Windows.";
+            StatusText = Localizer.GetString("PrivacyDebloat_Status_RestoredCount", restored);
         }
         catch (OperationCanceledException)
         {
             await ReloadTweaksAsync();
-            StatusText = "Операция отменена. Показано фактическое состояние параметров.";
+            StatusText = Localizer.GetString("PrivacyDebloat_Status_Cancelled");
         }
         catch (Exception ex)
         {
-            StatusText = $"Ошибка восстановления: {ex.Message}";
+            StatusText = Localizer.GetString("Common_Status_RestoreError", ex.Message);
         }
         finally
         {

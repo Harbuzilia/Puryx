@@ -393,9 +393,6 @@
   <data name="Startup_FilterLabel" xml:space="preserve">
     <value>Filter:</value>
   </data>
-  <data name="Startup_FilterAll" xml:space="preserve">
-    <value>All</value>
-  </data>
   <data name="Startup_FilterEnabled" xml:space="preserve">
     <value>Enabled</value>
   </data>
@@ -1460,9 +1457,6 @@ Skipped {0}:
   <data name="Quarantine_Caption_RestoreError" xml:space="preserve">
     <value>Restore Error</value>
   </data>
-  <data name="Quarantine_Status_RestoreError" xml:space="preserve">
-    <value>Restore error: {0}</value>
-  </data>
   <data name="Quarantine_PurgeConfirmBody" xml:space="preserve">
     <value>Delete item '{0}' from quarantine FOREVER with no way to recover?</value>
   </data>
@@ -1872,5 +1866,211 @@ The file will be overwritten with zeros and random bytes in 3 passes. Recovery w
   </data>
   <data name="Settings_Caption_Report" xml:space="preserve">
     <value>System Report</value>
+  </data>
+  <data name="NetworkOptimizer_Status_Ready" xml:space="preserve">
+    <value>Ready to optimize network latency and DNS</value>
+  </data>
+  <data name="NetworkOptimizer_Status_Benchmarking" xml:space="preserve">
+    <value>Benchmarking DNS server latency (Ping)...</value>
+  </data>
+  <data name="NetworkOptimizer_Status_BenchmarkDone" xml:space="preserve">
+    <value>DNS latency benchmark complete.</value>
+  </data>
+  <data name="NetworkOptimizer_Status_Flushing" xml:space="preserve">
+    <value>Flushing the DNS cache and resetting Winsock sockets...</value>
+  </data>
+  <data name="NetworkOptimizer_Status_ApplyingPreset" xml:space="preserve">
+    <value>Setting DNS {0}...</value>
+  </data>
+  <data name="NetworkOptimizer_Status_ResettingDhcp" xml:space="preserve">
+    <value>Resetting DNS to automatic (DHCP)...</value>
+  </data>
+  <data name="PrivacyDebloat_Status_Ready" xml:space="preserve">
+    <value>Ready to check privacy and telemetry settings</value>
+  </data>
+  <data name="PrivacyDebloat_Status_Scanning" xml:space="preserve">
+    <value>Scanning telemetry and registry settings...</value>
+  </data>
+  <data name="PrivacyDebloat_Status_ScanDone" xml:space="preserve">
+    <value>Scan complete: {0} of {1} data collection settings disabled.</value>
+  </data>
+  <data name="PrivacyDebloat_Status_ScanError" xml:space="preserve">
+    <value>Scan error: {0}</value>
+  </data>
+  <data name="PrivacyDebloat_Status_Disabling" xml:space="preserve">
+    <value>Disabling {0}...</value>
+  </data>
+  <data name="PrivacyDebloat_Status_Reverting" xml:space="preserve">
+    <value>Restoring {0}...</value>
+  </data>
+  <data name="PrivacyDebloat_Status_Disabled" xml:space="preserve">
+    <value>Disabled: {0}</value>
+  </data>
+  <data name="PrivacyDebloat_Status_Reverted" xml:space="preserve">
+    <value>Restored: {0}</value>
+  </data>
+  <data name="PrivacyDebloat_Status_ChangeFailedAdmin" xml:space="preserve">
+    <value>Failed to change the status of {0}. Administrator rights are required.</value>
+  </data>
+  <data name="PrivacyDebloat_Status_ApplyingRecommended" xml:space="preserve">
+    <value>Disabling all recommended telemetry and advertising settings...</value>
+  </data>
+  <data name="PrivacyDebloat_Status_RecommendedDone" xml:space="preserve">
+    <value>Successfully disabled {0} recommended data collection and advertising settings.</value>
+  </data>
+  <data name="PrivacyDebloat_Status_Cancelled" xml:space="preserve">
+    <value>Operation cancelled. The actual state of the settings is shown.</value>
+  </data>
+  <data name="PrivacyDebloat_Status_RestoringDefaults" xml:space="preserve">
+    <value>Restoring default Windows settings...</value>
+  </data>
+  <data name="PrivacyDebloat_Status_RestoredCount" xml:space="preserve">
+    <value>Restored {0} settings to their original Windows state.</value>
+  </data>
+  <data name="ServicesOptimizer_Status_Ready" xml:space="preserve">
+    <value>Ready to scan and optimize Windows background services</value>
+  </data>
+  <data name="ServicesOptimizer_Status_Querying" xml:space="preserve">
+    <value>Querying the state and startup types of system services...</value>
+  </data>
+  <data name="ServicesOptimizer_Status_ScanDone" xml:space="preserve">
+    <value>Scan complete: {0} of {1} services disabled.</value>
+  </data>
+  <data name="ServicesOptimizer_Status_QueryError" xml:space="preserve">
+    <value>Service query error: {0}</value>
+  </data>
+  <data name="ServicesOptimizer_Status_ChangingService" xml:space="preserve">
+    <value>Changing service {0}...</value>
+  </data>
+  <data name="ServicesOptimizer_Status_ServiceMode" xml:space="preserve">
+    <value>Service {0} switched to {1} mode.</value>
+  </data>
+  <data name="ServicesOptimizer_Status_ChangeFailedAdmin" xml:space="preserve">
+    <value>Failed to change service {0}. Administrator rights are required.</value>
+  </data>
+  <data name="ServicesOptimizer_Status_ApplyingGaming" xml:space="preserve">
+    <value>🎮 Applying the gaming profile (maximum FPS, minimum latency)...</value>
+  </data>
+  <data name="ServicesOptimizer_Status_ApplyingBalanced" xml:space="preserve">
+    <value>⚡ Applying the balanced profile (safe removal of bloat)...</value>
+  </data>
+  <data name="ServicesOptimizer_Status_ApplyingWorkstation" xml:space="preserve">
+    <value>💼 Applying the office profile (keeping network and printers)...</value>
+  </data>
+  <data name="ServicesOptimizer_Status_RestoringDefaults" xml:space="preserve">
+    <value>Restoring default services from the backup...</value>
+  </data>
+  <data name="ServicesOptimizer_Status_RestoredCount" xml:space="preserve">
+    <value>Restored {0} services to their default Windows state.</value>
+  </data>
+  <data name="ServicesOptimizer_Status_Cancelled" xml:space="preserve">
+    <value>Operation cancelled. The actual state of the services is shown.</value>
+  </data>
+  <data name="ServicesOptimizer_Status_ProfileDone" xml:space="preserve">
+    <value>Profile applied. {0} services configured.</value>
+  </data>
+  <data name="ServicesOptimizer_Status_ProfileCancelled" xml:space="preserve">
+    <value>Profile cancelled. The actual state of the services is shown.</value>
+  </data>
+  <data name="ServicesOptimizer_Status_ProfileError" xml:space="preserve">
+    <value>Profile application error: {0}</value>
+  </data>
+  <data name="CliInspector_Status_Ready" xml:space="preserve">
+    <value>Press "Scan" to inspect CLI tools, AI agents and PATH variables</value>
+  </data>
+  <data name="CliInspector_Status_Scanning" xml:space="preserve">
+    <value>Scanning CLI tools, AI agents and system PATH variables...</value>
+  </data>
+  <data name="CliInspector_Status_Found" xml:space="preserve">
+    <value>Found {0} tools ({1}), {2} dead paths in PATH, {3} PowerShell profiles</value>
+  </data>
+  <data name="CliInspector_Status_ScanError" xml:space="preserve">
+    <value>Scan error: {0}</value>
+  </data>
+  <data name="CliInspector_Msg_PathNotFound" xml:space="preserve">
+    <value>Path not found: {0}</value>
+  </data>
+  <data name="CliInspector_Msg_OpenError" xml:space="preserve">
+    <value>Failed to open: {0}</value>
+  </data>
+  <data name="CliInspector_Msg_TerminalError" xml:space="preserve">
+    <value>Failed to launch the terminal: {0}</value>
+  </data>
+  <data name="CliInspector_Status_Copied" xml:space="preserve">
+    <value>Command copied to the clipboard: {0}</value>
+  </data>
+  <data name="CliInspector_Msg_CopyError" xml:space="preserve">
+    <value>Failed to copy: {0}</value>
+  </data>
+  <data name="CliInspector_Msg_DeleteConfirmBody" xml:space="preserve">
+    <value>Delete tool '{0}'?
+Path: {1}
+Size: {2}
+
+The files will be moved to the Recycle Bin.</value>
+  </data>
+  <data name="CliInspector_Msg_DeleteConfirmTitle" xml:space="preserve">
+    <value>Delete confirmation</value>
+  </data>
+  <data name="CliInspector_Msg_DeleteBlocked" xml:space="preserve">
+    <value>Deletion blocked: {0}</value>
+  </data>
+  <data name="CliInspector_Caption_Protection" xml:space="preserve">
+    <value>Protection</value>
+  </data>
+  <data name="CliInspector_Msg_ElevationRequired" xml:space="preserve">
+    <value>The tool is located in a protected directory and requires administrator rights.</value>
+  </data>
+  <data name="CliInspector_Status_Deleted" xml:space="preserve">
+    <value>Moved to the Recycle Bin: {0} ({1})</value>
+  </data>
+  <data name="CliInspector_Msg_DeleteError" xml:space="preserve">
+    <value>Deletion error: {0}</value>
+  </data>
+  <data name="CliInspector_Msg_NoDeadPaths" xml:space="preserve">
+    <value>No dead paths found in the user PATH variable.</value>
+  </data>
+  <data name="CliInspector_Caption_PathHealth" xml:space="preserve">
+    <value>PATH Health</value>
+  </data>
+  <data name="CliInspector_Msg_CleanDeadPathsConfirm" xml:space="preserve">
+    <value>Found {0} non-existent entries in User PATH:
+
+{1}
+
+Remove these entries from the system registry?</value>
+  </data>
+  <data name="CliInspector_Caption_CleanDeadPaths" xml:space="preserve">
+    <value>Clean dead PATH entries</value>
+  </data>
+  <data name="CliInspector_Status_DeadPathsCleaned" xml:space="preserve">
+    <value>Successfully cleaned {0} dead paths from the user PATH variable!</value>
+  </data>
+  <data name="CliInspector_Msg_DeadPathsRemoved" xml:space="preserve">
+    <value>Removed {0} dead paths. System variables updated without a reboot.</value>
+  </data>
+  <data name="CliInspector_Caption_Success" xml:space="preserve">
+    <value>Success</value>
+  </data>
+  <data name="CliInspector_Msg_CleanError" xml:space="preserve">
+    <value>Cleanup error: {0}</value>
+  </data>
+  <data name="CliInspector_Msg_UserScopeOnly" xml:space="preserve">
+    <value>Removal is only possible for user PATH entries (User).</value>
+  </data>
+  <data name="CliInspector_Status_PathRemoved" xml:space="preserve">
+    <value>Path removed from User PATH: {0}</value>
+  </data>
+  <data name="CliInspector_Status_ReportSaved" xml:space="preserve">
+    <value>Report saved successfully: {0}</value>
+  </data>
+  <data name="CliInspector_Msg_SaveError" xml:space="preserve">
+    <value>Save error: {0}</value>
+  </data>
+  <data name="Common_CategoryAll" xml:space="preserve">
+    <value>All</value>
+  </data>
+  <data name="Common_Status_RestoreError" xml:space="preserve">
+    <value>Restore error: {0}</value>
   </data>
 </root>

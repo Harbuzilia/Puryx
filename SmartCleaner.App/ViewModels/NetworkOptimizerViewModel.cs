@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SmartCleaner.App.Services;
+using SmartCleaner.Core.Localization;
 using SmartCleaner.Core.Network;
 using System.Collections.ObjectModel;
 using System.Windows;
@@ -16,7 +17,7 @@ public partial class NetworkOptimizerViewModel : ObservableObject
     private bool _isBusy;
 
     [ObservableProperty]
-    private string _statusText = "Готов к оптимизации сетевых задержек и DNS";
+    private string _statusText = Localizer.GetString("NetworkOptimizer_Status_Ready");
 
     [ObservableProperty]
     private bool _isTcpNoDelayEnabled;
@@ -42,7 +43,7 @@ public partial class NetworkOptimizerViewModel : ObservableObject
         if (IsBusy) return;
 
         IsBusy = true;
-        StatusText = "Замер сетевых задержек DNS-серверов (Ping)...";
+        StatusText = Localizer.GetString("NetworkOptimizer_Status_Benchmarking");
 
         try
         {
@@ -52,11 +53,11 @@ public partial class NetworkOptimizerViewModel : ObservableObject
             {
                 Presets.Add(p);
             }
-            StatusText = "Замер задержек DNS завершен.";
+            StatusText = Localizer.GetString("NetworkOptimizer_Status_BenchmarkDone");
         }
         catch (Exception ex)
         {
-            StatusText = $"Ошибка: {ex.Message}";
+            StatusText = Localizer.GetString("Common_Status_Error", ex.Message);
         }
         finally
         {
@@ -70,7 +71,7 @@ public partial class NetworkOptimizerViewModel : ObservableObject
         if (IsBusy) return;
 
         IsBusy = true;
-        StatusText = "Очистка DNS кэша и сброс сокетов Winsock...";
+        StatusText = Localizer.GetString("NetworkOptimizer_Status_Flushing");
 
         try
         {
@@ -81,7 +82,7 @@ public partial class NetworkOptimizerViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            StatusText = $"Ошибка: {ex.Message}";
+            StatusText = Localizer.GetString("Common_Status_Error", ex.Message);
         }
         finally
         {
@@ -95,7 +96,7 @@ public partial class NetworkOptimizerViewModel : ObservableObject
         if (preset == null || IsBusy) return;
 
         IsBusy = true;
-        StatusText = $"Установка DNS {preset.Name}...";
+        StatusText = Localizer.GetString("NetworkOptimizer_Status_ApplyingPreset", preset.Name);
 
         try
         {
@@ -106,7 +107,7 @@ public partial class NetworkOptimizerViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            StatusText = $"Ошибка: {ex.Message}";
+            StatusText = Localizer.GetString("Common_Status_Error", ex.Message);
         }
         finally
         {
@@ -120,7 +121,7 @@ public partial class NetworkOptimizerViewModel : ObservableObject
         if (IsBusy) return;
 
         IsBusy = true;
-        StatusText = "Сброс DNS на автоматический (DHCP)...";
+        StatusText = Localizer.GetString("NetworkOptimizer_Status_ResettingDhcp");
 
         try
         {
@@ -130,7 +131,7 @@ public partial class NetworkOptimizerViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            StatusText = $"Ошибка: {ex.Message}";
+            StatusText = Localizer.GetString("Common_Status_Error", ex.Message);
         }
         finally
         {
@@ -152,7 +153,7 @@ public partial class NetworkOptimizerViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            StatusText = $"Ошибка: {ex.Message}";
+            StatusText = Localizer.GetString("Common_Status_Error", ex.Message);
         }
         finally
         {
