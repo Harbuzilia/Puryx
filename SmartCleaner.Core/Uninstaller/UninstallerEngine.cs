@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using SmartCleaner.Core.Cleaning;
 using SmartCleaner.Core.Helpers;
+using SmartCleaner.Core.Localization;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
@@ -57,7 +58,7 @@ public class UninstallerEngine
     public async Task<(bool Success, string Message)> UninstallAppAsync(InstalledAppItem app, bool silent = false)
     {
         if (app == null || string.IsNullOrWhiteSpace(app.UninstallString))
-            return (false, "Команда деинсталляции отсутствует");
+            return (false, Localizer.GetString("Uninstall_Error_NoCommand"));
 
         var cmd = silent && !string.IsNullOrWhiteSpace(app.QuietUninstallString)
             ? app.QuietUninstallString
@@ -72,9 +73,7 @@ public class UninstallerEngine
         if (silent && !UninstallTrustPolicy.IsTrustedExecutable(exePath))
         {
             return (false,
-                $"Тихая деинсталляция отклонена: «{fileName}» не находится в доверенной зоне " +
-                "(Program Files / Windows) и не имеет Authenticode-подписи. " +
-                "Запустите деинсталляцию в интерактивном режиме.");
+                Localizer.GetString("Uninstall_Error_SilentRejected", fileName));
         }
 
         try
@@ -94,7 +93,7 @@ public class UninstallerEngine
                 WorkingDirectory = string.Empty,
                 Timeout = Timeout.InfiniteTimeSpan
             });
-            return (execution.ExitCode == 0, $"Деинсталлятор завершил работу с кодом {execution.ExitCode}");
+            return (execution.ExitCode == 0, Localizer.GetString("Uninstall_ExitCode", execution.ExitCode));
         }
         catch (Win32Exception ex) when (ex.NativeErrorCode == ErrorElevationRequired)
         {
@@ -104,9 +103,7 @@ public class UninstallerEngine
             if (!UninstallTrustPolicy.IsTrustedExecutable(exePath))
             {
                 return (false,
-                    $"Деинсталлятор требует повышения прав, но «{fileName}» не признан доверенным " +
-                    "(не находится в Program Files/Windows и не имеет Authenticode-подписи). " +
-                    "Автоматическое повышение прав команды из реестра отклонено из соображений безопасности.");
+                    Localizer.GetString("Uninstall_Error_ElevationUntrusted", fileName));
             }
 
             try
@@ -120,22 +117,22 @@ public class UninstallerEngine
                 if (proc != null)
                 {
                     await proc.WaitForExitAsync();
-                    return (proc.ExitCode == 0, $"Деинсталлятор завершил работу с кодом {proc.ExitCode}");
+                    return (proc.ExitCode == 0, Localizer.GetString("Uninstall_ExitCode", proc.ExitCode));
                 }
-                return (false, "Не удалось запустить процесс деинсталлятора с повышением прав");
+                return (false, Localizer.GetString("Uninstall_Error_ElevationStartFailed"));
             }
             catch (Win32Exception ex2) when (ex2.NativeErrorCode == ErrorCancelled)
             {
-                return (false, "Повышение прав отменено пользователем");
+                return (false, Localizer.GetString("Uninstall_ElevationCancelled"));
             }
             catch (Exception ex2)
             {
-                return (false, $"Ошибка запуска деинсталлятора с повышением прав: {ex2.Message}");
+                return (false, Localizer.GetString("Uninstall_Error_ElevationFailed", ex2.Message));
             }
         }
         catch (Exception ex)
         {
-            return (false, $"Ошибка запуска деинсталлятора: {ex.Message}");
+            return (false, Localizer.GetString("Uninstall_Error_StartFailed", ex.Message));
         }
     }
 

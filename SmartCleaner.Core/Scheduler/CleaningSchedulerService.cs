@@ -28,8 +28,8 @@ public sealed class ScheduleSettings
     /// <summary>Минуты запуска.</summary>
     public int Minute { get; set; } = 0;
 
-    /// <summary>Профиль очистки: Быстрая, Разработка, Полное.</summary>
-    public string Profile { get; set; } = "Быстрая";
+    /// <summary>Профиль очистки: Быстрая, Разработка, Полное (токены CleaningProfileMap).</summary>
+    public string Profile { get; set; } = CleaningProfileMap.Quick;
 
     /// <summary>Дата последнего запуска.</summary>
     public DateTime? LastRun { get; set; }

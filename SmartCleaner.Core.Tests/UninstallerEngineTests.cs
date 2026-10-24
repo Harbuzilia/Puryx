@@ -309,8 +309,8 @@ public class UninstallerEngineTests
         var (success, message) = await engine.UninstallAppAsync(app, silent: true);
 
         Assert.False(success);
-        Assert.Contains("Тихая деинсталляция отклонена", message);
-        Assert.Contains("доверенной зоне", message);
+        Assert.Contains("Silent uninstall rejected", message);
+        Assert.Contains("trusted location", message);
         // Отказ происходит ДО любого запуска — исполнителю команд ничего не ушло
         Assert.Empty(executor.Requests);
     }
@@ -323,7 +323,7 @@ public class UninstallerEngineTests
         var (success, message) = await engine.UninstallAppAsync(new InstalledAppItem { DisplayName = "X" });
 
         Assert.False(success);
-        Assert.Contains("Команда деинсталляции отсутствует", message);
+        Assert.Contains("Uninstall command is missing", message);
     }
 
     [Fact]
@@ -334,7 +334,7 @@ public class UninstallerEngineTests
         var (success, message) = await engine.UninstallAppAsync(null!);
 
         Assert.False(success);
-        Assert.Contains("Команда деинсталляции отсутствует", message);
+        Assert.Contains("Uninstall command is missing", message);
     }
 
     // ─── UninstallAppAsync: контракт ICommandExecutor (День 19, срез C) ──────
@@ -356,7 +356,7 @@ public class UninstallerEngineTests
         var (success, message) = await engine.UninstallAppAsync(app);
 
         Assert.True(success);
-        Assert.Contains("кодом 0", message);
+        Assert.Contains("code 0", message);
         var request = Assert.Single(executor.Requests);
         Assert.Equal(@"C:\Temp Plain\uninstall.exe", request.FileName);
         Assert.Equal(new[] { "/S", "/D=C:\\Data" }, request.Arguments);
@@ -377,7 +377,7 @@ public class UninstallerEngineTests
         var (success, message) = await engine.UninstallAppAsync(app);
 
         Assert.False(success);
-        Assert.Contains("кодом 5", message);
+        Assert.Contains("code 5", message);
     }
 
     [Fact]

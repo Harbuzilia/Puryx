@@ -2509,4 +2509,29 @@ Windows может использовать эти драйверы прямо �
   <data name="DiskHealth_LocalDisk" xml:space="preserve">
     <value>Локальный диск ({0})</value>
   </data>
+  <!-- День 5, волна 2c: UninstallerEngine / CleaningSchedulerService -->
+  <data name="Uninstall_Error_NoCommand" xml:space="preserve">
+    <value>Команда деинсталляции отсутствует</value>
+  </data>
+  <data name="Uninstall_Error_SilentRejected" xml:space="preserve">
+    <value>Тихая деинсталляция отклонена: «{0}» не находится в доверенной зоне (Program Files / Windows) и не имеет Authenticode-подписи. Запустите деинсталляцию в интерактивном режиме.</value>
+  </data>
+  <data name="Uninstall_ExitCode" xml:space="preserve">
+    <value>Деинсталлятор завершил работу с кодом {0}</value>
+  </data>
+  <data name="Uninstall_Error_ElevationUntrusted" xml:space="preserve">
+    <value>Деинсталлятор требует повышения прав, но «{0}» не признан доверенным (не находится в Program Files/Windows и не имеет Authenticode-подписи). Автоматическое повышение прав команды из реестра отклонено из соображений безопасности.</value>
+  </data>
+  <data name="Uninstall_Error_ElevationStartFailed" xml:space="preserve">
+    <value>Не удалось запустить процесс деинсталлятора с повышением прав</value>
+  </data>
+  <data name="Uninstall_ElevationCancelled" xml:space="preserve">
+    <value>Повышение прав отменено пользователем</value>
+  </data>
+  <data name="Uninstall_Error_ElevationFailed" xml:space="preserve">
+    <value>Ошибка запуска деинсталлятора с повышением прав: {0}</value>
+  </data>
+  <data name="Uninstall_Error_StartFailed" xml:space="preserve">
+    <value>Ошибка запуска деинсталлятора: {0}</value>
+  </data>
 </root>

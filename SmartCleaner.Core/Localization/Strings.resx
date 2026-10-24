@@ -2509,4 +2509,29 @@ Remove these entries from the system registry?</value>
   <data name="DiskHealth_LocalDisk" xml:space="preserve">
     <value>Local disk ({0})</value>
   </data>
+  <!-- День 5, волна 2c: UninstallerEngine / CleaningSchedulerService -->
+  <data name="Uninstall_Error_NoCommand" xml:space="preserve">
+    <value>Uninstall command is missing</value>
+  </data>
+  <data name="Uninstall_Error_SilentRejected" xml:space="preserve">
+    <value>Silent uninstall rejected: "{0}" is not in a trusted location (Program Files / Windows) and has no Authenticode signature. Run the uninstall in interactive mode.</value>
+  </data>
+  <data name="Uninstall_ExitCode" xml:space="preserve">
+    <value>Uninstaller exited with code {0}</value>
+  </data>
+  <data name="Uninstall_Error_ElevationUntrusted" xml:space="preserve">
+    <value>The uninstaller requires elevation, but "{0}" is not trusted (not in Program Files/Windows and has no Authenticode signature). Automatic elevation of a registry command was rejected for security reasons.</value>
+  </data>
+  <data name="Uninstall_Error_ElevationStartFailed" xml:space="preserve">
+    <value>Failed to start the elevated uninstaller process</value>
+  </data>
+  <data name="Uninstall_ElevationCancelled" xml:space="preserve">
+    <value>Elevation cancelled by user</value>
+  </data>
+  <data name="Uninstall_Error_ElevationFailed" xml:space="preserve">
+    <value>Failed to start the elevated uninstaller: {0}</value>
+  </data>
+  <data name="Uninstall_Error_StartFailed" xml:space="preserve">
+    <value>Failed to start the uninstaller: {0}</value>
+  </data>
 </root>
