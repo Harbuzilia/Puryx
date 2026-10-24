@@ -1101,4 +1101,237 @@
   <data name="Common_CategoryLabel" xml:space="preserve">
     <value>Category:</value>
   </data>
+  <data name="Common_Status_Ready" xml:space="preserve">
+    <value>Ready to scan</value>
+  </data>
+  <data name="Common_Status_Error" xml:space="preserve">
+    <value>Error: {0}</value>
+  </data>
+  <data name="Common_Status_ScanCancelled" xml:space="preserve">
+    <value>Scan cancelled</value>
+  </data>
+  <data name="Common_Status_Cancelling" xml:space="preserve">
+    <value>Cancelling...</value>
+  </data>
+  <data name="Common_SelectFolderForScan" xml:space="preserve">
+    <value>Select a folder to scan</value>
+  </data>
+  <data name="Common_ZeroBytes" xml:space="preserve">
+    <value>0 B</value>
+  </data>
+  <data name="Main_Status_Scanning" xml:space="preserve">
+    <value>Scanning...</value>
+  </data>
+  <data name="Main_Status_ScanningCategory" xml:space="preserve">
+    <value>Scanning: {0}...</value>
+  </data>
+  <data name="Main_Status_ScannerTimeout" xml:space="preserve">
+    <value>⚠️ {0}: timed out, skipped</value>
+  </data>
+  <data name="Main_Status_FoundInFolders" xml:space="preserve">
+    <value>Found {0} items in {1} folders</value>
+  </data>
+  <data name="Main_Status_ScanningFolders" xml:space="preserve">
+    <value>Scanning {0} folders...</value>
+  </data>
+  <data name="Main_Status_NothingSelected" xml:space="preserve">
+    <value>No items selected for cleanup</value>
+  </data>
+  <data name="Main_Status_CleanCancelled" xml:space="preserve">
+    <value>Cleanup cancelled</value>
+  </data>
+  <data name="Main_Status_Preparing" xml:space="preserve">
+    <value>Preparing...</value>
+  </data>
+  <data name="Main_Status_Cleaning" xml:space="preserve">
+    <value>Cleaning...</value>
+  </data>
+  <data name="Main_Status_CleaningProgress" xml:space="preserve">
+    <value>Cleaning: {0}/{1} — {2}</value>
+  </data>
+  <data name="Main_Status_CleaningFilesProgress" xml:space="preserve">
+    <value>Cleaning files: {0}/{1} ({2}%)</value>
+  </data>
+  <data name="Main_Status_PackageMaintenance" xml:space="preserve">
+    <value>Package maintenance...</value>
+  </data>
+  <data name="Main_Status_PackagesProgress" xml:space="preserve">
+    <value>Packages: {0}/{1} — {2}</value>
+  </data>
+  <data name="Main_Status_PackageMaintenanceProgress" xml:space="preserve">
+    <value>Package maintenance: {0}/{1} ({2}%)</value>
+  </data>
+  <data name="Main_Status_CompletionFull" xml:space="preserve">
+    <value>Done: deleted {0}, uninstalled {1}, freed {2}</value>
+  </data>
+  <data name="Main_Status_PackagesSummary" xml:space="preserve">
+    <value>Packages: uninstalled {0}, errors {1}, skipped {2}</value>
+  </data>
+  <data name="Main_Status_PackagesSummaryWithFreed" xml:space="preserve">
+    <value>Packages: uninstalled {0}, errors {1}, skipped {2}, freed {3}</value>
+  </data>
+  <data name="Main_Status_Cleaned" xml:space="preserve">
+    <value>Cleaned: {0} ({1} items)</value>
+  </data>
+  <data name="Main_Status_CleanError" xml:space="preserve">
+    <value>Cleanup error: {0}</value>
+  </data>
+  <data name="Main_Toast_Cleaned" xml:space="preserve">
+    <value>✅ {0} freed ({1} items)</value>
+  </data>
+  <data name="Main_Toast_CleanedWithErrors" xml:space="preserve">
+    <value>✅ {0} freed ({1} items)
+⚠️ Skipped: {2}, Errors: {3}</value>
+  </data>
+  <data name="Main_Toast_DragFolders" xml:space="preserve">
+    <value>⚠️ Drag and drop folders to scan</value>
+  </data>
+  <data name="Main_Status_AddedToWhitelist" xml:space="preserve">
+    <value>Added to whitelist: {0}</value>
+  </data>
+  <data name="Main_Status_NothingToExport" xml:space="preserve">
+    <value>Nothing to export — run a scan first</value>
+  </data>
+  <data name="Main_ExportFilter" xml:space="preserve">
+    <value>CSV file|*.csv|JSON file|*.json</value>
+  </data>
+  <data name="Main_Status_Exported" xml:space="preserve">
+    <value>Exported {0} items to {1}</value>
+  </data>
+  <data name="Main_Status_ExportError" xml:space="preserve">
+    <value>Export error: {0}</value>
+  </data>
+  <data name="Main_ExportCsvHeader" xml:space="preserve">
+    <value>Category,Path,Size (bytes),Size,Risk,Description,App</value>
+  </data>
+  <data name="Main_AllCategories" xml:space="preserve">
+    <value>All categories</value>
+  </data>
+  <data name="Main_ToolTip_Command" xml:space="preserve">
+    <value>
+💻 Command: {0}</value>
+  </data>
+  <data name="Duplicates_PreviewTruncated" xml:space="preserve">
+    <value>
+
+... (truncated to 10 KB) ...</value>
+  </data>
+  <data name="Duplicates_FileInfo" xml:space="preserve">
+    <value>📁 {0}
+Size: {1}
+Created: {2:MMM d, yyyy HH:mm}
+Modified: {3:MMM d, yyyy HH:mm}
+Extension: {4}
+Attributes: {5}
+Path: {6}</value>
+  </data>
+  <data name="Duplicates_BrowseScanFolders" xml:space="preserve">
+    <value>Select a folder to scan for duplicates</value>
+  </data>
+  <data name="Duplicates_BrowseSampleFile" xml:space="preserve">
+    <value>Select a sample file</value>
+  </data>
+  <data name="Duplicates_BrowseSampleSearchFolders" xml:space="preserve">
+    <value>Select a folder to search for copies</value>
+  </data>
+  <data name="Duplicates_BrowseFolderA" xml:space="preserve">
+    <value>Select folder A</value>
+  </data>
+  <data name="Duplicates_BrowseFolderB" xml:space="preserve">
+    <value>Select folder B</value>
+  </data>
+  <data name="Duplicates_Status_NeedFolder" xml:space="preserve">
+    <value>⚠️ Specify at least one folder</value>
+  </data>
+  <data name="Duplicates_Status_FoundGroups" xml:space="preserve">
+    <value>Found {0} groups ({1} duplicates, {2} wasted)</value>
+  </data>
+  <data name="Duplicates_Status_SampleNotFound" xml:space="preserve">
+    <value>⚠️ Sample file not found</value>
+  </data>
+  <data name="Duplicates_Status_NeedSearchFolders" xml:space="preserve">
+    <value>⚠️ Specify folders to search</value>
+  </data>
+  <data name="Duplicates_Status_FoundCopies" xml:space="preserve">
+    <value>Found {0} copies of "{1}"</value>
+  </data>
+  <data name="Duplicates_Status_SearchCancelled" xml:space="preserve">
+    <value>Search cancelled</value>
+  </data>
+  <data name="Duplicates_Status_FolderAMissing" xml:space="preserve">
+    <value>⚠️ Folder A does not exist</value>
+  </data>
+  <data name="Duplicates_Status_FolderBMissing" xml:space="preserve">
+    <value>⚠️ Folder B does not exist</value>
+  </data>
+  <data name="Duplicates_CompareOnlyA" xml:space="preserve">
+    <value>Only in A</value>
+  </data>
+  <data name="Duplicates_CompareOnlyB" xml:space="preserve">
+    <value>Only in B</value>
+  </data>
+  <data name="Duplicates_CompareIdentical" xml:space="preserve">
+    <value>Identical</value>
+  </data>
+  <data name="Duplicates_CompareSizeMatch" xml:space="preserve">
+    <value>Size matches, content differs</value>
+  </data>
+  <data name="Duplicates_CompareDifferent" xml:space="preserve">
+    <value>Different</value>
+  </data>
+  <data name="Duplicates_Status_CompareSummary" xml:space="preserve">
+    <value>A: {0} unique, B: {1} unique, common: {2}</value>
+  </data>
+  <data name="Duplicates_Status_CompareCancelled" xml:space="preserve">
+    <value>Comparison cancelled</value>
+  </data>
+  <data name="Duplicates_Status_SelectFiles" xml:space="preserve">
+    <value>⚠️ Select files to delete</value>
+  </data>
+  <data name="Duplicates_AdminRequired" xml:space="preserve">
+    <value>Administrator privileges required</value>
+  </data>
+  <data name="Duplicates_Status_Deleted" xml:space="preserve">
+    <value>Deleted {0} files to Recycle Bin</value>
+  </data>
+  <data name="Duplicates_Status_BlockedSuffix" xml:space="preserve">
+    <value>, blocked {0} ({1})</value>
+  </data>
+  <data name="Duplicates_Status_ErrorsSuffix" xml:space="preserve">
+    <value> ({0} errors)</value>
+  </data>
+  <data name="Duplicates_Status_LogCleared" xml:space="preserve">
+    <value>Deletion log cleared</value>
+  </data>
+  <data name="Duplicates_Status_NothingToLink" xml:space="preserve">
+    <value>⚠️ No found duplicates to link.</value>
+  </data>
+  <data name="Duplicates_HardlinkConfirmBody" xml:space="preserve">
+    <value>Replace the found duplicates with NTFS hard links (Hardlink Zero-Byte)?
+
+• Physical disk space will be freed (the file will be stored on disk in a single instance).
+• All paths will remain fully functional and compatible with all programs.</value>
+  </data>
+  <data name="Duplicates_HardlinkConfirmTitle" xml:space="preserve">
+    <value>Hardlink Deduplication Confirmation</value>
+  </data>
+  <data name="Duplicates_Status_Linking" xml:space="preserve">
+    <value>Replacing duplicates with NTFS hard links...</value>
+  </data>
+  <data name="Duplicates_Status_Linked" xml:space="preserve">
+    <value>Successfully replaced {0} duplicates with hard links! Freed: {1}</value>
+  </data>
+  <data name="Duplicates_HardlinkDoneBody" xml:space="preserve">
+    <value>Created {0} hard links.
+Physical space freed: {1}</value>
+  </data>
+  <data name="Duplicates_HardlinkDoneTitle" xml:space="preserve">
+    <value>Hardlink Deduplication Complete</value>
+  </data>
+  <data name="Duplicates_Status_FolderAdded" xml:space="preserve">
+    <value>📂 Folder added: {0}</value>
+  </data>
+  <data name="Duplicates_Status_SampleSet" xml:space="preserve">
+    <value>📄 Sample file: {0}</value>
+  </data>
 </root>

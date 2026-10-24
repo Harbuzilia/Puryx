@@ -1101,4 +1101,237 @@
   <data name="Common_CategoryLabel" xml:space="preserve">
     <value>Категория:</value>
   </data>
+  <data name="Common_Status_Ready" xml:space="preserve">
+    <value>Готов к сканированию</value>
+  </data>
+  <data name="Common_Status_Error" xml:space="preserve">
+    <value>Ошибка: {0}</value>
+  </data>
+  <data name="Common_Status_ScanCancelled" xml:space="preserve">
+    <value>Сканирование отменено</value>
+  </data>
+  <data name="Common_Status_Cancelling" xml:space="preserve">
+    <value>Отмена...</value>
+  </data>
+  <data name="Common_SelectFolderForScan" xml:space="preserve">
+    <value>Выберите папку для сканирования</value>
+  </data>
+  <data name="Common_ZeroBytes" xml:space="preserve">
+    <value>0 Б</value>
+  </data>
+  <data name="Main_Status_Scanning" xml:space="preserve">
+    <value>Сканирование...</value>
+  </data>
+  <data name="Main_Status_ScanningCategory" xml:space="preserve">
+    <value>Сканирование: {0}...</value>
+  </data>
+  <data name="Main_Status_ScannerTimeout" xml:space="preserve">
+    <value>⚠️ {0}: таймаут, пропущен</value>
+  </data>
+  <data name="Main_Status_FoundInFolders" xml:space="preserve">
+    <value>Найдено {0} элементов в {1} папках</value>
+  </data>
+  <data name="Main_Status_ScanningFolders" xml:space="preserve">
+    <value>Сканирование {0} папок...</value>
+  </data>
+  <data name="Main_Status_NothingSelected" xml:space="preserve">
+    <value>Нет выбранных элементов для очистки</value>
+  </data>
+  <data name="Main_Status_CleanCancelled" xml:space="preserve">
+    <value>Очистка отменена</value>
+  </data>
+  <data name="Main_Status_Preparing" xml:space="preserve">
+    <value>Подготовка...</value>
+  </data>
+  <data name="Main_Status_Cleaning" xml:space="preserve">
+    <value>Очистка...</value>
+  </data>
+  <data name="Main_Status_CleaningProgress" xml:space="preserve">
+    <value>Очистка: {0}/{1} — {2}</value>
+  </data>
+  <data name="Main_Status_CleaningFilesProgress" xml:space="preserve">
+    <value>Очистка файлов: {0}/{1} ({2}%)</value>
+  </data>
+  <data name="Main_Status_PackageMaintenance" xml:space="preserve">
+    <value>Обслуживание пакетов...</value>
+  </data>
+  <data name="Main_Status_PackagesProgress" xml:space="preserve">
+    <value>Пакеты: {0}/{1} — {2}</value>
+  </data>
+  <data name="Main_Status_PackageMaintenanceProgress" xml:space="preserve">
+    <value>Обслуживание пакетов: {0}/{1} ({2}%)</value>
+  </data>
+  <data name="Main_Status_CompletionFull" xml:space="preserve">
+    <value>Выполнено: удалено {0}, деинсталлировано {1}, освобождено {2}</value>
+  </data>
+  <data name="Main_Status_PackagesSummary" xml:space="preserve">
+    <value>Пакеты: деинсталлировано {0}, ошибок {1}, пропущено {2}</value>
+  </data>
+  <data name="Main_Status_PackagesSummaryWithFreed" xml:space="preserve">
+    <value>Пакеты: деинсталлировано {0}, ошибок {1}, пропущено {2}, освобождено {3}</value>
+  </data>
+  <data name="Main_Status_Cleaned" xml:space="preserve">
+    <value>Очищено: {0} ({1} элементов)</value>
+  </data>
+  <data name="Main_Status_CleanError" xml:space="preserve">
+    <value>Ошибка очистки: {0}</value>
+  </data>
+  <data name="Main_Toast_Cleaned" xml:space="preserve">
+    <value>✅ {0} освобождено ({1} элементов)</value>
+  </data>
+  <data name="Main_Toast_CleanedWithErrors" xml:space="preserve">
+    <value>✅ {0} освобождено ({1} элементов)
+⚠️ Пропущено: {2}, Ошибок: {3}</value>
+  </data>
+  <data name="Main_Toast_DragFolders" xml:space="preserve">
+    <value>⚠️ Перетащите папки для сканирования</value>
+  </data>
+  <data name="Main_Status_AddedToWhitelist" xml:space="preserve">
+    <value>Добавлено в белый список: {0}</value>
+  </data>
+  <data name="Main_Status_NothingToExport" xml:space="preserve">
+    <value>Нечего экспортировать — сначала выполните сканирование</value>
+  </data>
+  <data name="Main_ExportFilter" xml:space="preserve">
+    <value>CSV файл|*.csv|JSON файл|*.json</value>
+  </data>
+  <data name="Main_Status_Exported" xml:space="preserve">
+    <value>Экспортировано {0} элементов в {1}</value>
+  </data>
+  <data name="Main_Status_ExportError" xml:space="preserve">
+    <value>Ошибка экспорта: {0}</value>
+  </data>
+  <data name="Main_ExportCsvHeader" xml:space="preserve">
+    <value>Категория,Путь,Размер (байт),Размер,Риск,Описание,Приложение</value>
+  </data>
+  <data name="Main_AllCategories" xml:space="preserve">
+    <value>Все категории</value>
+  </data>
+  <data name="Main_ToolTip_Command" xml:space="preserve">
+    <value>
+💻 Команда: {0}</value>
+  </data>
+  <data name="Duplicates_PreviewTruncated" xml:space="preserve">
+    <value>
+
+... (обрезано до 10 КБ) ...</value>
+  </data>
+  <data name="Duplicates_FileInfo" xml:space="preserve">
+    <value>📁 {0}
+Размер: {1}
+Создан: {2:dd.MM.yyyy HH:mm}
+Изменён: {3:dd.MM.yyyy HH:mm}
+Расширение: {4}
+Атрибуты: {5}
+Путь: {6}</value>
+  </data>
+  <data name="Duplicates_BrowseScanFolders" xml:space="preserve">
+    <value>Выберите папку для сканирования дубликатов</value>
+  </data>
+  <data name="Duplicates_BrowseSampleFile" xml:space="preserve">
+    <value>Выберите файл-образец</value>
+  </data>
+  <data name="Duplicates_BrowseSampleSearchFolders" xml:space="preserve">
+    <value>Выберите папку для поиска копий</value>
+  </data>
+  <data name="Duplicates_BrowseFolderA" xml:space="preserve">
+    <value>Выберите папку A</value>
+  </data>
+  <data name="Duplicates_BrowseFolderB" xml:space="preserve">
+    <value>Выберите папку B</value>
+  </data>
+  <data name="Duplicates_Status_NeedFolder" xml:space="preserve">
+    <value>⚠️ Укажите хотя бы одну папку</value>
+  </data>
+  <data name="Duplicates_Status_FoundGroups" xml:space="preserve">
+    <value>Найдено {0} групп ({1} дубликатов, {2} потрачено впустую)</value>
+  </data>
+  <data name="Duplicates_Status_SampleNotFound" xml:space="preserve">
+    <value>⚠️ Файл-образец не найден</value>
+  </data>
+  <data name="Duplicates_Status_NeedSearchFolders" xml:space="preserve">
+    <value>⚠️ Укажите папки для поиска</value>
+  </data>
+  <data name="Duplicates_Status_FoundCopies" xml:space="preserve">
+    <value>Найдено {0} копий файла «{1}»</value>
+  </data>
+  <data name="Duplicates_Status_SearchCancelled" xml:space="preserve">
+    <value>Поиск отменён</value>
+  </data>
+  <data name="Duplicates_Status_FolderAMissing" xml:space="preserve">
+    <value>⚠️ Папка A не существует</value>
+  </data>
+  <data name="Duplicates_Status_FolderBMissing" xml:space="preserve">
+    <value>⚠️ Папка B не существует</value>
+  </data>
+  <data name="Duplicates_CompareOnlyA" xml:space="preserve">
+    <value>Только A</value>
+  </data>
+  <data name="Duplicates_CompareOnlyB" xml:space="preserve">
+    <value>Только B</value>
+  </data>
+  <data name="Duplicates_CompareIdentical" xml:space="preserve">
+    <value>Идентичны</value>
+  </data>
+  <data name="Duplicates_CompareSizeMatch" xml:space="preserve">
+    <value>Размер совпал, содержимое нет</value>
+  </data>
+  <data name="Duplicates_CompareDifferent" xml:space="preserve">
+    <value>Различны</value>
+  </data>
+  <data name="Duplicates_Status_CompareSummary" xml:space="preserve">
+    <value>A: {0} уникальных, B: {1} уникальных, общих: {2}</value>
+  </data>
+  <data name="Duplicates_Status_CompareCancelled" xml:space="preserve">
+    <value>Сравнение отменено</value>
+  </data>
+  <data name="Duplicates_Status_SelectFiles" xml:space="preserve">
+    <value>⚠️ Выберите файлы для удаления</value>
+  </data>
+  <data name="Duplicates_AdminRequired" xml:space="preserve">
+    <value>Требуются права администратора</value>
+  </data>
+  <data name="Duplicates_Status_Deleted" xml:space="preserve">
+    <value>Удалено {0} файлов в корзину</value>
+  </data>
+  <data name="Duplicates_Status_BlockedSuffix" xml:space="preserve">
+    <value>, заблокировано {0} ({1})</value>
+  </data>
+  <data name="Duplicates_Status_ErrorsSuffix" xml:space="preserve">
+    <value> ({0} ошибок)</value>
+  </data>
+  <data name="Duplicates_Status_LogCleared" xml:space="preserve">
+    <value>Лог удалений очищен</value>
+  </data>
+  <data name="Duplicates_Status_NothingToLink" xml:space="preserve">
+    <value>⚠️ Нет найденных дубликатов для связывания.</value>
+  </data>
+  <data name="Duplicates_HardlinkConfirmBody" xml:space="preserve">
+    <value>Заменить найденные дубликаты на жесткие ссылки NTFS (Hardlink Zero-Byte)?
+
+• Физическое дисковое пространство освободится (файл будет храниться на диске в 1 экземпляре).
+• Все пути останутся полностью рабочими и совместимыми со всеми программами.</value>
+  </data>
+  <data name="Duplicates_HardlinkConfirmTitle" xml:space="preserve">
+    <value>Подтверждение Hardlink Deduplication</value>
+  </data>
+  <data name="Duplicates_Status_Linking" xml:space="preserve">
+    <value>Выполняется замена дубликатов на жесткие ссылки NTFS...</value>
+  </data>
+  <data name="Duplicates_Status_Linked" xml:space="preserve">
+    <value>Успешно заменено {0} дубликатов на хардлинки! Освобождено: {1}</value>
+  </data>
+  <data name="Duplicates_HardlinkDoneBody" xml:space="preserve">
+    <value>Создано {0} хардлинков.
+Освобождено физического места: {1}</value>
+  </data>
+  <data name="Duplicates_HardlinkDoneTitle" xml:space="preserve">
+    <value>Hardlink Deduplication завершена</value>
+  </data>
+  <data name="Duplicates_Status_FolderAdded" xml:space="preserve">
+    <value>📂 Добавлена папка: {0}</value>
+  </data>
+  <data name="Duplicates_Status_SampleSet" xml:space="preserve">
+    <value>📄 Файл-образец: {0}</value>
+  </data>
 </root>

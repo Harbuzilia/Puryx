@@ -8,6 +8,7 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
 using SmartCleaner.Core.Duplicates;
 using SmartCleaner.Core.Helpers;
+using SmartCleaner.Core.Localization;
 using SmartCleaner.Core.Models;
 using SmartCleaner.Core.Safety;
 
@@ -35,7 +36,7 @@ public partial class DuplicatesViewModel : ObservableObject
     // ─── Общее состояние ────────────────────────
 
     [ObservableProperty] private bool _isScanning;
-    [ObservableProperty] private string _statusText = "Готов к сканированию";
+    [ObservableProperty] private string _statusText = Localizer.GetString("Common_Status_Ready");
     [ObservableProperty] private int _selectedTabIndex;
     [ObservableProperty] private int _progressPercent;
     [ObservableProperty] private bool _isProgressIndeterminate;
@@ -175,7 +176,7 @@ public partial class DuplicatesViewModel : ObservableObject
                         var buffer = new char[10240];
                         int read = reader.Read(buffer, 0, buffer.Length);
                         var content = new string(buffer, 0, read);
-                        if (read == buffer.Length) content += "\n\n... (обрезано до 10 КБ) ...";
+                        if (read == buffer.Length) content += Localizer.GetString("Duplicates_PreviewTruncated");
                         return content;
                     }
                     catch
@@ -212,17 +213,18 @@ public partial class DuplicatesViewModel : ObservableObject
             try
             {
                 var fi = new FileInfo(file.Path);
-                return $"📁 {fi.Name}\n" +
-                       $"Размер: {SizeFormatter.Format(fi.Length)}\n" +
-                       $"Создан: {fi.CreationTime:dd.MM.yyyy HH:mm}\n" +
-                       $"Изменён: {fi.LastWriteTime:dd.MM.yyyy HH:mm}\n" +
-                       $"Расширение: {fi.Extension}\n" +
-                       $"Атрибуты: {fi.Attributes}\n" +
-                       $"Путь: {fi.FullName}";
+                return Localizer.GetString("Duplicates_FileInfo",
+                    fi.Name,
+                    SizeFormatter.Format(fi.Length),
+                    fi.CreationTime,
+                    fi.LastWriteTime,
+                    fi.Extension,
+                    fi.Attributes,
+                    fi.FullName);
             }
             catch (Exception ex)
             {
-                return $"Ошибка: {ex.Message}";
+                return Localizer.GetString("Common_Status_Error", ex.Message);
             }
         }, token);
 
@@ -238,7 +240,7 @@ public partial class DuplicatesViewModel : ObservableObject
     [RelayCommand]
     private void BrowseScanFolders()
     {
-        var path = PickFolder("Выберите папку для сканирования дубликатов");
+        var path = PickFolder(Localizer.GetString("Duplicates_BrowseScanFolders"));
         if (path != null)
         {
             ScanFolders = string.IsNullOrWhiteSpace(ScanFolders)
@@ -250,7 +252,7 @@ public partial class DuplicatesViewModel : ObservableObject
     [RelayCommand]
     private void BrowseSampleFile()
     {
-        var dlg = new OpenFileDialog { Title = "Выберите файл-образец" };
+        var dlg = new OpenFileDialog { Title = Localizer.GetString("Duplicates_BrowseSampleFile") };
         if (dlg.ShowDialog() == true)
             SampleFilePath = dlg.FileName;
     }
@@ -258,7 +260,7 @@ public partial class DuplicatesViewModel : ObservableObject
     [RelayCommand]
     private void BrowseSampleSearchFolders()
     {
-        var path = PickFolder("Выберите папку для поиска копий");
+        var path = PickFolder(Localizer.GetString("Duplicates_BrowseSampleSearchFolders"));
         if (path != null)
         {
             SampleSearchFolders = string.IsNullOrWhiteSpace(SampleSearchFolders)
@@ -270,14 +272,14 @@ public partial class DuplicatesViewModel : ObservableObject
     [RelayCommand]
     private void BrowseFolderA()
     {
-        var path = PickFolder("Выберите папку A");
+        var path = PickFolder(Localizer.GetString("Duplicates_BrowseFolderA"));
         if (path != null) CompareFolderA = path;
     }
 
     [RelayCommand]
     private void BrowseFolderB()
     {
-        var path = PickFolder("Выберите папку B");
+        var path = PickFolder(Localizer.GetString("Duplicates_BrowseFolderB"));
         if (path != null) CompareFolderB = path;
     }
 
@@ -285,7 +287,7 @@ public partial class DuplicatesViewModel : ObservableObject
     private void CancelScan()
     {
         _cts?.Cancel();
-        StatusText = "Отмена...";
+        StatusText = Localizer.GetString("Common_Status_Cancelling");
     }
 
     // ─── Поиск дубликатов ───────────────────────
@@ -294,7 +296,7 @@ public partial class DuplicatesViewModel : ObservableObject
     private async Task StartDuplicateScanAsync()
     {
         var dirs = ParsePaths(ScanFolders);
-        if (dirs.Count == 0) { StatusText = "⚠️ Укажите хотя бы одну папку"; return; }
+        if (dirs.Count == 0) { StatusText = Localizer.GetString("Duplicates_Status_NeedFolder"); return; }
 
         IsScanning = true;
         IsProgressIndeterminate = true;
@@ -331,10 +333,10 @@ public partial class DuplicatesViewModel : ObservableObject
             TotalDuplicates = groups.Sum(g => g.Files.Count - 1);
             TotalWasted = SizeFormatter.Format(groups.Sum(g => g.WastedBytes));
             ProgressPercent = 100;
-            StatusText = $"Найдено {TotalGroups} групп ({TotalDuplicates} дубликатов, {TotalWasted} потрачено впустую)";
+            StatusText = Localizer.GetString("Duplicates_Status_FoundGroups", TotalGroups, TotalDuplicates, TotalWasted);
         }
-        catch (OperationCanceledException) { StatusText = "Сканирование отменено"; }
-        catch (Exception ex) { StatusText = $"Ошибка: {ex.Message}"; }
+        catch (OperationCanceledException) { StatusText = Localizer.GetString("Common_Status_ScanCancelled"); }
+        catch (Exception ex) { StatusText = Localizer.GetString("Common_Status_Error", ex.Message); }
         finally { IsScanning = false; IsProgressIndeterminate = false; _cts?.Dispose(); _cts = null; }
     }
 
@@ -344,10 +346,10 @@ public partial class DuplicatesViewModel : ObservableObject
     private async Task StartSampleScanAsync()
     {
         if (string.IsNullOrWhiteSpace(SampleFilePath) || !File.Exists(SampleFilePath))
-        { StatusText = "⚠️ Файл-образец не найден"; return; }
+        { StatusText = Localizer.GetString("Duplicates_Status_SampleNotFound"); return; }
 
         var dirs = ParsePaths(SampleSearchFolders);
-        if (dirs.Count == 0) { StatusText = "⚠️ Укажите папки для поиска"; return; }
+        if (dirs.Count == 0) { StatusText = Localizer.GetString("Duplicates_Status_NeedSearchFolders"); return; }
 
         IsScanning = true;
         IsProgressIndeterminate = true;
@@ -373,10 +375,10 @@ public partial class DuplicatesViewModel : ObservableObject
 
             ProgressPercent = 100;
             IsProgressIndeterminate = false;
-            StatusText = $"Найдено {found.Count} копий файла «{Path.GetFileName(SampleFilePath)}»";
+            StatusText = Localizer.GetString("Duplicates_Status_FoundCopies", found.Count, Path.GetFileName(SampleFilePath));
         }
-        catch (OperationCanceledException) { StatusText = "Поиск отменён"; }
-        catch (Exception ex) { StatusText = $"Ошибка: {ex.Message}"; }
+        catch (OperationCanceledException) { StatusText = Localizer.GetString("Duplicates_Status_SearchCancelled"); }
+        catch (Exception ex) { StatusText = Localizer.GetString("Common_Status_Error", ex.Message); }
         finally { IsScanning = false; IsProgressIndeterminate = false; _cts?.Dispose(); _cts = null; }
     }
 
@@ -385,8 +387,8 @@ public partial class DuplicatesViewModel : ObservableObject
     [RelayCommand]
     private async Task StartCompareFoldersAsync()
     {
-        if (!Directory.Exists(CompareFolderA)) { StatusText = "⚠️ Папка A не существует"; return; }
-        if (!Directory.Exists(CompareFolderB)) { StatusText = "⚠️ Папка B не существует"; return; }
+        if (!Directory.Exists(CompareFolderA)) { StatusText = Localizer.GetString("Duplicates_Status_FolderAMissing"); return; }
+        if (!Directory.Exists(CompareFolderB)) { StatusText = Localizer.GetString("Duplicates_Status_FolderBMissing"); return; }
 
         IsScanning = true;
         IsProgressIndeterminate = true;
@@ -404,16 +406,16 @@ public partial class DuplicatesViewModel : ObservableObject
             CommonCount = result.Common.Count;
 
             foreach (var f in result.UniqueA)
-                CompareResults.Add(new CompareItemViewModel("Только A", f.Path, SizeFormatter.Format(f.Size), "—", "—"));
+                CompareResults.Add(new CompareItemViewModel(Localizer.GetString("Duplicates_CompareOnlyA"), f.Path, SizeFormatter.Format(f.Size), "—", "—"));
 
             foreach (var f in result.UniqueB)
-                CompareResults.Add(new CompareItemViewModel("Только B", f.Path, "—", SizeFormatter.Format(f.Size), "—"));
+                CompareResults.Add(new CompareItemViewModel(Localizer.GetString("Duplicates_CompareOnlyB"), f.Path, "—", SizeFormatter.Format(f.Size), "—"));
 
             foreach (var c in result.Common)
             {
-                var status = c.Similarity >= 1.0 ? "Идентичны"
-                    : c.Similarity >= 0.5 ? "Размер совпал, содержимое нет"
-                    : "Различны";
+                var status = c.Similarity >= 1.0 ? Localizer.GetString("Duplicates_CompareIdentical")
+                    : c.Similarity >= 0.5 ? Localizer.GetString("Duplicates_CompareSizeMatch")
+                    : Localizer.GetString("Duplicates_CompareDifferent");
                 CompareResults.Add(new CompareItemViewModel(
                     status, c.RelativePath,
                     SizeFormatter.Format(c.FileA.Size),
@@ -423,10 +425,10 @@ public partial class DuplicatesViewModel : ObservableObject
 
             ProgressPercent = 100;
             IsProgressIndeterminate = false;
-            StatusText = $"A: {UniqueACount} уникальных, B: {UniqueBCount} уникальных, общих: {CommonCount}";
+            StatusText = Localizer.GetString("Duplicates_Status_CompareSummary", UniqueACount, UniqueBCount, CommonCount);
         }
-        catch (OperationCanceledException) { StatusText = "Сравнение отменено"; }
-        catch (Exception ex) { StatusText = $"Ошибка: {ex.Message}"; }
+        catch (OperationCanceledException) { StatusText = Localizer.GetString("Duplicates_Status_CompareCancelled"); }
+        catch (Exception ex) { StatusText = Localizer.GetString("Common_Status_Error", ex.Message); }
         finally { IsScanning = false; IsProgressIndeterminate = false; _cts?.Dispose(); _cts = null; }
     }
 
@@ -441,7 +443,7 @@ public partial class DuplicatesViewModel : ObservableObject
 
         if (selected.Count == 0)
         {
-            StatusText = "⚠️ Выберите файлы для удаления";
+            StatusText = Localizer.GetString("Duplicates_Status_SelectFiles");
             return;
         }
 
@@ -467,7 +469,7 @@ public partial class DuplicatesViewModel : ObservableObject
             else
             {
                 blocked++;
-                firstBlockReason ??= validation.BlockReason ?? "Требуются права администратора";
+                firstBlockReason ??= validation.BlockReason ?? Localizer.GetString("Duplicates_AdminRequired");
             }
         }
 
@@ -495,9 +497,9 @@ public partial class DuplicatesViewModel : ObservableObject
         // Лог фиксирует только фактически удалённые файлы
         _deletionLog.LogDeletion(deletedPaths);
 
-        StatusText = $"Удалено {deleted} файлов в корзину"
-            + (blocked > 0 ? $", заблокировано {blocked} ({firstBlockReason})" : "")
-            + (errors > 0 ? $" ({errors} ошибок)" : "");
+        StatusText = Localizer.GetString("Duplicates_Status_Deleted", deleted)
+            + (blocked > 0 ? Localizer.GetString("Duplicates_Status_BlockedSuffix", blocked, firstBlockReason ?? "") : "")
+            + (errors > 0 ? Localizer.GetString("Duplicates_Status_ErrorsSuffix", errors) : "");
 
         // Обновляем списки — убираем только реально удалённые файлы
         var deletedSet = deletedPaths.Select(p => p.Path).ToHashSet(StringComparer.OrdinalIgnoreCase);
@@ -545,7 +547,7 @@ public partial class DuplicatesViewModel : ObservableObject
     {
         _deletionLog.ClearHistory();
         DeletionHistory.Clear();
-        StatusText = "Лог удалений очищен";
+        StatusText = Localizer.GetString("Duplicates_Status_LogCleared");
     }
 
     /// <summary>
@@ -567,22 +569,20 @@ public partial class DuplicatesViewModel : ObservableObject
     {
         if (DuplicateGroups.Count == 0)
         {
-            StatusText = "⚠️ Нет найденных дубликатов для связывания.";
+            StatusText = Localizer.GetString("Duplicates_Status_NothingToLink");
             return;
         }
 
         var result = MessageBox.Show(
-            "Заменить найденные дубликаты на жесткие ссылки NTFS (Hardlink Zero-Byte)?\n\n" +
-            "• Физическое дисковое пространство освободится (файл будет храниться на диске в 1 экземпляре).\n" +
-            "• Все пути останутся полностью рабочими и совместимыми со всеми программами.",
-            "Подтверждение Hardlink Deduplication",
+            Localizer.GetString("Duplicates_HardlinkConfirmBody"),
+            Localizer.GetString("Duplicates_HardlinkConfirmTitle"),
             MessageBoxButton.YesNo,
             MessageBoxImage.Question);
 
         if (result != MessageBoxResult.Yes) return;
 
         IsScanning = true;
-        StatusText = "Выполняется замена дубликатов на жесткие ссылки NTFS...";
+        StatusText = Localizer.GetString("Duplicates_Status_Linking");
 
         var groups = DuplicateGroups.Select(g => new DuplicateGroup
         {
@@ -598,8 +598,11 @@ public partial class DuplicatesViewModel : ObservableObject
         var (replaced, saved, errors) = await _engine.ReplaceDuplicatesWithHardlinksAsync(groups, new Progress<string>(s => StatusText = s));
 
         IsScanning = false;
-        StatusText = $"Успешно заменено {replaced} дубликатов на хардлинки! Освобождено: {SizeFormatter.Format(saved)}";
-        MessageBox.Show($"Создано {replaced} хардлинков.\nОсвобождено физического места: {SizeFormatter.Format(saved)}", "Hardlink Deduplication завершена", MessageBoxButton.OK, MessageBoxImage.Information);
+        StatusText = Localizer.GetString("Duplicates_Status_Linked", replaced, SizeFormatter.Format(saved));
+        MessageBox.Show(
+            Localizer.GetString("Duplicates_HardlinkDoneBody", replaced, SizeFormatter.Format(saved)),
+            Localizer.GetString("Duplicates_HardlinkDoneTitle"),
+            MessageBoxButton.OK, MessageBoxImage.Information);
     }
 
     // ─── Drag & Drop ───────────────────────────
@@ -622,14 +625,14 @@ public partial class DuplicatesViewModel : ObservableObject
                     ? path
                     : ScanFolders + "\n" + path;
                 SelectedTabIndex = 0;
-                StatusText = $"📂 Добавлена папка: {Path.GetFileName(path)}";
+                StatusText = Localizer.GetString("Duplicates_Status_FolderAdded", Path.GetFileName(path));
             }
             else if (File.Exists(path))
             {
                 // Файл → помещаем в поле образца + переключаемся на таб 2
                 SampleFilePath = path;
                 SelectedTabIndex = 1;
-                StatusText = $"📄 Файл-образец: {Path.GetFileName(path)}";
+                StatusText = Localizer.GetString("Duplicates_Status_SampleSet", Path.GetFileName(path));
             }
         }
     }

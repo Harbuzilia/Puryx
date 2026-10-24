@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SmartCleaner.Core.Helpers;
+using SmartCleaner.Core.Localization;
 using SmartCleaner.Core.Stats;
 
 namespace SmartCleaner.App.ViewModels;
@@ -20,9 +21,9 @@ public partial class DashboardViewModel : ObservableObject
 
     // ─── Summary cards ──────────────────
     [ObservableProperty] private int _totalSessions;
-    [ObservableProperty] private string _totalFreed = "0 Б";
+    [ObservableProperty] private string _totalFreed = Localizer.GetString("Common_ZeroBytes");
     [ObservableProperty] private int _totalFiles;
-    [ObservableProperty] private string _averagePerSession = "0 Б";
+    [ObservableProperty] private string _averagePerSession = Localizer.GetString("Common_ZeroBytes");
 
     // ─── Chart data ─────────────────────
     [ObservableProperty] private List<double>? _monthlyValues;
@@ -44,7 +45,7 @@ public partial class DashboardViewModel : ObservableObject
         TotalFiles = _stats.TotalFilesDeleted;
         AveragePerSession = TotalSessions > 0
             ? SizeFormatter.Format(_stats.TotalFreedBytes / TotalSessions)
-            : "0 Б";
+            : Localizer.GetString("Common_ZeroBytes");
 
         // Monthly chart
         var monthly = _stats.GetMonthlyStats(12);

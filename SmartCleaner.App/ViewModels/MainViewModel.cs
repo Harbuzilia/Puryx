@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using SmartCleaner.Core.Cleaning;
 using SmartCleaner.Core.Helpers;
 using SmartCleaner.Core.Knowledge;
+using SmartCleaner.Core.Localization;
 using SmartCleaner.Core.Models;
 using SmartCleaner.Core.Safety;
 using SmartCleaner.Core.Scheduler;
@@ -47,7 +48,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     private bool _isCleaning;
 
     [ObservableProperty]
-    private string _statusText = "Готов к сканированию";
+    private string _statusText = Localizer.GetString("Common_Status_Ready");
 
     [ObservableProperty]
     private string? _selectedCategoryName;
@@ -183,7 +184,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     {
         _scanCts = new CancellationTokenSource();
         IsScanning = true;
-        StatusText = "Сканирование...";
+        StatusText = Localizer.GetString("Main_Status_Scanning");
         ScanResults.Clear();
         AllItems.Clear();
         Categories.Clear();
@@ -212,7 +213,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             {
                 _scanCts.Token.ThrowIfCancellationRequested();
 
-                StatusText = $"Сканирование: {scanner.CategoryName}...";
+                StatusText = Localizer.GetString("Main_Status_ScanningCategory", scanner.CategoryName);
 
                 try
                 {
@@ -239,7 +240,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 catch (OperationCanceledException) when (!_scanCts.Token.IsCancellationRequested)
                 {
                     // Таймаут конкретного сканера — пропускаем, не прерываем весь скан
-                    StatusText = $"⚠️ {scanner.CategoryName}: таймаут, пропущен";
+                    StatusText = Localizer.GetString("Main_Status_ScannerTimeout", scanner.CategoryName);
                     await Task.Delay(500); // Чтобы пользователь увидел сообщение
                 }
             }
@@ -247,18 +248,18 @@ public partial class MainViewModel : ObservableObject, IDisposable
             BuildCategories();
             RefreshFilteredItems();
             UpdateTotals();
-            StatusText = $"Найдено: {FormatSize(TotalSize)} в {TotalCount} элементах";
+            StatusText = Localizer.GetString("Main_Status_Found", FormatSize(TotalSize), TotalCount);
         }
         catch (OperationCanceledException)
         {
-            StatusText = "Сканирование отменено";
+            StatusText = Localizer.GetString("Common_Status_ScanCancelled");
             BuildCategories();
             RefreshFilteredItems();
             UpdateTotals();
         }
         catch (Exception ex)
         {
-            StatusText = $"Ошибка: {ex.Message}";
+            StatusText = Localizer.GetString("Common_Status_Error", ex.Message);
         }
         finally
         {
@@ -315,7 +316,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     {
         var dialog = new Microsoft.Win32.OpenFolderDialog
         {
-            Title = "Выберите папку для сканирования"
+            Title = Localizer.GetString("Common_SelectFolderForScan")
         };
 
         if (dialog.ShowDialog() == true)
@@ -347,7 +348,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         if (selectedVMs.Count == 0)
         {
-            StatusText = "Нет выбранных элементов для очистки";
+            StatusText = Localizer.GetString("Main_Status_NothingSelected");
             return;
         }
 
@@ -362,7 +363,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         if (!dialog.Confirmed)
         {
-            StatusText = "Очистка отменена";
+            StatusText = Localizer.GetString("Main_Status_CleanCancelled");
             return;
         }
 
@@ -376,8 +377,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         IsCleaning = true;
         CleaningProgressValue = 0;
-        CleaningStatusText = "Подготовка...";
-        StatusText = "Очистка...";
+        CleaningStatusText = Localizer.GetString("Main_Status_Preparing");
+        StatusText = Localizer.GetString("Main_Status_Cleaning");
 
         try
         {
@@ -389,23 +390,23 @@ public partial class MainViewModel : ObservableObject, IDisposable
                     new Progress<CleaningProgress>(p =>
                     {
                         CleaningProgressValue = p.Percentage;
-                        CleaningStatusText = $"Очистка: {p.ProcessedCount}/{p.TotalCount} — {System.IO.Path.GetFileName(p.CurrentItem)}";
-                        StatusText = $"Очистка файлов: {p.ProcessedCount}/{p.TotalCount} ({p.Percentage:0}%)";
+                        CleaningStatusText = Localizer.GetString("Main_Status_CleaningProgress", p.ProcessedCount, p.TotalCount, System.IO.Path.GetFileName(p.CurrentItem));
+                        StatusText = Localizer.GetString("Main_Status_CleaningFilesProgress", p.ProcessedCount, p.TotalCount, p.Percentage.ToString("0"));
                     }));
             }
 
             var packageResult = new PackageMaintenanceResult();
             if (actionPartition.PackageItems.Count > 0)
             {
-                CleaningStatusText = "Обслуживание пакетов...";
-                StatusText = "Обслуживание пакетов...";
+                CleaningStatusText = Localizer.GetString("Main_Status_PackageMaintenance");
+                StatusText = Localizer.GetString("Main_Status_PackageMaintenance");
                 packageResult = await _packageMaintenanceService.ExecuteAsync(
                     actionPartition.PackageItems,
                     new Progress<CleaningProgress>(p =>
                     {
                         CleaningProgressValue = p.Percentage;
-                        CleaningStatusText = $"Пакеты: {p.ProcessedCount}/{p.TotalCount} — {p.CurrentItem}";
-                        StatusText = $"Обслуживание пакетов: {p.ProcessedCount}/{p.TotalCount} ({p.Percentage:0}%)";
+                        CleaningStatusText = Localizer.GetString("Main_Status_PackagesProgress", p.ProcessedCount, p.TotalCount, p.CurrentItem);
+                        StatusText = Localizer.GetString("Main_Status_PackageMaintenanceProgress", p.ProcessedCount, p.TotalCount, p.Percentage.ToString("0"));
                     }));
             }
 
@@ -451,14 +452,14 @@ public partial class MainViewModel : ObservableObject, IDisposable
             UpdateTotals();
 
             // Toast — показываем и ошибки, если были
-            var toastMsg = $"✅ {FormatSize(result.FreedBytes)} освобождено ({result.DeletedCount} элементов)";
-            if (result.SkippedCount > 0 || result.FailedCount > 0)
-                toastMsg += $"\n⚠️ Пропущено: {result.SkippedCount}, Ошибок: {result.FailedCount}";
+            var toastMsg = result.SkippedCount > 0 || result.FailedCount > 0
+                ? Localizer.GetString("Main_Toast_CleanedWithErrors", FormatSize(result.FreedBytes), result.DeletedCount, result.SkippedCount, result.FailedCount)
+                : Localizer.GetString("Main_Toast_Cleaned", FormatSize(result.FreedBytes), result.DeletedCount);
             ShowToast(toastMsg);
         }
         catch (Exception ex)
         {
-            StatusText = $"Ошибка очистки: {ex.Message}";
+            StatusText = Localizer.GetString("Main_Status_CleanError", ex.Message);
         }
         finally
         {
@@ -588,7 +589,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         BuildCategories();
         RefreshFilteredItems();
         UpdateTotals();
-        StatusText = $"Добавлено в белый список: {System.IO.Path.GetFileName(item.Path)}";
+        StatusText = Localizer.GetString("Main_Status_AddedToWhitelist", System.IO.Path.GetFileName(item.Path));
     }
 
     /// <summary>
@@ -599,13 +600,13 @@ public partial class MainViewModel : ObservableObject, IDisposable
     {
         if (AllItems.Count == 0)
         {
-            StatusText = "Нечего экспортировать — сначала выполните сканирование";
+            StatusText = Localizer.GetString("Main_Status_NothingToExport");
             return;
         }
 
         var dialog = new Microsoft.Win32.SaveFileDialog
         {
-            Filter = "CSV файл|*.csv|JSON файл|*.json",
+            Filter = Localizer.GetString("Main_ExportFilter"),
             FileName = $"SmartCleaner_Scan_{DateTime.Now:yyyy-MM-dd_HHmm}",
             DefaultExt = ".csv"
         };
@@ -620,11 +621,11 @@ public partial class MainViewModel : ObservableObject, IDisposable
             else
                 ExportAsCsv(dialog.FileName);
 
-            StatusText = $"Экспортировано {AllItems.Count} элементов в {System.IO.Path.GetFileName(dialog.FileName)}";
+            StatusText = Localizer.GetString("Main_Status_Exported", AllItems.Count, System.IO.Path.GetFileName(dialog.FileName));
         }
         catch (Exception ex)
         {
-            StatusText = $"Ошибка экспорта: {ex.Message}";
+            StatusText = Localizer.GetString("Main_Status_ExportError", ex.Message);
         }
     }
 
@@ -713,7 +714,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     private void ExportAsCsv(string filePath)
     {
         var sb = new StringBuilder();
-        sb.AppendLine("Категория,Путь,Размер (байт),Размер,Риск,Описание,Приложение");
+        sb.AppendLine(Localizer.GetString("Main_ExportCsvHeader"));
         foreach (var item in AllItems)
         {
             sb.AppendLine($"\"{item.CategoryName}\",\"{item.Path}\",{item.Size},\"{item.SizeFormatted}\",\"{item.Risk}\",\"{item.Description}\",\"{item.ParentApp ?? ""}\"");
@@ -769,7 +770,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         // Добавляем "Все категории" первым элементом
         Categories.Add(new CategorySummary
         {
-            Name = "Все категории",
+            Name = Localizer.GetString("Main_AllCategories"),
             Icon = "\uE80F",
             TotalSize = groups.Sum(g => g.TotalSize),
             ItemCount = groups.Sum(g => g.ItemCount),
@@ -820,18 +821,17 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         if (hasFileOps && hasPackageOps)
         {
-            return $"Выполнено: удалено {fileResult.DeletedCount}, деинсталлировано {packageResult.SucceededCount}, освобождено {FormatSize(mergedResult.FreedBytes)}";
+            return Localizer.GetString("Main_Status_CompletionFull", fileResult.DeletedCount, packageResult.SucceededCount, FormatSize(mergedResult.FreedBytes));
         }
 
         if (hasPackageOps)
         {
-            var packageStatus = $"Пакеты: деинсталлировано {packageResult.SucceededCount}, ошибок {packageResult.FailedCount}, пропущено {packageResult.SkippedCount}";
             return packageResult.FreedBytes > 0
-                ? $"{packageStatus}, освобождено {FormatSize(packageResult.FreedBytes)}"
-                : packageStatus;
+                ? Localizer.GetString("Main_Status_PackagesSummaryWithFreed", packageResult.SucceededCount, packageResult.FailedCount, packageResult.SkippedCount, FormatSize(packageResult.FreedBytes))
+                : Localizer.GetString("Main_Status_PackagesSummary", packageResult.SucceededCount, packageResult.FailedCount, packageResult.SkippedCount);
         }
 
-        return $"Очищено: {FormatSize(mergedResult.FreedBytes)} ({mergedResult.DeletedCount} элементов)";
+        return Localizer.GetString("Main_Status_Cleaned", FormatSize(mergedResult.FreedBytes), mergedResult.DeletedCount);
     }
 
     private CancellationTokenSource? _toastCts;
@@ -880,11 +880,11 @@ public partial class MainViewModel : ObservableObject, IDisposable
         var dirs = paths.Where(Directory.Exists).ToArray();
         if (dirs.Length == 0)
         {
-            ShowToast("⚠️ Перетащите папки для сканирования");
+            ShowToast(Localizer.GetString("Main_Toast_DragFolders"));
             return;
         }
 
-        StatusText = $"Сканирование {dirs.Length} папок...";
+        StatusText = Localizer.GetString("Main_Status_ScanningFolders", dirs.Length);
         IsScanning = true;
         _scanCts = new CancellationTokenSource();
 
@@ -920,7 +920,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 }
                 catch (OperationCanceledException) when (!_scanCts.Token.IsCancellationRequested)
                 {
-                    StatusText = $"⚠️ {scanner.CategoryName}: таймаут, пропущен";
+                    StatusText = Localizer.GetString("Main_Status_ScannerTimeout", scanner.CategoryName);
                     await Task.Delay(500);
                     continue;
                 }
@@ -948,11 +948,11 @@ public partial class MainViewModel : ObservableObject, IDisposable
             UpdateTotals();
             ApplySorting();
 
-            StatusText = $"Найдено {AllItems.Count} элементов в {dirs.Length} папках";
+            StatusText = Localizer.GetString("Main_Status_FoundInFolders", AllItems.Count, dirs.Length);
         }
         catch (OperationCanceledException)
         {
-            StatusText = "Сканирование отменено";
+            StatusText = Localizer.GetString("Common_Status_ScanCancelled");
         }
         finally
         {
@@ -993,7 +993,7 @@ public partial class ScannedItemViewModel : ObservableObject
             if (!string.IsNullOrEmpty(HowToRestore))
                 parts.Add($"\n🔄 {HowToRestore}");
             if (!string.IsNullOrEmpty(RestoreCommand))
-                parts.Add($"\n💻 Команда: {RestoreCommand}");
+                parts.Add(Localizer.GetString("Main_ToolTip_Command", RestoreCommand));
             return string.Join("", parts);
         }
     }
