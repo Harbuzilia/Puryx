@@ -2960,7 +2960,125 @@ Remove these entries from the system registry?</value>
   <data name="Scanner_NodeModules_Desc_IdleDays" xml:space="preserve">
     <value>📅 {0:0} days without access</value>
   </data>
-  <data name="Scanner_NodeModules_ParentProject" xml:space="preserve">
-    <value>Project: {0}</value>
+  <!-- Day 6a, wave 3: NpmPackages / PythonPackages / PythonVenv / PackageCache -->
+  <data name="Scanner_Npm_Progress_Searching" xml:space="preserve">
+    <value>Searching for npm packages in {0}...</value>
+  </data>
+  <data name="Scanner_Npm_Desc_GlobalPackage" xml:space="preserve">
+    <value>Global npm package (view only)</value>
+  </data>
+  <data name="Scanner_Npm_Desc_LocalPackage" xml:space="preserve">
+    <value>Local project npm package (uninstall available)</value>
+  </data>
+  <data name="Scanner_Python_Progress_Searching" xml:space="preserve">
+    <value>Searching for python-venv in {0}...</value>
+  </data>
+  <data name="Scanner_Python_Desc_VenvPackage" xml:space="preserve">
+    <value>Package from a local virtualenv (uninstall available)</value>
+  </data>
+  <data name="Scanner_Python_Desc_GlobalPackage" xml:space="preserve">
+    <value>Global Python package (view only)</value>
+  </data>
+  <data name="Scanner_PythonVenv_Progress_Searching" xml:space="preserve">
+    <value>Searching for Python virtual environments...</value>
+  </data>
+  <data name="Scanner_PythonVenv_Desc_Idle" xml:space="preserve">
+    <value>Virtual environment of project '{0}' — not used for {1} days, can be re-created</value>
+  </data>
+  <data name="Scanner_PythonVenv_Desc_Active" xml:space="preserve">
+    <value>Virtual environment of project '{0}' — active (last used {1} days ago)</value>
+  </data>
+  <data name="Scanner_PackageCache_Progress_Checking" xml:space="preserve">
+    <value>Checking cache: {0}...</value>
+  </data>
+  <data name="Scanner_PackageCache_Desc_Default" xml:space="preserve">
+    <value>package manager cache</value>
+  </data>
+  <data name="Scanner_PackageCache_App_Electron" xml:space="preserve">
+    <value>Electron applications</value>
+  </data>
+  <data name="Scanner_PackageCache_Expl_Npm" xml:space="preserve">
+    <value>Cache of downloaded npm packages (.tgz archives). Builds up on every npm install. Deleting is safe — packages will be re-downloaded when needed.</value>
+  </data>
+  <data name="Scanner_PackageCache_HowTo_Npm" xml:space="preserve">
+    <value>Automatically: packages will be re-downloaded from registry.npmjs.org on the next npm install.</value>
+  </data>
+  <data name="Scanner_PackageCache_Expl_Yarn" xml:space="preserve">
+    <value>Cache of downloaded Yarn packages. Similar to npm cache, but for Yarn.</value>
+  </data>
+  <data name="Scanner_PackageCache_HowTo_Yarn" xml:space="preserve">
+    <value>Automatically: on the next yarn install.</value>
+  </data>
+  <data name="Scanner_PackageCache_Expl_Pnpm" xml:space="preserve">
+    <value>Content-addressable store for pnpm. All packages are stored here and hard-linked into projects. Deleting it will make pnpm re-download packages.</value>
+  </data>
+  <data name="Scanner_PackageCache_HowTo_Pnpm" xml:space="preserve">
+    <value>Automatically: pnpm install will download the required packages.</value>
+  </data>
+  <data name="Scanner_PackageCache_Expl_Pip" xml:space="preserve">
+    <value>Cache of downloaded Python .whl packages. Builds up on pip install. Can be huge if heavy packages (torch, tensorflow) were installed.</value>
+  </data>
+  <data name="Scanner_PackageCache_HowTo_Pip" xml:space="preserve">
+    <value>Automatically: pip install will download packages from PyPI.</value>
+  </data>
+  <data name="Scanner_PackageCache_Expl_Conda" xml:space="preserve">
+    <value>Conda/Miniconda package cache. Includes downloaded .tar.bz2 and unpacked packages.</value>
+  </data>
+  <data name="Scanner_PackageCache_HowTo_Conda" xml:space="preserve">
+    <value>Automatically: conda install will re-download packages.</value>
+  </data>
+  <data name="Scanner_PackageCache_Expl_Nuget" xml:space="preserve">
+    <value>Global NuGet package cache. Used by all .NET projects on this machine. Can take up 2-10 GB after many installs.</value>
+  </data>
+  <data name="Scanner_PackageCache_HowTo_Nuget" xml:space="preserve">
+    <value>Automatically: dotnet restore will download the required packages from nuget.org.</value>
+  </data>
+  <data name="Scanner_PackageCache_Expl_NugetHttp" xml:space="preserve">
+    <value>NuGet HTTP cache — metadata and responses from nuget.org. Safe to delete.</value>
+  </data>
+  <data name="Scanner_PackageCache_HowTo_NugetHttp" xml:space="preserve">
+    <value>Automatically: the next dotnet restore will refresh the cache.</value>
+  </data>
+  <data name="Scanner_PackageCache_Expl_Composer" xml:space="preserve">
+    <value>Cache of downloaded PHP Composer packages.</value>
+  </data>
+  <data name="Scanner_PackageCache_HowTo_Composer" xml:space="preserve">
+    <value>Automatically: composer install will download dependencies.</value>
+  </data>
+  <data name="Scanner_PackageCache_Expl_Gradle" xml:space="preserve">
+    <value>Gradle dependency cache. Includes downloaded JAR/AAR, transform cache, build cache. Can take up tens of GB for Android developers.</value>
+  </data>
+  <data name="Scanner_PackageCache_HowTo_Gradle" xml:space="preserve">
+    <value>Automatically: gradle build will download dependencies.</value>
+  </data>
+  <data name="Scanner_PackageCache_Expl_Maven" xml:space="preserve">
+    <value>Local Maven repository with JAR/POM files. Shared by all Maven projects.</value>
+  </data>
+  <data name="Scanner_PackageCache_HowTo_Maven" xml:space="preserve">
+    <value>Automatically: mvn install will download dependencies from Maven Central.</value>
+  </data>
+  <data name="Scanner_PackageCache_Expl_Go" xml:space="preserve">
+    <value>Cache of compiled Go packages and downloaded modules.</value>
+  </data>
+  <data name="Scanner_PackageCache_HowTo_Go" xml:space="preserve">
+    <value>Automatically: go build will download the required modules.</value>
+  </data>
+  <data name="Scanner_PackageCache_Expl_Cargo" xml:space="preserve">
+    <value>Cache of Rust crates from crates.io. Includes downloaded and unpacked sources.</value>
+  </data>
+  <data name="Scanner_PackageCache_HowTo_Cargo" xml:space="preserve">
+    <value>Automatically: cargo build will download the required crates.</value>
+  </data>
+  <data name="Scanner_PackageCache_Expl_VscodeObsolete" xml:space="preserve">
+    <value>Outdated VS Code extension versions marked for deletion.</value>
+  </data>
+  <data name="Scanner_PackageCache_HowTo_VscodeObsolete" xml:space="preserve">
+    <value>Not required — this is garbage from extension updates.</value>
+  </data>
+  <data name="Scanner_PackageCache_Expl_Electron" xml:space="preserve">
+    <value>Electron framework cache — used by Electron applications (VS Code, Slack, Discord, etc.).</value>
+  </data>
+  <data name="Scanner_PackageCache_HowTo_Electron" xml:space="preserve">
+    <value>Automatically: re-downloaded when Electron projects are built.</value>
   </data>
 </root>

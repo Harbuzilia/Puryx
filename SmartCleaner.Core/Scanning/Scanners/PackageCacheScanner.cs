@@ -1,3 +1,4 @@
+using SmartCleaner.Core.Localization;
 using SmartCleaner.Core.Models;
 using SmartCleaner.Core.Safety;
 
@@ -30,9 +31,8 @@ public class PackageCacheScanner : ScannerBase
             ParentApp = "npm",
             Paths = [@"%APPDATA%\npm-cache", @"%LOCALAPPDATA%\npm-cache"],
             CleanCommand = "npm cache clean --force",
-            Explanation = "Кэш скачанных npm-пакетов (.tgz архивы). Накапливается при каждом npm install. " +
-                          "Удаление безопасно — пакеты скачаются заново при необходимости.",
-            HowToRestore = "Автоматически: при следующем npm install пакеты скачаются с registry.npmjs.org."
+            ExplanationKey = "Scanner_PackageCache_Expl_Npm",
+            HowToRestoreKey = "Scanner_PackageCache_HowTo_Npm"
         },
         new()
         {
@@ -40,8 +40,8 @@ public class PackageCacheScanner : ScannerBase
             ParentApp = "Yarn",
             Paths = [@"%LOCALAPPDATA%\Yarn\Cache\v6", @"%LOCALAPPDATA%\Yarn\Cache"],
             CleanCommand = "yarn cache clean",
-            Explanation = "Кэш скачанных пакетов Yarn. Аналог npm cache, но для Yarn.",
-            HowToRestore = "Автоматически: при следующем yarn install."
+            ExplanationKey = "Scanner_PackageCache_Expl_Yarn",
+            HowToRestoreKey = "Scanner_PackageCache_HowTo_Yarn"
         },
         new()
         {
@@ -50,9 +50,8 @@ public class PackageCacheScanner : ScannerBase
             Paths = [@"%LOCALAPPDATA%\pnpm\store", @"%LOCALAPPDATA%\pnpm-store",
                      @"%USERPROFILE%\.pnpm-store"],
             CleanCommand = "pnpm store prune",
-            Explanation = "Content-addressable store для pnpm. Все пакеты хранятся здесь и хардлинкуются в проекты. " +
-                          "Удаление заставит pnpm скачать пакеты заново.",
-            HowToRestore = "Автоматически: pnpm install скачает нужные пакеты."
+            ExplanationKey = "Scanner_PackageCache_Expl_Pnpm",
+            HowToRestoreKey = "Scanner_PackageCache_HowTo_Pnpm"
         },
 
         // ── Python ──
@@ -63,9 +62,8 @@ public class PackageCacheScanner : ScannerBase
             Paths = [@"%LOCALAPPDATA%\pip\Cache", @"%LOCALAPPDATA%\pip\cache",
                      @"%USERPROFILE%\.cache\pip"],
             CleanCommand = "pip cache purge",
-            Explanation = "Кэш скачанных .whl пакетов Python. Накапливается при pip install. " +
-                          "Может быть огромным если ставились тяжёлые пакеты (torch, tensorflow).",
-            HowToRestore = "Автоматически: pip install скачает пакеты с PyPI."
+            ExplanationKey = "Scanner_PackageCache_Expl_Pip",
+            HowToRestoreKey = "Scanner_PackageCache_HowTo_Pip"
         },
         new()
         {
@@ -74,8 +72,8 @@ public class PackageCacheScanner : ScannerBase
             Paths = [@"%USERPROFILE%\Miniconda3\pkgs", @"%USERPROFILE%\Anaconda3\pkgs",
                      @"%USERPROFILE%\.conda\pkgs"],
             CleanCommand = "conda clean --all",
-            Explanation = "Кэш пакетов Conda/Miniconda. Включает скачанные .tar.bz2 и распакованные пакеты.",
-            HowToRestore = "Автоматически: conda install скачает пакеты заново."
+            ExplanationKey = "Scanner_PackageCache_Expl_Conda",
+            HowToRestoreKey = "Scanner_PackageCache_HowTo_Conda"
         },
 
         // ── .NET ──
@@ -85,9 +83,8 @@ public class PackageCacheScanner : ScannerBase
             ParentApp = "NuGet (.NET)",
             Paths = [@"%USERPROFILE%\.nuget\packages"],
             CleanCommand = "dotnet nuget locals global-packages --clear",
-            Explanation = "Глобальный кэш NuGet-пакетов. Используется всеми .NET проектами на этой машине. " +
-                          "Может занимать 2-10 ГБ если установок было много.",
-            HowToRestore = "Автоматически: dotnet restore скачает нужные пакеты из nuget.org."
+            ExplanationKey = "Scanner_PackageCache_Expl_Nuget",
+            HowToRestoreKey = "Scanner_PackageCache_HowTo_Nuget"
         },
         new()
         {
@@ -95,8 +92,8 @@ public class PackageCacheScanner : ScannerBase
             ParentApp = "NuGet (.NET)",
             Paths = [@"%LOCALAPPDATA%\NuGet\v3-cache", @"%LOCALAPPDATA%\NuGet\plugins-cache"],
             CleanCommand = "dotnet nuget locals http-cache --clear",
-            Explanation = "HTTP-кэш NuGet — метаданные и ответы от nuget.org. Безопасно удалять.",
-            HowToRestore = "Автоматически: следующий dotnet restore обновит кэш."
+            ExplanationKey = "Scanner_PackageCache_Expl_NugetHttp",
+            HowToRestoreKey = "Scanner_PackageCache_HowTo_NugetHttp"
         },
 
         // ── PHP ──
@@ -106,8 +103,8 @@ public class PackageCacheScanner : ScannerBase
             ParentApp = "Composer (PHP)",
             Paths = [@"%LOCALAPPDATA%\Composer\cache", @"%APPDATA%\Composer\cache"],
             CleanCommand = "composer clear-cache",
-            Explanation = "Кэш скачанных PHP-пакетов Composer.",
-            HowToRestore = "Автоматически: composer install скачает зависимости."
+            ExplanationKey = "Scanner_PackageCache_Expl_Composer",
+            HowToRestoreKey = "Scanner_PackageCache_HowTo_Composer"
         },
 
         // ── Java/Kotlin ──
@@ -117,9 +114,8 @@ public class PackageCacheScanner : ScannerBase
             ParentApp = "Gradle (Java/Kotlin)",
             Paths = [@"%USERPROFILE%\.gradle\caches"],
             CleanCommand = "gradle --stop && del /s /q %USERPROFILE%\\.gradle\\caches",
-            Explanation = "Кэш зависимостей Gradle. Включает скачанные JAR/AAR, кэш трансформаций, " +
-                          "build cache. Может занимать десятки ГБ у Android-разработчиков.",
-            HowToRestore = "Автоматически: gradle build скачает зависимости."
+            ExplanationKey = "Scanner_PackageCache_Expl_Gradle",
+            HowToRestoreKey = "Scanner_PackageCache_HowTo_Gradle"
         },
         new()
         {
@@ -127,8 +123,8 @@ public class PackageCacheScanner : ScannerBase
             ParentApp = "Maven (Java)",
             Paths = [@"%USERPROFILE%\.m2\repository"],
             CleanCommand = "mvn dependency:purge-local-repository",
-            Explanation = "Локальный репозиторий Maven с JAR/POM файлами. Общий для всех Maven-проектов.",
-            HowToRestore = "Автоматически: mvn install скачает зависимости из Maven Central."
+            ExplanationKey = "Scanner_PackageCache_Expl_Maven",
+            HowToRestoreKey = "Scanner_PackageCache_HowTo_Maven"
         },
 
         // ── Go ──
@@ -138,8 +134,8 @@ public class PackageCacheScanner : ScannerBase
             ParentApp = "Go",
             Paths = [@"%LOCALAPPDATA%\go-build", @"%USERPROFILE%\go\pkg\mod\cache"],
             CleanCommand = "go clean -cache -modcache",
-            Explanation = "Кэш скомпилированных Go-пакетов и скачанных модулей.",
-            HowToRestore = "Автоматически: go build скачает нужные модули."
+            ExplanationKey = "Scanner_PackageCache_Expl_Go",
+            HowToRestoreKey = "Scanner_PackageCache_HowTo_Go"
         },
 
         // ── Rust ──
@@ -149,8 +145,8 @@ public class PackageCacheScanner : ScannerBase
             ParentApp = "Cargo (Rust)",
             Paths = [@"%USERPROFILE%\.cargo\registry\cache", @"%USERPROFILE%\.cargo\registry\src"],
             CleanCommand = "cargo cache --autoclean",
-            Explanation = "Кэш crate-ов Rust из crates.io. Включает скачанные и распакованные исходники.",
-            HowToRestore = "Автоматически: cargo build скачает нужные crate-ы."
+            ExplanationKey = "Scanner_PackageCache_Expl_Cargo",
+            HowToRestoreKey = "Scanner_PackageCache_HowTo_Cargo"
         },
 
         // ── Системные кэши разработчика ──
@@ -160,18 +156,18 @@ public class PackageCacheScanner : ScannerBase
             ParentApp = "VS Code",
             Paths = [@"%USERPROFILE%\.vscode\extensions\.obsolete"],
             CleanCommand = null,
-            Explanation = "Устаревшие версии расширений VS Code, помеченные для удаления.",
-            HowToRestore = "Не требуется — это мусор от обновлений расширений."
+            ExplanationKey = "Scanner_PackageCache_Expl_VscodeObsolete",
+            HowToRestoreKey = "Scanner_PackageCache_HowTo_VscodeObsolete"
         },
         new()
         {
             Name = "Electron/Chromium cache",
-            ParentApp = "Electron приложения",
+            ParentAppKey = "Scanner_PackageCache_App_Electron",
             Paths = [@"%APPDATA%\electron\Cache", @"%LOCALAPPDATA%\electron\Cache",
                      @"%LOCALAPPDATA%\electron-builder\Cache"],
             CleanCommand = null,
-            Explanation = "Кэш Electron framework — используется Electron-приложениями (VS Code, Slack, Discord и т.д.).",
-            HowToRestore = "Автоматически: скачается при сборке Electron-проектов."
+            ExplanationKey = "Scanner_PackageCache_Expl_Electron",
+            HowToRestoreKey = "Scanner_PackageCache_HowTo_Electron"
         }
     ];
 
@@ -189,7 +185,7 @@ public class PackageCacheScanner : ScannerBase
             foreach (var cache in CacheDefinitions)
             {
                 ct.ThrowIfCancellationRequested();
-                progress?.Report($"Проверка кэша: {cache.Name}...");
+                progress?.Report(Localizer.GetString("Scanner_PackageCache_Progress_Checking", cache.Name));
 
                 ScanCache(cache, items);
             }
@@ -223,17 +219,24 @@ public class PackageCacheScanner : ScannerBase
 
                 var lastAccess = GetLastAccess(expandedPath);
 
+                var explanation = cache.ExplanationKey is not null
+                    ? Localizer.GetString(cache.ExplanationKey)
+                    : null;
+                var howToRestore = cache.HowToRestoreKey is not null
+                    ? Localizer.GetString(cache.HowToRestoreKey)
+                    : null;
+
                 items.Add(new ScannedItem
                 {
                     Path = expandedPath,
                     Size = size,
                     LastAccess = lastAccess,
                     Risk = RiskCategory.SafeToDelete,
-                    Description = $"{cache.Name} — {cache.Explanation?.Split('.')[0] ?? "кэш пакетного менеджера"}",
-                    Explanation = cache.Explanation,
-                    HowToRestore = cache.HowToRestore,
+                    Description = $"{cache.Name} — {explanation?.Split('.')[0] ?? Localizer.GetString("Scanner_PackageCache_Desc_Default")}",
+                    Explanation = explanation,
+                    HowToRestore = howToRestore,
                     IsDirectory = true,
-                    ParentApp = cache.ParentApp,
+                    ParentApp = cache.ParentAppKey is not null ? Localizer.GetString(cache.ParentAppKey) : cache.ParentApp,
                     RestoreCommand = cache.CleanCommand,
                     IsSelected = true, // Кэши безопасно удалять
                     IsLocked = false
@@ -253,7 +256,10 @@ public class PackageCacheScanner : ScannerBase
         public required string Name { get; init; }
 
         /// <summary>Имя родительского приложения/менеджера</summary>
-        public required string ParentApp { get; init; }
+        public string? ParentApp { get; init; }
+
+        /// <summary>Ключ локализации имени родительского приложения</summary>
+        public string? ParentAppKey { get; init; }
 
         /// <summary>Возможные пути (с %ENV% переменными)</summary>
         public required string[] Paths { get; init; }
@@ -261,10 +267,10 @@ public class PackageCacheScanner : ScannerBase
         /// <summary>Команда для корректной очистки (если есть)</summary>
         public string? CleanCommand { get; init; }
 
-        /// <summary>Объяснение: что это за кэш и зачем нужен</summary>
-        public string? Explanation { get; init; }
+        /// <summary>Ключ объяснения: что это за кэш и зачем нужен</summary>
+        public string? ExplanationKey { get; init; }
 
-        /// <summary>Как восстановить данные если удалил</summary>
-        public string? HowToRestore { get; init; }
+        /// <summary>Ключ: как восстановить данные если удалил</summary>
+        public string? HowToRestoreKey { get; init; }
     }
 }

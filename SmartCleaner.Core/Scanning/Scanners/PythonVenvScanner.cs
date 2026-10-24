@@ -1,3 +1,4 @@
+using SmartCleaner.Core.Localization;
 using SmartCleaner.Core.Models;
 using SmartCleaner.Core.Safety;
 
@@ -58,7 +59,7 @@ public class PythonVenvScanner : ScannerBase
                     continue;
 
                 ct.ThrowIfCancellationRequested();
-                progress?.Report("Поиск Python виртуальных сред...");
+                progress?.Report(Localizer.GetString("Scanner_PythonVenv_Progress_Searching"));
 
                 FindVenvFolders(root, result.Items, progress, ct, maxDepth: 6, currentDepth: 0);
             }
@@ -131,12 +132,12 @@ public class PythonVenvScanner : ScannerBase
         if (daysSinceAccess > MinAgeDays)
         {
             risk = RiskCategory.SafeToDelete;
-            description = $"Виртуальная среда проекта «{projectName}» — не использовалась {(int)daysSinceAccess} дней, можно пересоздать";
+            description = Localizer.GetString("Scanner_PythonVenv_Desc_Idle", projectName, (int)daysSinceAccess);
         }
         else
         {
             risk = RiskCategory.PerformanceCache;
-            description = $"Виртуальная среда проекта «{projectName}» — активная (использовалась {(int)daysSinceAccess} дней назад)";
+            description = Localizer.GetString("Scanner_PythonVenv_Desc_Active", projectName, (int)daysSinceAccess);
         }
 
         // Проверяем requirements.txt для restore command

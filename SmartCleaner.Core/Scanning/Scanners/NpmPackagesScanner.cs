@@ -1,5 +1,6 @@
 using System.Text.Json;
 using SmartCleaner.Core.Cleaning;
+using SmartCleaner.Core.Localization;
 using SmartCleaner.Core.Models;
 using SmartCleaner.Core.Safety;
 using SmartCleaner.Core.Services;
@@ -44,7 +45,7 @@ public sealed class NpmPackagesScanner : ScannerBase
         foreach (var root in GetEffectiveScanRoots())
         {
             ct.ThrowIfCancellationRequested();
-            progress?.Report($"Поиск npm-пакетов в {root}...");
+            progress?.Report(Localizer.GetString("Scanner_Npm_Progress_Searching", root));
 
             foreach (var packageJson in EnumerateFilesSafe(root, "package.json", maxDepth: 4, ct))
             {
@@ -61,7 +62,7 @@ public sealed class NpmPackagesScanner : ScannerBase
                 Size = 0,
                 LastAccess = DateTime.MinValue,
                 Risk = RiskCategory.UserData,
-                Description = "Глобальный npm-пакет (только просмотр)",
+                Description = Localizer.GetString("Scanner_Npm_Desc_GlobalPackage"),
                 IsLocked = false,
                 IsDirectory = false,
                 ParentApp = "npm global",
@@ -127,7 +128,7 @@ public sealed class NpmPackagesScanner : ScannerBase
                         Size = 0,
                         LastAccess = GetLastAccess(packageJsonPath),
                         Risk = RiskCategory.SafeToDelete,
-                        Description = "Локальный npm-пакет проекта (доступен uninstall)",
+                        Description = Localizer.GetString("Scanner_Npm_Desc_LocalPackage"),
                         IsLocked = false,
                         IsDirectory = false,
                         ParentApp = $"npm: {Path.GetFileName(projectDirectory)}",

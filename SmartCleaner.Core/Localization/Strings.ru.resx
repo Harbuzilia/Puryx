@@ -2960,7 +2960,125 @@ Windows может использовать эти драйверы прямо �
   <data name="Scanner_NodeModules_Desc_IdleDays" xml:space="preserve">
     <value>📅 {0:0} дней без доступа</value>
   </data>
-  <data name="Scanner_NodeModules_ParentProject" xml:space="preserve">
-    <value>Проект: {0}</value>
+  <!-- День 6а, волна 3: NpmPackages / PythonPackages / PythonVenv / PackageCache -->
+  <data name="Scanner_Npm_Progress_Searching" xml:space="preserve">
+    <value>Поиск npm-пакетов в {0}...</value>
+  </data>
+  <data name="Scanner_Npm_Desc_GlobalPackage" xml:space="preserve">
+    <value>Глобальный npm-пакет (только просмотр)</value>
+  </data>
+  <data name="Scanner_Npm_Desc_LocalPackage" xml:space="preserve">
+    <value>Локальный npm-пакет проекта (доступен uninstall)</value>
+  </data>
+  <data name="Scanner_Python_Progress_Searching" xml:space="preserve">
+    <value>Поиск python-venv в {0}...</value>
+  </data>
+  <data name="Scanner_Python_Desc_VenvPackage" xml:space="preserve">
+    <value>Пакет из локального virtualenv (доступен uninstall)</value>
+  </data>
+  <data name="Scanner_Python_Desc_GlobalPackage" xml:space="preserve">
+    <value>Глобальный python-пакет (только просмотр)</value>
+  </data>
+  <data name="Scanner_PythonVenv_Progress_Searching" xml:space="preserve">
+    <value>Поиск Python виртуальных сред...</value>
+  </data>
+  <data name="Scanner_PythonVenv_Desc_Idle" xml:space="preserve">
+    <value>Виртуальная среда проекта «{0}» — не использовалась {1} дней, можно пересоздать</value>
+  </data>
+  <data name="Scanner_PythonVenv_Desc_Active" xml:space="preserve">
+    <value>Виртуальная среда проекта «{0}» — активная (использовалась {1} дней назад)</value>
+  </data>
+  <data name="Scanner_PackageCache_Progress_Checking" xml:space="preserve">
+    <value>Проверка кэша: {0}...</value>
+  </data>
+  <data name="Scanner_PackageCache_Desc_Default" xml:space="preserve">
+    <value>кэш пакетного менеджера</value>
+  </data>
+  <data name="Scanner_PackageCache_App_Electron" xml:space="preserve">
+    <value>Electron приложения</value>
+  </data>
+  <data name="Scanner_PackageCache_Expl_Npm" xml:space="preserve">
+    <value>Кэш скачанных npm-пакетов (.tgz архивы). Накапливается при каждом npm install. Удаление безопасно — пакеты скачаются заново при необходимости.</value>
+  </data>
+  <data name="Scanner_PackageCache_HowTo_Npm" xml:space="preserve">
+    <value>Автоматически: при следующем npm install пакеты скачаются с registry.npmjs.org.</value>
+  </data>
+  <data name="Scanner_PackageCache_Expl_Yarn" xml:space="preserve">
+    <value>Кэш скачанных пакетов Yarn. Аналог npm cache, но для Yarn.</value>
+  </data>
+  <data name="Scanner_PackageCache_HowTo_Yarn" xml:space="preserve">
+    <value>Автоматически: при следующем yarn install.</value>
+  </data>
+  <data name="Scanner_PackageCache_Expl_Pnpm" xml:space="preserve">
+    <value>Content-addressable store для pnpm. Все пакеты хранятся здесь и хардлинкуются в проекты. Удаление заставит pnpm скачать пакеты заново.</value>
+  </data>
+  <data name="Scanner_PackageCache_HowTo_Pnpm" xml:space="preserve">
+    <value>Автоматически: pnpm install скачает нужные пакеты.</value>
+  </data>
+  <data name="Scanner_PackageCache_Expl_Pip" xml:space="preserve">
+    <value>Кэш скачанных .whl пакетов Python. Накапливается при pip install. Может быть огромным если ставились тяжёлые пакеты (torch, tensorflow).</value>
+  </data>
+  <data name="Scanner_PackageCache_HowTo_Pip" xml:space="preserve">
+    <value>Автоматически: pip install скачает пакеты с PyPI.</value>
+  </data>
+  <data name="Scanner_PackageCache_Expl_Conda" xml:space="preserve">
+    <value>Кэш пакетов Conda/Miniconda. Включает скачанные .tar.bz2 и распакованные пакеты.</value>
+  </data>
+  <data name="Scanner_PackageCache_HowTo_Conda" xml:space="preserve">
+    <value>Автоматически: conda install скачает пакеты заново.</value>
+  </data>
+  <data name="Scanner_PackageCache_Expl_Nuget" xml:space="preserve">
+    <value>Глобальный кэш NuGet-пакетов. Используется всеми .NET проектами на этой машине. Может занимать 2-10 ГБ если установок было много.</value>
+  </data>
+  <data name="Scanner_PackageCache_HowTo_Nuget" xml:space="preserve">
+    <value>Автоматически: dotnet restore скачает нужные пакеты из nuget.org.</value>
+  </data>
+  <data name="Scanner_PackageCache_Expl_NugetHttp" xml:space="preserve">
+    <value>HTTP-кэш NuGet — метаданные и ответы от nuget.org. Безопасно удалять.</value>
+  </data>
+  <data name="Scanner_PackageCache_HowTo_NugetHttp" xml:space="preserve">
+    <value>Автоматически: следующий dotnet restore обновит кэш.</value>
+  </data>
+  <data name="Scanner_PackageCache_Expl_Composer" xml:space="preserve">
+    <value>Кэш скачанных PHP-пакетов Composer.</value>
+  </data>
+  <data name="Scanner_PackageCache_HowTo_Composer" xml:space="preserve">
+    <value>Автоматически: composer install скачает зависимости.</value>
+  </data>
+  <data name="Scanner_PackageCache_Expl_Gradle" xml:space="preserve">
+    <value>Кэш зависимостей Gradle. Включает скачанные JAR/AAR, кэш трансформаций, build cache. Может занимать десятки ГБ у Android-разработчиков.</value>
+  </data>
+  <data name="Scanner_PackageCache_HowTo_Gradle" xml:space="preserve">
+    <value>Автоматически: gradle build скачает зависимости.</value>
+  </data>
+  <data name="Scanner_PackageCache_Expl_Maven" xml:space="preserve">
+    <value>Локальный репозиторий Maven с JAR/POM файлами. Общий для всех Maven-проектов.</value>
+  </data>
+  <data name="Scanner_PackageCache_HowTo_Maven" xml:space="preserve">
+    <value>Автоматически: mvn install скачает зависимости из Maven Central.</value>
+  </data>
+  <data name="Scanner_PackageCache_Expl_Go" xml:space="preserve">
+    <value>Кэш скомпилированных Go-пакетов и скачанных модулей.</value>
+  </data>
+  <data name="Scanner_PackageCache_HowTo_Go" xml:space="preserve">
+    <value>Автоматически: go build скачает нужные модули.</value>
+  </data>
+  <data name="Scanner_PackageCache_Expl_Cargo" xml:space="preserve">
+    <value>Кэш crate-ов Rust из crates.io. Включает скачанные и распакованные исходники.</value>
+  </data>
+  <data name="Scanner_PackageCache_HowTo_Cargo" xml:space="preserve">
+    <value>Автоматически: cargo build скачает нужные crate-ы.</value>
+  </data>
+  <data name="Scanner_PackageCache_Expl_VscodeObsolete" xml:space="preserve">
+    <value>Устаревшие версии расширений VS Code, помеченные для удаления.</value>
+  </data>
+  <data name="Scanner_PackageCache_HowTo_VscodeObsolete" xml:space="preserve">
+    <value>Не требуется — это мусор от обновлений расширений.</value>
+  </data>
+  <data name="Scanner_PackageCache_Expl_Electron" xml:space="preserve">
+    <value>Кэш Electron framework — используется Electron-приложениями (VS Code, Slack, Discord и т.д.).</value>
+  </data>
+  <data name="Scanner_PackageCache_HowTo_Electron" xml:space="preserve">
+    <value>Автоматически: скачается при сборке Electron-проектов.</value>
   </data>
 </root>

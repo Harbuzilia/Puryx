@@ -1,5 +1,6 @@
 using System.Text.Json;
 using SmartCleaner.Core.Cleaning;
+using SmartCleaner.Core.Localization;
 using SmartCleaner.Core.Models;
 using SmartCleaner.Core.Safety;
 using SmartCleaner.Core.Services;
@@ -44,7 +45,7 @@ public sealed class PythonPackagesScanner : ScannerBase
         foreach (var root in GetEffectiveScanRoots())
         {
             ct.ThrowIfCancellationRequested();
-            progress?.Report($"Поиск python-venv в {root}...");
+            progress?.Report(Localizer.GetString("Scanner_Python_Progress_Searching", root));
 
             foreach (var marker in EnumerateFilesSafe(root, "pyvenv.cfg", maxDepth: 5, ct))
             {
@@ -76,7 +77,7 @@ public sealed class PythonPackagesScanner : ScannerBase
                         Size = 0,
                         LastAccess = GetLastAccess(marker),
                         Risk = RiskCategory.SafeToDelete,
-                        Description = "Пакет из локального virtualenv (доступен uninstall)",
+                        Description = Localizer.GetString("Scanner_Python_Desc_VenvPackage"),
                         IsLocked = false,
                         IsDirectory = false,
                         ParentApp = $"python: {Path.GetFileName(projectDirectory)}",
@@ -107,7 +108,7 @@ public sealed class PythonPackagesScanner : ScannerBase
                 Size = 0,
                 LastAccess = DateTime.MinValue,
                 Risk = RiskCategory.UserData,
-                Description = "Глобальный python-пакет (только просмотр)",
+                Description = Localizer.GetString("Scanner_Python_Desc_GlobalPackage"),
                 IsLocked = false,
                 IsDirectory = false,
                 ParentApp = "pip global",
