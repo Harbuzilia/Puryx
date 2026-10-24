@@ -1,5 +1,6 @@
 using SmartCleaner.Core.DiskHealth;
 using SmartCleaner.Core.Helpers;
+using SmartCleaner.Core.Localization;
 using SmartCleaner.Core.Models;
 using System.Diagnostics;
 using System.IO;
@@ -52,13 +53,18 @@ public class SystemReportGenerator
 
     public string GenerateHtmlReport(SystemReportData data)
     {
+        // Язык отчёта следует за выбранным в приложении (null/EN — инвариантная
+        // культура): lang-атрибут HTML, формат даты и локализованные строки
+        var isRussian = Localizer.Culture?.Name.StartsWith("ru", StringComparison.OrdinalIgnoreCase) == true;
+        var lang = isRussian ? "ru" : "en";
+
         var sb = new StringBuilder();
         sb.AppendLine("<!DOCTYPE html>");
-        sb.AppendLine("<html lang=\"ru\">");
+        sb.AppendLine($"<html lang=\"{lang}\">");
         sb.AppendLine("<head>");
         sb.AppendLine("<meta charset=\"UTF-8\">");
         sb.AppendLine("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">");
-        sb.AppendLine("<title>Паспорт системы и отчет Puryx</title>");
+        sb.AppendLine($"<title>{Localizer.GetString("Report_Title")}</title>");
         sb.AppendLine("<style>");
         sb.AppendLine("body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #0f172a; color: #f8fafc; margin: 0; padding: 40px 20px; }");
         sb.AppendLine(".container { max-width: 900px; margin: 0 auto; background: #1e293b; border-radius: 16px; padding: 32px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); border: 1px solid #334155; }");
@@ -85,25 +91,25 @@ public class SystemReportGenerator
         sb.AppendLine("<div class=\"header\">");
         sb.AppendLine("<div>");
         sb.AppendLine("<div class=\"title\">🛡️ Puryx</div>");
-        sb.AppendLine($"<div style=\"color: #94a3b8; margin-top: 4px;\">Паспорт системы и отчет об оптимизации • {data.GeneratedAt:dd.MM.yyyy HH:mm}</div>");
+        sb.AppendLine($"<div style=\"color: #94a3b8; margin-top: 4px;\">{Localizer.GetString("Report_Subtitle", data.GeneratedAt.ToString(isRussian ? "dd.MM.yyyy HH:mm" : "MMM dd, yyyy HH:mm"))}</div>");
         sb.AppendLine("</div>");
-        sb.AppendLine("<div class=\"badge\">ОТЧЕТ СИСТЕМЫ</div>");
+        sb.AppendLine($"<div class=\"badge\">{Localizer.GetString("Report_Badge")}</div>");
         sb.AppendLine("</div>");
 
         // System Cards
         sb.AppendLine("<div class=\"grid\">");
-        sb.AppendLine($"<div class=\"card\"><div class=\"card-title\">Компьютер / Пользователь</div><div class=\"card-value\">{data.ComputerName} ({data.UserName})</div></div>");
-        sb.AppendLine($"<div class=\"card\"><div class=\"card-title\">Операционная система</div><div class=\"card-value\">{data.OsVersion}</div></div>");
-        sb.AppendLine($"<div class=\"card\"><div class=\"card-title\">Оперативная память (RAM)</div><div class=\"card-value\">{SizeFormatter.Format(data.TotalRamBytes)}</div></div>");
-        sb.AppendLine($"<div class=\"card\"><div class=\"card-title\">Освобождено дискового места</div><div class=\"card-value success\">{data.TotalFreedFormatted}</div></div>");
+        sb.AppendLine($"<div class=\"card\"><div class=\"card-title\">{Localizer.GetString("Report_CardComputer")}</div><div class=\"card-value\">{data.ComputerName} ({data.UserName})</div></div>");
+        sb.AppendLine($"<div class=\"card\"><div class=\"card-title\">{Localizer.GetString("Report_CardOs")}</div><div class=\"card-value\">{data.OsVersion}</div></div>");
+        sb.AppendLine($"<div class=\"card\"><div class=\"card-title\">{Localizer.GetString("Report_CardRam")}</div><div class=\"card-value\">{SizeFormatter.Format(data.TotalRamBytes)}</div></div>");
+        sb.AppendLine($"<div class=\"card\"><div class=\"card-title\">{Localizer.GetString("Report_CardFreed")}</div><div class=\"card-value success\">{data.TotalFreedFormatted}</div></div>");
         sb.AppendLine("</div>");
 
         // Storage / SSD Health Section
         if (data.Disks.Count > 0)
         {
-            sb.AppendLine("<h3 style=\"color: #38bdf8; margin-top: 32px;\">💾 Аппаратная телеметрия накопителей (S.M.A.R.T.)</h3>");
+            sb.AppendLine($"<h3 style=\"color: #38bdf8; margin-top: 32px;\">{Localizer.GetString("Report_SmartHeading")}</h3>");
             sb.AppendLine("<table>");
-            sb.AppendLine("<thead><tr><th>Накопитель / Модель</th><th>Тип</th><th>Шина</th><th>Объем</th><th>Состояние</th><th>Остаток ресурса</th><th>Температура</th></tr></thead>");
+            sb.AppendLine($"<thead><tr><th>{Localizer.GetString("Report_ColDrive")}</th><th>{Localizer.GetString("Report_ColType")}</th><th>{Localizer.GetString("Report_ColBus")}</th><th>{Localizer.GetString("Report_ColSize")}</th><th>{Localizer.GetString("Report_ColHealth")}</th><th>{Localizer.GetString("Report_ColRemaining")}</th><th>{Localizer.GetString("Report_ColTemp")}</th></tr></thead>");
             sb.AppendLine("<tbody>");
             foreach (var d in data.Disks)
             {
@@ -115,9 +121,9 @@ public class SystemReportGenerator
         // Cleaned Items Breakdown
         if (data.CleanedItems.Count > 0)
         {
-            sb.AppendLine("<h3 style=\"color: #38bdf8; margin-top: 32px;\">🧹 Список оптимизированных элементов</h3>");
+            sb.AppendLine($"<h3 style=\"color: #38bdf8; margin-top: 32px;\">{Localizer.GetString("Report_CleanedHeading")}</h3>");
             sb.AppendLine("<table>");
-            sb.AppendLine("<thead><tr><th>Путь / Элемент</th><th>Размер</th><th>Описание</th></tr></thead>");
+            sb.AppendLine($"<thead><tr><th>{Localizer.GetString("Report_ColPath")}</th><th>{Localizer.GetString("Report_ColItemSize")}</th><th>{Localizer.GetString("Report_ColDescription")}</th></tr></thead>");
             sb.AppendLine("<tbody>");
             foreach (var item in data.CleanedItems.Take(25))
             {
@@ -126,7 +132,7 @@ public class SystemReportGenerator
             sb.AppendLine("</tbody></table>");
         }
 
-        sb.AppendLine("<button class=\"btn-print\" onclick=\"window.print()\">🖨️ Печать / Сохранить в PDF</button>");
+        sb.AppendLine($"<button class=\"btn-print\" onclick=\"window.print()\">{Localizer.GetString("Report_PrintButton")}</button>");
         sb.AppendLine("<div style=\"clear: both;\"></div>");
 
         sb.AppendLine("</div>");

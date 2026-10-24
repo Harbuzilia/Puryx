@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using SmartCleaner.Core.Localization;
 using System.Diagnostics;
 using System.Text;
 
@@ -46,7 +47,7 @@ public sealed class ProcessCommandExecutor : ICommandExecutor
             return new CommandExecutionResult
             {
                 ExitCode = -1,
-                StandardError = "Не удалось запустить процесс"
+                StandardError = Localizer.GetString("PkgExec_StartFailed")
             };
         }
 
@@ -95,7 +96,7 @@ public sealed class ProcessCommandExecutor : ICommandExecutor
             {
                 ExitCode = -1,
                 TimedOut = true,
-                StandardError = "Превышен таймаут выполнения"
+                StandardError = Localizer.GetString("PkgExec_Timeout")
             };
         }
 
@@ -120,7 +121,7 @@ public sealed class ProcessCommandExecutor : ICommandExecutor
             {
                 ExitCode = -1,
                 TimedOut = true,
-                StandardError = "Превышен таймаут выполнения"
+                StandardError = Localizer.GetString("PkgExec_Timeout")
             };
         }
     }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using System.Diagnostics;
+using SmartCleaner.Core.Localization;
 using SmartCleaner.Core.Services;
 
 namespace SmartCleaner.Core.SystemOpt;
@@ -77,15 +78,15 @@ public class GameBoostService
     {
         if (CurrentState.IsBoostActive) return CurrentState;
 
-        progress?.Report("🎮 Активация Game Turbo Boost...");
+        progress?.Report(Localizer.GetString("GameBoost_ProgressActivating"));
 
         // 1. Optimize RAM
-        progress?.Report("Очистка и сжатие оперативной памяти...");
+        progress?.Report(Localizer.GetString("GameBoost_ProgressClearingRam"));
         var ramResult = await _ramOptimizer.OptimizeMemoryAsync();
         CurrentState.ReclaimedMemoryFormatted = ramResult.ReclaimedFormatted;
 
         // 2. Pause non-essential background services
-        progress?.Report("Приостановка фоновых служб (SysMain, Telemetry, Windows Update)...");
+        progress?.Report(Localizer.GetString("GameBoost_ProgressPausingServices"));
         CurrentState.StoppedServices.Clear();
 
         // Запомнить текущий план питания ДО переключения — единственный шанс
@@ -106,7 +107,7 @@ public class GameBoostService
 
         PersistState();
 
-        progress?.Report($"🚀 Game Turbo Boost включен! (Остановлено служб: {CurrentState.StoppedServices.Count}, RAM: {CurrentState.ReclaimedMemoryFormatted})");
+        progress?.Report(Localizer.GetString("GameBoost_ProgressActivated", CurrentState.StoppedServices.Count, CurrentState.ReclaimedMemoryFormatted));
         return CurrentState;
     }
 
@@ -114,7 +115,7 @@ public class GameBoostService
     {
         if (!CurrentState.IsBoostActive) return CurrentState;
 
-        progress?.Report("Восстановление стандартного режима системы...");
+        progress?.Report(Localizer.GetString("GameBoost_ProgressRestoring"));
 
         // Resume stopped services
         foreach (var svcName in CurrentState.StoppedServices)
@@ -129,7 +130,7 @@ public class GameBoostService
 
         DeleteStateFile();
 
-        progress?.Report("Стандартный режим системы восстановлен.");
+        progress?.Report(Localizer.GetString("GameBoost_ProgressRestored"));
         return CurrentState;
     }
 

@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Text.RegularExpressions;
+using SmartCleaner.Core.Localization;
 using SmartCleaner.Core.Models;
 using SmartCleaner.Core.Services;
 
@@ -62,7 +63,7 @@ public sealed class PackageMaintenanceService : IPackageMaintenanceService
             if (item.ActionTarget != CleaningActionTarget.Package)
             {
                 skipped++;
-                errors.Add(CreateError(item.Path, "Некорректный тип действия для package maintenance"));
+                errors.Add(CreateError(item.Path, Localizer.GetString("PkgMaint_ErrActionType")));
                 continue;
             }
 
@@ -78,7 +79,7 @@ public sealed class PackageMaintenanceService : IPackageMaintenanceService
             if (request is null)
             {
                 skipped++;
-                errors.Add(CreateError(item.Path, "Недопустимая команда package manager"));
+                errors.Add(CreateError(item.Path, Localizer.GetString("PkgMaint_ErrNoCommand")));
                 continue;
             }
 
@@ -90,14 +91,14 @@ public sealed class PackageMaintenanceService : IPackageMaintenanceService
             catch (Exception ex)
             {
                 failed++;
-                errors.Add(CreateError(item.Path, $"Ошибка запуска команды: {ex.GetType().Name}: {ex.Message}"));
+                errors.Add(CreateError(item.Path, Localizer.GetString("PkgMaint_ErrCommandFailed", ex.GetType().Name, ex.Message)));
                 continue;
             }
 
             if (commandResult.TimedOut)
             {
                 failed++;
-                errors.Add(CreateError(item.Path, "Превышен таймаут uninstall-команды"));
+                errors.Add(CreateError(item.Path, Localizer.GetString("PkgMaint_ErrTimeout")));
                 continue;
             }
 
@@ -105,7 +106,7 @@ public sealed class PackageMaintenanceService : IPackageMaintenanceService
             {
                 failed++;
                 var stderr = string.IsNullOrWhiteSpace(commandResult.StandardError)
-                    ? "uninstall завершился с ошибкой"
+                    ? Localizer.GetString("PkgMaint_ErrUninstallFailed")
                     : commandResult.StandardError.Trim();
                 errors.Add(CreateError(item.Path, stderr));
                 continue;
@@ -144,43 +145,43 @@ public sealed class PackageMaintenanceService : IPackageMaintenanceService
     {
         if (item.IsReadonlyInventory)
         {
-            return "Глобальные/системные пакеты доступны только для просмотра";
+            return Localizer.GetString("PkgMaint_ErrReadonly");
         }
 
         if (item.PackageManager is null)
         {
-            return "Не указан поддерживаемый пакетный менеджер";
+            return Localizer.GetString("PkgMaint_ErrNoManager");
         }
 
         if (string.IsNullOrWhiteSpace(item.PackageName))
         {
-            return "Не указано имя пакета";
+            return Localizer.GetString("PkgMaint_ErrNoPackageName");
         }
 
         if (!IsValidPackageName(item.PackageManager.Value, item.PackageName))
         {
-            return "Недопустимое имя пакета";
+            return Localizer.GetString("PkgMaint_ErrBadPackageName");
         }
 
         if (string.IsNullOrWhiteSpace(item.PackageWorkingDirectory))
         {
-            return "Отсутствует рабочая директория проекта";
+            return Localizer.GetString("PkgMaint_ErrNoWorkingDir");
         }
 
         var normalizedWorkingDirectory = NormalizePath(item.PackageWorkingDirectory);
         if (!Directory.Exists(normalizedWorkingDirectory))
         {
-            return "Рабочая директория не существует";
+            return Localizer.GetString("PkgMaint_ErrWorkingDirMissing");
         }
 
         if (!IsInsideAllowedRoots(normalizedWorkingDirectory, allowedRoots))
         {
-            return "Рабочая директория вне разрешенных границ";
+            return Localizer.GetString("PkgMaint_ErrWorkingDirOutside");
         }
 
         if (IsSystemPath(normalizedWorkingDirectory))
         {
-            return "Системные директории запрещены для uninstall";
+            return Localizer.GetString("PkgMaint_ErrSystemDir");
         }
 
         if (item.PackageManager == PackageManagerType.Pip && !string.IsNullOrWhiteSpace(item.PackageExecutablePath))
@@ -188,12 +189,12 @@ public sealed class PackageMaintenanceService : IPackageMaintenanceService
             var normalizedExecutable = NormalizePath(item.PackageExecutablePath);
             if (!File.Exists(normalizedExecutable))
             {
-                return "Python executable для venv не найден";
+                return Localizer.GetString("PkgMaint_ErrPythonMissing");
             }
 
             if (!normalizedExecutable.StartsWith(normalizedWorkingDirectory, StringComparison.OrdinalIgnoreCase))
             {
-                return "Python executable должен находиться внутри рабочей директории";
+                return Localizer.GetString("PkgMaint_ErrPythonOutside");
             }
         }
 

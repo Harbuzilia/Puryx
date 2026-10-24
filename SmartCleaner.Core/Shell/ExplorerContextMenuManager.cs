@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using SmartCleaner.Core.Localization;
 using System.Diagnostics;
 using System.IO;
 
@@ -36,17 +37,17 @@ public class ExplorerContextMenuManager
         {
             var exe = GetAppExePath();
             using var key = Registry.CurrentUser.CreateSubKey(@"Software\Classes\Directory\shell\SmartCleanerAnalyze");
-            key.SetValue("", "⚡ Анализировать в Puryx");
+            key.SetValue("", Localizer.GetString("Shell_Menu_Analyze"));
             key.SetValue("Icon", $"\"{exe}\",0");
 
             using var cmdKey = key.CreateSubKey("command");
             cmdKey.SetValue("", $"\"{exe}\" --scan-path \"%1\"");
 
-            return (true, "Пункт «⚡ Анализировать в Puryx» успешно добавлен в контекстное меню папок!");
+            return (true, Localizer.GetString("Shell_Msg_AnalyzeRegistered", Localizer.GetString("Shell_Menu_Analyze")));
         }
         catch (Exception ex)
         {
-            return (false, $"Ошибка регистрации меню: {ex.Message}");
+            return (false, Localizer.GetString("Shell_Err_Register", ex.Message));
         }
     }
 
@@ -55,11 +56,11 @@ public class ExplorerContextMenuManager
         try
         {
             Registry.CurrentUser.DeleteSubKeyTree(@"Software\Classes\Directory\shell\SmartCleanerAnalyze", false);
-            return (true, "Пункт удален из контекстного меню.");
+            return (true, Localizer.GetString("Shell_Msg_Unregistered"));
         }
         catch (Exception ex)
         {
-            return (false, $"Ошибка удаления меню: {ex.Message}");
+            return (false, Localizer.GetString("Shell_Err_Unregister", ex.Message));
         }
     }
 
@@ -69,17 +70,17 @@ public class ExplorerContextMenuManager
         {
             var exe = GetAppExePath();
             using var key = Registry.CurrentUser.CreateSubKey(@"Software\Classes\*\shell\SmartCleanerShred");
-            key.SetValue("", "🔥 Безвозвратно уничтожить (Шредер DoD)");
+            key.SetValue("", Localizer.GetString("Shell_Menu_Shred"));
             key.SetValue("Icon", $"\"{exe}\",0");
 
             using var cmdKey = key.CreateSubKey("command");
             cmdKey.SetValue("", $"\"{exe}\" --shred-path \"%1\"");
 
-            return (true, "Пункт «🔥 Безвозвратно уничтожить (Шредер DoD)» добавлен в контекстное меню файлов!");
+            return (true, Localizer.GetString("Shell_Msg_ShredRegistered", Localizer.GetString("Shell_Menu_Shred")));
         }
         catch (Exception ex)
         {
-            return (false, $"Ошибка регистрации меню: {ex.Message}");
+            return (false, Localizer.GetString("Shell_Err_Register", ex.Message));
         }
     }
 
@@ -88,11 +89,11 @@ public class ExplorerContextMenuManager
         try
         {
             Registry.CurrentUser.DeleteSubKeyTree(@"Software\Classes\*\shell\SmartCleanerShred", false);
-            return (true, "Пункт удален из контекстного меню.");
+            return (true, Localizer.GetString("Shell_Msg_Unregistered"));
         }
         catch (Exception ex)
         {
-            return (false, $"Ошибка удаления меню: {ex.Message}");
+            return (false, Localizer.GetString("Shell_Err_Unregister", ex.Message));
         }
     }
 
@@ -102,17 +103,17 @@ public class ExplorerContextMenuManager
         {
             var exe = GetAppExePath();
             using var key = Registry.CurrentUser.CreateSubKey(@"Software\Classes\Directory\shell\SmartCleanerCompact");
-            key.SetValue("", "🗜️ Сжать через CompactOS (LZX)");
+            key.SetValue("", Localizer.GetString("Shell_Menu_Compact"));
             key.SetValue("Icon", $"\"{exe}\",0");
 
             using var cmdKey = key.CreateSubKey("command");
             cmdKey.SetValue("", $"\"{exe}\" --compact-path \"%1\"");
 
-            return (true, "Пункт «🗜️ Сжать через CompactOS (LZX)» добавлен в контекстное меню папок!");
+            return (true, Localizer.GetString("Shell_Msg_CompactRegistered", Localizer.GetString("Shell_Menu_Compact")));
         }
         catch (Exception ex)
         {
-            return (false, $"Ошибка регистрации меню: {ex.Message}");
+            return (false, Localizer.GetString("Shell_Err_Register", ex.Message));
         }
     }
 
@@ -121,11 +122,11 @@ public class ExplorerContextMenuManager
         try
         {
             Registry.CurrentUser.DeleteSubKeyTree(@"Software\Classes\Directory\shell\SmartCleanerCompact", false);
-            return (true, "Пункт удален из контекстного меню.");
+            return (true, Localizer.GetString("Shell_Msg_Unregistered"));
         }
         catch (Exception ex)
         {
-            return (false, $"Ошибка удаления меню: {ex.Message}");
+            return (false, Localizer.GetString("Shell_Err_Unregister", ex.Message));
         }
     }
 }

@@ -1,5 +1,6 @@
 using SmartCleaner.Core.Cleaning;
 using SmartCleaner.Core.Helpers;
+using SmartCleaner.Core.Localization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Win32;
@@ -60,8 +61,8 @@ public class PrivacyDebloatService
         new()
         {
             Id = "telemetry_datacollection",
-            Title = "Сбор диагностической телеметрии",
-            Description = "Запрещает Windows передавать расширенную телеметрию и данные использования на сервера Microsoft (AllowTelemetry = 0).",
+            Title = Localizer.GetString("Privacy_Tweak_telemetry_datacollection_Title"),
+            Description = Localizer.GetString("Privacy_Tweak_telemetry_datacollection_Desc"),
             Category = PrivacyCategory.Telemetry,
             RegistryRoot = "HKLM",
             SubKeyPath = @"SOFTWARE\Policies\Microsoft\Windows\DataCollection",
@@ -72,24 +73,24 @@ public class PrivacyDebloatService
         new()
         {
             Id = "telemetry_diagtrack",
-            Title = "Служба телеметрии DiagTrack",
-            Description = "Отключает фоновую службу «Connected User Experiences and Telemetry», собирающую системные логи и события.",
+            Title = Localizer.GetString("Privacy_Tweak_telemetry_diagtrack_Title"),
+            Description = Localizer.GetString("Privacy_Tweak_telemetry_diagtrack_Desc"),
             Category = PrivacyCategory.Telemetry,
             ServiceName = "DiagTrack"
         },
         new()
         {
             Id = "telemetry_dmwappush",
-            Title = "Служба WAP Push (dmwappushservice)",
-            Description = "Отключает службу маршрутизации push-сообщений телеметрии WAP.",
+            Title = Localizer.GetString("Privacy_Tweak_telemetry_dmwappush_Title"),
+            Description = Localizer.GetString("Privacy_Tweak_telemetry_dmwappush_Desc"),
             Category = PrivacyCategory.Telemetry,
             ServiceName = "dmwappushservice"
         },
         new()
         {
             Id = "telemetry_enhanceddiag",
-            Title = "Расширенная диагностика приложений",
-            Description = "Блокирует отправку дампов памяти и стеков вызовов сторонних приложений при сбоях.",
+            Title = Localizer.GetString("Privacy_Tweak_telemetry_enhanceddiag_Title"),
+            Description = Localizer.GetString("Privacy_Tweak_telemetry_enhanceddiag_Desc"),
             Category = PrivacyCategory.Telemetry,
             RegistryRoot = "HKLM",
             SubKeyPath = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Diagnostics\DiagTrack",
@@ -100,8 +101,8 @@ public class PrivacyDebloatService
         new()
         {
             Id = "advertising_id",
-            Title = "Рекламный идентификатор (Advertising ID)",
-            Description = "Запрещает приложениям использовать уникальный ID пользователя для показа персонализированной рекламы.",
+            Title = Localizer.GetString("Privacy_Tweak_advertising_id_Title"),
+            Description = Localizer.GetString("Privacy_Tweak_advertising_id_Desc"),
             Category = PrivacyCategory.Advertising,
             RegistryRoot = "HKCU",
             SubKeyPath = @"Software\Microsoft\Windows\CurrentVersion\AdvertisingInfo",
@@ -112,8 +113,8 @@ public class PrivacyDebloatService
         new()
         {
             Id = "advertising_bingsearch",
-            Title = "Веб-поиск Bing в меню Пуск",
-            Description = "Отключает сетевые запросы в Bing при поиске локальных файлов и программ в меню Пуск.",
+            Title = Localizer.GetString("Privacy_Tweak_advertising_bingsearch_Title"),
+            Description = Localizer.GetString("Privacy_Tweak_advertising_bingsearch_Desc"),
             Category = PrivacyCategory.Advertising,
             RegistryRoot = "HKCU",
             SubKeyPath = @"Software\Microsoft\Windows\CurrentVersion\Search",
@@ -124,8 +125,8 @@ public class PrivacyDebloatService
         new()
         {
             Id = "advertising_suggestions",
-            Title = "Рекомендации в строке поиска Explorer",
-            Description = "Отключает всплывающие подсказки и рекламу в окнах Проводника Windows.",
+            Title = Localizer.GetString("Privacy_Tweak_advertising_suggestions_Title"),
+            Description = Localizer.GetString("Privacy_Tweak_advertising_suggestions_Desc"),
             Category = PrivacyCategory.Advertising,
             RegistryRoot = "HKCU",
             SubKeyPath = @"Software\Policies\Microsoft\Windows\Explorer",
@@ -136,8 +137,8 @@ public class PrivacyDebloatService
         new()
         {
             Id = "advertising_tailored",
-            Title = "Персонализированный опыт (Tailored Experiences)",
-            Description = "Запрещает Microsoft использовать диагностические данные для рекламных рекомендаций.",
+            Title = Localizer.GetString("Privacy_Tweak_advertising_tailored_Title"),
+            Description = Localizer.GetString("Privacy_Tweak_advertising_tailored_Desc"),
             Category = PrivacyCategory.Advertising,
             RegistryRoot = "HKCU",
             SubKeyPath = @"Software\Microsoft\Windows\CurrentVersion\Privacy",
@@ -148,8 +149,8 @@ public class PrivacyDebloatService
         new()
         {
             Id = "advertising_contentdelivery",
-            Title = "Реклама приложений в меню Пуск",
-            Description = "Блокирует автоматическую установку промо-приложений (Candy Crush, Disney и т.д.) в меню Пуск.",
+            Title = Localizer.GetString("Privacy_Tweak_advertising_contentdelivery_Title"),
+            Description = Localizer.GetString("Privacy_Tweak_advertising_contentdelivery_Desc"),
             Category = PrivacyCategory.Advertising,
             RegistryRoot = "HKCU",
             SubKeyPath = @"Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager",
@@ -160,8 +161,8 @@ public class PrivacyDebloatService
         new()
         {
             Id = "feedback_siuf",
-            Title = "Запросы на обратную связь (SIUF)",
-            Description = "Отключает всплывающие окна с просьбой оценить Windows или отправить отзыв.",
+            Title = Localizer.GetString("Privacy_Tweak_feedback_siuf_Title"),
+            Description = Localizer.GetString("Privacy_Tweak_feedback_siuf_Desc"),
             Category = PrivacyCategory.FeedbackAndErrors,
             RegistryRoot = "HKCU",
             SubKeyPath = @"Software\Microsoft\Siuf\Rules",
@@ -172,8 +173,8 @@ public class PrivacyDebloatService
         new()
         {
             Id = "error_reporting_wer",
-            Title = "Отчёты об ошибках Windows (WER)",
-            Description = "Отключает фоновую отправку диагностических дампов сбоев на сервера Microsoft.",
+            Title = Localizer.GetString("Privacy_Tweak_error_reporting_wer_Title"),
+            Description = Localizer.GetString("Privacy_Tweak_error_reporting_wer_Desc"),
             Category = PrivacyCategory.FeedbackAndErrors,
             RegistryRoot = "HKLM",
             SubKeyPath = @"SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting",
@@ -184,8 +185,8 @@ public class PrivacyDebloatService
         new()
         {
             Id = "customer_ceip",
-            Title = "Программа улучшения качества (CEIP)",
-            Description = "Отключает сбор данных об использовании функций и производительности программ.",
+            Title = Localizer.GetString("Privacy_Tweak_customer_ceip_Title"),
+            Description = Localizer.GetString("Privacy_Tweak_customer_ceip_Desc"),
             Category = PrivacyCategory.FeedbackAndErrors,
             RegistryRoot = "HKLM",
             SubKeyPath = @"SOFTWARE\Policies\Microsoft\SQMClient\Windows",
@@ -196,8 +197,8 @@ public class PrivacyDebloatService
         new()
         {
             Id = "sensors_location",
-            Title = "Служба геолокации и датчиков",
-            Description = "Блокирует фоновое определение физического местоположения устройства системой и службами.",
+            Title = Localizer.GetString("Privacy_Tweak_sensors_location_Title"),
+            Description = Localizer.GetString("Privacy_Tweak_sensors_location_Desc"),
             Category = PrivacyCategory.TrackingAndSensors,
             RegistryRoot = "HKLM",
             SubKeyPath = @"SOFTWARE\Policies\Microsoft\Windows\LocationAndSensors",
@@ -208,8 +209,8 @@ public class PrivacyDebloatService
         new()
         {
             Id = "tracking_activityfeed",
-            Title = "Хронология действий (Activity Feed)",
-            Description = "Отключает сохранение и синхронизацию истории открытых файлов и действий с облаком.",
+            Title = Localizer.GetString("Privacy_Tweak_tracking_activityfeed_Title"),
+            Description = Localizer.GetString("Privacy_Tweak_tracking_activityfeed_Desc"),
             Category = PrivacyCategory.TrackingAndSensors,
             RegistryRoot = "HKLM",
             SubKeyPath = @"SOFTWARE\Policies\Microsoft\Windows\System",

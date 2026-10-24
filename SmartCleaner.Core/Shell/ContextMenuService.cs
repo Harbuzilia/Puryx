@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Microsoft.Win32;
+using SmartCleaner.Core.Localization;
 
 namespace SmartCleaner.Core.Shell;
 
@@ -46,7 +47,7 @@ public sealed class ContextMenuService
             // Для папок (ПКМ по папке)
             using (var key = Registry.CurrentUser.CreateSubKey(MenuKeyPath))
             {
-                key.SetValue("", "Сканировать в Puryx");
+                key.SetValue("", Localizer.GetString("Shell_Menu_ScanFolder"));
                 key.SetValue("Icon", iconValue);
             }
             using (var key = Registry.CurrentUser.CreateSubKey(CommandKeyPath))
@@ -57,7 +58,7 @@ public sealed class ContextMenuService
             // Для фона папки (ПКМ по пустому месту)
             using (var key = Registry.CurrentUser.CreateSubKey(BgMenuKeyPath))
             {
-                key.SetValue("", "Сканировать текущую папку в Puryx");
+                key.SetValue("", Localizer.GetString("Shell_Menu_ScanFolderBackground"));
                 key.SetValue("Icon", iconValue);
             }
             using (var key = Registry.CurrentUser.CreateSubKey(BgCommandKeyPath))

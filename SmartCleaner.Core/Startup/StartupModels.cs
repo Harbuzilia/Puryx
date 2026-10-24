@@ -1,3 +1,5 @@
+using SmartCleaner.Core.Localization;
+
 namespace SmartCleaner.Core.Startup;
 
 /// <summary>
@@ -36,13 +38,13 @@ public sealed class StartupItem
     /// <summary>Локализованное описание источника.</summary>
     public string SourceDescription => Source switch
     {
-        StartupSource.RegistryCurrentUser => "Реестр (HKCU)",
-        StartupSource.RegistryLocalMachine => "Реестр (HKLM)",
-        StartupSource.RegistryWow6432 => "Реестр (WOW64)",
-        StartupSource.StartupFolder => "Папка автозагрузки",
-        StartupSource.CommonStartupFolder => "Общая папка автозагрузки",
-        StartupSource.TaskScheduler => "Планировщик заданий",
-        _ => "Неизвестно"
+        StartupSource.RegistryCurrentUser => Localizer.GetString("Startup_Source_Hkcu"),
+        StartupSource.RegistryLocalMachine => Localizer.GetString("Startup_Source_Hklm"),
+        StartupSource.RegistryWow6432 => Localizer.GetString("Startup_Source_Wow64"),
+        StartupSource.StartupFolder => Localizer.GetString("Startup_Source_UserFolder"),
+        StartupSource.CommonStartupFolder => Localizer.GetString("Startup_Source_CommonFolder"),
+        StartupSource.TaskScheduler => Localizer.GetString("Startup_Source_TaskScheduler"),
+        _ => Localizer.GetString("Startup_Source_Unknown")
     };
 
     /// <summary>true = включён, false = отключён (для реестра: имя с "!" prefix).</summary>

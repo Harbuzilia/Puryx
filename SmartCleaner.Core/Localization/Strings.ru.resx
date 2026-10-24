@@ -3496,4 +3496,410 @@ Windows может использовать эти драйверы прямо �
   <data name="Scanner_Custom_HowTo_Coverage" xml:space="preserve">
     <value>Пересоздаются при запуске тестов с --coverage</value>
   </data>
+  <!-- День 6, волна 6: Uninstaller (LeftoverItem/LeftoverHunter/CategorySummary) -->
+  <data name="Leftover_Type_Folder" xml:space="preserve">
+    <value>Папка</value>
+  </data>
+  <data name="Leftover_Type_File" xml:space="preserve">
+    <value>Файл</value>
+  </data>
+  <data name="Leftover_Type_RegistryKey" xml:space="preserve">
+    <value>Раздел реестра</value>
+  </data>
+  <data name="Leftover_Type_RegistryValue" xml:space="preserve">
+    <value>Параметр реестра</value>
+  </data>
+  <data name="Leftover_Type_ScheduledTask" xml:space="preserve">
+    <value>Задача планировщика</value>
+  </data>
+  <data name="Leftover_Type_Service" xml:space="preserve">
+    <value>Служба</value>
+  </data>
+  <data name="Leftover_Type_Unknown" xml:space="preserve">
+    <value>Элемент</value>
+  </data>
+  <data name="Leftover_FolderIn" xml:space="preserve">
+    <value>Остаточная папка в {0}</value>
+  </data>
+  <data name="Leftover_RequiresAdmin" xml:space="preserve">
+    <value>Требуются права администратора</value>
+  </data>
+  <data name="Leftover_BlockedBySafety" xml:space="preserve">
+    <value>Заблокировано службой безопасности</value>
+  </data>
+  <data name="Leftover_RegistryKeyIn" xml:space="preserve">
+    <value>Раздел реестра {0}</value>
+  </data>
+  <data name="Leftover_RegistryMarker" xml:space="preserve">
+    <value>Реестр</value>
+  </data>
+  <data name="CategorySummary_ItemsCount" xml:space="preserve">
+    <value>{0} элементов</value>
+  </data>
+  <!-- День 6, волна 6: Privacy (PrivacyTweakItem/PrivacyDebloatService) -->
+  <data name="Privacy_Category_Telemetry" xml:space="preserve">
+    <value>Телеметрия и диагностика</value>
+  </data>
+  <data name="Privacy_Category_Advertising" xml:space="preserve">
+    <value>Реклама и предложения</value>
+  </data>
+  <data name="Privacy_Category_FeedbackAndErrors" xml:space="preserve">
+    <value>Отчёты и отзывы</value>
+  </data>
+  <data name="Privacy_Category_TrackingAndSensors" xml:space="preserve">
+    <value>Слежка и датчики</value>
+  </data>
+  <data name="Privacy_Category_General" xml:space="preserve">
+    <value>Общее</value>
+  </data>
+  <data name="Privacy_Tweak_telemetry_datacollection_Title" xml:space="preserve">
+    <value>Сбор диагностической телеметрии</value>
+  </data>
+  <data name="Privacy_Tweak_telemetry_datacollection_Desc" xml:space="preserve">
+    <value>Запрещает Windows передавать расширенную телеметрию и данные использования на сервера Microsoft (AllowTelemetry = 0).</value>
+  </data>
+  <data name="Privacy_Tweak_telemetry_diagtrack_Title" xml:space="preserve">
+    <value>Служба телеметрии DiagTrack</value>
+  </data>
+  <data name="Privacy_Tweak_telemetry_diagtrack_Desc" xml:space="preserve">
+    <value>Отключает фоновую службу «Connected User Experiences and Telemetry», собирающую системные логи и события.</value>
+  </data>
+  <data name="Privacy_Tweak_telemetry_dmwappush_Title" xml:space="preserve">
+    <value>Служба WAP Push (dmwappushservice)</value>
+  </data>
+  <data name="Privacy_Tweak_telemetry_dmwappush_Desc" xml:space="preserve">
+    <value>Отключает службу маршрутизации push-сообщений телеметрии WAP.</value>
+  </data>
+  <data name="Privacy_Tweak_telemetry_enhanceddiag_Title" xml:space="preserve">
+    <value>Расширенная диагностика приложений</value>
+  </data>
+  <data name="Privacy_Tweak_telemetry_enhanceddiag_Desc" xml:space="preserve">
+    <value>Блокирует отправку дампов памяти и стеков вызовов сторонних приложений при сбоях.</value>
+  </data>
+  <data name="Privacy_Tweak_advertising_id_Title" xml:space="preserve">
+    <value>Рекламный идентификатор (Advertising ID)</value>
+  </data>
+  <data name="Privacy_Tweak_advertising_id_Desc" xml:space="preserve">
+    <value>Запрещает приложениям использовать уникальный ID пользователя для показа персонализированной рекламы.</value>
+  </data>
+  <data name="Privacy_Tweak_advertising_bingsearch_Title" xml:space="preserve">
+    <value>Веб-поиск Bing в меню Пуск</value>
+  </data>
+  <data name="Privacy_Tweak_advertising_bingsearch_Desc" xml:space="preserve">
+    <value>Отключает сетевые запросы в Bing при поиске локальных файлов и программ в меню Пуск.</value>
+  </data>
+  <data name="Privacy_Tweak_advertising_suggestions_Title" xml:space="preserve">
+    <value>Рекомендации в строке поиска Explorer</value>
+  </data>
+  <data name="Privacy_Tweak_advertising_suggestions_Desc" xml:space="preserve">
+    <value>Отключает всплывающие подсказки и рекламу в окнах Проводника Windows.</value>
+  </data>
+  <data name="Privacy_Tweak_advertising_tailored_Title" xml:space="preserve">
+    <value>Персонализированный опыт (Tailored Experiences)</value>
+  </data>
+  <data name="Privacy_Tweak_advertising_tailored_Desc" xml:space="preserve">
+    <value>Запрещает Microsoft использовать диагностические данные для рекламных рекомендаций.</value>
+  </data>
+  <data name="Privacy_Tweak_advertising_contentdelivery_Title" xml:space="preserve">
+    <value>Реклама приложений в меню Пуск</value>
+  </data>
+  <data name="Privacy_Tweak_advertising_contentdelivery_Desc" xml:space="preserve">
+    <value>Блокирует автоматическую установку промо-приложений (Candy Crush, Disney и т.д.) в меню Пуск.</value>
+  </data>
+  <data name="Privacy_Tweak_feedback_siuf_Title" xml:space="preserve">
+    <value>Запросы на обратную связь (SIUF)</value>
+  </data>
+  <data name="Privacy_Tweak_feedback_siuf_Desc" xml:space="preserve">
+    <value>Отключает всплывающие окна с просьбой оценить Windows или отправить отзыв.</value>
+  </data>
+  <data name="Privacy_Tweak_error_reporting_wer_Title" xml:space="preserve">
+    <value>Отчёты об ошибках Windows (WER)</value>
+  </data>
+  <data name="Privacy_Tweak_error_reporting_wer_Desc" xml:space="preserve">
+    <value>Отключает фоновую отправку диагностических дампов сбоев на сервера Microsoft.</value>
+  </data>
+  <data name="Privacy_Tweak_customer_ceip_Title" xml:space="preserve">
+    <value>Программа улучшения качества (CEIP)</value>
+  </data>
+  <data name="Privacy_Tweak_customer_ceip_Desc" xml:space="preserve">
+    <value>Отключает сбор данных об использовании функций и производительности программ.</value>
+  </data>
+  <data name="Privacy_Tweak_sensors_location_Title" xml:space="preserve">
+    <value>Служба геолокации и датчиков</value>
+  </data>
+  <data name="Privacy_Tweak_sensors_location_Desc" xml:space="preserve">
+    <value>Блокирует фоновое определение физического местоположения устройства системой и службами.</value>
+  </data>
+  <data name="Privacy_Tweak_tracking_activityfeed_Title" xml:space="preserve">
+    <value>Хронология действий (Activity Feed)</value>
+  </data>
+  <data name="Privacy_Tweak_tracking_activityfeed_Desc" xml:space="preserve">
+    <value>Отключает сохранение и синхронизацию истории открытых файлов и действий с облаком.</value>
+  </data>
+  <!-- День 6, волна 6: Startup (StartupModels) -->
+  <data name="Startup_Source_Hkcu" xml:space="preserve">
+    <value>Реестр (HKCU)</value>
+  </data>
+  <data name="Startup_Source_Hklm" xml:space="preserve">
+    <value>Реестр (HKLM)</value>
+  </data>
+  <data name="Startup_Source_Wow64" xml:space="preserve">
+    <value>Реестр (WOW64)</value>
+  </data>
+  <data name="Startup_Source_UserFolder" xml:space="preserve">
+    <value>Папка автозагрузки</value>
+  </data>
+  <data name="Startup_Source_CommonFolder" xml:space="preserve">
+    <value>Общая папка автозагрузки</value>
+  </data>
+  <data name="Startup_Source_TaskScheduler" xml:space="preserve">
+    <value>Планировщик заданий</value>
+  </data>
+  <data name="Startup_Source_Unknown" xml:space="preserve">
+    <value>Неизвестно</value>
+  </data>
+  <!-- День 6, волна 6: SystemOpt progress (RamOptimizer/GameBoost) -->
+  <data name="RamOptimizer_ProgressWorkingSets" xml:space="preserve">
+    <value>Оптимизация рабочих наборов процессов и очистка кэша памяти...</value>
+  </data>
+  <data name="GameBoost_ProgressActivating" xml:space="preserve">
+    <value>🎮 Активация Game Turbo Boost...</value>
+  </data>
+  <data name="GameBoost_ProgressClearingRam" xml:space="preserve">
+    <value>Очистка и сжатие оперативной памяти...</value>
+  </data>
+  <data name="GameBoost_ProgressPausingServices" xml:space="preserve">
+    <value>Приостановка фоновых служб (SysMain, Telemetry, Windows Update)...</value>
+  </data>
+  <data name="GameBoost_ProgressActivated" xml:space="preserve">
+    <value>🚀 Game Turbo Boost включен! (Остановлено служб: {0}, RAM: {1})</value>
+  </data>
+  <data name="GameBoost_ProgressRestoring" xml:space="preserve">
+    <value>Восстановление стандартного режима системы...</value>
+  </data>
+  <data name="GameBoost_ProgressRestored" xml:space="preserve">
+    <value>Стандартный режим системы восстановлен.</value>
+  </data>
+  <!-- День 6, волна 6: AI Assistant (NLQ output) -->
+  <data name="Nlq_DefaultSize" xml:space="preserve">
+    <value>500 МБ</value>
+  </data>
+  <data name="Nlq_VideoText" xml:space="preserve">
+    <value>🎬 **Поиск больших видеофайлов (> {0})**
+
+Я настроил фильтр по видеоформатам (`.mp4`, `.mkv`, `.avi`, `.mov`, `.wmv`) и размеру. Нажмите кнопку ниже для мгновенного перехода в анализатор больших файлов.</value>
+  </data>
+  <data name="Nlq_VideoButton" xml:space="preserve">
+    <value>📂 Открыть Анализатор больших файлов</value>
+  </data>
+  <data name="Nlq_UninstallText" xml:space="preserve">
+    <value>🗑️ **Глубокий деинсталлятор и Охотник за хвостами**
+
+Позволяет полностью деинсталлировать программы с зачисткой всех остаточных ключей реестра и временных папок в AppData.</value>
+  </data>
+  <data name="Nlq_UninstallButton" xml:space="preserve">
+    <value>🗑️ Открыть деинсталлятор</value>
+  </data>
+  <data name="Nlq_DevText" xml:space="preserve">
+    <value>🛠️ **Очистка окружения разработки (Dev Super-Cleaner)**
+
+Обнаружен запрос на очистку инструментов программиста (кэши Rust Cargo, Gradle, Maven, Go, образы дисков WSL2 и node_modules). Запускаю аудит!</value>
+  </data>
+  <data name="Nlq_DevButton" xml:space="preserve">
+    <value>⚡ Перейти к очистке Dev-кэшей</value>
+  </data>
+  <data name="Nlq_DeepText" xml:space="preserve">
+    <value>🛡️ **Глубокая очистка ядра Windows (WinSxS &amp; DriverStore)**
+
+Рекомендуется выполнить консолидацию старых обновлений Windows (DISM) и удалить дубликаты устаревших драйверов.</value>
+  </data>
+  <data name="Nlq_DeepButton" xml:space="preserve">
+    <value>🛡️ Открыть очистку ядра WinSxS</value>
+  </data>
+  <data name="Nlq_DuplicatesText" xml:space="preserve">
+    <value>🔗 **Поиск дубликатов и Hardlink-дедупликация**
+
+Вы можете найти дубликаты и заменить их на **NTFS Hardlinks**: место освободится, а программы не сломаются!</value>
+  </data>
+  <data name="Nlq_DuplicatesButton" xml:space="preserve">
+    <value>🔍 Открыть поиск дубликатов</value>
+  </data>
+  <data name="Nlq_CompactText" xml:space="preserve">
+    <value>🗜️ **CompactOS &amp; LZX сжатие игр и папок**
+
+Прозрачное NTFS-сжатие алгоритмом LZX позволяет уменьшить размер игр в Steam/Epic и папок на 30–50% без потери производительности.</value>
+  </data>
+  <data name="Nlq_CompactButton" xml:space="preserve">
+    <value>🗜️ Открыть менеджер сжатия</value>
+  </data>
+  <data name="Nlq_CleanText" xml:space="preserve">
+    <value>🧹 **Комплексная очистка системы**
+
+Я проверил систему: безопасно освободить максимальный объем можно через очистку системного кэша Windows, временных файлов браузеров и старых логов.</value>
+  </data>
+  <data name="Nlq_CleanButton" xml:space="preserve">
+    <value>🚀 Запустить полное сканирование</value>
+  </data>
+  <data name="Nlq_DefaultText" xml:space="preserve">
+    <value>🤖 **Анализ запроса:** *«{0}»*
+
+Я могу помочь вам:
+• Найти тяжелые файлы и дубликаты;
+• Очистить кэши разработки (WSL, Rust, npm, Gradle);
+• Сжать игры через CompactOS LZX (+30–50% места);
+• Очистить WinSxS и устаревшие драйверы;
+• Полностью удалить программы без мусора и хвостов.
+
+Что именно вы хотите сделать?</value>
+  </data>
+  <data name="Nlq_DefaultButton" xml:space="preserve">
+    <value>🚀 Быстрое сканирование</value>
+  </data>
+  <!-- День 6, волна 6: Package maintenance errors + executor -->
+  <data name="PkgMaint_ErrActionType" xml:space="preserve">
+    <value>Некорректный тип действия для package maintenance</value>
+  </data>
+  <data name="PkgMaint_ErrNoCommand" xml:space="preserve">
+    <value>Недопустимая команда package manager</value>
+  </data>
+  <data name="PkgMaint_ErrCommandFailed" xml:space="preserve">
+    <value>Ошибка запуска команды: {0}: {1}</value>
+  </data>
+  <data name="PkgMaint_ErrTimeout" xml:space="preserve">
+    <value>Превышен таймаут uninstall-команды</value>
+  </data>
+  <data name="PkgMaint_ErrUninstallFailed" xml:space="preserve">
+    <value>uninstall завершился с ошибкой</value>
+  </data>
+  <data name="PkgMaint_ErrReadonly" xml:space="preserve">
+    <value>Глобальные/системные пакеты доступны только для просмотра</value>
+  </data>
+  <data name="PkgMaint_ErrNoManager" xml:space="preserve">
+    <value>Не указан поддерживаемый пакетный менеджер</value>
+  </data>
+  <data name="PkgMaint_ErrNoPackageName" xml:space="preserve">
+    <value>Не указано имя пакета</value>
+  </data>
+  <data name="PkgMaint_ErrBadPackageName" xml:space="preserve">
+    <value>Недопустимое имя пакета</value>
+  </data>
+  <data name="PkgMaint_ErrNoWorkingDir" xml:space="preserve">
+    <value>Отсутствует рабочая директория проекта</value>
+  </data>
+  <data name="PkgMaint_ErrWorkingDirMissing" xml:space="preserve">
+    <value>Рабочая директория не существует</value>
+  </data>
+  <data name="PkgMaint_ErrWorkingDirOutside" xml:space="preserve">
+    <value>Рабочая директория вне разрешенных границ</value>
+  </data>
+  <data name="PkgMaint_ErrSystemDir" xml:space="preserve">
+    <value>Системные директории запрещены для uninstall</value>
+  </data>
+  <data name="PkgMaint_ErrPythonMissing" xml:space="preserve">
+    <value>Python executable для venv не найден</value>
+  </data>
+  <data name="PkgMaint_ErrPythonOutside" xml:space="preserve">
+    <value>Python executable должен находиться внутри рабочей директории</value>
+  </data>
+  <data name="PkgExec_StartFailed" xml:space="preserve">
+    <value>Не удалось запустить процесс</value>
+  </data>
+  <data name="PkgExec_Timeout" xml:space="preserve">
+    <value>Превышен таймаут выполнения</value>
+  </data>
+  <!-- День 6, волна 6: Explorer context menu (Shell) -->
+  <data name="Shell_Menu_ScanFolder" xml:space="preserve">
+    <value>Сканировать в Puryx</value>
+  </data>
+  <data name="Shell_Menu_ScanFolderBackground" xml:space="preserve">
+    <value>Сканировать текущую папку в Puryx</value>
+  </data>
+  <data name="Shell_Menu_Analyze" xml:space="preserve">
+    <value>⚡ Анализировать в Puryx</value>
+  </data>
+  <data name="Shell_Menu_Shred" xml:space="preserve">
+    <value>🔥 Безвозвратно уничтожить (Шредер DoD)</value>
+  </data>
+  <data name="Shell_Menu_Compact" xml:space="preserve">
+    <value>🗜️ Сжать через CompactOS (LZX)</value>
+  </data>
+  <data name="Shell_Msg_AnalyzeRegistered" xml:space="preserve">
+    <value>Пункт «{0}» успешно добавлен в контекстное меню папок!</value>
+  </data>
+  <data name="Shell_Msg_ShredRegistered" xml:space="preserve">
+    <value>Пункт «{0}» добавлен в контекстное меню файлов!</value>
+  </data>
+  <data name="Shell_Msg_CompactRegistered" xml:space="preserve">
+    <value>Пункт «{0}» добавлен в контекстное меню папок!</value>
+  </data>
+  <data name="Shell_Msg_Unregistered" xml:space="preserve">
+    <value>Пункт удален из контекстного меню.</value>
+  </data>
+  <data name="Shell_Err_Register" xml:space="preserve">
+    <value>Ошибка регистрации меню: {0}</value>
+  </data>
+  <data name="Shell_Err_Unregister" xml:space="preserve">
+    <value>Ошибка удаления меню: {0}</value>
+  </data>
+  <!-- День 6, волна 6: System report (HTML) -->
+  <data name="Report_Title" xml:space="preserve">
+    <value>Паспорт системы и отчет Puryx</value>
+  </data>
+  <data name="Report_Subtitle" xml:space="preserve">
+    <value>Паспорт системы и отчет об оптимизации • {0}</value>
+  </data>
+  <data name="Report_Badge" xml:space="preserve">
+    <value>ОТЧЕТ СИСТЕМЫ</value>
+  </data>
+  <data name="Report_CardComputer" xml:space="preserve">
+    <value>Компьютер / Пользователь</value>
+  </data>
+  <data name="Report_CardOs" xml:space="preserve">
+    <value>Операционная система</value>
+  </data>
+  <data name="Report_CardRam" xml:space="preserve">
+    <value>Оперативная память (RAM)</value>
+  </data>
+  <data name="Report_CardFreed" xml:space="preserve">
+    <value>Освобождено дискового места</value>
+  </data>
+  <data name="Report_SmartHeading" xml:space="preserve">
+    <value>💾 Аппаратная телеметрия накопителей (S.M.A.R.T.)</value>
+  </data>
+  <data name="Report_ColDrive" xml:space="preserve">
+    <value>Накопитель / Модель</value>
+  </data>
+  <data name="Report_ColType" xml:space="preserve">
+    <value>Тип</value>
+  </data>
+  <data name="Report_ColBus" xml:space="preserve">
+    <value>Шина</value>
+  </data>
+  <data name="Report_ColSize" xml:space="preserve">
+    <value>Объем</value>
+  </data>
+  <data name="Report_ColHealth" xml:space="preserve">
+    <value>Состояние</value>
+  </data>
+  <data name="Report_ColRemaining" xml:space="preserve">
+    <value>Остаток ресурса</value>
+  </data>
+  <data name="Report_ColTemp" xml:space="preserve">
+    <value>Температура</value>
+  </data>
+  <data name="Report_CleanedHeading" xml:space="preserve">
+    <value>🧹 Список оптимизированных элементов</value>
+  </data>
+  <data name="Report_ColPath" xml:space="preserve">
+    <value>Путь / Элемент</value>
+  </data>
+  <data name="Report_ColItemSize" xml:space="preserve">
+    <value>Размер</value>
+  </data>
+  <data name="Report_ColDescription" xml:space="preserve">
+    <value>Описание</value>
+  </data>
+  <data name="Report_PrintButton" xml:space="preserve">
+    <value>🖨️ Печать / Сохранить в PDF</value>
+  </data>
 </root>

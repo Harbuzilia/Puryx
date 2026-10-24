@@ -84,8 +84,8 @@ public class PackageMaintenanceServiceTests
             Assert.Equal(2, result.ProcessedCount);
             Assert.Equal(2, result.SkippedCount);
             Assert.Empty(executor.Requests);
-            Assert.Contains(result.Errors, e => e.Message.Contains("Недопустимое имя пакета", StringComparison.Ordinal));
-            Assert.Contains(result.Errors, e => e.Message.Contains("вне разрешенных границ", StringComparison.Ordinal));
+            Assert.Contains(result.Errors, e => e.Message.Contains("Invalid package name", StringComparison.Ordinal));
+            Assert.Contains(result.Errors, e => e.Message.Contains("outside the allowed roots", StringComparison.Ordinal));
         }
         finally
         {

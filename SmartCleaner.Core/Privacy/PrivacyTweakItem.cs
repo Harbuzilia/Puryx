@@ -1,3 +1,5 @@
+using SmartCleaner.Core.Localization;
+
 namespace SmartCleaner.Core.Privacy;
 
 public enum PrivacyCategory
@@ -16,11 +18,11 @@ public class PrivacyTweakItem
     public PrivacyCategory Category { get; set; } = PrivacyCategory.Telemetry;
     public string CategoryName => Category switch
     {
-        PrivacyCategory.Telemetry => "Телеметрия и диагностика",
-        PrivacyCategory.Advertising => "Реклама и предложения",
-        PrivacyCategory.FeedbackAndErrors => "Отчёты и отзывы",
-        PrivacyCategory.TrackingAndSensors => "Слежка и датчики",
-        _ => "Общее"
+        PrivacyCategory.Telemetry => Localizer.GetString("Privacy_Category_Telemetry"),
+        PrivacyCategory.Advertising => Localizer.GetString("Privacy_Category_Advertising"),
+        PrivacyCategory.FeedbackAndErrors => Localizer.GetString("Privacy_Category_FeedbackAndErrors"),
+        PrivacyCategory.TrackingAndSensors => Localizer.GetString("Privacy_Category_TrackingAndSensors"),
+        _ => Localizer.GetString("Privacy_Category_General")
     };
 
     public bool IsApplied { get; set; }

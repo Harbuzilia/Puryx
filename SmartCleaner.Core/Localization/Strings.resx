@@ -3496,4 +3496,410 @@ Remove these entries from the system registry?</value>
   <data name="Scanner_Custom_HowTo_Coverage" xml:space="preserve">
     <value>Re-created by running tests with --coverage</value>
   </data>
+  <!-- День 6, волна 6: Uninstaller (LeftoverItem/LeftoverHunter/CategorySummary) -->
+  <data name="Leftover_Type_Folder" xml:space="preserve">
+    <value>Folder</value>
+  </data>
+  <data name="Leftover_Type_File" xml:space="preserve">
+    <value>File</value>
+  </data>
+  <data name="Leftover_Type_RegistryKey" xml:space="preserve">
+    <value>Registry key</value>
+  </data>
+  <data name="Leftover_Type_RegistryValue" xml:space="preserve">
+    <value>Registry value</value>
+  </data>
+  <data name="Leftover_Type_ScheduledTask" xml:space="preserve">
+    <value>Scheduled task</value>
+  </data>
+  <data name="Leftover_Type_Service" xml:space="preserve">
+    <value>Service</value>
+  </data>
+  <data name="Leftover_Type_Unknown" xml:space="preserve">
+    <value>Item</value>
+  </data>
+  <data name="Leftover_FolderIn" xml:space="preserve">
+    <value>Leftover folder in {0}</value>
+  </data>
+  <data name="Leftover_RequiresAdmin" xml:space="preserve">
+    <value>Administrator privileges required</value>
+  </data>
+  <data name="Leftover_BlockedBySafety" xml:space="preserve">
+    <value>Blocked by the safety service</value>
+  </data>
+  <data name="Leftover_RegistryKeyIn" xml:space="preserve">
+    <value>Registry key {0}</value>
+  </data>
+  <data name="Leftover_RegistryMarker" xml:space="preserve">
+    <value>Registry</value>
+  </data>
+  <data name="CategorySummary_ItemsCount" xml:space="preserve">
+    <value>{0} items</value>
+  </data>
+  <!-- День 6, волна 6: Privacy (PrivacyTweakItem/PrivacyDebloatService) -->
+  <data name="Privacy_Category_Telemetry" xml:space="preserve">
+    <value>Telemetry and diagnostics</value>
+  </data>
+  <data name="Privacy_Category_Advertising" xml:space="preserve">
+    <value>Ads and offers</value>
+  </data>
+  <data name="Privacy_Category_FeedbackAndErrors" xml:space="preserve">
+    <value>Reports and feedback</value>
+  </data>
+  <data name="Privacy_Category_TrackingAndSensors" xml:space="preserve">
+    <value>Tracking and sensors</value>
+  </data>
+  <data name="Privacy_Category_General" xml:space="preserve">
+    <value>General</value>
+  </data>
+  <data name="Privacy_Tweak_telemetry_datacollection_Title" xml:space="preserve">
+    <value>Diagnostic telemetry collection</value>
+  </data>
+  <data name="Privacy_Tweak_telemetry_datacollection_Desc" xml:space="preserve">
+    <value>Prevents Windows from sending extended telemetry and usage data to Microsoft servers (AllowTelemetry = 0).</value>
+  </data>
+  <data name="Privacy_Tweak_telemetry_diagtrack_Title" xml:space="preserve">
+    <value>DiagTrack telemetry service</value>
+  </data>
+  <data name="Privacy_Tweak_telemetry_diagtrack_Desc" xml:space="preserve">
+    <value>Disables the background service "Connected User Experiences and Telemetry" that collects system logs and events.</value>
+  </data>
+  <data name="Privacy_Tweak_telemetry_dmwappush_Title" xml:space="preserve">
+    <value>WAP Push service (dmwappushservice)</value>
+  </data>
+  <data name="Privacy_Tweak_telemetry_dmwappush_Desc" xml:space="preserve">
+    <value>Disables the WAP telemetry push message routing service.</value>
+  </data>
+  <data name="Privacy_Tweak_telemetry_enhanceddiag_Title" xml:space="preserve">
+    <value>Enhanced application diagnostics</value>
+  </data>
+  <data name="Privacy_Tweak_telemetry_enhanceddiag_Desc" xml:space="preserve">
+    <value>Blocks sending memory dumps and call stacks of third-party applications on crashes.</value>
+  </data>
+  <data name="Privacy_Tweak_advertising_id_Title" xml:space="preserve">
+    <value>Advertising ID</value>
+  </data>
+  <data name="Privacy_Tweak_advertising_id_Desc" xml:space="preserve">
+    <value>Prevents apps from using the unique user ID to show personalized ads.</value>
+  </data>
+  <data name="Privacy_Tweak_advertising_bingsearch_Title" xml:space="preserve">
+    <value>Bing web search in the Start menu</value>
+  </data>
+  <data name="Privacy_Tweak_advertising_bingsearch_Desc" xml:space="preserve">
+    <value>Disables network requests to Bing when searching for local files and programs in the Start menu.</value>
+  </data>
+  <data name="Privacy_Tweak_advertising_suggestions_Title" xml:space="preserve">
+    <value>Suggestions in the Explorer search box</value>
+  </data>
+  <data name="Privacy_Tweak_advertising_suggestions_Desc" xml:space="preserve">
+    <value>Disables pop-up tips and ads in Windows Explorer windows.</value>
+  </data>
+  <data name="Privacy_Tweak_advertising_tailored_Title" xml:space="preserve">
+    <value>Tailored experiences</value>
+  </data>
+  <data name="Privacy_Tweak_advertising_tailored_Desc" xml:space="preserve">
+    <value>Prevents Microsoft from using diagnostic data for advertising recommendations.</value>
+  </data>
+  <data name="Privacy_Tweak_advertising_contentdelivery_Title" xml:space="preserve">
+    <value>App ads in the Start menu</value>
+  </data>
+  <data name="Privacy_Tweak_advertising_contentdelivery_Desc" xml:space="preserve">
+    <value>Blocks automatic installation of promo apps (Candy Crush, Disney, etc.) in the Start menu.</value>
+  </data>
+  <data name="Privacy_Tweak_feedback_siuf_Title" xml:space="preserve">
+    <value>Feedback requests (SIUF)</value>
+  </data>
+  <data name="Privacy_Tweak_feedback_siuf_Desc" xml:space="preserve">
+    <value>Disables pop-up windows asking you to rate Windows or send feedback.</value>
+  </data>
+  <data name="Privacy_Tweak_error_reporting_wer_Title" xml:space="preserve">
+    <value>Windows Error Reporting (WER)</value>
+  </data>
+  <data name="Privacy_Tweak_error_reporting_wer_Desc" xml:space="preserve">
+    <value>Disables background sending of crash diagnostic dumps to Microsoft servers.</value>
+  </data>
+  <data name="Privacy_Tweak_customer_ceip_Title" xml:space="preserve">
+    <value>Customer Experience Improvement Program (CEIP)</value>
+  </data>
+  <data name="Privacy_Tweak_customer_ceip_Desc" xml:space="preserve">
+    <value>Disables collecting data about feature usage and program performance.</value>
+  </data>
+  <data name="Privacy_Tweak_sensors_location_Title" xml:space="preserve">
+    <value>Geolocation and sensor service</value>
+  </data>
+  <data name="Privacy_Tweak_sensors_location_Desc" xml:space="preserve">
+    <value>Blocks background determination of the device's physical location by the system and services.</value>
+  </data>
+  <data name="Privacy_Tweak_tracking_activityfeed_Title" xml:space="preserve">
+    <value>Activity history (Activity Feed)</value>
+  </data>
+  <data name="Privacy_Tweak_tracking_activityfeed_Desc" xml:space="preserve">
+    <value>Disables saving and syncing the history of opened files and activities to the cloud.</value>
+  </data>
+  <!-- День 6, волна 6: Startup (StartupModels) -->
+  <data name="Startup_Source_Hkcu" xml:space="preserve">
+    <value>Registry (HKCU)</value>
+  </data>
+  <data name="Startup_Source_Hklm" xml:space="preserve">
+    <value>Registry (HKLM)</value>
+  </data>
+  <data name="Startup_Source_Wow64" xml:space="preserve">
+    <value>Registry (WOW64)</value>
+  </data>
+  <data name="Startup_Source_UserFolder" xml:space="preserve">
+    <value>Startup folder</value>
+  </data>
+  <data name="Startup_Source_CommonFolder" xml:space="preserve">
+    <value>Common startup folder</value>
+  </data>
+  <data name="Startup_Source_TaskScheduler" xml:space="preserve">
+    <value>Task Scheduler</value>
+  </data>
+  <data name="Startup_Source_Unknown" xml:space="preserve">
+    <value>Unknown</value>
+  </data>
+  <!-- День 6, волна 6: SystemOpt progress (RamOptimizer/GameBoost) -->
+  <data name="RamOptimizer_ProgressWorkingSets" xml:space="preserve">
+    <value>Optimizing process working sets and clearing the memory cache...</value>
+  </data>
+  <data name="GameBoost_ProgressActivating" xml:space="preserve">
+    <value>🎮 Activating Game Turbo Boost...</value>
+  </data>
+  <data name="GameBoost_ProgressClearingRam" xml:space="preserve">
+    <value>Clearing and compacting RAM...</value>
+  </data>
+  <data name="GameBoost_ProgressPausingServices" xml:space="preserve">
+    <value>Pausing background services (SysMain, Telemetry, Windows Update)...</value>
+  </data>
+  <data name="GameBoost_ProgressActivated" xml:space="preserve">
+    <value>🚀 Game Turbo Boost enabled! (Services stopped: {0}, RAM: {1})</value>
+  </data>
+  <data name="GameBoost_ProgressRestoring" xml:space="preserve">
+    <value>Restoring the standard system mode...</value>
+  </data>
+  <data name="GameBoost_ProgressRestored" xml:space="preserve">
+    <value>Standard system mode restored.</value>
+  </data>
+  <!-- День 6, волна 6: AI Assistant (NLQ output) -->
+  <data name="Nlq_DefaultSize" xml:space="preserve">
+    <value>500 MB</value>
+  </data>
+  <data name="Nlq_VideoText" xml:space="preserve">
+    <value>🎬 **Large video files search (> {0})**
+
+I have set up a filter for video formats (`.mp4`, `.mkv`, `.avi`, `.mov`, `.wmv`) and size. Click the button below to jump straight into the large files analyzer.</value>
+  </data>
+  <data name="Nlq_VideoButton" xml:space="preserve">
+    <value>📂 Open Large Files Analyzer</value>
+  </data>
+  <data name="Nlq_UninstallText" xml:space="preserve">
+    <value>🗑️ **Deep Uninstaller and Leftover Hunter**
+
+Lets you fully uninstall programs while wiping all leftover registry keys and temporary folders in AppData.</value>
+  </data>
+  <data name="Nlq_UninstallButton" xml:space="preserve">
+    <value>🗑️ Open Uninstaller</value>
+  </data>
+  <data name="Nlq_DevText" xml:space="preserve">
+    <value>🛠️ **Development environment cleanup (Dev Super-Cleaner)**
+
+Detected a request to clean developer tooling (Rust Cargo, Gradle, Maven, Go caches, WSL2 disk images and node_modules). Running an audit!</value>
+  </data>
+  <data name="Nlq_DevButton" xml:space="preserve">
+    <value>⚡ Go to Dev cache cleanup</value>
+  </data>
+  <data name="Nlq_DeepText" xml:space="preserve">
+    <value>🛡️ **Deep Windows core cleanup (WinSxS &amp; DriverStore)**
+
+It is recommended to consolidate old Windows updates (DISM) and remove duplicate outdated drivers.</value>
+  </data>
+  <data name="Nlq_DeepButton" xml:space="preserve">
+    <value>🛡️ Open WinSxS core cleanup</value>
+  </data>
+  <data name="Nlq_DuplicatesText" xml:space="preserve">
+    <value>🔗 **Duplicate finder and Hardlink deduplication**
+
+Find duplicates and replace them with **NTFS Hardlinks**: disk space is freed while programs keep working!</value>
+  </data>
+  <data name="Nlq_DuplicatesButton" xml:space="preserve">
+    <value>🔍 Open duplicate finder</value>
+  </data>
+  <data name="Nlq_CompactText" xml:space="preserve">
+    <value>🗜️ **CompactOS &amp; LZX compression for games and folders**
+
+Transparent NTFS compression with the LZX algorithm can shrink games in Steam/Epic and folders by 30–50% with no performance loss.</value>
+  </data>
+  <data name="Nlq_CompactButton" xml:space="preserve">
+    <value>🗜️ Open compression manager</value>
+  </data>
+  <data name="Nlq_CleanText" xml:space="preserve">
+    <value>🧹 **Comprehensive system cleanup**
+
+I have checked the system: the most space can be freed safely by cleaning the Windows system cache, browser temporary files and old logs.</value>
+  </data>
+  <data name="Nlq_CleanButton" xml:space="preserve">
+    <value>🚀 Run full scan</value>
+  </data>
+  <data name="Nlq_DefaultText" xml:space="preserve">
+    <value>🤖 **Query analysis:** *"{0}"*
+
+I can help you:
+• Find heavy files and duplicates;
+• Clean development caches (WSL, Rust, npm, Gradle);
+• Compress games with CompactOS LZX (+30–50% space);
+• Clean WinSxS and outdated drivers;
+• Fully remove programs with no junk or leftovers.
+
+What exactly would you like to do?</value>
+  </data>
+  <data name="Nlq_DefaultButton" xml:space="preserve">
+    <value>🚀 Quick scan</value>
+  </data>
+  <!-- День 6, волна 6: Package maintenance errors + executor -->
+  <data name="PkgMaint_ErrActionType" xml:space="preserve">
+    <value>Invalid action type for package maintenance</value>
+  </data>
+  <data name="PkgMaint_ErrNoCommand" xml:space="preserve">
+    <value>Invalid package manager command</value>
+  </data>
+  <data name="PkgMaint_ErrCommandFailed" xml:space="preserve">
+    <value>Command launch failed: {0}: {1}</value>
+  </data>
+  <data name="PkgMaint_ErrTimeout" xml:space="preserve">
+    <value>Uninstall command timed out</value>
+  </data>
+  <data name="PkgMaint_ErrUninstallFailed" xml:space="preserve">
+    <value>Uninstall finished with an error</value>
+  </data>
+  <data name="PkgMaint_ErrReadonly" xml:space="preserve">
+    <value>Global/system packages are read-only</value>
+  </data>
+  <data name="PkgMaint_ErrNoManager" xml:space="preserve">
+    <value>No supported package manager specified</value>
+  </data>
+  <data name="PkgMaint_ErrNoPackageName" xml:space="preserve">
+    <value>No package name specified</value>
+  </data>
+  <data name="PkgMaint_ErrBadPackageName" xml:space="preserve">
+    <value>Invalid package name</value>
+  </data>
+  <data name="PkgMaint_ErrNoWorkingDir" xml:space="preserve">
+    <value>Project working directory is missing</value>
+  </data>
+  <data name="PkgMaint_ErrWorkingDirMissing" xml:space="preserve">
+    <value>Working directory does not exist</value>
+  </data>
+  <data name="PkgMaint_ErrWorkingDirOutside" xml:space="preserve">
+    <value>Working directory is outside the allowed roots</value>
+  </data>
+  <data name="PkgMaint_ErrSystemDir" xml:space="preserve">
+    <value>System directories are not allowed for uninstall</value>
+  </data>
+  <data name="PkgMaint_ErrPythonMissing" xml:space="preserve">
+    <value>Python executable for venv not found</value>
+  </data>
+  <data name="PkgMaint_ErrPythonOutside" xml:space="preserve">
+    <value>Python executable must be inside the working directory</value>
+  </data>
+  <data name="PkgExec_StartFailed" xml:space="preserve">
+    <value>Failed to start the process</value>
+  </data>
+  <data name="PkgExec_Timeout" xml:space="preserve">
+    <value>Execution timed out</value>
+  </data>
+  <!-- День 6, волна 6: Explorer context menu (Shell) -->
+  <data name="Shell_Menu_ScanFolder" xml:space="preserve">
+    <value>Scan with Puryx</value>
+  </data>
+  <data name="Shell_Menu_ScanFolderBackground" xml:space="preserve">
+    <value>Scan current folder with Puryx</value>
+  </data>
+  <data name="Shell_Menu_Analyze" xml:space="preserve">
+    <value>⚡ Analyze with Puryx</value>
+  </data>
+  <data name="Shell_Menu_Shred" xml:space="preserve">
+    <value>🔥 Shred irreversibly (DoD Shredder)</value>
+  </data>
+  <data name="Shell_Menu_Compact" xml:space="preserve">
+    <value>🗜️ Compress with CompactOS (LZX)</value>
+  </data>
+  <data name="Shell_Msg_AnalyzeRegistered" xml:space="preserve">
+    <value>Menu item "{0}" successfully added to the folder context menu!</value>
+  </data>
+  <data name="Shell_Msg_ShredRegistered" xml:space="preserve">
+    <value>Menu item "{0}" added to the file context menu!</value>
+  </data>
+  <data name="Shell_Msg_CompactRegistered" xml:space="preserve">
+    <value>Menu item "{0}" added to the folder context menu!</value>
+  </data>
+  <data name="Shell_Msg_Unregistered" xml:space="preserve">
+    <value>Menu item removed from the context menu.</value>
+  </data>
+  <data name="Shell_Err_Register" xml:space="preserve">
+    <value>Menu registration error: {0}</value>
+  </data>
+  <data name="Shell_Err_Unregister" xml:space="preserve">
+    <value>Menu removal error: {0}</value>
+  </data>
+  <!-- День 6, волна 6: System report (HTML) -->
+  <data name="Report_Title" xml:space="preserve">
+    <value>Puryx system passport and report</value>
+  </data>
+  <data name="Report_Subtitle" xml:space="preserve">
+    <value>System passport and optimization report • {0}</value>
+  </data>
+  <data name="Report_Badge" xml:space="preserve">
+    <value>SYSTEM REPORT</value>
+  </data>
+  <data name="Report_CardComputer" xml:space="preserve">
+    <value>Computer / User</value>
+  </data>
+  <data name="Report_CardOs" xml:space="preserve">
+    <value>Operating system</value>
+  </data>
+  <data name="Report_CardRam" xml:space="preserve">
+    <value>Memory (RAM)</value>
+  </data>
+  <data name="Report_CardFreed" xml:space="preserve">
+    <value>Disk space freed</value>
+  </data>
+  <data name="Report_SmartHeading" xml:space="preserve">
+    <value>💾 Drive hardware telemetry (S.M.A.R.T.)</value>
+  </data>
+  <data name="Report_ColDrive" xml:space="preserve">
+    <value>Drive / Model</value>
+  </data>
+  <data name="Report_ColType" xml:space="preserve">
+    <value>Type</value>
+  </data>
+  <data name="Report_ColBus" xml:space="preserve">
+    <value>Bus</value>
+  </data>
+  <data name="Report_ColSize" xml:space="preserve">
+    <value>Size</value>
+  </data>
+  <data name="Report_ColHealth" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="Report_ColRemaining" xml:space="preserve">
+    <value>Remaining life</value>
+  </data>
+  <data name="Report_ColTemp" xml:space="preserve">
+    <value>Temperature</value>
+  </data>
+  <data name="Report_CleanedHeading" xml:space="preserve">
+    <value>🧹 Optimized items list</value>
+  </data>
+  <data name="Report_ColPath" xml:space="preserve">
+    <value>Path / Item</value>
+  </data>
+  <data name="Report_ColItemSize" xml:space="preserve">
+    <value>Size</value>
+  </data>
+  <data name="Report_ColDescription" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="Report_PrintButton" xml:space="preserve">
+    <value>🖨️ Print / Save as PDF</value>
+  </data>
 </root>

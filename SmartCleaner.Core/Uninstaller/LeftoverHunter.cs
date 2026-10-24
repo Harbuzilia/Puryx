@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using Microsoft.VisualBasic.FileIO;
 using SmartCleaner.Core.Helpers;
+using SmartCleaner.Core.Localization;
 using SmartCleaner.Core.Models;
 using SmartCleaner.Core.Safety;
 using System.IO;
@@ -72,7 +73,7 @@ public class LeftoverHunter
                             {
                                 Path = dir,
                                 Type = LeftoverType.Folder,
-                                Description = $"Остаточная папка в {Path.GetFileName(root)}",
+                                Description = Localizer.GetString("Leftover_FolderIn", Path.GetFileName(root)),
                                 SizeBytes = size,
                                 SizeFormatted = SizeFormatter.Format(size),
                                 IsSelected = true
@@ -168,8 +169,8 @@ public class LeftoverHunter
         if (validation.CanDelete && !validation.RequiresElevation) return true;
 
         var reason = validation.BlockReason ?? (validation.RequiresElevation
-            ? "Требуются права администратора"
-            : "Заблокировано службой безопасности");
+            ? Localizer.GetString("Leftover_RequiresAdmin")
+            : Localizer.GetString("Leftover_BlockedBySafety"));
         skipped.Add($"{item.Path}: {reason}");
         return false;
     }
@@ -190,9 +191,9 @@ public class LeftoverHunter
                     {
                         Path = $@"{prefix}\{subPath}\{subName}",
                         Type = LeftoverType.RegistryKey,
-                        Description = $"Раздел реестра {subName}",
+                        Description = Localizer.GetString("Leftover_RegistryKeyIn", subName),
                         SizeBytes = 0,
-                        SizeFormatted = "Реестр",
+                        SizeFormatted = Localizer.GetString("Leftover_RegistryMarker"),
                         IsSelected = true
                     });
                 }

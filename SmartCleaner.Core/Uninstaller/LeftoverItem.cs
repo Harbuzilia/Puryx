@@ -1,4 +1,6 @@
-﻿namespace SmartCleaner.Core.Uninstaller;
+﻿using SmartCleaner.Core.Localization;
+
+namespace SmartCleaner.Core.Uninstaller;
 
 public enum LeftoverType
 {
@@ -17,13 +19,13 @@ public class LeftoverItem
     public LeftoverType Type { get; set; }
     public string TypeName => Type switch
     {
-        LeftoverType.Folder => "Папка",
-        LeftoverType.File => "Файл",
-        LeftoverType.RegistryKey => "Раздел реестра",
-        LeftoverType.RegistryValue => "Параметр реестра",
-        LeftoverType.ScheduledTask => "Задача планировщика",
-        LeftoverType.Service => "Служба",
-        _ => "Элемент"
+        LeftoverType.Folder => Localizer.GetString("Leftover_Type_Folder"),
+        LeftoverType.File => Localizer.GetString("Leftover_Type_File"),
+        LeftoverType.RegistryKey => Localizer.GetString("Leftover_Type_RegistryKey"),
+        LeftoverType.RegistryValue => Localizer.GetString("Leftover_Type_RegistryValue"),
+        LeftoverType.ScheduledTask => Localizer.GetString("Leftover_Type_ScheduledTask"),
+        LeftoverType.Service => Localizer.GetString("Leftover_Type_Service"),
+        _ => Localizer.GetString("Leftover_Type_Unknown")
     };
     public string Description { get; set; } = string.Empty;
     public long SizeBytes { get; set; }

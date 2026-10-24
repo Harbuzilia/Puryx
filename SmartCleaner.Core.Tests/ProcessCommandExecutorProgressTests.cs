@@ -74,7 +74,7 @@ public class ProcessCommandExecutorProgressTests
 
         Assert.Equal(-1, result.ExitCode);
         Assert.True(result.TimedOut);
-        Assert.Equal("Превышен таймаут выполнения", result.StandardError);
+        Assert.Equal("Execution timed out", result.StandardError);
     }
 
     [Fact]
@@ -118,7 +118,7 @@ public class ProcessCommandExecutorProgressTests
 
         Assert.True(result.TimedOut);
         Assert.Equal(-1, result.ExitCode);
-        Assert.Equal("Превышен таймаут выполнения", result.StandardError);
+        Assert.Equal("Execution timed out", result.StandardError);
         Assert.True(lines.Count > 0); // вывод действительно стримился — таймаут в середине
     }
 }

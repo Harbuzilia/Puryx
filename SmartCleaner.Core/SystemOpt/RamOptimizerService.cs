@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using SmartCleaner.Core.Helpers;
+using SmartCleaner.Core.Localization;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
@@ -88,7 +89,7 @@ public class RamOptimizerService
             Before = GetMemoryStatus()
         };
 
-        progress?.Report("Оптимизация рабочих наборов процессов и очистка кэша памяти...");
+        progress?.Report(Localizer.GetString("RamOptimizer_ProgressWorkingSets"));
 
         int count = 0;
         await Task.Run(() =>

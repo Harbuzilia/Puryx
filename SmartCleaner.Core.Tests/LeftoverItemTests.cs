@@ -9,49 +9,49 @@ public class LeftoverItemTests
     public void TypeName_Folder_ReturnsRussianName()
     {
         var item = new LeftoverItem { Type = LeftoverType.Folder };
-        Assert.Equal("Папка", item.TypeName);
+        Assert.Equal("Folder", item.TypeName);
     }
 
     [Fact]
     public void TypeName_File_ReturnsRussianName()
     {
         var item = new LeftoverItem { Type = LeftoverType.File };
-        Assert.Equal("Файл", item.TypeName);
+        Assert.Equal("File", item.TypeName);
     }
 
     [Fact]
     public void TypeName_RegistryKey_ReturnsRussianName()
     {
         var item = new LeftoverItem { Type = LeftoverType.RegistryKey };
-        Assert.Equal("Раздел реестра", item.TypeName);
+        Assert.Equal("Registry key", item.TypeName);
     }
 
     [Fact]
     public void TypeName_RegistryValue_ReturnsRussianName()
     {
         var item = new LeftoverItem { Type = LeftoverType.RegistryValue };
-        Assert.Equal("Параметр реестра", item.TypeName);
+        Assert.Equal("Registry value", item.TypeName);
     }
 
     [Fact]
     public void TypeName_ScheduledTask_ReturnsRussianName()
     {
         var item = new LeftoverItem { Type = LeftoverType.ScheduledTask };
-        Assert.Equal("Задача планировщика", item.TypeName);
+        Assert.Equal("Scheduled task", item.TypeName);
     }
 
     [Fact]
     public void TypeName_Service_ReturnsRussianName()
     {
         var item = new LeftoverItem { Type = LeftoverType.Service };
-        Assert.Equal("Служба", item.TypeName);
+        Assert.Equal("Service", item.TypeName);
     }
 
     [Fact]
     public void TypeName_Default_ReturnsElement()
     {
         var item = new LeftoverItem { Type = (LeftoverType)999 };
-        Assert.Equal("Элемент", item.TypeName);
+        Assert.Equal("Item", item.TypeName);
     }
 
     [Fact]

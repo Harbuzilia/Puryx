@@ -1,3 +1,5 @@
+using SmartCleaner.Core.Localization;
+
 namespace SmartCleaner.Core.Models;
 
 /// <summary>
@@ -26,5 +28,5 @@ public record CategorySummary
     /// <summary>Текст tooltip для sidebar</summary>
     public string TooltipText => TopItems.Count > 0
         ? string.Join("\n", TopItems)
-        : $"{ItemCount} элементов";
+        : Localizer.GetString("CategorySummary_ItemsCount", ItemCount);
 }
