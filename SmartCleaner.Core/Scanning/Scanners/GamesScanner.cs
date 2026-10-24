@@ -1,3 +1,4 @@
+using SmartCleaner.Core.Localization;
 using SmartCleaner.Core.Models;
 using SmartCleaner.Core.Safety;
 
@@ -26,31 +27,31 @@ public class GamesScanner : ScannerBase
         await Task.Run(() =>
         {
             // Steam
-            progress?.Report("Сканирование Steam...");
+            progress?.Report(Localizer.GetString("Scanner_Progress_Scanning", "Steam"));
             ScanSteam(items, ct);
 
             // Epic Games
-            progress?.Report("Сканирование Epic Games...");
+            progress?.Report(Localizer.GetString("Scanner_Progress_Scanning", "Epic Games"));
             ScanEpicGames(items, ct);
 
             // NVIDIA Shader Cache
-            progress?.Report("Сканирование NVIDIA shader cache...");
+            progress?.Report(Localizer.GetString("Scanner_Progress_Scanning", "NVIDIA shader cache"));
             ScanNvidiaCache(items, ct);
 
             // AMD Shader Cache
-            progress?.Report("Сканирование AMD shader cache...");
+            progress?.Report(Localizer.GetString("Scanner_Progress_Scanning", "AMD shader cache"));
             ScanAmdCache(items, ct);
 
             // Intel Shader Cache
-            progress?.Report("Сканирование Intel shader cache...");
+            progress?.Report(Localizer.GetString("Scanner_Progress_Scanning", "Intel shader cache"));
             ScanIntelCache(items, ct);
 
             // Unity
-            progress?.Report("Сканирование Unity...");
+            progress?.Report(Localizer.GetString("Scanner_Progress_Scanning", "Unity"));
             ScanUnity(items, ct);
 
             // Unreal Engine
-            progress?.Report("Сканирование Unreal Engine...");
+            progress?.Report(Localizer.GetString("Scanner_Progress_Scanning", "Unreal Engine"));
             ScanUnreal(items, ct);
 
         }, ct);
@@ -84,7 +85,7 @@ public class GamesScanner : ScannerBase
                     items.Add(CreateDirectoryItem(
                         appCache,
                         RiskCategory.PerformanceCache,
-                        "Кэш приложений Steam. Замедлит загрузку магазина.",
+                        Localizer.GetString("Scanner_Games_Desc_SteamAppCache"),
                         "Steam"));
                 }
             }
@@ -99,7 +100,7 @@ public class GamesScanner : ScannerBase
                     items.Add(CreateDirectoryItem(
                         depotCache,
                         RiskCategory.SafeToDelete,
-                        "Кэш загрузок Steam",
+                        Localizer.GetString("Scanner_Games_Desc_SteamDepotCache"),
                         "Steam"));
                 }
             }
@@ -114,7 +115,7 @@ public class GamesScanner : ScannerBase
                     items.Add(CreateDirectoryItem(
                         logs,
                         RiskCategory.SafeToDelete,
-                        "Логи Steam",
+                        Localizer.GetString("Scanner_Desc_AppLogs", "Steam"),
                         "Steam"));
                 }
             }
@@ -129,7 +130,7 @@ public class GamesScanner : ScannerBase
                     items.Add(CreateDirectoryItem(
                         dumps,
                         RiskCategory.SafeToDelete,
-                        "Дампы Steam",
+                        Localizer.GetString("Scanner_Desc_AppDumps", "Steam"),
                         "Steam"));
                 }
             }
@@ -144,7 +145,7 @@ public class GamesScanner : ScannerBase
                     items.Add(CreateDirectoryItem(
                         shaderCache,
                         RiskCategory.PerformanceCache,
-                        "Кэш шейдеров Steam. Первый запуск игр будет дольше.",
+                        Localizer.GetString("Scanner_Games_Desc_SteamShaderCache"),
                         "Steam"));
                 }
             }
@@ -170,7 +171,7 @@ public class GamesScanner : ScannerBase
                     items.Add(CreateDirectoryItem(
                         webCache,
                         RiskCategory.PerformanceCache,
-                        "Веб-кэш Epic Games Launcher",
+                        Localizer.GetString("Scanner_Games_Desc_EpicWebCache"),
                         "Epic Games"));
                 }
             }
@@ -185,7 +186,7 @@ public class GamesScanner : ScannerBase
                     items.Add(CreateDirectoryItem(
                         logs,
                         RiskCategory.SafeToDelete,
-                        "Логи Epic Games Launcher",
+                        Localizer.GetString("Scanner_Desc_AppLogs", "Epic Games Launcher"),
                         "Epic Games"));
                 }
             }
@@ -205,7 +206,7 @@ public class GamesScanner : ScannerBase
                     items.Add(CreateDirectoryItem(
                         vaultCache,
                         RiskCategory.PerformanceCache,
-                        "Кэш ассетов Unreal Marketplace. Может быть очень большим!",
+                        Localizer.GetString("Scanner_Games_Desc_EpicVaultCache"),
                         "Epic Games"));
                 }
             }
@@ -235,7 +236,7 @@ public class GamesScanner : ScannerBase
                     items.Add(CreateDirectoryItem(
                         path,
                         RiskCategory.PerformanceCache,
-                        $"Кэш шейдеров NVIDIA ({name}). После очистки игры могут подтормаживать.",
+                        Localizer.GetString("Scanner_Games_Desc_NvidiaShaderCache", name),
                         "NVIDIA"));
                 }
             }
@@ -265,7 +266,7 @@ public class GamesScanner : ScannerBase
                     items.Add(CreateDirectoryItem(
                         path,
                         RiskCategory.PerformanceCache,
-                        $"Кэш шейдеров AMD ({name}). После очистки игры могут подтормаживать.",
+                        Localizer.GetString("Scanner_Games_Desc_AmdShaderCache", name),
                         "AMD"));
                 }
             }
@@ -286,7 +287,7 @@ public class GamesScanner : ScannerBase
                 items.Add(CreateDirectoryItem(
                     path,
                     RiskCategory.PerformanceCache,
-                    "Кэш шейдеров Intel",
+                    Localizer.GetString("Scanner_Games_Desc_IntelShaderCache"),
                     "Intel"));
             }
         }
@@ -310,7 +311,7 @@ public class GamesScanner : ScannerBase
                     items.Add(CreateDirectoryItem(
                         cache,
                         RiskCategory.PerformanceCache,
-                        "Кэш Unity Hub/Editor",
+                        Localizer.GetString("Scanner_Games_Desc_UnityCache"),
                         "Unity"));
                 }
             }
@@ -340,7 +341,7 @@ public class GamesScanner : ScannerBase
                         items.Add(CreateDirectoryItem(
                             ddc,
                             RiskCategory.PerformanceCache,
-                            $"DerivedDataCache UE {version}. Может занимать гигабайты!",
+                            Localizer.GetString("Scanner_Games_Desc_UnrealDdc", version),
                             "Unreal Engine"));
                     }
                 }
@@ -355,7 +356,7 @@ public class GamesScanner : ScannerBase
                         items.Add(CreateDirectoryItem(
                             logs,
                             RiskCategory.SafeToDelete,
-                            "Логи Unreal Engine",
+                            Localizer.GetString("Scanner_Desc_AppLogs", "Unreal Engine"),
                             "Unreal Engine"));
                     }
                 }
@@ -370,7 +371,7 @@ public class GamesScanner : ScannerBase
                         items.Add(CreateDirectoryItem(
                             crashes,
                             RiskCategory.SafeToDelete,
-                            "Отчёты о сбоях UE",
+                            Localizer.GetString("Scanner_Games_Desc_UnrealCrashes"),
                             "Unreal Engine"));
                     }
                 }

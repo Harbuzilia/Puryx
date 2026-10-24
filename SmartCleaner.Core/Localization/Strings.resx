@@ -2857,7 +2857,110 @@ Remove these entries from the system registry?</value>
   <data name="Scanner_System_Expl_Thumbcache" xml:space="preserve">
     <value>Cached previews of images/videos in Explorer</value>
   </data>
-  <data name="Scanner_System_HowTo_Thumbcache" xml:space="preserve">
-    <value>Re-created when browsing folders. The first opening of a photo folder will be slower</value>
+  <!-- Day 6a, wave 2: Browser / AIAgents / Games / NodeModules -->
+  <data name="Scanner_Progress_Checking" xml:space="preserve">
+    <value>Checking {0}...</value>
+  </data>
+  <data name="Scanner_Desc_JavaScriptCache" xml:space="preserve">
+    <value>JavaScript code cache</value>
+  </data>
+  <data name="Scanner_Desc_GpuCache" xml:space="preserve">
+    <value>GPU cache</value>
+  </data>
+  <data name="Scanner_Desc_ShaderCache" xml:space="preserve">
+    <value>Shader cache</value>
+  </data>
+  <data name="Scanner_Desc_AppCache" xml:space="preserve">
+    <value>Application cache</value>
+  </data>
+  <data name="Scanner_Desc_CachedData" xml:space="preserve">
+    <value>Cached data</value>
+  </data>
+  <data name="Scanner_Desc_LogFiles" xml:space="preserve">
+    <value>Log files</value>
+  </data>
+  <data name="Scanner_Desc_CacheOf" xml:space="preserve">
+    <value>Cache: {0}</value>
+  </data>
+  <data name="Scanner_Desc_ProtectedUserData" xml:space="preserve">
+    <value>⚠️ PROTECTED — contains user data</value>
+  </data>
+  <data name="Scanner_Desc_FullyProtectedAgent" xml:space="preserve">
+    <value>🔒 FULLY PROTECTED — {0} stores critical data</value>
+  </data>
+  <data name="Scanner_Desc_AppLogs" xml:space="preserve">
+    <value>{0} logs</value>
+  </data>
+  <data name="Scanner_Desc_AppDumps" xml:space="preserve">
+    <value>{0} dumps</value>
+  </data>
+  <data name="Scanner_Browser_Desc_PagesCache" xml:space="preserve">
+    <value>Page and image cache</value>
+  </data>
+  <data name="Scanner_Browser_Desc_ServiceWorkerCache" xml:space="preserve">
+    <value>Service Worker cache</value>
+  </data>
+  <data name="Scanner_Browser_Desc_BrowserCache" xml:space="preserve">
+    <value>Browser cache</value>
+  </data>
+  <data name="Scanner_Browser_Desc_FirefoxPagesCache" xml:space="preserve">
+    <value>Firefox page cache</value>
+  </data>
+  <data name="Scanner_Browser_Desc_FirefoxShaderCache" xml:space="preserve">
+    <value>Firefox shader cache</value>
+  </data>
+  <data name="Scanner_Browser_Desc_FirefoxStartupCache" xml:space="preserve">
+    <value>Firefox startup cache</value>
+  </data>
+  <data name="Scanner_Games_Desc_SteamAppCache" xml:space="preserve">
+    <value>Steam app cache. Will slow down store loading.</value>
+  </data>
+  <data name="Scanner_Games_Desc_SteamDepotCache" xml:space="preserve">
+    <value>Steam download cache</value>
+  </data>
+  <data name="Scanner_Games_Desc_SteamShaderCache" xml:space="preserve">
+    <value>Steam shader cache. First game launches will take longer.</value>
+  </data>
+  <data name="Scanner_Games_Desc_EpicWebCache" xml:space="preserve">
+    <value>Epic Games Launcher web cache</value>
+  </data>
+  <data name="Scanner_Games_Desc_EpicVaultCache" xml:space="preserve">
+    <value>Unreal Marketplace asset cache. Can be very large!</value>
+  </data>
+  <data name="Scanner_Games_Desc_NvidiaShaderCache" xml:space="preserve">
+    <value>NVIDIA shader cache ({0}). Games may stutter after cleaning.</value>
+  </data>
+  <data name="Scanner_Games_Desc_AmdShaderCache" xml:space="preserve">
+    <value>AMD shader cache ({0}). Games may stutter after cleaning.</value>
+  </data>
+  <data name="Scanner_Games_Desc_IntelShaderCache" xml:space="preserve">
+    <value>Intel shader cache</value>
+  </data>
+  <data name="Scanner_Games_Desc_UnityCache" xml:space="preserve">
+    <value>Unity Hub/Editor cache</value>
+  </data>
+  <data name="Scanner_Games_Desc_UnrealDdc" xml:space="preserve">
+    <value>DerivedDataCache of UE {0}. Can take up gigabytes!</value>
+  </data>
+  <data name="Scanner_Games_Desc_UnrealCrashes" xml:space="preserve">
+    <value>UE crash reports</value>
+  </data>
+  <data name="Scanner_NodeModules_Progress_Searching" xml:space="preserve">
+    <value>Searching for node_modules in {0}...</value>
+  </data>
+  <data name="Scanner_NodeModules_Progress_Found" xml:space="preserve">
+    <value>Found: {0} ({1})</value>
+  </data>
+  <data name="Scanner_NodeModules_Desc_RecentlyActive" xml:space="preserve">
+    <value>📅 Used {0:0} days ago — recently active project</value>
+  </data>
+  <data name="Scanner_NodeModules_Desc_NoLockFile" xml:space="preserve">
+    <value>⚠️ No lock file — cannot restore automatically</value>
+  </data>
+  <data name="Scanner_NodeModules_Desc_IdleDays" xml:space="preserve">
+    <value>📅 {0:0} days without access</value>
+  </data>
+  <data name="Scanner_NodeModules_ParentProject" xml:space="preserve">
+    <value>Project: {0}</value>
   </data>
 </root>

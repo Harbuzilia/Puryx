@@ -1,3 +1,4 @@
+using SmartCleaner.Core.Localization;
 using SmartCleaner.Core.Models;
 using SmartCleaner.Core.Safety;
 
@@ -64,12 +65,12 @@ public class BrowserScanner : ScannerBase
             foreach (var (name, pathTemplate) in ChromiumBrowsers)
             {
                 ct.ThrowIfCancellationRequested();
-                progress?.Report($"Сканирование {name}...");
+                progress?.Report(Localizer.GetString("Scanner_Progress_Scanning", name));
                 ScanChromiumBrowser(items, name, pathTemplate, ct);
             }
 
             // Firefox
-            progress?.Report("Сканирование Firefox...");
+            progress?.Report(Localizer.GetString("Scanner_Progress_Scanning", "Firefox"));
             ScanFirefox(items, ct);
 
         }, ct);
@@ -127,12 +128,12 @@ public class BrowserScanner : ScannerBase
                         {
                             var description = cacheFolder switch
                             {
-                                "Cache" => "Кэш страниц и изображений",
-                                "Code Cache" => "Кэш JavaScript кода",
-                                "GPUCache" => "Кэш GPU",
-                                _ when cacheFolder.Contains("Service Worker") => "Кэш Service Worker",
-                                _ when cacheFolder.Contains("Shader") => "Кэш шейдеров",
-                                _ => "Кэш браузера"
+                                "Cache" => Localizer.GetString("Scanner_Browser_Desc_PagesCache"),
+                                "Code Cache" => Localizer.GetString("Scanner_Desc_JavaScriptCache"),
+                                "GPUCache" => Localizer.GetString("Scanner_Desc_GpuCache"),
+                                _ when cacheFolder.Contains("Service Worker") => Localizer.GetString("Scanner_Browser_Desc_ServiceWorkerCache"),
+                                _ when cacheFolder.Contains("Shader") => Localizer.GetString("Scanner_Desc_ShaderCache"),
+                                _ => Localizer.GetString("Scanner_Browser_Desc_BrowserCache")
                             };
 
                             items.Add(new ScannedItem
@@ -164,7 +165,7 @@ public class BrowserScanner : ScannerBase
                         items.Add(CreateDirectoryItem(
                             cachePath, 
                             RiskCategory.PerformanceCache, 
-                            "Кэш шейдеров",
+                            Localizer.GetString("Scanner_Desc_ShaderCache"),
                             browserName));
                     }
                 }
@@ -195,7 +196,7 @@ public class BrowserScanner : ScannerBase
                         items.Add(CreateDirectoryItem(
                             cache2Path,
                             RiskCategory.PerformanceCache,
-                            "Кэш страниц Firefox",
+                            Localizer.GetString("Scanner_Browser_Desc_FirefoxPagesCache"),
                             "Firefox"));
                     }
                 }
@@ -210,7 +211,7 @@ public class BrowserScanner : ScannerBase
                         items.Add(CreateDirectoryItem(
                             shaderPath,
                             RiskCategory.PerformanceCache,
-                            "Кэш шейдеров Firefox",
+                            Localizer.GetString("Scanner_Browser_Desc_FirefoxShaderCache"),
                             "Firefox"));
                     }
                 }
@@ -225,7 +226,7 @@ public class BrowserScanner : ScannerBase
                         items.Add(CreateDirectoryItem(
                             startupCachePath,
                             RiskCategory.PerformanceCache,
-                            "Кэш запуска Firefox",
+                            Localizer.GetString("Scanner_Browser_Desc_FirefoxStartupCache"),
                             "Firefox"));
                     }
                 }

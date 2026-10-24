@@ -1,3 +1,4 @@
+using SmartCleaner.Core.Localization;
 using SmartCleaner.Core.Models;
 using SmartCleaner.Core.Safety;
 using SmartCleaner.Core.Services;
@@ -60,7 +61,7 @@ public class NodeModulesScanner : ScannerBase
                     continue;
                 }
 
-                progress?.Report($"Поиск node_modules в {scanPath}...");
+                progress?.Report(Localizer.GetString("Scanner_NodeModules_Progress_Searching", scanPath));
                 FindNodeModules(scanPath, items, progress, ct, maxDepth: 5);
             }
         }, ct);
@@ -149,7 +150,7 @@ public class NodeModulesScanner : ScannerBase
             var projectPath = Path.GetDirectoryName(path) ?? path;
             var projectName = Path.GetFileName(projectPath);
 
-            progress?.Report($"Найден: {projectName} ({FormatSize(size)})");
+            progress?.Report(Localizer.GetString("Scanner_NodeModules_Progress_Found", projectName, FormatSize(size)));
 
             // Проверяем наличие lock-файла
             var hasLockFile = HasLockFile(projectPath);
@@ -162,17 +163,17 @@ public class NodeModulesScanner : ScannerBase
             if (daysSinceAccess < MinAgeDays)
             {
                 risk = RiskCategory.PerformanceCache;
-                description = $"📅 Использовался {daysSinceAccess:0} дней назад — недавно активный проект";
+                description = Localizer.GetString("Scanner_NodeModules_Desc_RecentlyActive", daysSinceAccess);
             }
             else if (!hasLockFile)
             {
                 risk = RiskCategory.PerformanceCache;
-                description = "⚠️ Нет lock-файла — невозможно автоматически восстановить";
+                description = Localizer.GetString("Scanner_NodeModules_Desc_NoLockFile");
             }
             else
             {
                 risk = RiskCategory.SafeToDelete;
-                description = $"📅 {daysSinceAccess:0} дней без доступа";
+                description = Localizer.GetString("Scanner_NodeModules_Desc_IdleDays", daysSinceAccess);
             }
 
             items.Add(new ScannedItem
@@ -183,7 +184,7 @@ public class NodeModulesScanner : ScannerBase
                 Risk = risk,
                 Description = description,
                 IsDirectory = true,
-                ParentApp = $"Проект: {projectName}",
+                ParentApp = Localizer.GetString("Scanner_NodeModules_ParentProject", projectName),
                 RestoreCommand = restoreCommand,
                 IsSelected = risk == RiskCategory.SafeToDelete && daysSinceAccess >= MinAgeDays
             });

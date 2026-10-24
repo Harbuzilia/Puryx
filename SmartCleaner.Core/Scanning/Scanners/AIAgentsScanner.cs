@@ -1,3 +1,4 @@
+using SmartCleaner.Core.Localization;
 using SmartCleaner.Core.Models;
 using SmartCleaner.Core.Safety;
 
@@ -81,7 +82,7 @@ public class AIAgentsScanner : ScannerBase
             foreach (var (key, agent) in Agents)
             {
                 ct.ThrowIfCancellationRequested();
-                progress?.Report($"Сканирование {agent.DisplayName}...");
+                progress?.Report(Localizer.GetString("Scanner_Progress_Scanning", agent.DisplayName));
                 ScanAgent(items, agent, ct);
             }
 
@@ -89,7 +90,7 @@ public class AIAgentsScanner : ScannerBase
             foreach (var (name, paths) in ProtectedAgents)
             {
                 ct.ThrowIfCancellationRequested();
-                progress?.Report($"Проверка {name}...");
+                progress?.Report(Localizer.GetString("Scanner_Progress_Checking", name));
                 ShowProtectedAgent(items, name, paths);
             }
 
@@ -125,12 +126,12 @@ public class AIAgentsScanner : ScannerBase
                         {
                             var description = cacheFolder.ToLowerInvariant() switch
                             {
-                                "cache" => "Кэш приложения",
-                                "cacheddata" => "Кэшированные данные",
-                                "code cache" => "Кэш JavaScript кода",
-                                "gpucache" => "Кэш GPU",
-                                "logs" => "Файлы логов",
-                                _ => $"Кэш: {cacheFolder}"
+                                "cache" => Localizer.GetString("Scanner_Desc_AppCache"),
+                                "cacheddata" => Localizer.GetString("Scanner_Desc_CachedData"),
+                                "code cache" => Localizer.GetString("Scanner_Desc_JavaScriptCache"),
+                                "gpucache" => Localizer.GetString("Scanner_Desc_GpuCache"),
+                                "logs" => Localizer.GetString("Scanner_Desc_LogFiles"),
+                                _ => Localizer.GetString("Scanner_Desc_CacheOf", cacheFolder)
                             };
 
                             items.Add(new ScannedItem
@@ -165,7 +166,7 @@ public class AIAgentsScanner : ScannerBase
                                 Size = size,
                                 LastAccess = GetLastAccess(protectedPath),
                                 Risk = RiskCategory.UserData,
-                                Description = "⚠️ ЗАЩИЩЕНО — содержит пользовательские данные",
+                                Description = Localizer.GetString("Scanner_Desc_ProtectedUserData"),
                                 IsDirectory = true,
                                 ParentApp = agent.DisplayName,
                                 IsSelected = false
@@ -197,7 +198,7 @@ public class AIAgentsScanner : ScannerBase
                         Size = size,
                         LastAccess = GetLastAccess(path),
                         Risk = RiskCategory.UserData,
-                        Description = $"🔒 ПОЛНОСТЬЮ ЗАЩИЩЕНО — {agentName} хранит критичные данные",
+                        Description = Localizer.GetString("Scanner_Desc_FullyProtectedAgent", agentName),
                         IsDirectory = true,
                         ParentApp = agentName,
                         IsSelected = false

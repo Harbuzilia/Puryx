@@ -2857,7 +2857,110 @@ Windows может использовать эти драйверы прямо �
   <data name="Scanner_System_Expl_Thumbcache" xml:space="preserve">
     <value>Кэшированные превью изображений/видео в проводнике</value>
   </data>
-  <data name="Scanner_System_HowTo_Thumbcache" xml:space="preserve">
-    <value>Пересоздаётся при просмотре папок. Первое открытие папки с фото будет медленнее</value>
+  <!-- День 6а, волна 2: Browser / AIAgents / Games / NodeModules -->
+  <data name="Scanner_Progress_Checking" xml:space="preserve">
+    <value>Проверка {0}...</value>
+  </data>
+  <data name="Scanner_Desc_JavaScriptCache" xml:space="preserve">
+    <value>Кэш JavaScript кода</value>
+  </data>
+  <data name="Scanner_Desc_GpuCache" xml:space="preserve">
+    <value>Кэш GPU</value>
+  </data>
+  <data name="Scanner_Desc_ShaderCache" xml:space="preserve">
+    <value>Кэш шейдеров</value>
+  </data>
+  <data name="Scanner_Desc_AppCache" xml:space="preserve">
+    <value>Кэш приложения</value>
+  </data>
+  <data name="Scanner_Desc_CachedData" xml:space="preserve">
+    <value>Кэшированные данные</value>
+  </data>
+  <data name="Scanner_Desc_LogFiles" xml:space="preserve">
+    <value>Файлы логов</value>
+  </data>
+  <data name="Scanner_Desc_CacheOf" xml:space="preserve">
+    <value>Кэш: {0}</value>
+  </data>
+  <data name="Scanner_Desc_ProtectedUserData" xml:space="preserve">
+    <value>⚠️ ЗАЩИЩЕНО — содержит пользовательские данные</value>
+  </data>
+  <data name="Scanner_Desc_FullyProtectedAgent" xml:space="preserve">
+    <value>🔒 ПОЛНОСТЬЮ ЗАЩИЩЕНО — {0} хранит критичные данные</value>
+  </data>
+  <data name="Scanner_Desc_AppLogs" xml:space="preserve">
+    <value>Логи {0}</value>
+  </data>
+  <data name="Scanner_Desc_AppDumps" xml:space="preserve">
+    <value>Дампы {0}</value>
+  </data>
+  <data name="Scanner_Browser_Desc_PagesCache" xml:space="preserve">
+    <value>Кэш страниц и изображений</value>
+  </data>
+  <data name="Scanner_Browser_Desc_ServiceWorkerCache" xml:space="preserve">
+    <value>Кэш Service Worker</value>
+  </data>
+  <data name="Scanner_Browser_Desc_BrowserCache" xml:space="preserve">
+    <value>Кэш браузера</value>
+  </data>
+  <data name="Scanner_Browser_Desc_FirefoxPagesCache" xml:space="preserve">
+    <value>Кэш страниц Firefox</value>
+  </data>
+  <data name="Scanner_Browser_Desc_FirefoxShaderCache" xml:space="preserve">
+    <value>Кэш шейдеров Firefox</value>
+  </data>
+  <data name="Scanner_Browser_Desc_FirefoxStartupCache" xml:space="preserve">
+    <value>Кэш запуска Firefox</value>
+  </data>
+  <data name="Scanner_Games_Desc_SteamAppCache" xml:space="preserve">
+    <value>Кэш приложений Steam. Замедлит загрузку магазина.</value>
+  </data>
+  <data name="Scanner_Games_Desc_SteamDepotCache" xml:space="preserve">
+    <value>Кэш загрузок Steam</value>
+  </data>
+  <data name="Scanner_Games_Desc_SteamShaderCache" xml:space="preserve">
+    <value>Кэш шейдеров Steam. Первый запуск игр будет дольше.</value>
+  </data>
+  <data name="Scanner_Games_Desc_EpicWebCache" xml:space="preserve">
+    <value>Веб-кэш Epic Games Launcher</value>
+  </data>
+  <data name="Scanner_Games_Desc_EpicVaultCache" xml:space="preserve">
+    <value>Кэш ассетов Unreal Marketplace. Может быть очень большим!</value>
+  </data>
+  <data name="Scanner_Games_Desc_NvidiaShaderCache" xml:space="preserve">
+    <value>Кэш шейдеров NVIDIA ({0}). После очистки игры могут подтормаживать.</value>
+  </data>
+  <data name="Scanner_Games_Desc_AmdShaderCache" xml:space="preserve">
+    <value>Кэш шейдеров AMD ({0}). После очистки игры могут подтормаживать.</value>
+  </data>
+  <data name="Scanner_Games_Desc_IntelShaderCache" xml:space="preserve">
+    <value>Кэш шейдеров Intel</value>
+  </data>
+  <data name="Scanner_Games_Desc_UnityCache" xml:space="preserve">
+    <value>Кэш Unity Hub/Editor</value>
+  </data>
+  <data name="Scanner_Games_Desc_UnrealDdc" xml:space="preserve">
+    <value>DerivedDataCache UE {0}. Может занимать гигабайты!</value>
+  </data>
+  <data name="Scanner_Games_Desc_UnrealCrashes" xml:space="preserve">
+    <value>Отчёты о сбоях UE</value>
+  </data>
+  <data name="Scanner_NodeModules_Progress_Searching" xml:space="preserve">
+    <value>Поиск node_modules в {0}...</value>
+  </data>
+  <data name="Scanner_NodeModules_Progress_Found" xml:space="preserve">
+    <value>Найден: {0} ({1})</value>
+  </data>
+  <data name="Scanner_NodeModules_Desc_RecentlyActive" xml:space="preserve">
+    <value>📅 Использовался {0:0} дней назад — недавно активный проект</value>
+  </data>
+  <data name="Scanner_NodeModules_Desc_NoLockFile" xml:space="preserve">
+    <value>⚠️ Нет lock-файла — невозможно автоматически восстановить</value>
+  </data>
+  <data name="Scanner_NodeModules_Desc_IdleDays" xml:space="preserve">
+    <value>📅 {0:0} дней без доступа</value>
+  </data>
+  <data name="Scanner_NodeModules_ParentProject" xml:space="preserve">
+    <value>Проект: {0}</value>
   </data>
 </root>
