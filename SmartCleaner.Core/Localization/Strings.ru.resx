@@ -4011,4 +4011,19 @@ Windows может использовать эти драйверы прямо �
   <data name="MainWindow_CleanOverlayTitle" xml:space="preserve">
     <value>Выполняется безопасная очистка</value>
   </data>
+  <data name="Size_Unit_Bytes" xml:space="preserve">
+    <value>Б</value>
+  </data>
+  <data name="Size_Unit_KB" xml:space="preserve">
+    <value>КБ</value>
+  </data>
+  <data name="Size_Unit_MB" xml:space="preserve">
+    <value>МБ</value>
+  </data>
+  <data name="Size_Unit_GB" xml:space="preserve">
+    <value>ГБ</value>
+  </data>
+  <data name="Size_Unit_TB" xml:space="preserve">
+    <value>ТБ</value>
+  </data>
 </root>

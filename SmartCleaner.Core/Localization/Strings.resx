@@ -4011,4 +4011,19 @@ What exactly would you like to do?</value>
   <data name="MainWindow_CleanOverlayTitle" xml:space="preserve">
     <value>Safe cleanup in progress</value>
   </data>
+  <data name="Size_Unit_Bytes" xml:space="preserve">
+    <value>B</value>
+  </data>
+  <data name="Size_Unit_KB" xml:space="preserve">
+    <value>KB</value>
+  </data>
+  <data name="Size_Unit_MB" xml:space="preserve">
+    <value>MB</value>
+  </data>
+  <data name="Size_Unit_GB" xml:space="preserve">
+    <value>GB</value>
+  </data>
+  <data name="Size_Unit_TB" xml:space="preserve">
+    <value>TB</value>
+  </data>
 </root>

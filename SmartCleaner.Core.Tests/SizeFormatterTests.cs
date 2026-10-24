@@ -1,10 +1,27 @@
+using System.Globalization;
 using SmartCleaner.Core.Helpers;
+using SmartCleaner.Core.Localization;
 using Xunit;
 
 namespace SmartCleaner.Core.Tests;
 
-public class SizeFormatterTests
+public class SizeFormatterTests : IDisposable
 {
+    private readonly CultureInfo? _originalLocalizerCulture = Localizer.Culture;
+
+    public SizeFormatterTests()
+    {
+        // День 6б (фаза L): юниты размера идут через Localizer — существующие
+        // ассерты пиннят RU-юниты; Culture фиксируется для детерминизма,
+        // Dispose восстанавливает (паттерн LocalizationTests)
+        Localizer.Culture = new CultureInfo("ru");
+    }
+
+    public void Dispose()
+    {
+        Localizer.Culture = _originalLocalizerCulture;
+    }
+
     private static string BuildExpected(string fmt)
     {
         // SizeFormatter uses current culture for decimal separator
@@ -55,5 +72,28 @@ public class SizeFormatterTests
     {
         var result = SizeFormatter.Format(bytes);
         Assert.Equal(BuildExpected(expected), result);
+    }
+
+    /// <summary>
+    /// День 6б (фаза L): юниты размера локализуются через Localizer.
+    /// Найдено смоуком: «0 Б» в статс-пилюлях EN-главной. EN-культура
+    /// обязана давать B/KB/MB/GB/TB, RU — Б/КБ/МБ/ГБ/ТБ.
+    /// </summary>
+    [Fact]
+    public void Format_EnglishNeutralCulture_UsesEnglishUnits()
+    {
+        Localizer.Culture = CultureInfo.InvariantCulture;
+
+        Assert.Equal(BuildExpected("1.5 KB"), SizeFormatter.Format(1536));
+        Assert.Equal(BuildExpected("2 GB"), SizeFormatter.Format(1024L * 1024 * 1024 * 2));
+    }
+
+    [Fact]
+    public void Format_RussianCulture_UsesRussianUnits()
+    {
+        Localizer.Culture = new CultureInfo("ru");
+
+        Assert.Equal(BuildExpected("1.5 КБ"), SizeFormatter.Format(1536));
+        Assert.Equal(BuildExpected("2 ГБ"), SizeFormatter.Format(1024L * 1024 * 1024 * 2));
     }
 }
