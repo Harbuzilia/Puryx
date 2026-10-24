@@ -1529,4 +1529,261 @@ Skipped {0}:
   <data name="Scheduler_Status_TaskRemoved" xml:space="preserve">
     <value>🗑️ Task removed from Task Scheduler.</value>
   </data>
+  <data name="Common_Caption_Error" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="Common_Caption_CleanDone" xml:space="preserve">
+    <value>Cleanup Complete</value>
+  </data>
+  <data name="Compact_Status_PressAnalyze" xml:space="preserve">
+    <value>Press "Find compression targets" to analyze installed games and programs</value>
+  </data>
+  <data name="Compact_Status_Searching" xml:space="preserve">
+    <value>Searching for installed games and heavy development folders...</value>
+  </data>
+  <data name="Compact_Status_Found" xml:space="preserve">
+    <value>Found {0} items ({1}). Estimated savings: ~{2}</value>
+  </data>
+  <data name="Compact_Status_SearchError" xml:space="preserve">
+    <value>Search error: {0}</value>
+  </data>
+  <data name="Compact_CompressConfirmBody" xml:space="preserve">
+    <value>Apply transparent NTFS compression (algorithm {0}) to:
+
+{1}
+Path: {2}
+Size: {3}
+
+Files remain fully accessible; decompression happens on the fly with no performance loss.</value>
+  </data>
+  <data name="Compact_CompressConfirmCaption" xml:space="preserve">
+    <value>CompactOS LZX Compression Confirmation</value>
+  </data>
+  <data name="Compact_Status_CompressedSaved" xml:space="preserve">
+    <value>Compressed ({0} saved)</value>
+  </data>
+  <data name="Compact_Status_CompressedNoData" xml:space="preserve">
+    <value>Compressed (savings: n/a)</value>
+  </data>
+  <data name="Compact_Caption_CompressDone" xml:space="preserve">
+    <value>Compression Complete</value>
+  </data>
+  <data name="Compact_Status_NotCompressed" xml:space="preserve">
+    <value>Not compressed</value>
+  </data>
+  <data name="Compact_Caption_DecompressDone" xml:space="preserve">
+    <value>Decompression Complete</value>
+  </data>
+  <data name="SystemDeepClean_Status_PressAudit" xml:space="preserve">
+    <value>Press "Run system audit" to check WinSxS and old drivers</value>
+  </data>
+  <data name="SystemDeepClean_Status_Analyzing" xml:space="preserve">
+    <value>Analyzing the WinSxS component store and DriverStore...</value>
+  </data>
+  <data name="SystemDeepClean_Status_SearchingDrivers" xml:space="preserve">
+    <value>Searching for outdated driver duplicates...</value>
+  </data>
+  <data name="SystemDeepClean_Status_WinSxSSummaryOk" xml:space="preserve">
+    <value>{0} can be freed in WinSxS</value>
+  </data>
+  <data name="SystemDeepClean_Status_WinSxSSummaryUnavailable" xml:space="preserve">
+    <value>WinSxS analysis unavailable: {0}</value>
+  </data>
+  <data name="SystemDeepClean_Status_AuditDone" xml:space="preserve">
+    <value>Audit complete! {0}. Found {1} old drivers.</value>
+  </data>
+  <data name="SystemDeepClean_Status_AuditError" xml:space="preserve">
+    <value>Audit error: {0}</value>
+  </data>
+  <data name="SystemDeepClean_Confirm_ReclaimKnown" xml:space="preserve">
+    <value>• Up to {0} can be freed based on the latest DISM analysis.</value>
+  </data>
+  <data name="SystemDeepClean_Confirm_ReclaimUnknown" xml:space="preserve">
+    <value>• The reclaimable amount is unknown in advance (DISM analysis not run or unavailable); only the actual cleanup will show the result.</value>
+  </data>
+  <data name="SystemDeepClean_Confirm_Body" xml:space="preserve">
+    <value>Run consolidation and cleanup of the Windows component store (WinSxS /StartComponentCleanup)?
+
+• Outdated component versions will be removed; installed updates will remain removable.
+{0}
+• The process may take 3-10 minutes.</value>
+  </data>
+  <data name="SystemDeepClean_Caption_CleanWinSxS" xml:space="preserve">
+    <value>WinSxS Cleanup</value>
+  </data>
+  <data name="SystemDeepClean_Confirm_ResetBaseBody" xml:space="preserve">
+    <value>Additionally apply /ResetBase (IRREVERSIBLE)?
+
+• All superseded update components will be removed permanently.
+• After /ResetBase, installed Windows updates CANNOT be uninstalled — only a full Windows reinstall.
+• "No" — regular reversible cleanup (recommended).</value>
+  </data>
+  <data name="SystemDeepClean_Caption_ResetBase" xml:space="preserve">
+    <value>Irreversible /ResetBase Operation</value>
+  </data>
+  <data name="SystemDeepClean_Status_CleaningDeep" xml:space="preserve">
+    <value>Deep WinSxS cleanup in progress (DISM + /ResetBase)... Please wait.</value>
+  </data>
+  <data name="SystemDeepClean_Status_Cleaning" xml:space="preserve">
+    <value>WinSxS cleanup in progress (DISM)... Please wait.</value>
+  </data>
+  <data name="SystemDeepClean_Caption_CleanWinSxDone" xml:space="preserve">
+    <value>WinSxS Cleanup Complete</value>
+  </data>
+  <data name="SystemDeepClean_WinSxSCleanedValue" xml:space="preserve">
+    <value>0 B (Cleaned)</value>
+  </data>
+  <data name="SystemDeepClean_Confirm_DriversBody" xml:space="preserve">
+    <value>Delete {0} outdated driver duplicates from DriverStore via PnPUtil?
+
+• Deletion runs without the /force flag: drivers currently used by the system will NOT be removed.
+• Forced deletion (/force) — only with a separate confirmation if something fails to delete.</value>
+  </data>
+  <data name="SystemDeepClean_Caption_CleanDriverStore" xml:space="preserve">
+    <value>DriverStore Cleanup</value>
+  </data>
+  <data name="SystemDeepClean_Status_RemovingDrivers" xml:space="preserve">
+    <value>Removing outdated drivers...</value>
+  </data>
+  <data name="SystemDeepClean_Confirm_ForceBody" xml:space="preserve">
+    <value>Packages not removed: {0}.
+{1}
+
+Windows may be using these drivers right now.
+Force-remove them with the /force flag? This may break device operation.</value>
+  </data>
+  <data name="SystemDeepClean_Status_DriversRemovedOk" xml:space="preserve">
+    <value>Successfully removed {0} outdated driver packages!</value>
+  </data>
+  <data name="SystemDeepClean_Status_DriversRemovedPartial" xml:space="preserve">
+    <value>Removed {0}; not removed: {1} (drivers may be in use by the system).</value>
+  </data>
+  <data name="SystemDeepClean_Msg_DriversRemovedSummary" xml:space="preserve">
+    <value>Drivers removed: {0}. Not removed: {1}.</value>
+  </data>
+  <data name="Plugins_Status_PressScan" xml:space="preserve">
+    <value>Press "Scan plugins" to audit installed extensions</value>
+  </data>
+  <data name="Plugins_Status_Loading" xml:space="preserve">
+    <value>Loading plugins and manifests...</value>
+  </data>
+  <data name="Plugins_Status_Scanning" xml:space="preserve">
+    <value>Scanning plugin items...</value>
+  </data>
+  <data name="Plugins_Status_Loaded" xml:space="preserve">
+    <value>Loaded {0} plugins. Cleanable items found: {1}.</value>
+  </data>
+  <data name="Plugins_Confirm_CleanBody" xml:space="preserve">
+    <value>Clean {0} items detected by community plugins?</value>
+  </data>
+  <data name="Plugins_Caption_Clean" xml:space="preserve">
+    <value>Plugin Rules Cleanup</value>
+  </data>
+  <data name="Plugins_Status_Cleaning" xml:space="preserve">
+    <value>Plugin cleanup in progress...</value>
+  </data>
+  <data name="Plugins_Status_SkippedSuffix" xml:space="preserve">
+    <value>
+Skipped (security policy): {0}.</value>
+  </data>
+  <data name="Plugins_Status_CleanedOk" xml:space="preserve">
+    <value>Successfully cleaned {0} items (Freed: {1})!</value>
+  </data>
+  <data name="Plugins_Msg_CleanDone" xml:space="preserve">
+    <value>Cleaned {0} items ({1}).{2}</value>
+  </data>
+  <data name="AiAssistant_Msg_Welcome" xml:space="preserve">
+    <value>👋 **Hello! I'm your disk optimization AI assistant.**
+
+You can talk to me in plain human language, for example:
+• *«Find all videos larger than 2 GB»*
+• *«Free up 15 GB for a new game install»*
+• *«Clean up junk from Node.js and Rust»*
+• *«Compress games in Steam»*
+• *«Find and delete old drivers»*
+
+How can I help right now?</value>
+  </data>
+  <data name="AiAssistant_Msg_ProcessError" xml:space="preserve">
+    <value>⚠ Could not process the request: {0}
+Try rephrasing your question.</value>
+  </data>
+  <data name="RamOptimizer_Status_Ready" xml:space="preserve">
+    <value>Ready to analyze and optimize RAM, databases and SSDs</value>
+  </data>
+  <data name="RamOptimizer_Status_GameBoostOff" xml:space="preserve">
+    <value>Turbo mode is not active</value>
+  </data>
+  <data name="RamOptimizer_Status_OptimizingRam" xml:space="preserve">
+    <value>Optimizing memory (Working Sets)...</value>
+  </data>
+  <data name="RamOptimizer_Status_Reclaimed" xml:space="preserve">
+    <value>Freed: {0} across {1} processes</value>
+  </data>
+  <data name="RamOptimizer_Status_RamDone" xml:space="preserve">
+    <value>RAM optimization complete! Freed {0}.</value>
+  </data>
+  <data name="RamOptimizer_Msg_RamDone" xml:space="preserve">
+    <value>Memory optimized!
+
+Freed: {0}
+Processes optimized: {1}</value>
+  </data>
+  <data name="RamOptimizer_Caption_Ram" xml:space="preserve">
+    <value>RAM Optimizer</value>
+  </data>
+  <data name="RamOptimizer_Status_GameBoostEnabling" xml:space="preserve">
+    <value>Enabling Game Turbo Boost...</value>
+  </data>
+  <data name="RamOptimizer_Status_GameBoostActive" xml:space="preserve">
+    <value>🚀 Game Boost active! (Services stopped: {0}, RAM: {1})</value>
+  </data>
+  <data name="RamOptimizer_Msg_GameBoostOn" xml:space="preserve">
+    <value>Game Turbo Boost activated!
+
+• Memory cleared
+• Telemetry/SysMain background services paused
+• Power plan: High performance</value>
+  </data>
+  <data name="RamOptimizer_Caption_GameBoost" xml:space="preserve">
+    <value>Game Turbo Boost</value>
+  </data>
+  <data name="RamOptimizer_Status_GameBoostDisabling" xml:space="preserve">
+    <value>Disabling Game Turbo Boost...</value>
+  </data>
+  <data name="RamOptimizer_Msg_GameBoostOff" xml:space="preserve">
+    <value>Standard system mode restored.</value>
+  </data>
+  <data name="RamOptimizer_Status_ScanningDbs" xml:space="preserve">
+    <value>Searching for fragmented SQLite databases (Cursor, VS Code, Chrome)...</value>
+  </data>
+  <data name="RamOptimizer_Status_DbsFound" xml:space="preserve">
+    <value>Found {0} databases to optimize.</value>
+  </data>
+  <data name="RamOptimizer_Status_CompactingDbs" xml:space="preserve">
+    <value>Running VACUUM and database compaction...</value>
+  </data>
+  <data name="RamOptimizer_Status_DbsCompacted" xml:space="preserve">
+    <value>Successfully optimized {0} databases (Freed: {1})!</value>
+  </data>
+  <data name="RamOptimizer_Msg_DbsCompacted" xml:space="preserve">
+    <value>Optimized {0} databases.
+Space freed: {1}</value>
+  </data>
+  <data name="RamOptimizer_Caption_Sqlite" xml:space="preserve">
+    <value>SQLite Compactor</value>
+  </data>
+  <data name="RamOptimizer_Confirm_ShredBody" xml:space="preserve">
+    <value>WARNING! You are about to IRREVERSIBLY destroy a file using the DoD 5220.22-M military standard:
+
+{0}
+
+The file will be overwritten with zeros and random bytes in 3 passes. Recovery will be impossible!</value>
+  </data>
+  <data name="RamOptimizer_Caption_Shredder" xml:space="preserve">
+    <value>DoD 5220.22-M File Shredder</value>
+  </data>
+  <data name="RamOptimizer_Status_Shredding" xml:space="preserve">
+    <value>Irreversibly destroying the file (DoD 5220.22-M 3-Pass)...</value>
+  </data>
 </root>

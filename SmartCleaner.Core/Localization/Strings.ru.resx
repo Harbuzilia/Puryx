@@ -1529,4 +1529,261 @@
   <data name="Scheduler_Status_TaskRemoved" xml:space="preserve">
     <value>🗑️ Задача удалена из планировщика.</value>
   </data>
+  <data name="Common_Caption_Error" xml:space="preserve">
+    <value>Ошибка</value>
+  </data>
+  <data name="Common_Caption_CleanDone" xml:space="preserve">
+    <value>Очистка завершена</value>
+  </data>
+  <data name="Compact_Status_PressAnalyze" xml:space="preserve">
+    <value>Нажмите «Найти объекты для сжатия» для анализа установленных игр и программ</value>
+  </data>
+  <data name="Compact_Status_Searching" xml:space="preserve">
+    <value>Поиск установленных игр и тяжелых папок разработки...</value>
+  </data>
+  <data name="Compact_Status_Found" xml:space="preserve">
+    <value>Найдено {0} объектов ({1}). Потенциальная экономия: ~{2}</value>
+  </data>
+  <data name="Compact_Status_SearchError" xml:space="preserve">
+    <value>Ошибка поиска: {0}</value>
+  </data>
+  <data name="Compact_CompressConfirmBody" xml:space="preserve">
+    <value>Выполнить прозрачное сжатие NTFS (алгоритм {0}) для:
+
+{1}
+Путь: {2}
+Размер: {3}
+
+Файлы останутся полностью доступными, распаковка происходит на лету без потери производительности.</value>
+  </data>
+  <data name="Compact_CompressConfirmCaption" xml:space="preserve">
+    <value>Подтверждение сжатия CompactOS LZX</value>
+  </data>
+  <data name="Compact_Status_CompressedSaved" xml:space="preserve">
+    <value>Сжато ({0} сэкономлено)</value>
+  </data>
+  <data name="Compact_Status_CompressedNoData" xml:space="preserve">
+    <value>Сжато (экономия: н/д)</value>
+  </data>
+  <data name="Compact_Caption_CompressDone" xml:space="preserve">
+    <value>Сжатие завершено</value>
+  </data>
+  <data name="Compact_Status_NotCompressed" xml:space="preserve">
+    <value>Не сжато</value>
+  </data>
+  <data name="Compact_Caption_DecompressDone" xml:space="preserve">
+    <value>Распаковка завершена</value>
+  </data>
+  <data name="SystemDeepClean_Status_PressAudit" xml:space="preserve">
+    <value>Нажмите «Выполнить аудит системы» для проверки WinSxS и старых драйверов</value>
+  </data>
+  <data name="SystemDeepClean_Status_Analyzing" xml:space="preserve">
+    <value>Анализ хранилища компонентов WinSxS и DriverStore...</value>
+  </data>
+  <data name="SystemDeepClean_Status_SearchingDrivers" xml:space="preserve">
+    <value>Поиск устаревших дубликатов драйверов...</value>
+  </data>
+  <data name="SystemDeepClean_Status_WinSxSSummaryOk" xml:space="preserve">
+    <value>В WinSxS можно освободить {0}</value>
+  </data>
+  <data name="SystemDeepClean_Status_WinSxSSummaryUnavailable" xml:space="preserve">
+    <value>анализ WinSxS недоступен: {0}</value>
+  </data>
+  <data name="SystemDeepClean_Status_AuditDone" xml:space="preserve">
+    <value>Аудит завершен! {0}. Найдено {1} старых драйверов.</value>
+  </data>
+  <data name="SystemDeepClean_Status_AuditError" xml:space="preserve">
+    <value>Ошибка аудита: {0}</value>
+  </data>
+  <data name="SystemDeepClean_Confirm_ReclaimKnown" xml:space="preserve">
+    <value>• По последнему анализу DISM можно освободить до {0}.</value>
+  </data>
+  <data name="SystemDeepClean_Confirm_ReclaimUnknown" xml:space="preserve">
+    <value>• Объем освобождения заранее неизвестен (анализ DISM не выполнен или недоступен); фактический результат покажет только очистка.</value>
+  </data>
+  <data name="SystemDeepClean_Confirm_Body" xml:space="preserve">
+    <value>Запустить консолидацию и очистку хранилища компонентов Windows (WinSxS /StartComponentCleanup)?
+
+• Будут удалены устаревшие версии компонентов; установленные обновления останутся удаляемыми.
+{0}
+• Процесс может занять 3-10 минут.</value>
+  </data>
+  <data name="SystemDeepClean_Caption_CleanWinSxS" xml:space="preserve">
+    <value>Очистка WinSxS</value>
+  </data>
+  <data name="SystemDeepClean_Confirm_ResetBaseBody" xml:space="preserve">
+    <value>Дополнительно применить /ResetBase (НЕОБРАТИМО)?
+
+• Все superseded-компоненты обновлений будут удалены окончательно.
+• После /ResetBase установленные обновления Windows НЕЛЬЗЯ будет удалить — только полная переустановка Windows.
+• «Нет» — обычная обратимая очистка (рекомендуется).</value>
+  </data>
+  <data name="SystemDeepClean_Caption_ResetBase" xml:space="preserve">
+    <value>Необратимая операция /ResetBase</value>
+  </data>
+  <data name="SystemDeepClean_Status_CleaningDeep" xml:space="preserve">
+    <value>Выполняется глубокая очистка WinSxS (DISM + /ResetBase)... Пожалуйста, подождите.</value>
+  </data>
+  <data name="SystemDeepClean_Status_Cleaning" xml:space="preserve">
+    <value>Выполняется очистка WinSxS (DISM)... Пожалуйста, подождите.</value>
+  </data>
+  <data name="SystemDeepClean_Caption_CleanWinSxDone" xml:space="preserve">
+    <value>Очистка WinSxS завершена</value>
+  </data>
+  <data name="SystemDeepClean_WinSxSCleanedValue" xml:space="preserve">
+    <value>0 B (Очищено)</value>
+  </data>
+  <data name="SystemDeepClean_Confirm_DriversBody" xml:space="preserve">
+    <value>Удалить {0} устаревших дубликатов драйверов из DriverStore через PnPUtil?
+
+• Удаление выполняется без ключа /force: драйверы, которые используются системой, удалены НЕ будут.
+• Принудительное удаление (/force) — только по отдельному подтверждению, если что-то не удалится.</value>
+  </data>
+  <data name="SystemDeepClean_Caption_CleanDriverStore" xml:space="preserve">
+    <value>Очистка DriverStore</value>
+  </data>
+  <data name="SystemDeepClean_Status_RemovingDrivers" xml:space="preserve">
+    <value>Удаление устаревших драйверов...</value>
+  </data>
+  <data name="SystemDeepClean_Confirm_ForceBody" xml:space="preserve">
+    <value>Не удалено пакетов: {0}.
+{1}
+
+Windows может использовать эти драйверы прямо сейчас.
+Принудительно удалить их с ключом /force? Это может нарушить работу устройств.</value>
+  </data>
+  <data name="SystemDeepClean_Status_DriversRemovedOk" xml:space="preserve">
+    <value>Успешно удалено {0} устаревших пакетов драйверов!</value>
+  </data>
+  <data name="SystemDeepClean_Status_DriversRemovedPartial" xml:space="preserve">
+    <value>Удалено {0}; не удалено: {1} (драйверы могут использоваться системой).</value>
+  </data>
+  <data name="SystemDeepClean_Msg_DriversRemovedSummary" xml:space="preserve">
+    <value>Удалено драйверов: {0}. Не удалено: {1}.</value>
+  </data>
+  <data name="Plugins_Status_PressScan" xml:space="preserve">
+    <value>Нажмите «Сканировать плагины» для аудита установленных расширений</value>
+  </data>
+  <data name="Plugins_Status_Loading" xml:space="preserve">
+    <value>Загрузка плагинов и манифестов...</value>
+  </data>
+  <data name="Plugins_Status_Scanning" xml:space="preserve">
+    <value>Сканирование объектов плагинов...</value>
+  </data>
+  <data name="Plugins_Status_Loaded" xml:space="preserve">
+    <value>Загружено {0} плагинов. Найдено объектов для очистки на {1}.</value>
+  </data>
+  <data name="Plugins_Confirm_CleanBody" xml:space="preserve">
+    <value>Очистить {0} элементов, обнаруженных плагинами сообщества?</value>
+  </data>
+  <data name="Plugins_Caption_Clean" xml:space="preserve">
+    <value>Очистка по правилам плагинов</value>
+  </data>
+  <data name="Plugins_Status_Cleaning" xml:space="preserve">
+    <value>Выполняется очистка плагинов...</value>
+  </data>
+  <data name="Plugins_Status_SkippedSuffix" xml:space="preserve">
+    <value>
+Пропущено (политика безопасности): {0}.</value>
+  </data>
+  <data name="Plugins_Status_CleanedOk" xml:space="preserve">
+    <value>Успешно очищено {0} элементов (Освобождено: {1})!</value>
+  </data>
+  <data name="Plugins_Msg_CleanDone" xml:space="preserve">
+    <value>Очищено {0} объектов ({1}).{2}</value>
+  </data>
+  <data name="AiAssistant_Msg_Welcome" xml:space="preserve">
+    <value>👋 **Здравствуйте! Я ваш AI-ассистент по оптимизации диска.**
+
+Вы можете общаться со мной на обычном человеческом языке, например:
+• *«Найди все видео больше 2 ГБ»*
+• *«Освободи мне 15 ГБ под установку новой игры»*
+• *«Почисти мусор от Node.js и Rust»*
+• *«Сожми игры в Steam»*
+• *«Найди и удали старые драйверы»*
+
+Чем могу помочь прямо сейчас?</value>
+  </data>
+  <data name="AiAssistant_Msg_ProcessError" xml:space="preserve">
+    <value>⚠ Не удалось обработать запрос: {0}
+Попробуйте переформулировать вопрос.</value>
+  </data>
+  <data name="RamOptimizer_Status_Ready" xml:space="preserve">
+    <value>Готов к анализу и оптимизации оперативной памяти, баз данных и SSD</value>
+  </data>
+  <data name="RamOptimizer_Status_GameBoostOff" xml:space="preserve">
+    <value>Турбо-режим не активен</value>
+  </data>
+  <data name="RamOptimizer_Status_OptimizingRam" xml:space="preserve">
+    <value>Оптимизация оперативной памяти (Working Sets)...</value>
+  </data>
+  <data name="RamOptimizer_Status_Reclaimed" xml:space="preserve">
+    <value>Освобождено: {0} в {1} процессах</value>
+  </data>
+  <data name="RamOptimizer_Status_RamDone" xml:space="preserve">
+    <value>Оптимизация RAM завершена! Высвобождено {0}.</value>
+  </data>
+  <data name="RamOptimizer_Msg_RamDone" xml:space="preserve">
+    <value>Оперативная память оптимизирована!
+
+Освобождено: {0}
+Оптимизировано процессов: {1}</value>
+  </data>
+  <data name="RamOptimizer_Caption_Ram" xml:space="preserve">
+    <value>RAM Optimizer</value>
+  </data>
+  <data name="RamOptimizer_Status_GameBoostEnabling" xml:space="preserve">
+    <value>Включение Game Turbo Boost...</value>
+  </data>
+  <data name="RamOptimizer_Status_GameBoostActive" xml:space="preserve">
+    <value>🚀 Game Boost активен! (Остановлено служб: {0}, RAM: {1})</value>
+  </data>
+  <data name="RamOptimizer_Msg_GameBoostOn" xml:space="preserve">
+    <value>Game Turbo Boost активирован!
+
+• Оперативная память очищена
+• Фоновые службы телеметрии/SysMain приостановлены
+• Схема электропитания: Высокая производительность</value>
+  </data>
+  <data name="RamOptimizer_Caption_GameBoost" xml:space="preserve">
+    <value>Game Turbo Boost</value>
+  </data>
+  <data name="RamOptimizer_Status_GameBoostDisabling" xml:space="preserve">
+    <value>Отключение Game Turbo Boost...</value>
+  </data>
+  <data name="RamOptimizer_Msg_GameBoostOff" xml:space="preserve">
+    <value>Стандартный режим системы восстановлен.</value>
+  </data>
+  <data name="RamOptimizer_Status_ScanningDbs" xml:space="preserve">
+    <value>Поиск фрагментированных баз данных SQLite (Cursor, VS Code, Chrome)...</value>
+  </data>
+  <data name="RamOptimizer_Status_DbsFound" xml:space="preserve">
+    <value>Найдено {0} баз данных для оптимизации.</value>
+  </data>
+  <data name="RamOptimizer_Status_CompactingDbs" xml:space="preserve">
+    <value>Выполняется VACUUM и сжатие баз данных...</value>
+  </data>
+  <data name="RamOptimizer_Status_DbsCompacted" xml:space="preserve">
+    <value>Успешно оптимизировано {0} баз (Освобождено: {1})!</value>
+  </data>
+  <data name="RamOptimizer_Msg_DbsCompacted" xml:space="preserve">
+    <value>Оптимизировано {0} баз данных.
+Высвобождено места: {1}</value>
+  </data>
+  <data name="RamOptimizer_Caption_Sqlite" xml:space="preserve">
+    <value>SQLite Compactor</value>
+  </data>
+  <data name="RamOptimizer_Confirm_ShredBody" xml:space="preserve">
+    <value>ВНИМАНИЕ! Вы собираетесь БЕЗВОЗВРАТНО уничтожить файл по военному стандарту DoD 5220.22-M:
+
+{0}
+
+Файл будет перезаписан нулями и случайными байтами в 3 прохода. Восстановить его будет невозможно!</value>
+  </data>
+  <data name="RamOptimizer_Caption_Shredder" xml:space="preserve">
+    <value>Шредер файлов DoD 5220.22-M</value>
+  </data>
+  <data name="RamOptimizer_Status_Shredding" xml:space="preserve">
+    <value>Безвозвратное уничтожение файла (DoD 5220.22-M 3-Pass)...</value>
+  </data>
 </root>

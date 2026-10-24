@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SmartCleaner.Core.Helpers;
+using SmartCleaner.Core.Localization;
 using SmartCleaner.Core.Plugins;
 using System.Collections.ObjectModel;
 using System.Windows;
@@ -15,7 +16,7 @@ public partial class PluginsViewModel : ObservableObject
     private bool _isBusy;
 
     [ObservableProperty]
-    private string _statusText = "Нажмите «Сканировать плагины» для аудита установленных расширений";
+    private string _statusText = Localizer.GetString("Plugins_Status_PressScan");
 
     [ObservableProperty]
     private int _pluginsCount;
@@ -37,7 +38,7 @@ public partial class PluginsViewModel : ObservableObject
         if (IsBusy) return;
 
         IsBusy = true;
-        StatusText = "Загрузка плагинов и манифестов...";
+        StatusText = Localizer.GetString("Plugins_Status_Loading");
 
         try
         {
@@ -46,7 +47,7 @@ public partial class PluginsViewModel : ObservableObject
             foreach (var p in list) Plugins.Add(p);
             PluginsCount = Plugins.Count;
 
-            StatusText = "Сканирование объектов плагинов...";
+            StatusText = Localizer.GetString("Plugins_Status_Scanning");
             var items = await _engine.ScanPluginItemsAsync(Plugins);
             ScanItems.Clear();
             long total = 0;
@@ -57,11 +58,11 @@ public partial class PluginsViewModel : ObservableObject
             }
 
             TotalCleanableSize = SizeFormatter.Format(total);
-            StatusText = $"Загружено {PluginsCount} плагинов. Найдено объектов для очистки на {TotalCleanableSize}.";
+            StatusText = Localizer.GetString("Plugins_Status_Loaded", PluginsCount, TotalCleanableSize);
         }
         catch (Exception ex)
         {
-            StatusText = $"Ошибка: {ex.Message}";
+            StatusText = Localizer.GetString("Common_Status_Error", ex.Message);
         }
         finally
         {
@@ -76,15 +77,15 @@ public partial class PluginsViewModel : ObservableObject
         if (selected.Count == 0) return;
 
         var result = MessageBox.Show(
-            $"Очистить {selected.Count} элементов, обнаруженных плагинами сообщества?",
-            "Очистка по правилам плагинов",
+            Localizer.GetString("Plugins_Confirm_CleanBody", selected.Count),
+            Localizer.GetString("Plugins_Caption_Clean"),
             MessageBoxButton.YesNo,
             MessageBoxImage.Question);
 
         if (result != MessageBoxResult.Yes) return;
 
         IsBusy = true;
-        StatusText = "Выполняется очистка плагинов...";
+        StatusText = Localizer.GetString("Plugins_Status_Cleaning");
 
         try
         {
@@ -98,17 +99,17 @@ public partial class PluginsViewModel : ObservableObject
             TotalCleanableSize = SizeFormatter.Format(remaining);
 
             var skippedNote = cleanResult.SkippedMessages.Count > 0
-                ? $"\nПропущено (политика безопасности): {cleanResult.SkippedMessages.Count}."
+                ? Localizer.GetString("Plugins_Status_SkippedSuffix", cleanResult.SkippedMessages.Count)
                 : string.Empty;
 
-            StatusText = $"Успешно очищено {cleanResult.CleanedCount} элементов (Освобождено: {SizeFormatter.Format(cleanResult.SavedBytes)})!";
+            StatusText = Localizer.GetString("Plugins_Status_CleanedOk", cleanResult.CleanedCount, SizeFormatter.Format(cleanResult.SavedBytes));
             MessageBox.Show(
-                $"Очищено {cleanResult.CleanedCount} объектов ({SizeFormatter.Format(cleanResult.SavedBytes)}).{skippedNote}",
-                "Очистка завершена", MessageBoxButton.OK, MessageBoxImage.Information);
+                Localizer.GetString("Plugins_Msg_CleanDone", cleanResult.CleanedCount, SizeFormatter.Format(cleanResult.SavedBytes), skippedNote),
+                Localizer.GetString("Common_Caption_CleanDone"), MessageBoxButton.OK, MessageBoxImage.Information);
         }
         catch (Exception ex)
         {
-            StatusText = $"Ошибка: {ex.Message}";
+            StatusText = Localizer.GetString("Common_Status_Error", ex.Message);
         }
         finally
         {

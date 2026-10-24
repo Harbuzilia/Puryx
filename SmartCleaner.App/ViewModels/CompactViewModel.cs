@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using SmartCleaner.Core.Compression;
 using SmartCleaner.Core.Helpers;
+using SmartCleaner.Core.Localization;
 using System.Collections.ObjectModel;
 using System.Windows;
 
@@ -16,7 +17,7 @@ public partial class CompactViewModel : ObservableObject
     private bool _isBusy;
 
     [ObservableProperty]
-    private string _statusText = "Нажмите «Найти объекты для сжатия» для анализа установленных игр и программ";
+    private string _statusText = Localizer.GetString("Compact_Status_PressAnalyze");
 
     [ObservableProperty]
     private int _totalTargetsCount;
@@ -40,7 +41,7 @@ public partial class CompactViewModel : ObservableObject
         if (IsBusy) return;
 
         IsBusy = true;
-        StatusText = "Поиск установленных игр и тяжелых папок разработки...";
+        StatusText = Localizer.GetString("Compact_Status_Searching");
 
         try
         {
@@ -59,11 +60,11 @@ public partial class CompactViewModel : ObservableObject
             var estimatedSavings = (long)(totalBytes * 0.35); // ~35% average savings
             EstimatedSavingsFormatted = SizeFormatter.Format(estimatedSavings);
 
-            StatusText = $"Найдено {TotalTargetsCount} объектов ({TotalSizeFormatted}). Потенциальная экономия: ~{EstimatedSavingsFormatted}";
+            StatusText = Localizer.GetString("Compact_Status_Found", TotalTargetsCount, TotalSizeFormatted, EstimatedSavingsFormatted);
         }
         catch (Exception ex)
         {
-            StatusText = $"Ошибка поиска: {ex.Message}";
+            StatusText = Localizer.GetString("Compact_Status_SearchError", ex.Message);
         }
         finally
         {
@@ -77,8 +78,8 @@ public partial class CompactViewModel : ObservableObject
         if (target == null || IsBusy) return;
 
         var result = MessageBox.Show(
-            $"Выполнить прозрачное сжатие NTFS (алгоритм {target.RecommendedAlgorithm}) для:\n\n{target.Name}\nПуть: {target.Path}\nРазмер: {target.OriginalSizeFormatted}\n\nФайлы останутся полностью доступными, распаковка происходит на лету без потери производительности.",
-            "Подтверждение сжатия CompactOS LZX",
+            Localizer.GetString("Compact_CompressConfirmBody", target.RecommendedAlgorithm, target.Name, target.Path, target.OriginalSizeFormatted),
+            Localizer.GetString("Compact_CompressConfirmCaption"),
             MessageBoxButton.YesNo,
             MessageBoxImage.Question);
 
@@ -95,20 +96,20 @@ public partial class CompactViewModel : ObservableObject
             {
                 target.IsCompressed = true;
                 target.Status = saved > 0
-                    ? $"Сжато ({SizeFormatter.Format(saved)} сэкономлено)"
-                    : "Сжато (экономия: н/д)";
+                    ? Localizer.GetString("Compact_Status_CompressedSaved", SizeFormatter.Format(saved))
+                    : Localizer.GetString("Compact_Status_CompressedNoData");
                 StatusText = msg;
-                MessageBox.Show(msg, "Сжатие завершено", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show(msg, Localizer.GetString("Compact_Caption_CompressDone"), MessageBoxButton.OK, MessageBoxImage.Information);
             }
             else
             {
-                StatusText = $"Ошибка: {msg}";
-                MessageBox.Show(msg, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                StatusText = Localizer.GetString("Common_Status_Error", msg);
+                MessageBox.Show(msg, Localizer.GetString("Common_Caption_Error"), MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
         catch (Exception ex)
         {
-            StatusText = $"Исключение: {ex.Message}";
+            StatusText = Localizer.GetString("Common_Status_Error", ex.Message);
         }
         finally
         {
@@ -133,18 +134,18 @@ public partial class CompactViewModel : ObservableObject
             if (success)
             {
                 target.IsCompressed = false;
-                target.Status = "Не сжато";
+                target.Status = Localizer.GetString("Compact_Status_NotCompressed");
                 StatusText = msg;
-                MessageBox.Show(msg, "Распаковка завершена", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show(msg, Localizer.GetString("Compact_Caption_DecompressDone"), MessageBoxButton.OK, MessageBoxImage.Information);
             }
             else
             {
-                StatusText = $"Ошибка: {msg}";
+                StatusText = Localizer.GetString("Common_Status_Error", msg);
             }
         }
         catch (Exception ex)
         {
-            StatusText = $"Исключение: {ex.Message}";
+            StatusText = Localizer.GetString("Common_Status_Error", ex.Message);
         }
         finally
         {

@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using SmartCleaner.Core.Localization;
 using SmartCleaner.Core.WinSxS;
 using System.Collections.ObjectModel;
 using System.Windows;
@@ -18,7 +19,7 @@ public partial class SystemDeepCleanViewModel : ObservableObject
     private bool _isBusy;
 
     [ObservableProperty]
-    private string _statusText = "Нажмите «Выполнить аудит системы» для проверки WinSxS и старых драйверов";
+    private string _statusText = Localizer.GetString("SystemDeepClean_Status_PressAudit");
 
     [ObservableProperty]
     private string _winSxSActualSize = "-";
@@ -46,7 +47,7 @@ public partial class SystemDeepCleanViewModel : ObservableObject
         if (IsBusy) return;
 
         IsBusy = true;
-        StatusText = "Анализ хранилища компонентов WinSxS и DriverStore...";
+        StatusText = Localizer.GetString("SystemDeepClean_Status_Analyzing");
 
         try
         {
@@ -58,7 +59,7 @@ public partial class SystemDeepCleanViewModel : ObservableObject
             WinSxSReclaimable = sxsResult.ReclaimablePackagesFormatted;
             WinSxSCleanupRecommended = sxsResult.CleanupRecommended;
 
-            StatusText = "Поиск устаревших дубликатов драйверов...";
+            StatusText = Localizer.GetString("SystemDeepClean_Status_SearchingDrivers");
             var drvProgress = new Progress<string>(s => StatusText = s);
             var driversList = await _drivers.ScanDriversAsync(drvProgress);
 
@@ -70,13 +71,13 @@ public partial class SystemDeepCleanViewModel : ObservableObject
             OldDriversCount = OldDrivers.Count;
 
             var winSxSSummary = sxsResult.AnalysisAvailable
-                ? $"В WinSxS можно освободить {WinSxSReclaimable}"
-                : $"анализ WinSxS недоступен: {sxsResult.AnalysisUnavailableReason}";
-            StatusText = $"Аудит завершен! {winSxSSummary}. Найдено {OldDriversCount} старых драйверов.";
+                ? Localizer.GetString("SystemDeepClean_Status_WinSxSSummaryOk", WinSxSReclaimable)
+                : Localizer.GetString("SystemDeepClean_Status_WinSxSSummaryUnavailable", sxsResult.AnalysisUnavailableReason);
+            StatusText = Localizer.GetString("SystemDeepClean_Status_AuditDone", winSxSSummary, OldDriversCount);
         }
         catch (Exception ex)
         {
-            StatusText = $"Ошибка аудита: {ex.Message}";
+            StatusText = Localizer.GetString("SystemDeepClean_Status_AuditError", ex.Message);
         }
         finally
         {
@@ -92,17 +93,14 @@ public partial class SystemDeepCleanViewModel : ObservableObject
         // Честная оценка объёма: из последнего анализа DISM; без анализа — «неизвестно»,
         // а не выдуманный диапазон «от 2 до 10+ ГБ» (аудит H4).
         var reclaimLine = _lastWinSxSAnalysis is { AnalysisAvailable: true, ReclaimablePackagesBytes: > 0 }
-            ? $"• По последнему анализу DISM можно освободить до {_lastWinSxSAnalysis.ReclaimablePackagesFormatted}."
-            : "• Объем освобождения заранее неизвестен (анализ DISM не выполнен или недоступен); фактический результат покажет только очистка.";
+            ? Localizer.GetString("SystemDeepClean_Confirm_ReclaimKnown", _lastWinSxSAnalysis.ReclaimablePackagesFormatted)
+            : Localizer.GetString("SystemDeepClean_Confirm_ReclaimUnknown");
 
         // День 21, L5: /ResetBase (необратимо) — только явный opt-in. Базовое
         // подтверждение описывает обратимую очистку без /ResetBase
         var result = MessageBox.Show(
-            "Запустить консолидацию и очистку хранилища компонентов Windows (WinSxS /StartComponentCleanup)?\n\n" +
-            "• Будут удалены устаревшие версии компонентов; установленные обновления останутся удаляемыми.\n" +
-            reclaimLine + "\n" +
-            "• Процесс может занять 3-10 минут.",
-            "Очистка WinSxS",
+            Localizer.GetString("SystemDeepClean_Confirm_Body", reclaimLine),
+            Localizer.GetString("SystemDeepClean_Caption_CleanWinSxS"),
             MessageBoxButton.YesNo,
             MessageBoxImage.Question);
 
@@ -110,30 +108,27 @@ public partial class SystemDeepCleanViewModel : ObservableObject
 
         // Отдельный явный вопрос про необратимый режим — не часть базового потока
         var useResetBase = MessageBox.Show(
-            "Дополнительно применить /ResetBase (НЕОБРАТИМО)?\n\n" +
-            "• Все superseded-компоненты обновлений будут удалены окончательно.\n" +
-            "• После /ResetBase установленные обновления Windows НЕЛЬЗЯ будет удалить — только полная переустановка Windows.\n" +
-            "• «Нет» — обычная обратимая очистка (рекомендуется).",
-            "Необратимая операция /ResetBase",
+            Localizer.GetString("SystemDeepClean_Confirm_ResetBaseBody"),
+            Localizer.GetString("SystemDeepClean_Caption_ResetBase"),
             MessageBoxButton.YesNo,
             MessageBoxImage.Warning);
 
         IsBusy = true;
         StatusText = useResetBase == MessageBoxResult.Yes
-            ? "Выполняется глубокая очистка WinSxS (DISM + /ResetBase)... Пожалуйста, подождите."
-            : "Выполняется очистка WinSxS (DISM)... Пожалуйста, подождите.";
+            ? Localizer.GetString("SystemDeepClean_Status_CleaningDeep")
+            : Localizer.GetString("SystemDeepClean_Status_Cleaning");
 
         try
         {
             var (success, msg) = await _winsxs.RunComponentCleanupAsync(useResetBase == MessageBoxResult.Yes);
             StatusText = msg;
-            MessageBox.Show(msg, "Очистка WinSxS завершена", MessageBoxButton.OK, MessageBoxImage.Information);
-            WinSxSReclaimable = "0 B (Очищено)";
+            MessageBox.Show(msg, Localizer.GetString("SystemDeepClean_Caption_CleanWinSxDone"), MessageBoxButton.OK, MessageBoxImage.Information);
+            WinSxSReclaimable = Localizer.GetString("SystemDeepClean_WinSxSCleanedValue");
             WinSxSCleanupRecommended = false;
         }
         catch (Exception ex)
         {
-            StatusText = $"Исключение: {ex.Message}";
+            StatusText = Localizer.GetString("Common_Status_Error", ex.Message);
         }
         finally
         {
@@ -150,17 +145,15 @@ public partial class SystemDeepCleanViewModel : ObservableObject
         // День 15 — M8: по умолчанию удаление БЕЗ /force — драйверы, используемые
         // системой, pnputil откажется удалять (честный отказ), а не вырывает принудительно.
         var result = MessageBox.Show(
-            $"Удалить {selected.Count} устаревших дубликатов драйверов из DriverStore через PnPUtil?\n\n" +
-            "• Удаление выполняется без ключа /force: драйверы, которые используются системой, удалены НЕ будут.\n" +
-            "• Принудительное удаление (/force) — только по отдельному подтверждению, если что-то не удалится.",
-            "Очистка DriverStore",
+            Localizer.GetString("SystemDeepClean_Confirm_DriversBody", selected.Count),
+            Localizer.GetString("SystemDeepClean_Caption_CleanDriverStore"),
             MessageBoxButton.YesNo,
             MessageBoxImage.Question);
 
         if (result != MessageBoxResult.Yes) return;
 
         IsBusy = true;
-        StatusText = "Удаление устаревших драйверов...";
+        StatusText = Localizer.GetString("SystemDeepClean_Status_RemovingDrivers");
 
         try
         {
@@ -181,10 +174,8 @@ public partial class SystemDeepCleanViewModel : ObservableObject
                 // Осознанное решение о /force: только для записей, от которых отказался pnputil
                 // (возможно, используются системой), и только по явному подтверждению пользователя.
                 var force = MessageBox.Show(
-                    $"Не удалено пакетов: {errors.Count}.\n{errors[0]}\n\n" +
-                    "Windows может использовать эти драйверы прямо сейчас.\n" +
-                    "Принудительно удалить их с ключом /force? Это может нарушить работу устройств.",
-                    "Очистка DriverStore",
+                    Localizer.GetString("SystemDeepClean_Confirm_ForceBody", errors.Count, errors[0]),
+                    Localizer.GetString("SystemDeepClean_Caption_CleanDriverStore"),
                     MessageBoxButton.YesNo,
                     MessageBoxImage.Warning);
 
@@ -204,17 +195,17 @@ public partial class SystemDeepCleanViewModel : ObservableObject
             }
 
             StatusText = errors.Count == 0
-                ? $"Успешно удалено {totalRemoved} устаревших пакетов драйверов!"
-                : $"Удалено {totalRemoved}; не удалено: {errors.Count} (драйверы могут использоваться системой).";
+                ? Localizer.GetString("SystemDeepClean_Status_DriversRemovedOk", totalRemoved)
+                : Localizer.GetString("SystemDeepClean_Status_DriversRemovedPartial", totalRemoved, errors.Count);
             MessageBox.Show(
-                $"Удалено драйверов: {totalRemoved}. Не удалено: {errors.Count}.",
-                "Очистка завершена",
+                Localizer.GetString("SystemDeepClean_Msg_DriversRemovedSummary", totalRemoved, errors.Count),
+                Localizer.GetString("Common_Caption_CleanDone"),
                 MessageBoxButton.OK,
                 MessageBoxImage.Information);
         }
         catch (Exception ex)
         {
-            StatusText = $"Ошибка: {ex.Message}";
+            StatusText = Localizer.GetString("Common_Status_Error", ex.Message);
         }
         finally
         {
