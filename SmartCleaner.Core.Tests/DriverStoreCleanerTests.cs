@@ -329,8 +329,8 @@ public class DriverStoreCleanerTests
         var drivers = await cleaner.ScanDriversAsync(progress);
 
         Assert.Empty(drivers);
-        Assert.Contains(lines, l => l.Contains("отмен"));
-        Assert.DoesNotContain(lines, l => l.Contains("Ошибка"));
+        Assert.Contains(lines, l => l.Contains("cancel"));
+        Assert.DoesNotContain(lines, l => l.Contains("Driver scan error"));
     }
 
     private sealed class CollectingProgress(List<string> lines) : IProgress<string>

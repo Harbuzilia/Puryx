@@ -1,5 +1,6 @@
 ﻿using SmartCleaner.Core.Cleaning;
 using SmartCleaner.Core.Helpers;
+using SmartCleaner.Core.Localization;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -54,7 +55,7 @@ public class CompactEngine
                             {
                                 Name = name,
                                 Path = gameDir,
-                                Category = "Игры (Steam)",
+                                Category = Localizer.GetString("Compact_Category_GamesSteam"),
                                 OriginalSizeBytes = size,
                                 OriginalSizeFormatted = SizeFormatter.Format(size),
                                 RecommendedAlgorithm = "LZX"
@@ -82,7 +83,7 @@ public class CompactEngine
                             {
                                 Name = name,
                                 Path = gameDir,
-                                Category = "Игры (Epic Games)",
+                                Category = Localizer.GetString("Compact_Category_GamesEpic"),
                                 OriginalSizeBytes = size,
                                 OriginalSizeFormatted = SizeFormatter.Format(size),
                                 RecommendedAlgorithm = "LZX"
@@ -111,7 +112,7 @@ public class CompactEngine
                             {
                                 Name = name,
                                 Path = projDir,
-                                Category = "Проекты разработки",
+                                Category = Localizer.GetString("Compact_Category_DevProjects"),
                                 OriginalSizeBytes = size,
                                 OriginalSizeFormatted = SizeFormatter.Format(size),
                                 RecommendedAlgorithm = "XPRESS16K"
@@ -134,12 +135,12 @@ public class CompactEngine
         CancellationToken ct = default)
     {
         if (!Directory.Exists(directoryPath))
-            return (false, "Директория не найдена", 0);
+            return (false, Localizer.GetString("Compact_Error_DirectoryNotFound"), 0);
 
         // Экономия считается только по факту: размер на диске ДО запуска compact.exe
         // и ПОСЛЕ (GetCompressedFileSizeW). Никаких оценочных коэффициентов.
         var sizeOnDiskBefore = GetCompressedSizeOnDisk(directoryPath);
-        progress?.Report($"Сжатие '{Path.GetFileName(directoryPath)}' алгоритмом {algorithm}...");
+        progress?.Report(Localizer.GetString("Compact_Progress_Compressing", Path.GetFileName(directoryPath), algorithm));
 
         var algoArg = algorithm.ToLowerInvariant() switch
         {
@@ -157,9 +158,9 @@ public class CompactEngine
                 ["/c", $"/s:{directoryPath}", $"/exe:{algoArg}", "/i", "/f"], progress, ct);
 
             if (timedOut)
-                return (false, $"«compact.exe» не завершилась за {CompactToolTimeout.TotalMinutes:0} мин", 0);
+                return (false, Localizer.GetString("Compact_Error_Timeout", CompactToolTimeout.TotalMinutes), 0);
             if (exitCode != 0)
-                return (false, CompactFailureMessage("сжатия", exitCode, output), 0);
+                return (false, CompactFailureMessage("Compact_Error_CompressTool", exitCode, output), 0);
 
             // Фактическая экономия: разница размера на диске до/после сжатия.
             // Измерить не удалось — честное «н/д», а не подставное число.
@@ -167,19 +168,19 @@ public class CompactEngine
             if (sizeOnDiskBefore is long before && sizeOnDiskAfter is long after)
             {
                 var saved = Math.Max(0, before - after);
-                return (true, $"Сжатие завершено! Сэкономлено: {SizeFormatter.Format(saved)}", saved);
+                return (true, Localizer.GetString("Compact_Success_Compressed", SizeFormatter.Format(saved)), saved);
             }
 
-            return (true, "Сжатие завершено! Экономия: н/д (не удалось измерить размер на диске)", 0);
+            return (true, Localizer.GetString("Compact_Success_CompressedNoSavings"), 0);
         }
         catch (OperationCanceledException) when (ct.IsCancellationRequested)
         {
             // Отмена пользователем — не ошибка сжатия: честное сообщение
-            return (false, "Операция отменена пользователем", 0);
+            return (false, Localizer.GetString("Common_CancelledByUser"), 0);
         }
         catch (Exception ex)
         {
-            return (false, $"Ошибка сжатия: {ex.Message}", 0);
+            return (false, Localizer.GetString("Compact_Error_CompressFailed", ex.Message), 0);
         }
     }
 
@@ -189,9 +190,9 @@ public class CompactEngine
         CancellationToken ct = default)
     {
         if (!Directory.Exists(directoryPath))
-            return (false, "Директория не найдена");
+            return (false, Localizer.GetString("Compact_Error_DirectoryNotFound"));
 
-        progress?.Report($"Распаковка '{Path.GetFileName(directoryPath)}'...");
+        progress?.Report(Localizer.GetString("Compact_Progress_Decompressing", Path.GetFileName(directoryPath)));
 
         try
         {
@@ -201,20 +202,20 @@ public class CompactEngine
                 ["/u", $"/s:{directoryPath}", "/i"], progress, ct);
 
             if (timedOut)
-                return (false, $"«compact.exe» не завершилась за {CompactToolTimeout.TotalMinutes:0} мин");
+                return (false, Localizer.GetString("Compact_Error_Timeout", CompactToolTimeout.TotalMinutes));
             if (exitCode != 0)
-                return (false, CompactFailureMessage("распаковки", exitCode, output));
+                return (false, CompactFailureMessage("Compact_Error_DecompressTool", exitCode, output));
 
-            return (true, "Распаковка успешно завершена!");
+            return (true, Localizer.GetString("Compact_Success_Decompressed"));
         }
         catch (OperationCanceledException) when (ct.IsCancellationRequested)
         {
             // Отмена пользователем — не ошибка распаковки: честное сообщение
-            return (false, "Операция отменена пользователем");
+            return (false, Localizer.GetString("Common_CancelledByUser"));
         }
         catch (Exception ex)
         {
-            return (false, $"Ошибка распаковки: {ex.Message}");
+            return (false, Localizer.GetString("Compact_Error_DecompressFailed", ex.Message));
         }
     }
 
@@ -264,15 +265,19 @@ public class CompactEngine
 
     // Первая непустая строка вывода как компактная причина сбоя
     // (compact.exe печатает по строке на каждый файл — простыня не нужна).
-    private static string CompactFailureMessage(string operation, int exitCode, string output)
+    // Ключ ошибки ({0} = код возврата) приходит от вызывающего: сжатие/
+    // распаковка различаются только ключом; строка вывода добавляется
+    // суффиксом, чтобы формат-ключ не зависел от её наличия.
+    private static string CompactFailureMessage(string errorKey, int exitCode, string output)
     {
+        var message = Localizer.GetString(errorKey, exitCode);
         foreach (var raw in output.Split('\n'))
         {
             var line = raw.Trim('\r', ' ');
             if (line.Length > 0)
-                return $"Ошибка {operation}: compact.exe завершилась с кодом {exitCode}: {line}";
+                return message + ": " + line;
         }
-        return $"Ошибка {operation}: compact.exe завершилась с кодом {exitCode}";
+        return message;
     }
 
     private static List<string> GetFixedDriveRoots()

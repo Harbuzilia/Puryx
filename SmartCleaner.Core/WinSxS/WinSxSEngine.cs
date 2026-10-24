@@ -1,5 +1,6 @@
 ﻿using SmartCleaner.Core.Cleaning;
 using SmartCleaner.Core.Helpers;
+using SmartCleaner.Core.Localization;
 using System.Diagnostics;
 using System.Globalization;
 using System.Text.RegularExpressions;
@@ -12,13 +13,13 @@ namespace SmartCleaner.Core.WinSxS;
 public class WinSxSAnalysisResult
 {
     public long WindowsReportedSizeBytes { get; set; }
-    public string WindowsReportedSizeFormatted { get; set; } = "н/д";
+    public string WindowsReportedSizeFormatted { get; set; } = Localizer.GetString("Common_NotAvailable");
     public long ActualSizeBytes { get; set; }
-    public string ActualSizeFormatted { get; set; } = "н/д";
+    public string ActualSizeFormatted { get; set; } = Localizer.GetString("Common_NotAvailable");
     public long SharedWithWindowsBytes { get; set; }
     public long BackupsAndDisabledFeaturesBytes { get; set; }
     public long ReclaimablePackagesBytes { get; set; }
-    public string ReclaimablePackagesFormatted { get; set; } = "н/д";
+    public string ReclaimablePackagesFormatted { get; set; } = Localizer.GetString("Common_NotAvailable");
     public bool CleanupRecommended { get; set; }
     public string RawAnalysisOutput { get; set; } = string.Empty;
 
@@ -55,7 +56,7 @@ public class WinSxSEngine
     public async Task<WinSxSAnalysisResult> AnalyzeComponentStoreAsync(IProgress<string>? progress = null, CancellationToken ct = default)
     {
         var result = new WinSxSAnalysisResult();
-        progress?.Report("Анализ хранилища компонентов WinSxS через DISM...");
+        progress?.Report(Localizer.GetString("WinSxS_Progress_Analyzing"));
 
         try
         {
@@ -74,20 +75,20 @@ public class WinSxSEngine
             result = ParseAnalyzeComponentStoreOutput(output);
 
             if (!result.AnalysisAvailable && execution.TimedOut)
-                result.AnalysisUnavailableReason = "Анализ DISM прерван по таймауту (10 минут)";
+                result.AnalysisUnavailableReason = Localizer.GetString("WinSxS_Reason_Timeout");
             else if (!result.AnalysisAvailable && execution.ExitCode != 0)
-                result.AnalysisUnavailableReason = $"{result.AnalysisUnavailableReason} (код возврата {execution.ExitCode})";
+                result.AnalysisUnavailableReason = Localizer.GetString("WinSxS_Reason_ExitCode", result.AnalysisUnavailableReason, execution.ExitCode);
         }
         catch (OperationCanceledException)
         {
             // День 24: отмена — честный статус «отменено», а не «ошибка DISM»
-            result.RawAnalysisOutput = "Анализ WinSxS отменён";
-            result.AnalysisUnavailableReason = "Анализ WinSxS отменён";
+            result.RawAnalysisOutput = Localizer.GetString("WinSxS_Status_Cancelled");
+            result.AnalysisUnavailableReason = Localizer.GetString("WinSxS_Status_Cancelled");
         }
         catch (Exception ex)
         {
-            result.RawAnalysisOutput = $"Ошибка анализа DISM: {ex.Message}";
-            result.AnalysisUnavailableReason = $"Ошибка анализа DISM: {ex.Message}";
+            result.RawAnalysisOutput = Localizer.GetString("WinSxS_Error_Analysis", ex.Message);
+            result.AnalysisUnavailableReason = Localizer.GetString("WinSxS_Error_Analysis", ex.Message);
         }
 
         if (!result.AnalysisAvailable)
@@ -108,13 +109,13 @@ public class WinSxSEngine
 
         if (string.IsNullOrWhiteSpace(output))
         {
-            result.AnalysisUnavailableReason = "DISM не вернул данных";
+            result.AnalysisUnavailableReason = Localizer.GetString("WinSxS_Reason_NoData");
             return result;
         }
 
         if (LooksLikeElevationFailure(output))
         {
-            result.AnalysisUnavailableReason = "Анализ недоступен (нужны права администратора)";
+            result.AnalysisUnavailableReason = Localizer.GetString("WinSxS_Reason_ElevationRequired");
             return result;
         }
 
@@ -129,7 +130,7 @@ public class WinSxSEngine
 
         if (result.ActualSizeBytes <= 0)
         {
-            result.AnalysisUnavailableReason = "Не удалось разобрать вывод DISM: данные о размере хранилища не найдены";
+            result.AnalysisUnavailableReason = Localizer.GetString("WinSxS_Reason_ParseFailed");
             return result;
         }
 
@@ -137,7 +138,7 @@ public class WinSxSEngine
         result.ActualSizeFormatted = SizeFormatter.Format(result.ActualSizeBytes);
         result.ReclaimablePackagesFormatted = result.ReclaimablePackagesBytes > 0
             ? SizeFormatter.Format(result.ReclaimablePackagesBytes)
-            : "н/д";
+            : Localizer.GetString("Common_NotAvailable");
         return result;
     }
 
@@ -189,7 +190,7 @@ public class WinSxSEngine
     /// </param>
     public async Task<(bool Success, string Message)> RunComponentCleanupAsync(bool resetBase = false, IProgress<string>? progress = null, CancellationToken ct = default)
     {
-        progress?.Report("Запуск очистки WinSxS (DISM StartComponentCleanup)...");
+        progress?.Report(Localizer.GetString("WinSxS_Progress_CleanupStarting"));
 
         var args = BuildComponentCleanupArguments(resetBase);
 
@@ -220,10 +221,10 @@ public class WinSxSEngine
             {
                 await proc.WaitForExitAsync(ct);
                 // Честный итог: пользователь видит, выполнялся ли необратимый /ResetBase
-                var resetBaseNote = resetBase ? " (с необратимым /ResetBase)" : string.Empty;
-                return (proc.ExitCode == 0, $"Очистка WinSxS завершена с кодом {proc.ExitCode}{resetBaseNote}");
+                var resetBaseNote = resetBase ? Localizer.GetString("WinSxS_Cleanup_ResetBaseNote") : string.Empty;
+                return (proc.ExitCode == 0, Localizer.GetString("WinSxS_Cleanup_Completed", proc.ExitCode) + resetBaseNote);
             }
-            return (false, "Не удалось запустить DISM");
+            return (false, Localizer.GetString("WinSxS_Cleanup_FailedToStart"));
         }
         catch (OperationCanceledException)
         {
@@ -232,11 +233,11 @@ public class WinSxSEngine
             // продолжит очистку после «отмены»; kill с родителя без элевации
             // ограничен (отказ доступа) — попытка best-effort, отказ глотается
             TryKillOnCancel(proc);
-            return (false, "Очистка WinSxS отменена");
+            return (false, Localizer.GetString("WinSxS_Cleanup_Cancelled"));
         }
         catch (Exception ex)
         {
-            return (false, $"Ошибка выполнения DISM: {ex.Message}");
+            return (false, Localizer.GetString("WinSxS_Cleanup_Error", ex.Message));
         }
     }
 

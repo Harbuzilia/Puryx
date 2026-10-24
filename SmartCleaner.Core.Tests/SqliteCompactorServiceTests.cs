@@ -90,7 +90,7 @@ public class SqliteCompactorServiceTests : IDisposable
 
         Assert.Equal(1, count);
         Assert.True(saved > 0, $"expected savings > 0, got {saved} (size before {sizeBefore})");
-        Assert.StartsWith("Сжато", target.Status);
+        Assert.StartsWith("Compacted", target.Status);
         Assert.True(target.CompactedSizeBytes < sizeBefore);
     }
 
@@ -125,9 +125,9 @@ public class SqliteCompactorServiceTests : IDisposable
         // Занятая база пропущена: не считается сжатой, экономия нулевая
         Assert.Equal(0, count);
         Assert.Equal(0, saved);
-        Assert.StartsWith("Пропущено", target.Status);
+        Assert.StartsWith("Skipped", target.Status);
         // Не сырой текст SQLite в UI
         Assert.DoesNotContain("database is locked", target.Status, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("Ошибка", target.Status, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("Error", target.Status, StringComparison.OrdinalIgnoreCase);
     }
 }

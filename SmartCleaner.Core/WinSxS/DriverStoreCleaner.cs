@@ -1,5 +1,6 @@
 ﻿using SmartCleaner.Core.Cleaning;
 using SmartCleaner.Core.Helpers;
+using SmartCleaner.Core.Localization;
 using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
@@ -81,7 +82,7 @@ public class DriverStoreCleaner
     public async Task<List<DriverStoreItem>> ScanDriversAsync(IProgress<string>? progress = null, CancellationToken ct = default)
     {
         var drivers = new List<DriverStoreItem>();
-        progress?.Report("Опрос установленных драйверов через PnPUtil...");
+        progress?.Report(Localizer.GetString("DriverStore_Progress_Scanning"));
 
         try
         {
@@ -108,11 +109,11 @@ public class DriverStoreCleaner
         {
             // День 24: отмена — честный прогресс «отменено», а не «ошибка
             // сканирования»: вызывающий отличает отмену от отказа pnputil
-            progress?.Report("Сканирование драйверов отменено");
+            progress?.Report(Localizer.GetString("DriverStore_Scan_Cancelled"));
         }
         catch (Exception ex)
         {
-            progress?.Report($"Ошибка сканирования драйверов: {ex.Message}");
+            progress?.Report(Localizer.GetString("DriverStore_Scan_Error", ex.Message));
         }
 
         return drivers;
@@ -293,7 +294,7 @@ public class DriverStoreCleaner
         {
             try
             {
-                progress?.Report($"Удаление устаревшего драйвера {d.PublishedName} ({d.ProviderName})...");
+                progress?.Report(Localizer.GetString("DriverStore_Progress_Removing", d.PublishedName, d.ProviderName));
                 // Обоснованное исключение (День 18, срез B): /delete-driver
                 // требует повышения прав — UseShellExecute=true + Verb="runas"
                 // показывает UAC-диалог. Контракт ICommandExecutor исполняет
@@ -320,13 +321,13 @@ public class DriverStoreCleaner
                     }
                     else
                     {
-                        errors.Add($"Не удалось удалить {d.PublishedName}: код {proc.ExitCode}");
+                        errors.Add(Localizer.GetString("DriverStore_Remove_Failed", d.PublishedName, proc.ExitCode));
                     }
                 }
             }
             catch (Exception ex)
             {
-                errors.Add($"Ошибка при удалении {d.PublishedName}: {ex.Message}");
+                errors.Add(Localizer.GetString("DriverStore_Remove_Error", d.PublishedName, ex.Message));
             }
         }
 

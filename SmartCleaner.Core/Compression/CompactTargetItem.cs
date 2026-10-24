@@ -1,4 +1,6 @@
-﻿namespace SmartCleaner.Core.Compression;
+﻿using SmartCleaner.Core.Localization;
+
+namespace SmartCleaner.Core.Compression;
 
 public class CompactTargetItem
 {
@@ -14,6 +16,6 @@ public class CompactTargetItem
     public string SpaceSavedFormatted { get; set; } = "0 B";
     public double CompressionPercent { get; set; }
     public bool IsCompressed { get; set; }
-    public string Status { get; set; } = "Не сжато";
+    public string Status { get; set; } = Localizer.GetString("Compact_Status_NotCompressed");
     public string RecommendedAlgorithm { get; set; } = "LZX"; // LZX, XPRESS16K
 }

@@ -12,7 +12,7 @@ public class CompactTargetItemTests
 
         Assert.NotEmpty(item.Id);
         Assert.Equal("Games", item.Category);
-        Assert.Equal("Не сжато", item.Status);
+        Assert.Equal("Not compressed", item.Status);
         Assert.Equal("LZX", item.RecommendedAlgorithm);
         Assert.False(item.IsCompressed);
         Assert.Equal(0, item.OriginalSizeBytes);

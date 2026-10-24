@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging.Abstractions;
 using SmartCleaner.Core.Cleaning;
 using SmartCleaner.Core.Helpers;
+using SmartCleaner.Core.Localization;
 using System.Text;
 using System.Text.Json;
 // UseWindowsForms тянет System.Windows.Forms.ICommandExecutor — снимаем
@@ -27,12 +28,12 @@ public class PhysicalDiskInfo
     /// <summary>Температура, °C. null — телеметрия недоступна, UI показывает «н/д».</summary>
     public int? TemperatureCelsius { get; set; }
 
-    public string RemainingLifeFormatted => RemainingLifePercentage.HasValue ? $"{RemainingLifePercentage.Value}%" : "н/д";
-    public string TemperatureFormatted => TemperatureCelsius.HasValue ? $"{TemperatureCelsius.Value} °C" : "н/д";
+    public string RemainingLifeFormatted => RemainingLifePercentage.HasValue ? $"{RemainingLifePercentage.Value}%" : Localizer.GetString("Common_NotAvailable");
+    public string TemperatureFormatted => TemperatureCelsius.HasValue ? $"{TemperatureCelsius.Value} °C" : Localizer.GetString("Common_NotAvailable");
 
     public long SizeBytes { get; set; }
     public string SizeFormatted => SizeFormatter.Format(SizeBytes);
-    public string TotalBytesWrittenFormatted { get; set; } = "N/A";
+    public string TotalBytesWrittenFormatted { get; set; } = Localizer.GetString("Common_NotAvailable");
     public bool IsSsd => MediaType.Contains("SSD", StringComparison.OrdinalIgnoreCase) || BusType.Contains("NVMe", StringComparison.OrdinalIgnoreCase);
 }
 
@@ -99,8 +100,8 @@ public class DiskHealthService
                 // Фейл/таймаут PowerShell — честная причина, а не «пусто» (день 22):
                 // телеметрия недоступна, fallback ниже честен
                 _logger.LogWarning(
-                    "Телеметрия S.M.A.R.T. недоступна: {Reason}",
-                    execution.TimedOut ? "таймаут PowerShell" : $"код возврата {execution.ExitCode}");
+                    "S.M.A.R.T. telemetry unavailable: {Reason}",
+                    execution.TimedOut ? "PowerShell timeout" : $"exit code {execution.ExitCode}");
             }
             else
             {
@@ -109,7 +110,7 @@ public class DiskHealthService
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Телеметрия S.M.A.R.T. дисков недоступна: {Error}", ex.Message);
+            _logger.LogWarning(ex, "S.M.A.R.T. disk telemetry unavailable: {Error}", ex.Message);
         }
 
         // Fallback if empty
@@ -122,7 +123,7 @@ public class DiskHealthService
                 list.Add(new PhysicalDiskInfo
                 {
                     DeviceId = d.Name,
-                    FriendlyName = $"Локальный диск ({d.Name.TrimEnd('\\')})",
+                    FriendlyName = Localizer.GetString("DiskHealth_LocalDisk", d.Name.TrimEnd('\\')),
                     MediaType = "SSD / HDD",
                     BusType = "SATA/NVMe",
                     HealthStatus = "Healthy",

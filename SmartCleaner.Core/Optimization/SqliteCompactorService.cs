@@ -1,4 +1,5 @@
 ﻿using SmartCleaner.Core.Helpers;
+using SmartCleaner.Core.Localization;
 using System.Diagnostics;
 using System.IO;
 
@@ -14,7 +15,7 @@ public class SqliteDbTarget
     public long CompactedSizeBytes { get; set; }
     public string CompactedSizeFormatted { get; set; } = "0 B";
     public long SpaceSavedBytes { get; set; }
-    public string Status { get; set; } = "Готов к сжатию";
+    public string Status { get; set; } = Localizer.GetString("Sqlite_Status_Ready");
     public bool IsSelected { get; set; } = true;
 }
 
@@ -94,7 +95,7 @@ public class SqliteCompactorService
                 if (!File.Exists(target.Path)) continue;
 
                 var initialSize = new FileInfo(target.Path).Length;
-                progress?.Report($"Сжатие и вакуумизация базы: {target.Name} ({target.AppName})...");
+                progress?.Report(Localizer.GetString("Sqlite_Progress_Compacting", target.Name, target.AppName));
 
                 try
                 {
@@ -108,7 +109,7 @@ public class SqliteCompactorService
                     // сырой «database is locked» в UI
                     if (!TryProbeWriteAccess(conn))
                     {
-                        target.Status = "Пропущено: база занята другим процессом";
+                        target.Status = Localizer.GetString("Sqlite_Status_SkippedBusy");
                         continue;
                     }
 
@@ -134,8 +135,8 @@ public class SqliteCompactorService
                     target.CompactedSizeFormatted = SizeFormatter.Format(newSize);
                     target.SpaceSavedBytes = saved;
                     target.Status = saved > 0
-                        ? $"Сжато (высвобождено {SizeFormatter.Format(saved)})"
-                        : "Уже оптимизировано";
+                        ? Localizer.GetString("Sqlite_Status_Compacted", SizeFormatter.Format(saved))
+                        : Localizer.GetString("Sqlite_Status_AlreadyOptimized");
 
                     count++;
                     totalSaved += saved;
@@ -145,12 +146,12 @@ public class SqliteCompactorService
                     // Занятость, замеченная только на самом VACUUM (например,
                     // читатель, которого проба IMMEDIATE не ловит): честный
                     // пропуск, не «Ошибка: SQLite Error 5»
-                    target.Status = "Пропущено: база занята другим процессом";
+                    target.Status = Localizer.GetString("Sqlite_Status_SkippedBusy");
                 }
                 catch (Exception ex)
                 {
-                    System.Diagnostics.Debug.WriteLine($"[SqliteCompactor] Ошибка при сжатии {target.Path}: {ex.Message}");
-                    target.Status = $"Ошибка: {ex.Message}";
+                    System.Diagnostics.Debug.WriteLine($"[SqliteCompactor] VACUUM failed for {target.Path}: {ex.Message}");
+                    target.Status = Localizer.GetString("Sqlite_Status_Error", ex.Message);
                 }
             }
         }, ct);

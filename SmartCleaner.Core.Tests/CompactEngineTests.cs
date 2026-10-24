@@ -88,7 +88,7 @@ public class CompactEngineTests
             var result = await engine.DecompressDirectoryAsync(dir);
 
             Assert.True(result.Success);
-            Assert.Equal("Распаковка успешно завершена!", result.Message);
+            Assert.Equal("Decompression completed successfully!", result.Message);
             var request = Assert.Single(executor.Requests);
             Assert.Equal(SystemToolLocator.GetCompactPath(), request.FileName);
             Assert.Equal(new[] { "/u", $"/s:{dir}", "/i" }, request.Arguments);
@@ -114,7 +114,7 @@ public class CompactEngineTests
             var result = await engine.CompressDirectoryAsync(dir, "LZX");
 
             Assert.False(result.Success);
-            Assert.Equal("«compact.exe» не завершилась за 60 мин", result.Message);
+            Assert.Equal("compact.exe did not complete within 60 min", result.Message);
             Assert.Equal(0, result.SavedBytes);
         }
         finally
@@ -137,7 +137,7 @@ public class CompactEngineTests
 
             Assert.False(result.Success);
             Assert.Equal(0, result.SavedBytes);
-            Assert.Contains("кодом 2", result.Message);
+            Assert.Contains("code 2", result.Message);
             Assert.Contains("отказано в доступе", result.Message);
         }
         finally
@@ -162,7 +162,7 @@ public class CompactEngineTests
             var result = await engine.CompressDirectoryAsync(dir, "LZX", ct: cts.Token);
 
             Assert.False(result.Success);
-            Assert.Equal("Операция отменена пользователем", result.Message);
+            Assert.Equal("Operation cancelled by user", result.Message);
             Assert.Equal(0, result.SavedBytes);
         }
         finally
@@ -209,7 +209,7 @@ public class CompactEngineTests
 
             Assert.False(result.Success);
             Assert.Equal(0, result.SavedBytes);
-            Assert.Contains("кодом 1", result.Message);
+            Assert.Contains("code 1", result.Message);
             Assert.Contains("отказано в доступе", result.Message);
         }
         finally
@@ -231,7 +231,7 @@ public class CompactEngineTests
             var result = await engine.DecompressDirectoryAsync(dir);
 
             Assert.False(result.Success);
-            Assert.Contains("кодом 2", result.Message);
+            Assert.Contains("code 2", result.Message);
             Assert.Contains("отказано в доступе", result.Message);
         }
         finally

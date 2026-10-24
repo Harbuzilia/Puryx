@@ -127,8 +127,8 @@ public class WinSxSEngineTests
         Assert.Equal(0, result.ActualSizeBytes);
         Assert.Equal(0, result.ReclaimablePackagesBytes);
         Assert.False(result.CleanupRecommended);
-        Assert.Equal("н/д", result.ActualSizeFormatted);
-        Assert.Equal("н/д", result.ReclaimablePackagesFormatted);
+        Assert.Equal("N/A", result.ActualSizeFormatted);
+        Assert.Equal("N/A", result.ReclaimablePackagesFormatted);
         Assert.NotEmpty(result.AnalysisUnavailableReason);
     }
 
@@ -170,7 +170,7 @@ public class WinSxSEngineTests
         var result = await engine.AnalyzeComponentStoreAsync();
 
         Assert.False(result.AnalysisAvailable);
-        Assert.Contains("права администратора", result.AnalysisUnavailableReason);
+        Assert.Contains("administrator rights", result.AnalysisUnavailableReason);
         Assert.Contains("740", result.AnalysisUnavailableReason);
     }
 
@@ -184,7 +184,7 @@ public class WinSxSEngineTests
         var result = await engine.AnalyzeComponentStoreAsync();
 
         Assert.False(result.AnalysisAvailable);
-        Assert.Contains("таймаут", result.AnalysisUnavailableReason);
+        Assert.Contains("timed out", result.AnalysisUnavailableReason);
     }
 
     // ==== День 21 — L5 (ROADMAP): /ResetBase — только явный opt-in ====
@@ -242,7 +242,7 @@ public class WinSxSEngineTests
         Assert.False(result.AnalysisAvailable);
         Assert.Equal(0, result.ActualSizeBytes);
         Assert.Equal(0, result.ReclaimablePackagesBytes);
-        Assert.Contains("код возврата 5", result.AnalysisUnavailableReason);
+        Assert.Contains("exit code 5", result.AnalysisUnavailableReason);
     }
 
     [Fact]
@@ -257,8 +257,8 @@ public class WinSxSEngineTests
         var result = await engine.AnalyzeComponentStoreAsync();
 
         Assert.False(result.AnalysisAvailable);
-        Assert.Contains("DISM не вернул данных", result.AnalysisUnavailableReason);
-        Assert.Contains("код возврата 5", result.AnalysisUnavailableReason);
+        Assert.Contains("DISM returned no data", result.AnalysisUnavailableReason);
+        Assert.Contains("exit code 5", result.AnalysisUnavailableReason);
     }
 
     // ==== День 24 — отмена не глотается как ошибка (OCE-дисциплина, reviewer P3) ====
@@ -275,8 +275,8 @@ public class WinSxSEngineTests
         var result = await engine.AnalyzeComponentStoreAsync();
 
         Assert.False(result.AnalysisAvailable);
-        Assert.Contains("отмен", result.AnalysisUnavailableReason);
-        Assert.DoesNotContain("Ошибка", result.AnalysisUnavailableReason);
+        Assert.Contains("cancel", result.AnalysisUnavailableReason);
+        Assert.DoesNotContain("Error", result.AnalysisUnavailableReason);
     }
 
     // Тест добавлен после реализации (осознанное отступление от RED-фазы):
@@ -294,8 +294,8 @@ public class WinSxSEngineTests
         var (success, message) = await engine.RunComponentCleanupAsync(ct: cts.Token);
 
         Assert.False(success);
-        Assert.Contains("отменен", message);
-        Assert.DoesNotContain("Ошибка", message);
+        Assert.Contains("cancel", message);
+        Assert.DoesNotContain("Error", message);
     }
 
     // Ожидание «8.12 ГБ» без дублирования логики форматирования в тесте

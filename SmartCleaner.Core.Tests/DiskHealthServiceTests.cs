@@ -132,7 +132,7 @@ public class DiskHealthServiceTests
     private static void AssertFellBackToFixedDrives(List<PhysicalDiskInfo> disks)
     {
         Assert.NotEmpty(disks);
-        Assert.Contains(disks, d => d.FriendlyName.StartsWith("Локальный диск"));
+        Assert.Contains(disks, d => d.FriendlyName.StartsWith("Local disk"));
         Assert.All(disks, d => Assert.Null(d.RemainingLifePercentage));
         Assert.All(disks, d => Assert.Null(d.TemperatureCelsius));
     }

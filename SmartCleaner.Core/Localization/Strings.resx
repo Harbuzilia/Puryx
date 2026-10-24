@@ -2379,4 +2379,134 @@ Remove these entries from the system registry?</value>
   <data name="Network_Error_TcpRegistry" xml:space="preserve">
     <value>TCP registry configuration error: {0}</value>
   </data>
+  <!-- День 5, волна 2b: WinSxS / DriverStore / Compact / SQLite / DiskHealth -->
+  <data name="Common_NotAvailable" xml:space="preserve">
+    <value>N/A</value>
+  </data>
+  <data name="Common_CancelledByUser" xml:space="preserve">
+    <value>Operation cancelled by user</value>
+  </data>
+  <data name="WinSxS_Progress_Analyzing" xml:space="preserve">
+    <value>Analyzing the WinSxS component store via DISM...</value>
+  </data>
+  <data name="WinSxS_Reason_Timeout" xml:space="preserve">
+    <value>DISM analysis timed out (10 minutes)</value>
+  </data>
+  <data name="WinSxS_Reason_ExitCode" xml:space="preserve">
+    <value>{0} (exit code {1})</value>
+  </data>
+  <data name="WinSxS_Status_Cancelled" xml:space="preserve">
+    <value>WinSxS analysis cancelled</value>
+  </data>
+  <data name="WinSxS_Error_Analysis" xml:space="preserve">
+    <value>DISM analysis error: {0}</value>
+  </data>
+  <data name="WinSxS_Reason_NoData" xml:space="preserve">
+    <value>DISM returned no data</value>
+  </data>
+  <data name="WinSxS_Reason_ElevationRequired" xml:space="preserve">
+    <value>Analysis unavailable (administrator rights required)</value>
+  </data>
+  <data name="WinSxS_Reason_ParseFailed" xml:space="preserve">
+    <value>Failed to parse DISM output: component store size data not found</value>
+  </data>
+  <data name="WinSxS_Progress_CleanupStarting" xml:space="preserve">
+    <value>Starting WinSxS cleanup (DISM StartComponentCleanup)...</value>
+  </data>
+  <data name="WinSxS_Cleanup_ResetBaseNote" xml:space="preserve">
+    <value> (irreversible /ResetBase)</value>
+  </data>
+  <data name="WinSxS_Cleanup_Completed" xml:space="preserve">
+    <value>WinSxS cleanup completed with code {0}</value>
+  </data>
+  <data name="WinSxS_Cleanup_FailedToStart" xml:space="preserve">
+    <value>Failed to launch DISM</value>
+  </data>
+  <data name="WinSxS_Cleanup_Cancelled" xml:space="preserve">
+    <value>WinSxS cleanup cancelled</value>
+  </data>
+  <data name="WinSxS_Cleanup_Error" xml:space="preserve">
+    <value>DISM execution error: {0}</value>
+  </data>
+  <data name="DriverStore_Progress_Scanning" xml:space="preserve">
+    <value>Querying installed drivers via PnPUtil...</value>
+  </data>
+  <data name="DriverStore_Scan_Cancelled" xml:space="preserve">
+    <value>Driver scan cancelled</value>
+  </data>
+  <data name="DriverStore_Scan_Error" xml:space="preserve">
+    <value>Driver scan error: {0}</value>
+  </data>
+  <data name="DriverStore_Progress_Removing" xml:space="preserve">
+    <value>Removing outdated driver {0} ({1})...</value>
+  </data>
+  <data name="DriverStore_Remove_Failed" xml:space="preserve">
+    <value>Failed to remove {0}: code {1}</value>
+  </data>
+  <data name="DriverStore_Remove_Error" xml:space="preserve">
+    <value>Error removing {0}: {1}</value>
+  </data>
+  <data name="Compact_Category_GamesSteam" xml:space="preserve">
+    <value>Games (Steam)</value>
+  </data>
+  <data name="Compact_Category_GamesEpic" xml:space="preserve">
+    <value>Games (Epic Games)</value>
+  </data>
+  <data name="Compact_Category_DevProjects" xml:space="preserve">
+    <value>Development projects</value>
+  </data>
+  <data name="Compact_Error_DirectoryNotFound" xml:space="preserve">
+    <value>Directory not found</value>
+  </data>
+  <data name="Compact_Progress_Compressing" xml:space="preserve">
+    <value>Compressing '{0}' with {1} algorithm...</value>
+  </data>
+  <data name="Compact_Error_Timeout" xml:space="preserve">
+    <value>compact.exe did not complete within {0} min</value>
+  </data>
+  <data name="Compact_Error_CompressTool" xml:space="preserve">
+    <value>Compression error: compact.exe exited with code {0}</value>
+  </data>
+  <data name="Compact_Error_DecompressTool" xml:space="preserve">
+    <value>Decompression error: compact.exe exited with code {0}</value>
+  </data>
+  <data name="Compact_Success_Compressed" xml:space="preserve">
+    <value>Compression complete! Saved: {0}</value>
+  </data>
+  <data name="Compact_Success_CompressedNoSavings" xml:space="preserve">
+    <value>Compression complete! Savings: N/A (on-disk size could not be measured)</value>
+  </data>
+  <data name="Compact_Progress_Decompressing" xml:space="preserve">
+    <value>Decompressing '{0}'...</value>
+  </data>
+  <data name="Compact_Success_Decompressed" xml:space="preserve">
+    <value>Decompression completed successfully!</value>
+  </data>
+  <data name="Compact_Error_CompressFailed" xml:space="preserve">
+    <value>Compression error: {0}</value>
+  </data>
+  <data name="Compact_Error_DecompressFailed" xml:space="preserve">
+    <value>Decompression error: {0}</value>
+  </data>
+  <data name="Sqlite_Status_Ready" xml:space="preserve">
+    <value>Ready to compact</value>
+  </data>
+  <data name="Sqlite_Progress_Compacting" xml:space="preserve">
+    <value>Compacting and vacuuming database: {0} ({1})...</value>
+  </data>
+  <data name="Sqlite_Status_SkippedBusy" xml:space="preserve">
+    <value>Skipped: database is in use by another process</value>
+  </data>
+  <data name="Sqlite_Status_Compacted" xml:space="preserve">
+    <value>Compacted (freed {0})</value>
+  </data>
+  <data name="Sqlite_Status_AlreadyOptimized" xml:space="preserve">
+    <value>Already optimized</value>
+  </data>
+  <data name="Sqlite_Status_Error" xml:space="preserve">
+    <value>Error: {0}</value>
+  </data>
+  <data name="DiskHealth_LocalDisk" xml:space="preserve">
+    <value>Local disk ({0})</value>
+  </data>
 </root>

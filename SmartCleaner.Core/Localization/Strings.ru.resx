@@ -2379,4 +2379,134 @@ Windows может использовать эти драйверы прямо �
   <data name="Network_Error_TcpRegistry" xml:space="preserve">
     <value>Ошибка настройки реестра TCP: {0}</value>
   </data>
+  <!-- День 5, волна 2b: WinSxS / DriverStore / Compact / SQLite / DiskHealth -->
+  <data name="Common_NotAvailable" xml:space="preserve">
+    <value>н/д</value>
+  </data>
+  <data name="Common_CancelledByUser" xml:space="preserve">
+    <value>Операция отменена пользователем</value>
+  </data>
+  <data name="WinSxS_Progress_Analyzing" xml:space="preserve">
+    <value>Анализ хранилища компонентов WinSxS через DISM...</value>
+  </data>
+  <data name="WinSxS_Reason_Timeout" xml:space="preserve">
+    <value>Анализ DISM прерван по таймауту (10 минут)</value>
+  </data>
+  <data name="WinSxS_Reason_ExitCode" xml:space="preserve">
+    <value>{0} (код возврата {1})</value>
+  </data>
+  <data name="WinSxS_Status_Cancelled" xml:space="preserve">
+    <value>Анализ WinSxS отменён</value>
+  </data>
+  <data name="WinSxS_Error_Analysis" xml:space="preserve">
+    <value>Ошибка анализа DISM: {0}</value>
+  </data>
+  <data name="WinSxS_Reason_NoData" xml:space="preserve">
+    <value>DISM не вернул данных</value>
+  </data>
+  <data name="WinSxS_Reason_ElevationRequired" xml:space="preserve">
+    <value>Анализ недоступен (нужны права администратора)</value>
+  </data>
+  <data name="WinSxS_Reason_ParseFailed" xml:space="preserve">
+    <value>Не удалось разобрать вывод DISM: данные о размере хранилища не найдены</value>
+  </data>
+  <data name="WinSxS_Progress_CleanupStarting" xml:space="preserve">
+    <value>Запуск очистки WinSxS (DISM StartComponentCleanup)...</value>
+  </data>
+  <data name="WinSxS_Cleanup_ResetBaseNote" xml:space="preserve">
+    <value> (с необратимым /ResetBase)</value>
+  </data>
+  <data name="WinSxS_Cleanup_Completed" xml:space="preserve">
+    <value>Очистка WinSxS завершена с кодом {0}</value>
+  </data>
+  <data name="WinSxS_Cleanup_FailedToStart" xml:space="preserve">
+    <value>Не удалось запустить DISM</value>
+  </data>
+  <data name="WinSxS_Cleanup_Cancelled" xml:space="preserve">
+    <value>Очистка WinSxS отменена</value>
+  </data>
+  <data name="WinSxS_Cleanup_Error" xml:space="preserve">
+    <value>Ошибка выполнения DISM: {0}</value>
+  </data>
+  <data name="DriverStore_Progress_Scanning" xml:space="preserve">
+    <value>Опрос установленных драйверов через PnPUtil...</value>
+  </data>
+  <data name="DriverStore_Scan_Cancelled" xml:space="preserve">
+    <value>Сканирование драйверов отменено</value>
+  </data>
+  <data name="DriverStore_Scan_Error" xml:space="preserve">
+    <value>Ошибка сканирования драйверов: {0}</value>
+  </data>
+  <data name="DriverStore_Progress_Removing" xml:space="preserve">
+    <value>Удаление устаревшего драйвера {0} ({1})...</value>
+  </data>
+  <data name="DriverStore_Remove_Failed" xml:space="preserve">
+    <value>Не удалось удалить {0}: код {1}</value>
+  </data>
+  <data name="DriverStore_Remove_Error" xml:space="preserve">
+    <value>Ошибка при удалении {0}: {1}</value>
+  </data>
+  <data name="Compact_Category_GamesSteam" xml:space="preserve">
+    <value>Игры (Steam)</value>
+  </data>
+  <data name="Compact_Category_GamesEpic" xml:space="preserve">
+    <value>Игры (Epic Games)</value>
+  </data>
+  <data name="Compact_Category_DevProjects" xml:space="preserve">
+    <value>Проекты разработки</value>
+  </data>
+  <data name="Compact_Error_DirectoryNotFound" xml:space="preserve">
+    <value>Директория не найдена</value>
+  </data>
+  <data name="Compact_Progress_Compressing" xml:space="preserve">
+    <value>Сжатие '{0}' алгоритмом {1}...</value>
+  </data>
+  <data name="Compact_Error_Timeout" xml:space="preserve">
+    <value>compact.exe не завершилась за {0} мин</value>
+  </data>
+  <data name="Compact_Error_CompressTool" xml:space="preserve">
+    <value>Ошибка сжатия: compact.exe завершилась с кодом {0}</value>
+  </data>
+  <data name="Compact_Error_DecompressTool" xml:space="preserve">
+    <value>Ошибка распаковки: compact.exe завершилась с кодом {0}</value>
+  </data>
+  <data name="Compact_Success_Compressed" xml:space="preserve">
+    <value>Сжатие завершено! Сэкономлено: {0}</value>
+  </data>
+  <data name="Compact_Success_CompressedNoSavings" xml:space="preserve">
+    <value>Сжатие завершено! Экономия: н/д (не удалось измерить размер на диске)</value>
+  </data>
+  <data name="Compact_Progress_Decompressing" xml:space="preserve">
+    <value>Распаковка '{0}'...</value>
+  </data>
+  <data name="Compact_Success_Decompressed" xml:space="preserve">
+    <value>Распаковка успешно завершена!</value>
+  </data>
+  <data name="Compact_Error_CompressFailed" xml:space="preserve">
+    <value>Ошибка сжатия: {0}</value>
+  </data>
+  <data name="Compact_Error_DecompressFailed" xml:space="preserve">
+    <value>Ошибка распаковки: {0}</value>
+  </data>
+  <data name="Sqlite_Status_Ready" xml:space="preserve">
+    <value>Готов к сжатию</value>
+  </data>
+  <data name="Sqlite_Progress_Compacting" xml:space="preserve">
+    <value>Сжатие и вакуумизация базы: {0} ({1})...</value>
+  </data>
+  <data name="Sqlite_Status_SkippedBusy" xml:space="preserve">
+    <value>Пропущено: база занята другим процессом</value>
+  </data>
+  <data name="Sqlite_Status_Compacted" xml:space="preserve">
+    <value>Сжато (высвобождено {0})</value>
+  </data>
+  <data name="Sqlite_Status_AlreadyOptimized" xml:space="preserve">
+    <value>Уже оптимизировано</value>
+  </data>
+  <data name="Sqlite_Status_Error" xml:space="preserve">
+    <value>Ошибка: {0}</value>
+  </data>
+  <data name="DiskHealth_LocalDisk" xml:space="preserve">
+    <value>Локальный диск ({0})</value>
+  </data>
 </root>
