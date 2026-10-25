@@ -342,4 +342,67 @@ public class MftParserTests
         Assert.Null(record.Error);
         Assert.True(record.HasAttributeList);
     }
+
+    // ---------- Кейс-эджи: харднинг контрактов ----------
+
+    [Fact]
+    public void ParseRecord_NamedDataStream_Ignored()
+    {
+        // Только именованный поток (ADS) — содержимым файла не является
+        var namedOnly = new MftRecordBuilder();
+        namedOnly.AddFileName("ads.txt", MftNamespace.Win32AndDos, parentNumber: 5, parentSequence: 5);
+        namedOnly.AddNamedData("zone", new byte[] { 1, 2, 3 });
+
+        MftRecord namedOnlyRecord = BuildFixupAndParse(namedOnly);
+
+        Assert.Null(namedOnlyRecord.Error);
+        Assert.Equal(0UL, namedOnlyRecord.AllocatedSize);
+        Assert.Equal(0UL, namedOnlyRecord.RealSize);
+
+        // Именованный + неименованный: размеры только из неименованного
+        var withUnnamed = new MftRecordBuilder();
+        withUnnamed.AddFileName("ads2.txt", MftNamespace.Win32AndDos, parentNumber: 5, parentSequence: 5);
+        withUnnamed.AddNamedData("zone", new byte[] { 1, 2, 3 });
+        withUnnamed.AddResidentData(new byte[] { 7, 7, 7, 7 });
+
+        MftRecord withUnnamedRecord = BuildFixupAndParse(withUnnamed);
+
+        Assert.Null(withUnnamedRecord.Error);
+        Assert.Equal(0UL, withUnnamedRecord.AllocatedSize);
+        Assert.Equal(4UL, withUnnamedRecord.RealSize);
+    }
+
+    [Fact]
+    public void ParseRecord_Malformed_AttributeLengthBeyondRecord()
+    {
+        var builder = new MftRecordBuilder();
+        builder.AddFileName("len.txt", MftNamespace.Win32AndDos, parentNumber: 5, parentSequence: 5);
+        byte[] record = builder.Build();
+        Assert.Null(MftParser.ApplyFixups(record, 512));
+        MftTestBytes.PutU32(record, 0x38 + 0x04, 0x800); // длина первого атрибута вылазит за запись
+
+        Assert.Equal(MftRecordError.Malformed, MftParser.ParseRecord(record, 1024).Error);
+    }
+
+    [Fact]
+    public void ParseRecord_Malformed_TruncatedSpan()
+    {
+        var builder = new MftRecordBuilder();
+        builder.AddFileName("cut.txt", MftNamespace.Win32AndDos, parentNumber: 5, parentSequence: 5);
+        byte[] record = builder.Build();
+        ReadOnlySpan<byte> truncated = record.AsSpan(0, 512); // половина записи
+
+        Assert.Equal(MftRecordError.Malformed, MftParser.ParseRecord(truncated, 1024).Error);
+    }
+
+    [Fact]
+    public void ApplyFixups_Malformed_UsaCountTooSmall()
+    {
+        var record = new byte[1024];
+        MftTestBytes.WriteMagic(record, "FILE");
+        MftTestBytes.PutU16(record, 0x04, 0x30);
+        MftTestBytes.PutU16(record, 0x06, 1); // USA без единого слота данных
+
+        Assert.Equal(MftRecordError.Malformed, MftParser.ApplyFixups(record, 512));
+    }
 }
