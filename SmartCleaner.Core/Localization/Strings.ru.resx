@@ -4095,4 +4095,19 @@ Windows может использовать эти драйверы прямо �
   <data name="Update_NoSha256" xml:space="preserve">
     <value>У файла релиза нет контрольной суммы SHA256 — обновление отклонено (без проверки не устанавливаем).</value>
   </data>
+  <data name="Update_NotHttps" xml:space="preserve">
+    <value>Обновление отклонено: адрес загрузки не HTTPS.</value>
+  </data>
+  <data name="Update_DownloadFailed" xml:space="preserve">
+    <value>Не удалось скачать обновление (ошибка сети).</value>
+  </data>
+  <data name="Update_HashMismatch" xml:space="preserve">
+    <value>Контрольная сумма SHA256 скачанного файла не совпала — обновление отклонено, файл удалён.</value>
+  </data>
+  <data name="Update_NoWriteAccess" xml:space="preserve">
+    <value>Каталог программы не доступен для записи (нет прав) — запустите Puryx от имени администратора и повторите.</value>
+  </data>
+  <data name="Update_ApplyFailed" xml:space="preserve">
+    <value>Не удалось применить обновление — текущая версия продолжает работу.</value>
+  </data>
 </root>

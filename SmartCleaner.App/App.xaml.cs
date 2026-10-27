@@ -10,6 +10,7 @@ using SmartCleaner.Core.Scheduler;
 using SmartCleaner.Core.Scanning;
 using SmartCleaner.Core.Scanning.Scanners;
 using SmartCleaner.Core.Services;
+using SmartCleaner.Core.Update;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
@@ -41,6 +42,11 @@ public partial class App : Application
                 Shutdown(exitCode);
                 return;
             }
+
+            // День 12 (ROADMAP v3.1): убрать артефакт прошлого self-update —
+            // <exe>.old, оставленный rename-swap при применении обновления.
+            // Очистка необязательна для запуска: исключения глотаются внутри.
+            UpdateInstaller.CleanupOldFile(Environment.ProcessPath ?? typeof(App).Assembly.Location);
 
             var services = new ServiceCollection();
             ConfigureServices(services);

@@ -4095,4 +4095,19 @@ What exactly would you like to do?</value>
   <data name="Update_NoSha256" xml:space="preserve">
     <value>Release file has no SHA256 checksum — update refused (no install without verification).</value>
   </data>
+  <data name="Update_NotHttps" xml:space="preserve">
+    <value>Update refused: the download URL is not HTTPS.</value>
+  </data>
+  <data name="Update_DownloadFailed" xml:space="preserve">
+    <value>Failed to download the update (network error).</value>
+  </data>
+  <data name="Update_HashMismatch" xml:space="preserve">
+    <value>The downloaded file failed the SHA256 checksum — update refused, the file has been deleted.</value>
+  </data>
+  <data name="Update_NoWriteAccess" xml:space="preserve">
+    <value>The program folder is not writable (no permissions) — run Puryx as administrator and try again.</value>
+  </data>
+  <data name="Update_ApplyFailed" xml:space="preserve">
+    <value>Failed to apply the update — the current version keeps running.</value>
+  </data>
 </root>

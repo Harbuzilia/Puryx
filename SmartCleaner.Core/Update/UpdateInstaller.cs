@@ -146,17 +146,175 @@ public sealed class UpdateInstaller : IUpdateInstaller, IDisposable
     }
 
     /// <inheritdoc />
-    public Task<UpdateDownloadResult> DownloadAsync(
+    public async Task<UpdateDownloadResult> DownloadAsync(
         UpdateCheckResult update, IProgress<double>? progress = null, CancellationToken cancellationToken = default)
-        => throw new NotImplementedException();
+    {
+        // Только HTTPS: транспорт обновления не понижается, отказ — ДО любого сетевого запроса
+        if (!Uri.TryCreate(update.AssetUrl, UriKind.Absolute, out var assetUri) ||
+            !string.Equals(assetUri.Scheme, Uri.UriSchemeHttps, StringComparison.OrdinalIgnoreCase))
+        {
+            return UpdateDownloadResult.Fail("Update_NotHttps");
+        }
+
+        var tempPath = Path.Combine(_tempDirectory, $"Puryx-update-{update.LatestVersion}.exe");
+        try
+        {
+            using var response = await _httpClient
+                .GetAsync(assetUri, HttpCompletionOption.ResponseHeadersRead, cancellationToken)
+                .ConfigureAwait(false);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                TryDeleteFile(tempPath);
+                return UpdateDownloadResult.Fail("Update_DownloadFailed");
+            }
+
+            var totalBytes = response.Content.Headers.ContentLength ?? -1;
+            await using var source = await response.Content
+                .ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
+            await using var target = new FileStream(
+                tempPath, FileMode.Create, FileAccess.Write, FileShare.None, StreamBufferSize);
+
+            var buffer = new byte[StreamBufferSize];
+            long copiedBytes = 0;
+            int chunk;
+            while ((chunk = await source
+                       .ReadAsync(buffer.AsMemory(0, buffer.Length), cancellationToken)
+                       .ConfigureAwait(false)) > 0)
+            {
+                await target.WriteAsync(buffer.AsMemory(0, chunk), cancellationToken).ConfigureAwait(false);
+                copiedBytes += chunk;
+                if (totalBytes > 0)
+                {
+                    progress?.Report((double)copiedBytes / totalBytes);
+                }
+            }
+
+            // Финальный отчёт и при неизвестном Content-Length — индикатор завершения
+            progress?.Report(1.0);
+            return UpdateDownloadResult.Ok(tempPath);
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            // Отмена инициирована вызывающим кодом — пробрасываем честно (паттерн UpdateChecker),
+            // partial-файл в temp вычищаем
+            TryDeleteFile(tempPath);
+            throw;
+        }
+        catch (OperationCanceledException)
+        {
+            TryDeleteFile(tempPath);
+            return UpdateDownloadResult.Fail("Update_DownloadFailed");
+        }
+        catch (HttpRequestException)
+        {
+            TryDeleteFile(tempPath);
+            return UpdateDownloadResult.Fail("Update_DownloadFailed");
+        }
+        catch (IOException)
+        {
+            // Недоступный temp-каталог/диск — тот же честный отказ скачивания
+            TryDeleteFile(tempPath);
+            return UpdateDownloadResult.Fail("Update_DownloadFailed");
+        }
+    }
 
     /// <inheritdoc />
     public bool VerifySha256(string tempFilePath, string expectedSha256)
-        => throw new NotImplementedException();
+    {
+        if (string.IsNullOrWhiteSpace(expectedSha256) || !File.Exists(tempFilePath))
+        {
+            return false;
+        }
+
+        string actualHex;
+        try
+        {
+            // SHA256.HashData(Stream) хэширует поток чанками — 70 МБ ассет не грузится в память
+            using var stream = File.OpenRead(tempFilePath);
+            actualHex = Convert.ToHexString(SHA256.HashData(stream));
+        }
+        catch (IOException)
+        {
+            // Нечитаемый файл — верификация не удалась, refusal вызывающего
+            return false;
+        }
+
+        if (string.Equals(actualHex, expectedSha256.Trim(), StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        // Мисматч: невалидная загрузка не хранится в temp; вызывающий отказывает с Update_HashMismatch
+        TryDeleteFile(tempFilePath);
+        return false;
+    }
 
     /// <inheritdoc />
     public UpdateApplyResult ApplyUpdate(string tempFilePath)
-        => throw new NotImplementedException();
+    {
+        var programDirectory = Path.GetDirectoryName(_currentExePath);
+        if (string.IsNullOrEmpty(programDirectory))
+        {
+            return UpdateApplyResult.Fail("Update_ApplyFailed");
+        }
+
+        // Права записи в каталог программы (Program Files без админа): probe-файл —
+        // отказ честный, с подсказкой, БЕЗ элевации (новых elevated-векторов нет)
+        try
+        {
+            var probePath = Path.Combine(programDirectory, Path.GetRandomFileName());
+            using (File.Create(probePath))
+            {
+            }
+            File.Delete(probePath);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return UpdateApplyResult.Fail("Update_NoWriteAccess");
+        }
+        catch (IOException)
+        {
+            return UpdateApplyResult.Fail("Update_ApplyFailed");
+        }
+
+        var oldPath = Path.ChangeExtension(_currentExePath, ".old");
+
+        // Шаг 1: текущий exe → <имя>.old рядом; переживший .old от прошлой попытки замещается
+        try
+        {
+            if (File.Exists(oldPath))
+            {
+                File.Delete(oldPath);
+            }
+            File.Move(_currentExePath, oldPath);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return UpdateApplyResult.Fail("Update_NoWriteAccess");
+        }
+        catch (IOException)
+        {
+            return UpdateApplyResult.Fail("Update_ApplyFailed");
+        }
+
+        // Шаг 2: новый exe на место текущего; сбой — откат текущего из .old
+        try
+        {
+            File.Move(tempFilePath, _currentExePath);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            TryMoveBack(oldPath, _currentExePath);
+            return UpdateApplyResult.Fail(
+                ex is UnauthorizedAccessException ? "Update_NoWriteAccess" : "Update_ApplyFailed");
+        }
+
+        // Swap завершён: новый exe на месте, старый ждёт CleanupOldFile при следующем старте
+        _processLauncher.StartNewProcess(_currentExePath);
+        _processLauncher.Exit(0);
+        return UpdateApplyResult.Ok();
+    }
 
     /// <summary>
     /// Очистка артефакта прошлого self-update: удалить &lt;exe&gt;.old, если
@@ -164,8 +322,57 @@ public sealed class UpdateInstaller : IUpdateInstaller, IDisposable
     /// очистка необязательна для запуска.
     /// </summary>
     public static void CleanupOldFile(string currentExePath)
-        => throw new NotImplementedException();
+    {
+        if (string.IsNullOrWhiteSpace(currentExePath))
+        {
+            return;
+        }
+
+        try
+        {
+            var oldPath = Path.ChangeExtension(currentExePath, ".old");
+            if (File.Exists(oldPath))
+            {
+                File.Delete(oldPath);
+            }
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            // Молча: запуск приложения не должен зависеть от уборки
+        }
+    }
 
     /// <inheritdoc />
     public void Dispose() => _httpClient.Dispose();
+
+    /// <summary>Лучшее усилие удаления — мусор в temp не должен валить честный отказ.</summary>
+    private static void TryDeleteFile(string path)
+    {
+        try
+        {
+            if (File.Exists(path))
+            {
+                File.Delete(path);
+            }
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+        }
+    }
+
+    /// <summary>Откат swap: вернуть старый exe из .old на место (лучшее усилие, молча).</summary>
+    private static void TryMoveBack(string fromPath, string toPath)
+    {
+        try
+        {
+            if (File.Exists(fromPath))
+            {
+                File.Move(fromPath, toPath);
+            }
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            // Откат не удался: .old остаётся рядом — восстановление вручную; отказ ниже честный
+        }
+    }
 }
