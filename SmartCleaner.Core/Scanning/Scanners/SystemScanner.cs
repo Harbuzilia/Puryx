@@ -1,6 +1,7 @@
 using SmartCleaner.Core.Localization;
 using SmartCleaner.Core.Models;
 using SmartCleaner.Core.Safety;
+using SmartCleaner.Core.Services;
 
 namespace SmartCleaner.Core.Scanning.Scanners;
 
@@ -13,9 +14,23 @@ public class SystemScanner : ScannerBase
     public override string CategoryIcon => "\uE770"; // Segoe MDL2: Settings
     public override int DisplayOrder => 1;
 
-    public SystemScanner(ISafetyService safety) 
+    private readonly IConfigService? _configService;
+    private readonly IReadOnlyList<string>? _deepScanRoots;
+
+    /// <summary>
+    /// DI-конструктор. <paramref name="configService"/> — единая настройка
+    /// сканирования (<see cref="ScanSettingsConfig"/>; deep-pass opt-in), null —
+    /// дефолты (проход выключен). <paramref name="deepScanRoots"/> — тест-шов
+    /// корней deep-pass (null — %TEMP%, Windows\Temp, WER/Minidump, FOUND.*).
+    /// </summary>
+    public SystemScanner(
+        ISafetyService safety,
+        IConfigService? configService = null,
+        IReadOnlyList<string>? deepScanRoots = null)
         : base(safety)
     {
+        _configService = configService;
+        _deepScanRoots = deepScanRoots;
     }
 
     public override async Task<ScanResult> ScanAsync(

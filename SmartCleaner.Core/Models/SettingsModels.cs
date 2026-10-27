@@ -42,6 +42,15 @@ public sealed class ScanSettingsConfig
     /// всегда невыбранными — удаление только вручную и с подтверждением.
     /// </summary>
     public bool BrowserCleanCookies { get; set; }
+
+    /// <summary>
+    /// Глубокий проход «системного мусора» (ROADMAP v3.1, День 15, фаза F):
+    /// рекурсивно искать <c>.chk</c>/<c>.tmp</c>/<c>.dmp</c> внутри ОГРАНИЧЕННЫХ
+    /// корней (%TEMP% пользователя, Windows\Temp, WER/Minidump, <c>FOUND.*</c>).
+    /// По умолчанию <c>false</c>: расширенный проход по подкаталогам — только по
+    /// явному согласию; при выключенной опции SystemScanner работает как раньше.
+    /// </summary>
+    public bool DeepJunkScan { get; set; }
 }
 
 /// <summary>
