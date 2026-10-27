@@ -15,7 +15,7 @@
   <a href="https://github.com/Harbuzilia/Puryx/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/Harbuzilia/Puryx/actions/workflows/ci.yml/badge.svg"></a>
   <a href="https://github.com/Harbuzilia/Puryx"><img alt="Platform: Windows 10/11" src="https://img.shields.io/badge/platform-Windows%2010%2F11-0078D4?logo=windows&logoColor=white"></a>
   <a href="https://github.com/Harbuzilia/Puryx"><img alt=".NET 8" src="https://img.shields.io/badge/.NET-8.0-512BD4?logo=dotnet&logoColor=white"></a>
-  <a href="https://github.com/Harbuzilia/Puryx"><img alt="Version: 3.0.0" src="https://img.shields.io/badge/version-3.0.0-8a2be2.svg"></a>
+  <a href="https://github.com/Harbuzilia/Puryx"><img alt="Version: 3.1.0" src="https://img.shields.io/badge/version-3.1.0-8a2be2.svg"></a>
 </p>
 
 <p align="center">
@@ -31,7 +31,7 @@
 **Option A — portable (single exe, no installation):**
 
 1. **Download** the portable build from the [Releases](https://github.com/Harbuzilia/Puryx/releases) page.
-2. **Run** the downloaded `Puryx-3.0.0-portable-win-x64.exe`. The app is not code-signed: on first launch Windows SmartScreen will show a warning — click "More info" → "Run anyway".
+2. **Run** the downloaded `Puryx-3.1.0-portable-win-x64.exe`. The app is not code-signed: on first launch Windows SmartScreen will show a warning — click "More info" → "Run anyway".
 
 **Option B — Scoop (package manager):**
 
@@ -42,7 +42,7 @@ scoop install puryx
 
 **Scan**: start a scan (`Ctrl + S`), review the results and clean the selected items (`Delete`) — deleted files go to the Recycle Bin by default and can be restored.
 
-> What's new — [CHANGELOG.md](CHANGELOG.md): release 3.0.0; the version history follows below.
+> What's new — [CHANGELOG.md](CHANGELOG.md): release 3.1.0; the version history follows below.
 
 ---
 

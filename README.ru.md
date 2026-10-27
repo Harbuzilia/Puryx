@@ -15,7 +15,7 @@
   <a href="https://github.com/Harbuzilia/Puryx/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/Harbuzilia/Puryx/actions/workflows/ci.yml/badge.svg"></a>
   <a href="https://github.com/Harbuzilia/Puryx"><img alt="Platform: Windows 10/11" src="https://img.shields.io/badge/platform-Windows%2010%2F11-0078D4?logo=windows&logoColor=white"></a>
   <a href="https://github.com/Harbuzilia/Puryx"><img alt=".NET 8" src="https://img.shields.io/badge/.NET-8.0-512BD4?logo=dotnet&logoColor=white"></a>
-  <a href="https://github.com/Harbuzilia/Puryx"><img alt="Version: 3.0.0" src="https://img.shields.io/badge/version-3.0.0-8a2be2.svg"></a>
+  <a href="https://github.com/Harbuzilia/Puryx"><img alt="Version: 3.1.0" src="https://img.shields.io/badge/version-3.1.0-8a2be2.svg"></a>
 </p>
 
 <p align="center">
@@ -31,7 +31,7 @@
 **Вариант A — portable (один exe, без установки):**
 
 1. **Скачайте** portable-сборку со страницы [Releases](https://github.com/Harbuzilia/Puryx/releases).
-2. **Запустите** скачанный `Puryx-3.0.0-portable-win-x64.exe`. Приложение не подписано код-подписью: при первом запуске Windows SmartScreen покажет предупреждение — нажмите «Подробнее» → «Выполнить в любом случае».
+2. **Запустите** скачанный `Puryx-3.1.0-portable-win-x64.exe`. Приложение не подписано код-подписью: при первом запуске Windows SmartScreen покажет предупреждение — нажмите «Подробнее» → «Выполнить в любом случае».
 
 **Вариант B — Scoop (пакетный менеджер):**
 
@@ -42,7 +42,7 @@ scoop install puryx
 
 **Сканируйте**: запустите сканирование (`Ctrl + S`), просмотрите результаты и очистите выбранное (`Delete`) — удалённое по умолчанию отправляется в Корзину с возможностью восстановления.
 
-> Что нового — [CHANGELOG.md](CHANGELOG.md): релиз 3.0.0; ниже — история версий.
+> Что нового — [CHANGELOG.md](CHANGELOG.md): релиз 3.1.0; ниже — история версий.
 
 ---
 
