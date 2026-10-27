@@ -364,13 +364,29 @@ public partial class MainViewModel : ObservableObject, IDisposable
     private async Task CleanAsync()
     {
         var selectedVMs = AllItems
-            .Where(i => i.IsSelected && i.Risk != RiskCategory.UserData)
+            .Where(i => i.IsSelected && CleaningSelectionPolicy.IsEligible(i.Item))
             .ToList();
 
         if (selectedVMs.Count == 0)
         {
             StatusText = Localizer.GetString("Main_Status_NothingSelected");
             return;
+        }
+
+        // Opt-in пользовательские данные (cookie-хранилища браузеров, День 14):
+        // отдельное подтверждение ДО общего диалога — «будете разлогинены».
+        if (CleaningSelectionPolicy.RequiresUserDataConfirmation(selectedVMs.Select(vm => vm.Item)))
+        {
+            var cookieConfirmation = MessageBox.Show(
+                Localizer.GetString("Main_CookieConfirmText"),
+                Localizer.GetString("Main_CookieConfirmTitle"),
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning);
+            if (cookieConfirmation != MessageBoxResult.Yes)
+            {
+                StatusText = Localizer.GetString("Main_Status_CleanCancelled");
+                return;
+            }
         }
 
         // Показываем диалог подтверждения
@@ -1019,6 +1035,15 @@ public partial class ScannedItemViewModel : ObservableObject
         }
     }
     public string? ParentApp => Item.ParentApp;
+
+    /// <summary>
+    /// Чекбокс доступен: обычные элементы — кроме защищённых и заблокированных;
+    /// opt-in пользовательские данные (cookie-хранилища) — вручную, если браузер
+    /// не держит файл (иначе удаление всё равно заблокирует SafetyService).
+    /// </summary>
+    public bool IsSelectable => Item.IsUserDataOptIn
+        ? !Item.IsLocked
+        : Item.Risk != RiskCategory.UserData && Item.Risk != RiskCategory.Locked;
 
     [ObservableProperty]
     private bool _isSelected;

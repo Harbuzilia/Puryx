@@ -96,6 +96,17 @@ public partial class SettingsViewModel : ObservableObject
         Localizer.GetString("Settings_MftModeOff")
     ];
 
+    // ─── Cookie-файлы браузеров (ROADMAP v3.1, День 14, фаза B) ───
+
+    /// <summary>
+    /// Искать cookie-хранилища браузеров (RiskCategory.UserData, opt-in).
+    /// По умолчанию выключено: без согласия сканер не выдаёт cookie-элементы вообще;
+    /// при включении они никогда не выбираются автоматически, а удаление требует
+    /// дополнительного подтверждения. Хранится в общем scan_settings.json.
+    /// </summary>
+    [ObservableProperty]
+    private bool _browserCleanCookies;
+
     // ─── Обновления (ROADMAP v3.1, День 11, фаза U) ───
 
     /// <summary>
@@ -258,13 +269,16 @@ public partial class SettingsViewModel : ObservableObject
             _ => 0
         };
 
-        // Режим MFT — так же прямым полем (MftDiskScanner нормализует значения)
-        _selectedMftModeIndex = _configService.Load<ScanSettingsConfig>(ScanSettingsFilename).MftScanMode switch
+        // Режим MFT и cookie-opt-in — единый scan_settings.json; прямыми полями
+        // (MftDiskScanner нормализует значения, загрузка не должна сохранять файл)
+        var scanSettings = _configService.Load<ScanSettingsConfig>(ScanSettingsFilename);
+        _selectedMftModeIndex = scanSettings.MftScanMode switch
         {
             "On" => 1,
             "Off" => 2,
             _ => 0
         };
+        _browserCleanCookies = scanSettings.BrowserCleanCookies;
 
         // Трей — прямым полем: загрузка не триггерит OnChanged/сохранение
         _minimizeToTray = _configService.Load<TraySettingsConfig>(TraySettingsConfig.Filename).MinimizeToTray;
@@ -359,6 +373,15 @@ public partial class SettingsViewModel : ObservableObject
             2 => "Off",
             _ => "Auto"
         };
+        _configService.Save(ScanSettingsFilename, settings);
+    }
+
+    partial void OnBrowserCleanCookiesChanged(bool value)
+    {
+        // Read-modify-write: scan_settings.json читается BrowserScanner'ом в Core
+        // при каждом скане; MFT-режим в том же файле не теряется
+        var settings = _configService.Load<ScanSettingsConfig>(ScanSettingsFilename);
+        settings.BrowserCleanCookies = value;
         _configService.Save(ScanSettingsFilename, settings);
     }
 

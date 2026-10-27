@@ -74,24 +74,6 @@ public class RiskToTextConverter : IValueConverter
 }
 
 /// <summary>
-/// Конвертер RiskCategory в доступность чекбокса
-/// </summary>
-public class RiskToEnabledConverter : IValueConverter
-{
-    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-    {
-        if (value is RiskCategory risk)
-        {
-            return risk != RiskCategory.UserData && risk != RiskCategory.Locked;
-        }
-        return true;
-    }
-
-    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        => throw new NotImplementedException();
-}
-
-/// <summary>
 /// Конвертер bool в Visibility
 /// </summary>
 public class BoolToVisibilityConverter : IValueConverter

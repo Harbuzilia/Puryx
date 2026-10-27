@@ -230,6 +230,24 @@
                                        TextWrapping="Wrap"/>
                         </StackPanel>
                     </Grid>
+
+                    <!-- Cookie-файлы браузеров (ROADMAP v3.1, День 14: opt-in, UserData) -->
+                    <Border Background="{DynamicResource SurfaceVariantBrush}"
+                            CornerRadius="4"
+                            Padding="12,10"
+                            Margin="0,14,0,0">
+                        <StackPanel>
+                            <CheckBox Content="{x:Static loc:Localizer.Settings_BrowserCleanCookies}"
+                                      IsChecked="{Binding BrowserCleanCookies, Mode=TwoWay}"
+                                      Foreground="{DynamicResource TextPrimaryBrush}"
+                                      FontSize="13"
+                                      Margin="0,0,0,6"/>
+                            <TextBlock Text="{x:Static loc:Localizer.Settings_BrowserCleanCookiesHint}"
+                                       Style="{StaticResource Caption}"
+                                       Foreground="{DynamicResource TextSecondaryBrush}"
+                                       TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Border>
                 </StackPanel>
             </Border>
 

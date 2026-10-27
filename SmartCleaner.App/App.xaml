@@ -9,7 +9,6 @@
             <converters:SizeConverter x:Key="SizeConverter"/>
             <converters:RiskToBackgroundConverter x:Key="RiskToBackgroundConverter"/>
             <converters:RiskToTextConverter x:Key="RiskToTextConverter"/>
-            <converters:RiskToEnabledConverter x:Key="RiskToEnabledConverter"/>
             <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
             <converters:CountToVisibilityConverter x:Key="CountToVisibilityConverter"/>
             <converters:InverseBoolConverter x:Key="InverseBoolConverter"/>

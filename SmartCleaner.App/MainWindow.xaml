@@ -643,7 +643,7 @@
                                         </Grid.ColumnDefinitions>
 
                                         <CheckBox IsChecked="{Binding IsSelected}"
-                                                  IsEnabled="{Binding Risk, Converter={StaticResource RiskToEnabledConverter}}"
+                                                  IsEnabled="{Binding IsSelectable}"
                                                   VerticalAlignment="Center"/>
                                         
                                         <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,12,0">
