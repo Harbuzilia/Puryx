@@ -1,4 +1,5 @@
 using SmartCleaner.Core.Helpers;
+using SmartCleaner.Core.Localization;
 using SmartCleaner.Core.Models;
 using System.Globalization;
 using System.Windows;
@@ -49,7 +50,9 @@ public class RiskToBackgroundConverter : IValueConverter
 }
 
 /// <summary>
-/// Конвертер RiskCategory в текст
+/// Конвертер RiskCategory в текст. Подписи — из Localizer (ROADMAP v3.1,
+/// День 15): раньше здесь был русский хардкод, и в EN-интерфейсе риск
+/// показывался по-русски.
 /// </summary>
 public class RiskToTextConverter : IValueConverter
 {
@@ -59,14 +62,14 @@ public class RiskToTextConverter : IValueConverter
         {
             return risk switch
             {
-                RiskCategory.SafeToDelete => "Безопасно",
-                RiskCategory.PerformanceCache => "Кэш",
-                RiskCategory.UserData => "Защищено",
-                RiskCategory.Locked => "Занято",
-                _ => "?"
+                RiskCategory.SafeToDelete => Localizer.GetString("Risk_SafeToDelete"),
+                RiskCategory.PerformanceCache => Localizer.GetString("Risk_PerformanceCache"),
+                RiskCategory.UserData => Localizer.GetString("Risk_UserData"),
+                RiskCategory.Locked => Localizer.GetString("Risk_Locked"),
+                _ => Localizer.GetString("Risk_Unknown")
             };
         }
-        return "?";
+        return Localizer.GetString("Risk_Unknown");
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

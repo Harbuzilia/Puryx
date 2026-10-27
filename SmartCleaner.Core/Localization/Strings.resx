@@ -4216,4 +4216,20 @@ What exactly would you like to do?</value>
   <data name="Main_CookieConfirmText" xml:space="preserve">
     <value>You are deleting browser cookies: you will be signed out of websites and their per-site settings will be reset. Continue?</value>
   </data>
+  <!-- Day 15, phase F: risk labels for RiskToTextConverter (were hardcoded RU) -->
+  <data name="Risk_SafeToDelete" xml:space="preserve">
+    <value>Safe</value>
+  </data>
+  <data name="Risk_PerformanceCache" xml:space="preserve">
+    <value>Cache</value>
+  </data>
+  <data name="Risk_UserData" xml:space="preserve">
+    <value>Protected</value>
+  </data>
+  <data name="Risk_Locked" xml:space="preserve">
+    <value>In use</value>
+  </data>
+  <data name="Risk_Unknown" xml:space="preserve">
+    <value>Unknown</value>
+  </data>
 </root>

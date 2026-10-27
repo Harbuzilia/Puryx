@@ -4216,4 +4216,20 @@ Windows может использовать эти драйверы прямо �
   <data name="Main_CookieConfirmText" xml:space="preserve">
     <value>Вы удаляете cookie браузеров: будете разлогинены на сайтах, настройки сайтов сбросятся. Продолжить?</value>
   </data>
+  <!-- День 15, фаза F: подписи риска для RiskToTextConverter (были захардкожены RU) -->
+  <data name="Risk_SafeToDelete" xml:space="preserve">
+    <value>Безопасно</value>
+  </data>
+  <data name="Risk_PerformanceCache" xml:space="preserve">
+    <value>Кэш</value>
+  </data>
+  <data name="Risk_UserData" xml:space="preserve">
+    <value>Защищено</value>
+  </data>
+  <data name="Risk_Locked" xml:space="preserve">
+    <value>Занято</value>
+  </data>
+  <data name="Risk_Unknown" xml:space="preserve">
+    <value>Неизвестно</value>
+  </data>
 </root>
