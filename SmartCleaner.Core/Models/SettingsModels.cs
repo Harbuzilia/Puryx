@@ -32,3 +32,43 @@ public sealed class ScanSettingsConfig
     /// </summary>
     public string MftScanMode { get; set; } = "Auto";
 }
+
+/// <summary>
+/// Настройки трея и фоновой проверки обновлений (ROADMAP v3.1, День 13, фаза A).
+/// Обе опции выключены по умолчанию: резидентность и сетевые обращения —
+/// только по явному согласию (приватность — позиция проекта).
+/// Контракт поведения (см. docs/TRAY-MODE.md):
+/// <see cref="MinimizeToTray"/> управляет ТОЛЬКО кнопкой «свернуть»;
+/// закрытие окна (X) всегда завершает приложение — одна опция, один смысл.
+/// Имя файла — <see cref="Filename"/> (config-каталог, единый механизм
+/// с ui_settings.json/scan_settings.json).
+/// </summary>
+public sealed class TraySettingsConfig
+{
+    /// <summary>Имя файла настроек трея в config-каталоге.</summary>
+    public const string Filename = "tray_settings.json";
+
+    /// <summary>Сворачивать окно в трей по Minimize вместо панели задач.</summary>
+    public bool MinimizeToTray { get; set; }
+
+    /// <summary>
+    /// Фоновая проверка обновлений раз в сутки, пока приложение запущено.
+    /// Только уведомление: скачивание/установка — по явному действию пользователя.
+    /// </summary>
+    public bool AutoCheckUpdates { get; set; }
+}
+
+/// <summary>
+/// Состояние фоновой проверки обновлений (ROADMAP v3.1, День 13, фаза A):
+/// UTC-отметка последней авто-проверки переживает перезапуски, чтобы проверка
+/// шла НЕ чаще раза в сутки (иначе каждый старт = сетевой запрос).
+/// Имя файла — <see cref="Filename"/> (config-каталог).
+/// </summary>
+public sealed class UpdateStateConfig
+{
+    /// <summary>Имя файла состояния авто-проверки в config-каталоге.</summary>
+    public const string Filename = "update_state.json";
+
+    /// <summary>UTC-время последней авто-проверки; null — проверок ещё не было.</summary>
+    public DateTimeOffset? LastAutoCheckUtc { get; set; }
+}
