@@ -81,6 +81,17 @@ public record ScannedItem
 
     /// <summary>Readonly-инвентарь, по умолчанию не допускает действие</summary>
     public bool IsReadonlyInventory { get; init; }
+
+    /// <summary>
+    /// Явный opt-in пользовательских данных (ROADMAP v3.1, День 14): элементы
+    /// <see cref="RiskCategory.UserData"/>, которые появляются в выдаче ТОЛЬКО при
+    /// включённой opt-in настройке и могут быть удалены только вручную —
+    /// вручную выбранные (никогда автовыбором) и только после дополнительного
+    /// подтверждения в UI. В v3.1 единственный носитель флага — cookie-хранилища
+    /// браузеров. Флаг снимает защищённый период (cookie-БД пишется постоянно),
+    /// но НЕ whitelist и НЕ per-app защиту.
+    /// </summary>
+    public bool IsUserDataOptIn { get; init; }
 }
 
 /// <summary>

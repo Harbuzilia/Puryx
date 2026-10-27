@@ -68,7 +68,7 @@ public sealed class MftScanResult
 public class MftDiskScanner
 {
     /// <summary>Имя файла единой настройки сканирования (единая точка для Core и App).</summary>
-    public const string SettingsFilename = "scan_settings.json";
+    public const string SettingsFilename = ScanSettingsConfig.Filename;
 
     private readonly IConfigService? _configService;
 

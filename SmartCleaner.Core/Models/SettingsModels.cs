@@ -25,12 +25,23 @@ public sealed class UiSettingsConfig
 /// </summary>
 public sealed class ScanSettingsConfig
 {
+    /// <summary>Имя файла единой настройки сканирования (config-каталог).</summary>
+    public const string Filename = "scan_settings.json";
+
     /// <summary>
     /// Режим MFT-сканирования: "Auto" (NTFS + права → MFT, иначе фолбэк) |
     /// "On" (всегда попытка) | "Off" (никогда MFT, обход каталогов).
-    /// Имя файла — <see cref="SmartCleaner.Core.Mft.MftDiskScanner.SettingsFilename"/>.
     /// </summary>
     public string MftScanMode { get; set; } = "Auto";
+
+    /// <summary>
+    /// Искать cookie-хранилища браузеров (ROADMAP v3.1, День 14, фаза B).
+    /// По умолчанию <c>false</c>: без явного согласия сканер НЕ выдаёт cookie-элементы
+    /// вообще (не «не выбирает», а не показывает). При <c>true</c> элементы выдаются
+    /// с <see cref="RiskCategory.UserData"/> и <see cref="ScannedItem.IsUserDataOptIn"/>,
+    /// всегда невыбранными — удаление только вручную и с подтверждением.
+    /// </summary>
+    public bool BrowserCleanCookies { get; set; }
 }
 
 /// <summary>

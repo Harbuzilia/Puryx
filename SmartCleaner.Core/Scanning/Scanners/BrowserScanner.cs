@@ -1,6 +1,7 @@
 using SmartCleaner.Core.Localization;
 using SmartCleaner.Core.Models;
 using SmartCleaner.Core.Safety;
+using SmartCleaner.Core.Services;
 
 namespace SmartCleaner.Core.Scanning.Scanners;
 
@@ -39,9 +40,26 @@ public class BrowserScanner : ScannerBase
     /// <summary>Кэш имён запущенных процессов — заполняется один раз в ScanAsync</summary>
     private HashSet<string> _runningProcessNames = new(StringComparer.OrdinalIgnoreCase);
 
-    public BrowserScanner(ISafetyService safety) 
+    private readonly IConfigService? _configService;
+    private readonly string? _localAppDataRoot;
+    private readonly string? _roamingAppDataRoot;
+
+    /// <summary>
+    /// DI-конструктор. <paramref name="configService"/> — единая настройка
+    /// сканирования (<see cref="ScanSettingsConfig"/>, cookie opt-in); null — дефолты.
+    /// <paramref name="localAppDataRoot"/>/<paramref name="roamingAppDataRoot"/> —
+    /// тест-шов корней %LOCALAPPDATA%/%APPDATA% (null — окружение процесса).
+    /// </summary>
+    public BrowserScanner(
+        ISafetyService safety,
+        IConfigService? configService = null,
+        string? localAppDataRoot = null,
+        string? roamingAppDataRoot = null)
         : base(safety)
     {
+        _configService = configService;
+        _localAppDataRoot = localAppDataRoot;
+        _roamingAppDataRoot = roamingAppDataRoot;
     }
 
     public override async Task<ScanResult> ScanAsync(
@@ -72,6 +90,13 @@ public class BrowserScanner : ScannerBase
             // Firefox
             progress?.Report(Localizer.GetString("Scanner_Progress_Scanning", "Firefox"));
             ScanFirefox(items, ct);
+
+            // Cookie-хранилища — только при явном opt-in (ROADMAP v3.1, День 14)
+            if (IsCookieOptInEnabled())
+            {
+                progress?.Report(Localizer.GetString("Scanner_Progress_Scanning", "Cookies"));
+                ScanBrowserCookies(items, ct);
+            }
 
         }, ct);
 
@@ -234,6 +259,28 @@ public class BrowserScanner : ScannerBase
         }
         catch (UnauthorizedAccessException) { }
         catch (IOException) { }
+    }
+
+    /// <summary>
+    /// Cookie-хранилища браузеров — категория <see cref="RiskCategory.UserData"/>
+    /// с явным opt-in (ROADMAP v3.1, День 14, фаза B).
+    /// </summary>
+    private void ScanBrowserCookies(List<ScannedItem> items, CancellationToken ct)
+    {
+        // RED (TDD): сканер cookie-хранилищ ещё не реализован — элементы не выдаются.
+    }
+
+    /// <summary>Opt-in cookie-категории из единой настройки сканирования.</summary>
+    private bool IsCookieOptInEnabled()
+    {
+        try
+        {
+            return _configService?.Load<ScanSettingsConfig>(ScanSettingsConfig.Filename).BrowserCleanCookies ?? false;
+        }
+        catch
+        {
+            return false; // битая настройка — безопасный дефолт (opt-in выключен)
+        }
     }
 
     /// <summary>
