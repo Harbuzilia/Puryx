@@ -32,6 +32,26 @@ public readonly struct MftRawRecord
 }
 
 /// <summary>
+/// Классификация отказа ридера тома (День 9, ROADMAP v3.1): машиночитаемая
+/// причина фолбэка MFT-режима — UI показывает локализованный текст по виду
+/// отказа (права → подсказка про администратора, не NTFS → обычный обход).
+/// </summary>
+public enum MftReaderFailure
+{
+    /// <summary>$MFT читается — отказа нет.</summary>
+    None = 0,
+
+    /// <summary>Отказ прав (Win32 error 5): чтение $MFT требует администратора.</summary>
+    AccessDenied,
+
+    /// <summary>Том не NTFS или принципиально не открылся.</summary>
+    NotNtfs,
+
+    /// <summary>Структурная проблема тома (запись $MFT нечитаема/повреждена и т.п.).</summary>
+    VolumeError
+}
+
+/// <summary>
 /// Чтение $MFT тома NTFS (День 8, ROADMAP v3.1). ТОЛЬКО ЧТЕНИЕ: том
 /// открывается с GENERIC_READ, флагов записи нет. Доступ может быть
 /// отказан (Win32 error 5) — тогда <see cref="CanRead"/> = false и
@@ -45,6 +65,9 @@ public interface IMftVolumeReader : IDisposable
 
     /// <summary>Причина недоступности $MFT (русский текст движка для UI); null при CanRead.</summary>
     string? FailureReason { get; }
+
+    /// <summary>Классификация отказа (День 9): None при CanRead, иначе вид причины.</summary>
+    MftReaderFailure FailureKind { get; }
 
     /// <summary>Геометрия тома из загрузочного сектора (default при отказе доступа).</summary>
     NtfsBootSector Boot { get; }

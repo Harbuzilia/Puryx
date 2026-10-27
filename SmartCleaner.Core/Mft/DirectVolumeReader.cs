@@ -29,11 +29,12 @@ internal sealed class DirectVolumeReader : IMftVolumeReader
     private int _windowValidBytes;     // валидных байт в окне с начала
     private byte[]? _tornBuffer;       // буфер перечитывания torn-записи
 
-    /// <summary>Ридер в состоянии «отказ прав»: том не открыт, ридера недостаточно.</summary>
-    private DirectVolumeReader(string failureReason)
+    /// <summary>Ридер в состоянии отказа: том не открыт или $MFT структурно нечитаема.</summary>
+    private DirectVolumeReader(string failureReason, MftReaderFailure failureKind)
     {
         CanRead = false;
         FailureReason = failureReason;
+        FailureKind = failureKind;
         Boot = default;
         FileRecordSize = 0;
         RecordCapacity = 0;
@@ -51,6 +52,7 @@ internal sealed class DirectVolumeReader : IMftVolumeReader
     {
         CanRead = true;
         FailureReason = null;
+        FailureKind = MftReaderFailure.None;
         _stream = stream;
         Boot = boot;
         FileRecordSize = recordSize;
@@ -68,6 +70,9 @@ internal sealed class DirectVolumeReader : IMftVolumeReader
 
     /// <inheritdoc />
     public string? FailureReason { get; }
+
+    /// <inheritdoc />
+    public MftReaderFailure FailureKind { get; }
 
     /// <inheritdoc />
     public NtfsBootSector Boot { get; }
@@ -104,7 +109,8 @@ internal sealed class DirectVolumeReader : IMftVolumeReader
             {
                 // отказ прав — не ошибка открытия: честный CanRead = false
                 reader = new DirectVolumeReader(
-                    $"отказано в доступе к тому {letter}: (Win32 error {error}); чтение $MFT требует прав администратора");
+                    $"отказано в доступе к тому {letter}: (Win32 error {error}); чтение $MFT требует прав администратора",
+                    MftReaderFailure.AccessDenied);
                 return true;
             }
 
@@ -144,7 +150,7 @@ internal sealed class DirectVolumeReader : IMftVolumeReader
         byte[] record0 = new byte[probeSize];
         if (!TryAcquireRecord0(stream, mftOffset, record0, boot.BytesPerSector, out string? reason))
         {
-            reader = new DirectVolumeReader($"том {letter}: запись $MFT нечитаема ({reason})");
+            reader = new DirectVolumeReader($"том {letter}: запись $MFT нечитаема ({reason})", MftReaderFailure.VolumeError);
             return true;
         }
 
@@ -155,7 +161,7 @@ internal sealed class DirectVolumeReader : IMftVolumeReader
             record0 = new byte[headerSize];
             if (!TryAcquireRecord0(stream, mftOffset, record0, boot.BytesPerSector, out reason))
             {
-                reader = new DirectVolumeReader($"том {letter}: запись $MFT нечитаема ({reason})");
+                reader = new DirectVolumeReader($"том {letter}: запись $MFT нечитаема ({reason})", MftReaderFailure.VolumeError);
                 return true;
             }
         }
@@ -164,14 +170,14 @@ internal sealed class DirectVolumeReader : IMftVolumeReader
         MftRecord parsed0 = MftParser.ParseRecord(record0, recordSize);
         if (parsed0.Error != null)
         {
-            reader = new DirectVolumeReader($"том {letter}: запись $MFT повреждена ({parsed0.Error})");
+            reader = new DirectVolumeReader($"том {letter}: запись $MFT повреждена ({parsed0.Error})", MftReaderFailure.VolumeError);
             return true;
         }
         if (!MftDataRuns.TryLocate(record0, out ReadOnlySpan<byte> runList)
             || !RunListDecoder.TryDecode(runList, out IReadOnlyList<RunExtent> extents)
             || extents.Count == 0)
         {
-            reader = new DirectVolumeReader($"том {letter}: run-list $MFT отсутствует или повреждён");
+            reader = new DirectVolumeReader($"том {letter}: run-list $MFT отсутствует или повреждён", MftReaderFailure.VolumeError);
             return true;
         }
 
@@ -187,7 +193,7 @@ internal sealed class DirectVolumeReader : IMftVolumeReader
             long capacity = checked(totalClusters * boot.BytesPerCluster) / recordSize;
             if (capacity <= 0)
             {
-                reader = new DirectVolumeReader($"том {letter}: объём $MFT меньше одной записи");
+                reader = new DirectVolumeReader($"том {letter}: объём $MFT меньше одной записи", MftReaderFailure.VolumeError);
                 return true;
             }
 
@@ -196,7 +202,7 @@ internal sealed class DirectVolumeReader : IMftVolumeReader
         }
         catch (OverflowException)
         {
-            reader = new DirectVolumeReader($"том {letter}: объём $MFT переполняет адресное пространство");
+            reader = new DirectVolumeReader($"том {letter}: объём $MFT переполняет адресное пространство", MftReaderFailure.VolumeError);
             return true;
         }
     }

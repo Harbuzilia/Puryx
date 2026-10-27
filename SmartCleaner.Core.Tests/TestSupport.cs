@@ -8,6 +8,9 @@ namespace SmartCleaner.Core.Tests;
 
 internal sealed class InMemoryConfigService(IReadOnlyList<string> paths) : IConfigService
 {
+    /// <summary>Настройка сканирования (MFT-режим) для тестов выбора режима; null → default (Auto).</summary>
+    public ScanSettingsConfig? ScanSettings { get; set; }
+
     public ConfigMode Mode => ConfigMode.Portable;
     public string ConfigDirectory => Path.GetTempPath();
     public string LogDirectory => Path.GetTempPath();
@@ -21,6 +24,11 @@ internal sealed class InMemoryConfigService(IReadOnlyList<string> paths) : IConf
             {
                 Paths = paths.ToList()
             };
+        }
+
+        if (typeof(T) == typeof(ScanSettingsConfig))
+        {
+            return (T)(object)(ScanSettings ?? new ScanSettingsConfig());
         }
 
         return new T();
