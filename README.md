@@ -57,7 +57,7 @@ scoop install puryx
 - **Portable mode.** A `portable.txt` marker next to the executable moves the configuration into the portable build — no traces in `%APPDATA%`.
 - **Fluent UI with themes.** Windows 11 Fluent Design, dark/light/system theme switching with saved preferences.
 - **Interface: English & Русский.** The app language is switched in Settings (Auto / Русский / English) and applies on the next launch.
-- **475 unit tests** (xUnit) cover the cleaning engine, safety, plugins, duplicates and the CLI inspector.
+- **629 unit tests** (xUnit) cover the cleaning engine, safety, plugins, duplicates and the CLI inspector.
 
 ---
 
@@ -176,6 +176,19 @@ scoop install puryx
 - **Elevated Cleaning:** a separate UAC-elevated process is launched only for system directories — upon a signed request with an auth token, TTL and replay protection.
 
 Found a vulnerability? Please report it via [SECURITY.md](SECURITY.md).
+
+---
+
+## 🔒 Privacy & Trust
+
+- **Open source (MIT).** The whole product is in this repository — scanners, safety checks and the updater. Read the code before you run it: [LICENSE](LICENSE).
+- **No telemetry.** Puryx sends no usage data, no crash reports and no machine identifiers, and ships no analytics or advertising SDKs.
+- **The only network call is an update check — and it is optional.** It queries GitHub Releases; automatic checking is **off by default** and, when enabled, runs at most once a day. It only notifies: downloading and installing happen after an explicit confirmation, and the package is verified against the SHA256 published in the release notes — an asset without a hash is refused. No accounts, no cloud, no sync.
+- **No ads, bundles or upsells.** No third-party installers shipped alongside, no "PRO" nag screens, no sponsored offers. The portable build keeps its configuration next to the executable.
+- **Safety-first by design.** Deletion goes to the Recycle Bin by default, quarantine offers a return path, the glob whitelist is a hard veto, and every item carries an honest risk category — see [Security](#-security). A cleaner that leaves the system worse than before is not a feature.
+- **Registry "cleaning" is deliberately absent.** Microsoft's support policy for registry cleaning utilities (KB2563254) does not support such tools: the registry is not designed to be cleaned routinely. Puryx never scans for or deletes registry leftovers. Its optional system tweaks are separate, explicit switches with a documented restore path — not a bulk "optimize" that silently rewrites your system.
+
+Why say this out loud? Because the market norm is the opposite: "one-click optimizers" that ship registry cleaners, bundled installers and subscription walls. We do not — and the code in this repository is the proof.
 
 ---
 
