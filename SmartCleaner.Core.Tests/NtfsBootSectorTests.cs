@@ -6,9 +6,11 @@ namespace SmartCleaner.Core.Tests;
 
 /// <summary>
 /// День 8 (ROADMAP v3.1, фаза M): контракты разбора загрузочного сектора NTFS
-/// на синтетических фикстурах — геометрия тома и расположение $MFT (макет
-/// ntfsdoc: байт/сектор 0x0B, кластеры 0x0D, всего секторов 0x24, $MFT Lcn
-/// 0x2C — НЕ 0x24, кластеры на запись 0x3C — знаковый байт).
+/// на синтетических фикстурах — геометрия тома и расположение $MFT. Оффсеты
+/// выверены эмпирически на живом томе (кросс-проверка FSCTL_GET_NTFS_VOLUME_DATA
+/// и Wikipedia «Partition Boot Sector»): байт/сектор 0x0B, кластеры 0x0D,
+/// 0x24 — EBPB (не NTFS), всего секторов 0x28, $MFT Lcn 0x30, кластеры на
+/// запись 0x40 — знаковый байт.
 /// </summary>
 public class NtfsBootSectorTests
 {
@@ -24,9 +26,9 @@ public class NtfsBootSectorTests
         Encoding.ASCII.GetBytes("NTFS    ").CopyTo(sector, 0x03);
         MftTestBytes.PutU16(sector, 0x0B, (ushort)bytesPerSector);
         sector[0x0D] = (byte)sectorsPerCluster;
-        MftTestBytes.PutU64(sector, 0x24, (ulong)totalSectors);
-        MftTestBytes.PutU64(sector, 0x2C, (ulong)mftLcn);
-        sector[0x3C] = (byte)fileRecordHint;
+        MftTestBytes.PutU64(sector, 0x28, (ulong)totalSectors);
+        MftTestBytes.PutU64(sector, 0x30, (ulong)mftLcn);
+        sector[0x40] = (byte)fileRecordHint;
         MftTestBytes.PutU16(sector, 0x1FE, 0xAA55); // сигнатура загрузочного сектора
         return sector;
     }

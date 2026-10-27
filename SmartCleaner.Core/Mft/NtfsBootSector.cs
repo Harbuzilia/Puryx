@@ -3,11 +3,13 @@ using System.Buffers.Binary;
 namespace SmartCleaner.Core.Mft;
 
 /// <summary>
-/// Загрузочный сектор NTFS (OEM + BPB, макет ntfsdoc): геометрия тома и
-/// расположение $MFT. Pure-данные; разбор — <see cref="TryParse"/>, поля
-/// считаются ненадёжными и валидируются консервативно: ошибка → false,
-/// без исключений. Отклонение от текста задачи (фаза M): $MFT Lcn читается
-/// с 0x2C — поле 0x24 по ntfsdoc содержит TotalSectors.
+/// Загрузочный сектор NTFS (OEM + BPB): геометрия тома и расположение $MFT.
+/// Pure-данные; разбор — <see cref="TryParse"/>, поля считаются ненадёжными
+/// и валидируются консервативно: ошибка → false, без исключений.
+/// Отклонения от текста задачи (фаза M, проверено эмпирически на живом томе
+/// + FSCTL_GET_NTFS_VOLUME_DATA + Wikipedia «Partition Boot Sector»):
+/// 0x24 — EBPB (не используется NTFS), TotalSectors — 0x28, $MFT Lcn — 0x30,
+/// hint записи — 0x40.
 /// </summary>
 public readonly struct NtfsBootSector
 {
@@ -15,16 +17,16 @@ public readonly struct NtfsBootSector
     private const int OemOffset = 0x03;
     private const int BytesPerSectorOffset = 0x0B;
     private const int SectorsPerClusterOffset = 0x0D;
-    private const int TotalSectorsOffset = 0x24;
-    private const int MftLcnOffset = 0x2C;
-    private const int RecordSizeHintOffset = 0x3C;
+    private const int TotalSectorsOffset = 0x28;
+    private const int MftLcnOffset = 0x30;
+    private const int RecordSizeHintOffset = 0x40;
     private const int BootSignatureOffset = 0x1FE;
 
     private const ushort BootSignature = 0xAA55;
     private const int MinBytesPerSector = 512;
     private const int MaxBytesPerSector = 4096;
     private const int MaxSectorsPerCluster = 128;
-    private const int MaxHintExponent = 30;   // 2^30 — потолок для отрицательного 0x3C
+    private const int MaxHintExponent = 30;   // 2^30 — потолок для отрицательного 0x40
     private const int MinRecordSize = 256;
     private const int MaxRecordSize = 1 << 20;
 
@@ -48,14 +50,14 @@ public readonly struct NtfsBootSector
     /// <summary>Байт на кластер (сектор × кластеры; поля 0x0B/0x0D).</summary>
     public int BytesPerCluster { get; }
 
-    /// <summary>Кластер начала $MFT (поле 0x2C, знаковый; &gt; 0 и внутри тома).</summary>
+    /// <summary>Кластер начала $MFT (поле 0x30, знаковый; &gt; 0 и внутри тома).</summary>
     public long MftStartLcn { get; }
 
-    /// <summary>Всего секторов на томе (поле 0x24, знаковый).</summary>
+    /// <summary>Всего секторов на томе (поле 0x28, знаковый).</summary>
     public long TotalSectors { get; }
 
     /// <summary>
-    /// Размер MFT-записи из поля 0x3C (знаковый байт): отрицательное v → 2^-v байт,
+    /// Размер MFT-записи из поля 0x40 (знаковый байт): отрицательное v → 2^-v байт,
     /// положительное → v × кластер; null = не задан (0) — потребитель применяет
     /// эвристику (4096 при секторе 4096, иначе 1024).
     /// </summary>
