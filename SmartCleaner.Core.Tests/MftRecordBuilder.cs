@@ -104,14 +104,19 @@ internal sealed class MftRecordBuilder
         _attributes.Add(a);
     }
 
-    /// <summary>Добавляет неименованный нерезидентный $DATA (0x80) с размерами из заголовка.</summary>
-    public void AddNonResidentData(ulong allocatedSize, ulong realSize)
+    /// <summary>
+    /// Добавляет неименованный нерезидентный $DATA (0x80) с размерами из заголовка
+    /// и списком ранов (День 8: run-list $DATA). Список пишется как есть —
+    /// включая терминатор 0x00; null → пустой список [0x00].
+    /// </summary>
+    public void AddNonResidentData(ulong allocatedSize, ulong realSize, byte[]? runList = null)
     {
-        const int total = 0x48; // нерезидентный заголовок 0x40 + терминатор ранов с выравниванием
+        runList ??= [0x00];
+        int total = (0x40 + runList.Length + 7) & ~7; // нерезидентный заголовок 0x40 + раны с выравниванием
         var a = new byte[total];
 
         MftTestBytes.PutU32(a, 0x00, 0x80);
-        MftTestBytes.PutU32(a, 0x04, total);
+        MftTestBytes.PutU32(a, 0x04, (uint)total);
         a[0x08] = 1; // нерезидентный
         a[0x09] = 0; // неименованный
         MftTestBytes.PutU64(a, 0x10, 0);                                    // стартовый VCN
@@ -120,7 +125,7 @@ internal sealed class MftRecordBuilder
         MftTestBytes.PutU64(a, 0x28, allocatedSize);
         MftTestBytes.PutU64(a, 0x30, realSize);
         MftTestBytes.PutU64(a, 0x38, realSize);                             // инициализированный размер
-        a[0x40] = 0;                                                        // пустой список ранов
+        runList.CopyTo(a, 0x40);
 
         _attributes.Add(a);
     }
