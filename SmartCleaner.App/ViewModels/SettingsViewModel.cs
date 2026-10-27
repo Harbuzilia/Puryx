@@ -33,6 +33,8 @@ public partial class SettingsViewModel : ObservableObject
     private readonly RamOptimizerService _ramOptimizer;
     private readonly IUpdateChecker _updateChecker;
 
+    private readonly IUpdateInstaller _updateInstaller;
+
     [ObservableProperty]
     private bool _useRecycleBin = true;
 
@@ -96,8 +98,8 @@ public partial class SettingsViewModel : ObservableObject
 
     /// <summary>
     /// Статус последней проверки обновлений (локализован; пусто до первой
-    /// проверки). Полный флоу обновления — День 12; здесь только проверка
-    /// по требованию: сеть затрагивается исключительно нажатием кнопки.
+    /// проверки). День 12: статус-строка ведёт весь флоу — проверка →
+    /// подтверждение → скачивание с прогрессом → верификация → рестарт.
     /// </summary>
     [ObservableProperty]
     private string _updateStatusText = string.Empty;
@@ -109,13 +111,62 @@ public partial class SettingsViewModel : ObservableObject
 
         var result = await _updateChecker.CheckAsync();
 
-        UpdateStatusText = result.ErrorKey switch
+        if (result.ErrorKey is not null)
         {
-            null => result.HasUpdate
-                ? Localizer.GetString("Settings_UpdateStatus_Available", result.LatestVersion, result.CurrentVersion)
-                : Localizer.GetString("Settings_UpdateStatus_UpToDate", result.LatestVersion),
-            var errorKey => Localizer.GetString(errorKey)
-        };
+            UpdateStatusText = Localizer.GetString(result.ErrorKey);
+            return;
+        }
+
+        if (!result.HasUpdate)
+        {
+            UpdateStatusText = Localizer.GetString("Settings_UpdateStatus_UpToDate", result.LatestVersion);
+            return;
+        }
+
+        UpdateStatusText = Localizer.GetString("Settings_UpdateStatus_Available", result.LatestVersion, result.CurrentVersion);
+
+        // День 12 (ROADMAP v3.1): диалог подтверждения — установка только
+        // по явному согласию; сеть после этого затрагивается один раз
+        var confirmation = MessageBox.Show(
+            Localizer.GetString("Settings_UpdateConfirmText", result.LatestVersion),
+            Localizer.GetString("Settings_UpdateConfirmTitle"),
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Question);
+        if (confirmation != MessageBoxResult.Yes)
+        {
+            return;
+        }
+
+        try
+        {
+            // Прогресс репортится в UI-поток (SyncContext захвачен при создании Progress)
+            var progress = new Progress<double>(fraction =>
+                UpdateStatusText = Localizer.GetString("Settings_UpdateStatus_Downloading", fraction));
+            var download = await _updateInstaller.DownloadAsync(result, progress);
+            if (!download.Success)
+            {
+                UpdateStatusText = Localizer.GetString(download.ErrorKey ?? "Update_DownloadFailed");
+                return;
+            }
+
+            UpdateStatusText = Localizer.GetString("Settings_UpdateStatus_Verifying");
+            if (!_updateInstaller.VerifySha256(download.TempFilePath, result.Sha256))
+            {
+                UpdateStatusText = Localizer.GetString("Update_HashMismatch");
+                return;
+            }
+
+            // Успешный swap завершает процесс внутри ApplyUpdate — сюда
+            // возвращаемся только при честном отказе (ключ семейства Update_*)
+            UpdateStatusText = Localizer.GetString("Settings_UpdateStatus_Restarting");
+            var apply = _updateInstaller.ApplyUpdate(download.TempFilePath);
+            UpdateStatusText = Localizer.GetString(apply.ErrorKey ?? "Update_ApplyFailed");
+        }
+        catch (OperationCanceledException)
+        {
+            // Отмена скачивания: partial-файл в temp уже вычищен инсталлером
+            UpdateStatusText = Localizer.GetString("Settings_UpdateStatus_Canceled");
+        }
     }
 
     [ObservableProperty]
@@ -155,7 +206,8 @@ public partial class SettingsViewModel : ObservableObject
         SystemReportGenerator reportGenerator,
         DiskHealthService diskHealthService,
         RamOptimizerService ramOptimizer,
-        IUpdateChecker updateChecker)
+        IUpdateChecker updateChecker,
+        IUpdateInstaller updateInstaller)
     {
         _safetyService = safetyService;
         _configService = configService;
@@ -167,6 +219,7 @@ public partial class SettingsViewModel : ObservableObject
         _diskHealthService = diskHealthService;
         _ramOptimizer = ramOptimizer;
         _updateChecker = updateChecker;
+        _updateInstaller = updateInstaller;
 
         _protectedHours = (int)_safetyService.ProtectedPeriod.TotalHours;
         _selectedThemeIndex = _themeManager.CurrentTheme switch

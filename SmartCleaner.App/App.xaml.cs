@@ -309,6 +309,12 @@ public partial class App : Application
         // Обновления (День 11, ROADMAP v3.1, фаза U): проверка релизов GitHub
         // по требованию — сеть только при явном вызове из настроек
         services.AddSingleton<SmartCleaner.Core.Update.IUpdateChecker, SmartCleaner.Core.Update.UpdateChecker>();
+        // День 12: инсталлер — скачивание/верификация/swap; HttpClient без
+        // тайм-аута (отмена только CancellationToken из вызывающего кода).
+        // Фабрика: опциональные ctor-параметры (швы тестов) явно в null —
+        // реальный сетевой стек, путь процесса и launcher
+        services.AddSingleton<SmartCleaner.Core.Update.IUpdateInstaller>(
+            _ => new SmartCleaner.Core.Update.UpdateInstaller());
         // ILogger<PrivacyDebloatService> резолвится AddLogging автоматически
         // (открытый generic) — фабрика не нужна
         services.AddSingleton<SmartCleaner.Core.Privacy.PrivacyDebloatService>();

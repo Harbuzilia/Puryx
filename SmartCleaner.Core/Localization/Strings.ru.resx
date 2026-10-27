@@ -4083,6 +4083,24 @@ Windows может использовать эти драйверы прямо �
   <data name="Settings_UpdateStatus_UpToDate" xml:space="preserve">
     <value>У вас последняя версия: {0}</value>
   </data>
+  <data name="Settings_UpdateConfirmTitle" xml:space="preserve">
+    <value>Обновление Puryx</value>
+  </data>
+  <data name="Settings_UpdateConfirmText" xml:space="preserve">
+    <value>Доступна версия {0}. Установить сейчас? Puryx скачает обновление, проверит контрольную сумму SHA256 и перезапустится.</value>
+  </data>
+  <data name="Settings_UpdateStatus_Downloading" xml:space="preserve">
+    <value>Скачивание обновления: {0:P0}</value>
+  </data>
+  <data name="Settings_UpdateStatus_Verifying" xml:space="preserve">
+    <value>Проверка контрольной суммы SHA256...</value>
+  </data>
+  <data name="Settings_UpdateStatus_Restarting" xml:space="preserve">
+    <value>Обновление установлено — перезапуск Puryx...</value>
+  </data>
+  <data name="Settings_UpdateStatus_Canceled" xml:space="preserve">
+    <value>Скачивание обновления отменено.</value>
+  </data>
   <data name="Update_CheckFailed" xml:space="preserve">
     <value>Не удалось проверить обновления (ошибка сети).</value>
   </data>

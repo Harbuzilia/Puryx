@@ -4083,6 +4083,24 @@ What exactly would you like to do?</value>
   <data name="Settings_UpdateStatus_UpToDate" xml:space="preserve">
     <value>You have the latest version: {0}</value>
   </data>
+  <data name="Settings_UpdateConfirmTitle" xml:space="preserve">
+    <value>Update Puryx</value>
+  </data>
+  <data name="Settings_UpdateConfirmText" xml:space="preserve">
+    <value>Version {0} is available. Install it now? Puryx will download the update, verify its SHA256 checksum, and restart.</value>
+  </data>
+  <data name="Settings_UpdateStatus_Downloading" xml:space="preserve">
+    <value>Downloading update: {0:P0}</value>
+  </data>
+  <data name="Settings_UpdateStatus_Verifying" xml:space="preserve">
+    <value>Verifying SHA256 checksum...</value>
+  </data>
+  <data name="Settings_UpdateStatus_Restarting" xml:space="preserve">
+    <value>Update installed — restarting Puryx...</value>
+  </data>
+  <data name="Settings_UpdateStatus_Canceled" xml:space="preserve">
+    <value>Update download canceled.</value>
+  </data>
   <data name="Update_CheckFailed" xml:space="preserve">
     <value>Update check failed (network error).</value>
   </data>
