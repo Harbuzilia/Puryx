@@ -4146,4 +4146,16 @@ Windows может использовать эти драйверы прямо �
   <data name="Settings_MinimizeToTrayHint" xml:space="preserve">
     <value>Кнопка «Свернуть» скрывает окно в область уведомлений. Закрытие окна (X) всегда завершает Puryx.</value>
   </data>
+  <data name="Tray_UpdateAvailableTitle" xml:space="preserve">
+    <value>Доступно обновление Puryx</value>
+  </data>
+  <data name="Tray_UpdateAvailableText" xml:space="preserve">
+    <value>Вышла версия {0}. Откройте настройки, чтобы установить её.</value>
+  </data>
+  <data name="Settings_AutoCheckUpdates" xml:space="preserve">
+    <value>Проверять обновления в фоне</value>
+  </data>
+  <data name="Settings_AutoCheckUpdatesHint" xml:space="preserve">
+    <value>Не чаще одного раза в 24 часа; только уведомление в трее — ничего не скачивается и не устанавливается автоматически.</value>
+  </data>
 </root>

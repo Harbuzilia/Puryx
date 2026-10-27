@@ -4146,4 +4146,16 @@ What exactly would you like to do?</value>
   <data name="Settings_MinimizeToTrayHint" xml:space="preserve">
     <value>The Minimize button hides the window to the notification area. Closing the window (X) always exits Puryx.</value>
   </data>
+  <data name="Tray_UpdateAvailableTitle" xml:space="preserve">
+    <value>Puryx update available</value>
+  </data>
+  <data name="Tray_UpdateAvailableText" xml:space="preserve">
+    <value>Version {0} is available. Open Settings to install it.</value>
+  </data>
+  <data name="Settings_AutoCheckUpdates" xml:space="preserve">
+    <value>Check for updates in the background</value>
+  </data>
+  <data name="Settings_AutoCheckUpdatesHint" xml:space="preserve">
+    <value>At most once every 24 hours; only a notification in the tray — nothing is downloaded or installed automatically.</value>
+  </data>
 </root>

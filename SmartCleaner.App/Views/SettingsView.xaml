@@ -153,6 +153,17 @@
                                Style="{StaticResource Caption}"
                                Foreground="{DynamicResource TextSecondaryBrush}"
                                TextWrapping="Wrap"/>
+
+                    <CheckBox Content="{x:Static loc:Localizer.Settings_AutoCheckUpdates}"
+                              IsChecked="{Binding AutoCheckUpdates, Mode=TwoWay}"
+                              Foreground="{DynamicResource TextPrimaryBrush}"
+                              FontSize="13"
+                              Margin="0,14,0,6"/>
+
+                    <TextBlock Text="{x:Static loc:Localizer.Settings_AutoCheckUpdatesHint}"
+                               Style="{StaticResource Caption}"
+                               Foreground="{DynamicResource TextSecondaryBrush}"
+                               TextWrapping="Wrap"/>
                 </StackPanel>
             </Border>
 

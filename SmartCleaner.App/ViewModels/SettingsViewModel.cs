@@ -180,6 +180,14 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty]
     private bool _minimizeToTray;
 
+    /// <summary>
+    /// Фоновая проверка обновлений не чаще раза в сутки (opt-in): только балун
+    /// в трее, без авто-скачивания и установки. Отметка последней проверки
+    /// хранится в <see cref="UpdateStateConfig.Filename"/>.
+    /// </summary>
+    [ObservableProperty]
+    private bool _autoCheckUpdates;
+
     [ObservableProperty]
     private string _newWhitelistPattern = string.Empty;
 
@@ -260,6 +268,7 @@ public partial class SettingsViewModel : ObservableObject
 
         // Трей — прямым полем: загрузка не триггерит OnChanged/сохранение
         _minimizeToTray = _configService.Load<TraySettingsConfig>(TraySettingsConfig.Filename).MinimizeToTray;
+        _autoCheckUpdates = _configService.Load<TraySettingsConfig>(TraySettingsConfig.Filename).AutoCheckUpdates;
 
         _isSoundEnabled = _audioService.IsSoundEnabled;
         _isAnalyzeMenuEnabled = _shellManager.IsAnalyzeFolderRegistered();
@@ -359,7 +368,16 @@ public partial class SettingsViewModel : ObservableObject
         settings.MinimizeToTray = value;
         _configService.Save(TraySettingsConfig.Filename, settings);
         // Применение на лету: перезапуск для трей-опции не нужен
-        _trayService.ApplyOptions(value);
+        _trayService.ApplyOptions(value, _autoCheckUpdates);
+    }
+
+    partial void OnAutoCheckUpdatesChanged(bool value)
+    {
+        var settings = _configService.Load<TraySettingsConfig>(TraySettingsConfig.Filename);
+        settings.AutoCheckUpdates = value;
+        _configService.Save(TraySettingsConfig.Filename, settings);
+        // Таймер авто-проверки взводится/снимается сразу, без перезапуска
+        _trayService.ApplyOptions(_minimizeToTray, value);
     }
 
     partial void OnIsSoundEnabledChanged(bool value)

@@ -526,11 +526,13 @@ public static class Localizer
     public static string Settings_UpdateHint => GetString(nameof(Settings_UpdateHint));
 
     // День 13, фаза A: трей — карточка в Settings (XAML-ключи); Tray_Open/
-    // Tray_Exit/Tray_Tooltip — строки кода (меню/тултип NotifyIcon), без
-    // static-props: XAML их не использует
+    // Tray_Exit/Tray_Tooltip/Tray_UpdateAvailable* — строки кода (меню/тултип/
+    // балун NotifyIcon), без static-props: XAML их не использует
     public static string Settings_SectionTray => GetString(nameof(Settings_SectionTray));
     public static string Settings_MinimizeToTray => GetString(nameof(Settings_MinimizeToTray));
     public static string Settings_MinimizeToTrayHint => GetString(nameof(Settings_MinimizeToTrayHint));
+    public static string Settings_AutoCheckUpdates => GetString(nameof(Settings_AutoCheckUpdates));
+    public static string Settings_AutoCheckUpdatesHint => GetString(nameof(Settings_AutoCheckUpdatesHint));
 
     // День 4: строка со статусом результата сканирования (первый VM-ключ
     // с плейсхолдерами {0}/{1} — форматирование по текущей культуре)

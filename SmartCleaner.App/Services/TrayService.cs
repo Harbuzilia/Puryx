@@ -7,6 +7,7 @@ using SmartCleaner.Core.Update;
 using System.Drawing;
 using System.IO;
 using System.Windows;
+using System.Windows.Threading;
 using Forms = System.Windows.Forms;
 
 namespace SmartCleaner.App.Services;
@@ -18,6 +19,9 @@ namespace SmartCleaner.App.Services;
 /// <see cref="TraySettingsConfig.MinimizeToTray"/> управляет ТОЛЬКО кнопкой
 /// «свернуть» (окно уходит в трей); закрытие окна (X) всегда завершает
 /// приложение — стандартное поведение, минимум сюрпризов (docs/TRAY-MODE.md).
+/// Фоновая авто-проверка обновлений (opt-in, <see cref="TraySettingsConfig.AutoCheckUpdates"/>)
+/// идёт не чаще раза в сутки по расписанию <see cref="AutoUpdateSchedule"/>,
+/// напоминает балуном и НЕ скачивает обновление само.
 /// UI-часть покрывается смоук-запуском: юнит-тесты — только чистое расписание
 /// авто-проверки (<see cref="AutoUpdateSchedule"/>).
 /// </summary>
@@ -27,20 +31,26 @@ public sealed class TrayService : IDisposable
     private const int BalloonTimeoutMilliseconds = 10_000;
 
     private readonly IConfigService _configService;
+    private readonly IUpdateChecker _updateChecker;
     private readonly ILogger<TrayService> _logger;
+    private readonly CancellationTokenSource _disposeCts = new();
 
     private Window? _mainWindow;
     private Forms.NotifyIcon? _notifyIcon;
     private Forms.ContextMenuStrip? _contextMenu;
+    private DispatcherTimer? _autoCheckTimer;
     private Icon? _icon;
     private bool _minimizeToTray;
+    private bool _autoCheckUpdates;
     private bool _disposed;
 
     public TrayService(
         IConfigService configService,
+        IUpdateChecker updateChecker,
         ILogger<TrayService> logger)
     {
         _configService = configService;
+        _updateChecker = updateChecker;
         _logger = logger;
     }
 
@@ -63,6 +73,7 @@ public sealed class TrayService : IDisposable
         _mainWindow = mainWindow;
         var settings = _configService.Load<TraySettingsConfig>(TraySettingsConfig.Filename);
         _minimizeToTray = settings.MinimizeToTray;
+        _autoCheckUpdates = settings.AutoCheckUpdates;
 
         _icon = LoadAppIcon();
         _contextMenu = BuildContextMenu();
@@ -77,13 +88,27 @@ public sealed class TrayService : IDisposable
         _notifyIcon.BalloonTipClicked += OnBalloonTipClicked;
 
         mainWindow.StateChanged += OnMainWindowStateChanged;
+
+        ScheduleAutoCheck();
     }
 
     /// <summary>
     /// Применить опции из настроек без перезапуска: Minimize-поведение
-    /// переключается на лету (чтение config при каждом событии не нужно).
+    /// переключается на лету (чтение config при каждом событии не нужно),
+    /// авто-проверка обновлений взводится/снимается сразу.
     /// </summary>
-    public void ApplyOptions(bool minimizeToTray) => _minimizeToTray = minimizeToTray;
+    public void ApplyOptions(bool minimizeToTray, bool autoCheckUpdates)
+    {
+        _minimizeToTray = minimizeToTray;
+
+        if (_autoCheckUpdates == autoCheckUpdates)
+        {
+            return;
+        }
+
+        _autoCheckUpdates = autoCheckUpdates;
+        ScheduleAutoCheck();
+    }
 
     /// <summary>
     /// Показать балун-уведомление; клик по нему открывает страницу настроек
@@ -132,6 +157,98 @@ public sealed class TrayService : IDisposable
         {
             mainWindow.ShowSettingsPage();
         }
+    }
+
+    /// <summary>
+    /// Взвести таймер следующей авто-проверки: due → 30 с после старта, иначе
+    /// остаток суток (перезапуски не сбрасывают ритм). Таймер один: повторный
+    /// вызов лишь пересчитывает интервал.
+    /// </summary>
+    private void ScheduleAutoCheck()
+    {
+        if (_disposed || _notifyIcon is null)
+        {
+            return;
+        }
+
+        if (_autoCheckTimer is null)
+        {
+            _autoCheckTimer = new DispatcherTimer();
+            _autoCheckTimer.Tick += OnAutoCheckTick;
+        }
+
+        _autoCheckTimer.Stop();
+
+        if (!_autoCheckUpdates)
+        {
+            return;
+        }
+
+        var state = _configService.Load<UpdateStateConfig>(UpdateStateConfig.Filename);
+        _autoCheckTimer.Interval = AutoUpdateSchedule.InitialDelay(
+            state.LastAutoCheckUtc,
+            DateTimeOffset.UtcNow,
+            AutoUpdateSchedule.DefaultInterval,
+            AutoUpdateSchedule.FirstCheckDelay);
+        _autoCheckTimer.Start();
+    }
+
+    private async void OnAutoCheckTick(object? sender, EventArgs e)
+    {
+        _autoCheckTimer?.Stop();
+
+        try
+        {
+            await RunAutoCheckAsync();
+        }
+        catch (OperationCanceledException)
+        {
+            // Приложение закрывается — тихо выходим
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Фоновая проверка обновлений завершилась ошибкой.");
+        }
+        finally
+        {
+            ScheduleAutoCheck();
+        }
+    }
+
+    /// <summary>
+    /// Суточная проверка: отметка «последняя проверка» сохраняется ДО сетевого
+    /// запроса — сбой сети не даёт шторма запросов при перезапусках. Успех с
+    /// новой версией → балун; скачивание/установка — только вручную из Settings.
+    /// </summary>
+    private async Task RunAutoCheckAsync()
+    {
+        if (!_autoCheckUpdates)
+        {
+            return;
+        }
+
+        var now = DateTimeOffset.UtcNow;
+        var state = _configService.Load<UpdateStateConfig>(UpdateStateConfig.Filename);
+        if (!AutoUpdateSchedule.ShouldCheck(state.LastAutoCheckUtc, now, AutoUpdateSchedule.DefaultInterval))
+        {
+            return;
+        }
+
+        state.LastAutoCheckUtc = now;
+        _configService.Save(UpdateStateConfig.Filename, state);
+
+        _logger.LogInformation("Фоновая проверка обновлений (не чаще раза в сутки).");
+
+        var result = await _updateChecker.CheckAsync(_disposeCts.Token);
+        if (!result.HasUpdate)
+        {
+            return;
+        }
+
+        _logger.LogInformation("Доступно обновление {Version}.", result.LatestVersion);
+        ShowNotification(
+            Localizer.GetString("Tray_UpdateAvailableTitle"),
+            Localizer.GetString("Tray_UpdateAvailableText", result.LatestVersion));
     }
 
     private void OnMainWindowStateChanged(object? sender, EventArgs e)
@@ -224,6 +341,15 @@ public sealed class TrayService : IDisposable
 
         _disposed = true;
 
+        _disposeCts.Cancel();
+
+        if (_autoCheckTimer is not null)
+        {
+            _autoCheckTimer.Stop();
+            _autoCheckTimer.Tick -= OnAutoCheckTick;
+            _autoCheckTimer = null;
+        }
+
         if (_mainWindow is not null)
         {
             _mainWindow.StateChanged -= OnMainWindowStateChanged;
@@ -244,5 +370,7 @@ public sealed class TrayService : IDisposable
 
         _icon?.Dispose();
         _icon = null;
+
+        _disposeCts.Dispose();
     }
 }
