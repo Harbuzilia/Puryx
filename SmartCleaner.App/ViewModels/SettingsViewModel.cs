@@ -9,6 +9,7 @@ using SmartCleaner.Core.Safety;
 using SmartCleaner.Core.Services;
 using SmartCleaner.Core.Shell;
 using SmartCleaner.Core.SystemOpt;
+using SmartCleaner.Core.Update;
 using SmartCleaner.Core.Localization;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -30,6 +31,7 @@ public partial class SettingsViewModel : ObservableObject
     private readonly SystemReportGenerator _reportGenerator;
     private readonly DiskHealthService _diskHealthService;
     private readonly RamOptimizerService _ramOptimizer;
+    private readonly IUpdateChecker _updateChecker;
 
     [ObservableProperty]
     private bool _useRecycleBin = true;
@@ -90,6 +92,32 @@ public partial class SettingsViewModel : ObservableObject
         Localizer.GetString("Settings_MftModeOff")
     ];
 
+    // ─── Обновления (ROADMAP v3.1, День 11, фаза U) ───
+
+    /// <summary>
+    /// Статус последней проверки обновлений (локализован; пусто до первой
+    /// проверки). Полный флоу обновления — День 12; здесь только проверка
+    /// по требованию: сеть затрагивается исключительно нажатием кнопки.
+    /// </summary>
+    [ObservableProperty]
+    private string _updateStatusText = string.Empty;
+
+    [RelayCommand]
+    private async Task CheckForUpdatesAsync()
+    {
+        UpdateStatusText = Localizer.GetString("Settings_UpdateStatus_Checking");
+
+        var result = await _updateChecker.CheckAsync();
+
+        UpdateStatusText = result.ErrorKey switch
+        {
+            null => result.HasUpdate
+                ? Localizer.GetString("Settings_UpdateStatus_Available", result.LatestVersion, result.CurrentVersion)
+                : Localizer.GetString("Settings_UpdateStatus_UpToDate", result.LatestVersion),
+            var errorKey => Localizer.GetString(errorKey)
+        };
+    }
+
     [ObservableProperty]
     private string _newWhitelistPattern = string.Empty;
 
@@ -126,7 +154,8 @@ public partial class SettingsViewModel : ObservableObject
         AudioFeedbackService audioService,
         SystemReportGenerator reportGenerator,
         DiskHealthService diskHealthService,
-        RamOptimizerService ramOptimizer)
+        RamOptimizerService ramOptimizer,
+        IUpdateChecker updateChecker)
     {
         _safetyService = safetyService;
         _configService = configService;
@@ -137,6 +166,7 @@ public partial class SettingsViewModel : ObservableObject
         _reportGenerator = reportGenerator;
         _diskHealthService = diskHealthService;
         _ramOptimizer = ramOptimizer;
+        _updateChecker = updateChecker;
 
         _protectedHours = (int)_safetyService.ProtectedPeriod.TotalHours;
         _selectedThemeIndex = _themeManager.CurrentTheme switch

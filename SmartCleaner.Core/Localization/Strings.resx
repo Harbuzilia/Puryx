@@ -4065,4 +4065,34 @@ What exactly would you like to do?</value>
   <data name="Size_Unit_TB" xml:space="preserve">
     <value>TB</value>
   </data>
+  <data name="Settings_SectionUpdate" xml:space="preserve">
+    <value>Updates</value>
+  </data>
+  <data name="Settings_UpdateCheckButton" xml:space="preserve">
+    <value>Check for updates</value>
+  </data>
+  <data name="Settings_UpdateHint" xml:space="preserve">
+    <value>Manual check only: Puryx does not contact GitHub on its own — no background requests.</value>
+  </data>
+  <data name="Settings_UpdateStatus_Checking" xml:space="preserve">
+    <value>Checking for updates...</value>
+  </data>
+  <data name="Settings_UpdateStatus_Available" xml:space="preserve">
+    <value>New version available: {0} (current: {1})</value>
+  </data>
+  <data name="Settings_UpdateStatus_UpToDate" xml:space="preserve">
+    <value>You have the latest version: {0}</value>
+  </data>
+  <data name="Update_CheckFailed" xml:space="preserve">
+    <value>Update check failed (network error).</value>
+  </data>
+  <data name="Update_RateLimited" xml:space="preserve">
+    <value>GitHub request limit reached — try again later.</value>
+  </data>
+  <data name="Update_InvalidResponse" xml:space="preserve">
+    <value>Unexpected release data from GitHub — update check refused.</value>
+  </data>
+  <data name="Update_NoSha256" xml:space="preserve">
+    <value>Release file has no SHA256 checksum — update refused (no install without verification).</value>
+  </data>
 </root>

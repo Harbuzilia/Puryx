@@ -518,6 +518,13 @@ public static class Localizer
     public static string Settings_MftModeOff => GetString(nameof(Settings_MftModeOff));
     public static string Settings_MftModeHint => GetString(nameof(Settings_MftModeHint));
 
+    // День 11, фаза U: обновления — карточка в Settings (XAML-ключи);
+    // статусы/ошибки (Settings_UpdateStatus_*, Update_*) — из кода VM/Core,
+    // static-props не нужны
+    public static string Settings_SectionUpdate => GetString(nameof(Settings_SectionUpdate));
+    public static string Settings_UpdateCheckButton => GetString(nameof(Settings_UpdateCheckButton));
+    public static string Settings_UpdateHint => GetString(nameof(Settings_UpdateHint));
+
     // День 4: строка со статусом результата сканирования (первый VM-ключ
     // с плейсхолдерами {0}/{1} — форматирование по текущей культуре)
     public static string Main_Status_Found => GetString(nameof(Main_Status_Found));

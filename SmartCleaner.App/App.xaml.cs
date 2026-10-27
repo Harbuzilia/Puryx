@@ -299,6 +299,10 @@ public partial class App : Application
         services.AddSingleton<SmartCleaner.Core.Shell.ExplorerContextMenuManager>();
         services.AddSingleton<SmartCleaner.Core.Reporting.SystemReportGenerator>();
         services.AddSingleton<SmartCleaner.App.Services.AudioFeedbackService>();
+
+        // Обновления (День 11, ROADMAP v3.1, фаза U): проверка релизов GitHub
+        // по требованию — сеть только при явном вызове из настроек
+        services.AddSingleton<SmartCleaner.Core.Update.IUpdateChecker, SmartCleaner.Core.Update.UpdateChecker>();
         // ILogger<PrivacyDebloatService> резолвится AddLogging автоматически
         // (открытый generic) — фабрика не нужна
         services.AddSingleton<SmartCleaner.Core.Privacy.PrivacyDebloatService>();

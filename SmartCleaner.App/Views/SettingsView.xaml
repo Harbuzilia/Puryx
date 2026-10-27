@@ -110,6 +110,32 @@
                 </StackPanel>
             </Border>
 
+            <!-- Updates (ROADMAP v3.1, День 11): проверка только по требованию, без фоновой активности -->
+            <Border Style="{StaticResource Card}" Margin="0,0,0,16">
+                <StackPanel>
+                    <TextBlock Text="{x:Static loc:Localizer.Settings_SectionUpdate}" 
+                               Style="{StaticResource Heading2}"
+                               Margin="0,0,0,12"/>
+                    <TextBlock Text="{x:Static loc:Localizer.Settings_UpdateHint}"
+                               Style="{StaticResource Caption}"
+                               Foreground="{DynamicResource TextSecondaryBrush}"
+                               TextWrapping="Wrap"
+                               Margin="0,0,0,12"/>
+
+                    <Button Content="{x:Static loc:Localizer.Settings_UpdateCheckButton}"
+                            Command="{Binding CheckForUpdatesCommand}"
+                            Style="{StaticResource PrimaryButton}"
+                            HorizontalAlignment="Left"
+                            Padding="18,10" FontSize="13" FontWeight="SemiBold"/>
+
+                    <TextBlock Text="{Binding UpdateStatusText}"
+                               Style="{StaticResource Caption}"
+                               Foreground="{DynamicResource TextSecondaryBrush}"
+                               TextWrapping="Wrap"
+                               Margin="0,8,0,0"/>
+                </StackPanel>
+            </Border>
+
             <!-- Cleaning Settings -->
             <Border Style="{StaticResource Card}" Margin="0,0,0,16">
                 <StackPanel>
