@@ -2896,6 +2896,37 @@ Windows может использовать эти драйверы прямо �
   <data name="Scanner_System_Expl_Thumbcache" xml:space="preserve">
     <value>Кэшированные превью изображений/видео в проводнике</value>
   </data>
+  <!-- День 15, фаза F: глубокий проход .chk/.tmp/.dmp (opt-in) -->
+  <data name="Scanner_System_Progress_DeepPass" xml:space="preserve">
+    <value>Глубокий проход: .chk/.tmp/.dmp в мусорных корнях</value>
+  </data>
+  <data name="Scanner_System_Desc_DeepChk" xml:space="preserve">
+    <value>Фрагмент восстановления chkdsk (.chk)</value>
+  </data>
+  <data name="Scanner_System_Expl_DeepChk" xml:space="preserve">
+    <value>Остаток проверки диска: chkdsk складывает повреждённые файлы в FOUND.000 как фрагменты FILE0000.CHK. Windows эти фрагменты не использует</value>
+  </data>
+  <data name="Scanner_System_HowTo_DeepChk" xml:space="preserve">
+    <value>Теряются только фрагменты восстановления; новые появятся при следующей проверке диска</value>
+  </data>
+  <data name="Scanner_System_Desc_DeepTmp" xml:space="preserve">
+    <value>Временный файл (.tmp)</value>
+  </data>
+  <data name="Scanner_System_Expl_DeepTmp" xml:space="preserve">
+    <value>Временный файл, оставленный установщиком или приложением во временной папке. В список попадают только файлы вне защищённого периода</value>
+  </data>
+  <data name="Scanner_System_HowTo_DeepTmp" xml:space="preserve">
+    <value>Восстанавливать нечего: приложения создают временные файлы заново при необходимости</value>
+  </data>
+  <data name="Scanner_System_Desc_DeepDmp" xml:space="preserve">
+    <value>Дамп сбоя (.dmp)</value>
+  </data>
+  <data name="Scanner_System_Expl_DeepDmp" xml:space="preserve">
+    <value>Слепок памяти упавшего приложения или отчёт об ошибке Windows. Нужен только для диагностики этого сбоя</value>
+  </data>
+  <data name="Scanner_System_HowTo_DeepDmp" xml:space="preserve">
+    <value>Не восстанавливается: новый дамп появится только после следующего сбоя той же программы</value>
+  </data>
   <!-- День 6а, волна 2: Browser / AIAgents / Games / NodeModules -->
   <data name="Scanner_Progress_Checking" xml:space="preserve">
     <value>Проверка {0}...</value>
@@ -4163,6 +4194,12 @@ Windows может использовать эти драйверы прямо �
   </data>
   <data name="Settings_BrowserCleanCookiesHint" xml:space="preserve">
     <value>По умолчанию выключено. Если включить, скан покажет cookie-хранилища поддерживаемых браузеров (Chrome, Edge, Brave, Opera, Vivaldi, Yandex, Firefox). Cookie-элементы никогда не выбираются автоматически: удаление только вручную и с дополнительным подтверждением — вы будете разлогинены на сайтах.</value>
+  </data>
+  <data name="Settings_DeepJunkScan" xml:space="preserve">
+    <value>Глубокий поиск .chk/.tmp/.dmp</value>
+  </data>
+  <data name="Settings_DeepJunkScanHint" xml:space="preserve">
+    <value>По умолчанию выключено. Если включить, системный скан ищет .chk/.tmp/.dmp только в мусорных корнях: ваш %TEMP%, Windows\Temp, папки отчётов об ошибках Windows и Minidump, C:\FOUND.* (восстановление chkdsk). Пустые файлы, файлы внутри защищённого периода и пути из белого списка пропускаются.</value>
   </data>
   <data name="Browser_Cookies_Desc" xml:space="preserve">
     <value>Cookie-хранилище ({0})</value>

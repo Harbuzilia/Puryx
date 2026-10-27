@@ -2896,6 +2896,37 @@ Remove these entries from the system registry?</value>
   <data name="Scanner_System_Expl_Thumbcache" xml:space="preserve">
     <value>Cached previews of images/videos in Explorer</value>
   </data>
+  <!-- Day 15, phase F: deep pass .chk/.tmp/.dmp (opt-in) -->
+  <data name="Scanner_System_Progress_DeepPass" xml:space="preserve">
+    <value>Deep pass: .chk/.tmp/.dmp in junk roots</value>
+  </data>
+  <data name="Scanner_System_Desc_DeepChk" xml:space="preserve">
+    <value>chkdsk recovery fragment (.chk)</value>
+  </data>
+  <data name="Scanner_System_Expl_DeepChk" xml:space="preserve">
+    <value>Leftover of a disk check: chkdsk moves damaged files to FOUND.000 as FILE0000.CHK fragments. Windows does not use these fragments</value>
+  </data>
+  <data name="Scanner_System_HowTo_DeepChk" xml:space="preserve">
+    <value>Only recovery fragments are lost; new ones appear on the next disk check</value>
+  </data>
+  <data name="Scanner_System_Desc_DeepTmp" xml:space="preserve">
+    <value>Temporary file (.tmp)</value>
+  </data>
+  <data name="Scanner_System_Expl_DeepTmp" xml:space="preserve">
+    <value>Temp file left behind by an installer or application in a temp folder. Only files outside the protection period are listed</value>
+  </data>
+  <data name="Scanner_System_HowTo_DeepTmp" xml:space="preserve">
+    <value>Nothing to restore: applications create their temp files again when needed</value>
+  </data>
+  <data name="Scanner_System_Desc_DeepDmp" xml:space="preserve">
+    <value>Crash dump (.dmp)</value>
+  </data>
+  <data name="Scanner_System_Expl_DeepDmp" xml:space="preserve">
+    <value>Memory snapshot of a crashed application or a Windows error report. Only needed to diagnose that crash</value>
+  </data>
+  <data name="Scanner_System_HowTo_DeepDmp" xml:space="preserve">
+    <value>Not restorable: a new dump appears only after the next crash of the same application</value>
+  </data>
   <!-- Day 6a, wave 2: Browser / AIAgents / Games / NodeModules -->
   <data name="Scanner_Progress_Checking" xml:space="preserve">
     <value>Checking {0}...</value>
@@ -4163,6 +4194,12 @@ What exactly would you like to do?</value>
   </data>
   <data name="Settings_BrowserCleanCookiesHint" xml:space="preserve">
     <value>Off by default. When enabled, the scan lists cookie storages of supported browsers (Chrome, Edge, Brave, Opera, Vivaldi, Yandex, Firefox). Cookie items are never selected automatically: deletion is manual only and asks for an extra confirmation — you will be signed out of websites.</value>
+  </data>
+  <data name="Settings_DeepJunkScan" xml:space="preserve">
+    <value>Deep scan for .chk/.tmp/.dmp files</value>
+  </data>
+  <data name="Settings_DeepJunkScanHint" xml:space="preserve">
+    <value>Off by default. When enabled, the system scan looks for .chk/.tmp/.dmp files in junk roots only: your %TEMP%, Windows\Temp, Windows Error Reporting and Minidump folders, and C:\FOUND.* (chkdsk recovery). Empty files, files inside the protection period and whitelisted paths are skipped.</value>
   </data>
   <data name="Browser_Cookies_Desc" xml:space="preserve">
     <value>{0} cookie storage</value>

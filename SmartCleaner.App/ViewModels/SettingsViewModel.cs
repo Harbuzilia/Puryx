@@ -107,6 +107,17 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty]
     private bool _browserCleanCookies;
 
+    // ─── Deep-pass системного мусора (ROADMAP v3.1, День 15, фаза F) ───
+
+    /// <summary>
+    /// Глубокий поиск <c>.chk</c>/<c>.tmp</c>/<c>.dmp</c> в ограниченных мусорных
+    /// корнях (%TEMP%, Windows\Temp, WER/Minidump, FOUND.*). По умолчанию
+    /// выключено: расширенный проход по подкаталогам — только по явному
+    /// согласию. Хранится в общем scan_settings.json.
+    /// </summary>
+    [ObservableProperty]
+    private bool _deepJunkScan;
+
     // ─── Обновления (ROADMAP v3.1, День 11, фаза U) ───
 
     /// <summary>
@@ -279,6 +290,7 @@ public partial class SettingsViewModel : ObservableObject
             _ => 0
         };
         _browserCleanCookies = scanSettings.BrowserCleanCookies;
+        _deepJunkScan = scanSettings.DeepJunkScan;
 
         // Трей — прямым полем: загрузка не триггерит OnChanged/сохранение
         _minimizeToTray = _configService.Load<TraySettingsConfig>(TraySettingsConfig.Filename).MinimizeToTray;
@@ -382,6 +394,15 @@ public partial class SettingsViewModel : ObservableObject
         // при каждом скане; MFT-режим в том же файле не теряется
         var settings = _configService.Load<ScanSettingsConfig>(ScanSettingsFilename);
         settings.BrowserCleanCookies = value;
+        _configService.Save(ScanSettingsFilename, settings);
+    }
+
+    partial void OnDeepJunkScanChanged(bool value)
+    {
+        // Read-modify-write: scan_settings.json читается SystemScanner'ом в Core
+        // при каждом скане; MFT-режим и cookie-opt-in в том же файле не теряются
+        var settings = _configService.Load<ScanSettingsConfig>(ScanSettingsFilename);
+        settings.DeepJunkScan = value;
         _configService.Save(ScanSettingsFilename, settings);
     }
 

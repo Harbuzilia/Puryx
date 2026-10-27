@@ -93,6 +93,9 @@ public class SystemScanner : ScannerBase
             progress?.Report(Localizer.GetString("Scanner_System_Progress_IconCache"));
             ScanIconCache(items, ct);
 
+            // 15. Глубокий проход .chk/.tmp/.dmp (opt-in, ROADMAP v3.1, День 15)
+            ScanDeepJunk(items, progress, ct);
+
         }, ct);
 
         return new ScanResult
@@ -588,4 +591,118 @@ public class SystemScanner : ScannerBase
             catch (IOException) { }
         }
     }
+
+    // ─── Глубокий проход .chk/.tmp/.dmp (ROADMAP v3.1, День 15, фаза F) ───
+
+    /// <summary>Расширения deep-pass: фрагменты chkdsk, временные файлы, дампы сбоев.</summary>
+    private static readonly string[] DeepJunkExtensions = [".chk", ".tmp", ".dmp"];
+
+    /// <summary>Opt-in deep-pass из единой настройки сканирования (по умолчанию выключен).</summary>
+    private bool IsDeepJunkScanEnabled()
+    {
+        try
+        {
+            return _configService?.Load<ScanSettingsConfig>(ScanSettingsConfig.Filename).DeepJunkScan ?? false;
+        }
+        catch
+        {
+            return false; // битая настройка — безопасный дефолт (проход выключен)
+        }
+    }
+
+    /// <summary>
+    /// Глубокий проход по ОГРАНИЧЕННЫМ мусорным корням: рекурсивный поиск
+    /// <c>.chk</c>/<c>.tmp</c>/<c>.dmp</c> (цикл-гвард reparse — в
+    /// <see cref="ScannerBase.SafeEnumerateFilesRecursive"/>). Учитываются только
+    /// файлы больше нуля байт, вне защищённого периода и вне whitelist; занятые
+    /// файлы не отсеиваются на скане — блокировку проверяет удаление, как всегда.
+    /// Уже найденные обычным проходом пути не дублируются.
+    /// </summary>
+    private void ScanDeepJunk(List<ScannedItem> items, IProgress<string>? progress, CancellationToken ct)
+    {
+        if (!IsDeepJunkScanEnabled()) return;
+
+        progress?.Report(Localizer.GetString("Scanner_System_Progress_DeepPass"));
+
+        var seen = new HashSet<string>(items.Select(i => i.Path), StringComparer.OrdinalIgnoreCase);
+
+        foreach (var root in ResolveDeepScanRoots())
+        {
+            if (!Directory.Exists(root)) continue;
+
+            foreach (var file in SafeEnumerateFilesRecursive(root))
+            {
+                ct.ThrowIfCancellationRequested();
+
+                var extension = Path.GetExtension(file).ToLowerInvariant();
+                if (!DeepJunkExtensions.Contains(extension)) continue;
+
+                if (!seen.Add(file)) continue;          // уже выдано обычным проходом
+                if (GetFileSize(file) <= 0) continue;   // пустые файлы — не мусор, а артефакт
+
+                if (_safety.IsWithinProtectedPeriod(file)) continue;
+                if (IsProtectedScanTarget(file)) continue; // whitelist по реальному пути, fail-closed
+
+                var keys = DeepJunkKeys(extension);
+                items.Add(CreateFileItem(
+                    file,
+                    RiskCategory.SafeToDelete,
+                    Localizer.GetString(keys.Description),
+                    explanation: Localizer.GetString(keys.Explanation),
+                    howToRestore: Localizer.GetString(keys.HowToRestore)));
+            }
+        }
+    }
+
+    /// <summary>
+    /// Корни deep-pass: явный тест-шов, иначе — %TEMP% пользователя, Windows\Temp,
+    /// WER (пользовательский и ProgramData), Windows\Minidump и найденные
+    /// каталоги <c>FOUND.*</c> в корне системного диска. За эти пределы проход
+    /// не выходит: чужие диски и профили не сканируются.
+    /// </summary>
+    private IReadOnlyList<string> ResolveDeepScanRoots()
+    {
+        if (_deepScanRoots is not null) return _deepScanRoots;
+
+        var roots = new List<string>();
+
+        AddIfExists(roots, Path.GetTempPath());
+
+        var winDir = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
+        var localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        var programData = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+
+        AddIfExists(roots, Path.Combine(winDir, "Temp"));
+        AddIfExists(roots, Path.Combine(localAppData, "Microsoft", "Windows", "WER"));
+        AddIfExists(roots, Path.Combine(programData, "Microsoft", "Windows", "WER"));
+        AddIfExists(roots, Path.Combine(winDir, "Minidump"));
+
+        // FOUND.000/FOUND.001 — каталоги восстановления chkdsk в корне системного диска.
+        var systemDriveRoot = Path.GetPathRoot(Environment.SystemDirectory) ?? @"C:\";
+        try
+        {
+            foreach (var foundDirectory in Directory.EnumerateDirectories(systemDriveRoot, "FOUND.*"))
+            {
+                roots.Add(foundDirectory);
+            }
+        }
+        catch (UnauthorizedAccessException) { }
+        catch (IOException) { }
+
+        return roots;
+
+        static void AddIfExists(List<string> list, string path)
+        {
+            if (!string.IsNullOrWhiteSpace(path) && Directory.Exists(path)) list.Add(path);
+        }
+    }
+
+    /// <summary>Ключи честных текстов по расширению: chk — фрагменты chkdsk, dmp — дампы сбоев, tmp — временные.</summary>
+    private static (string Description, string Explanation, string HowToRestore) DeepJunkKeys(string extension) =>
+        extension switch
+        {
+            ".chk" => ("Scanner_System_Desc_DeepChk", "Scanner_System_Expl_DeepChk", "Scanner_System_HowTo_DeepChk"),
+            ".dmp" => ("Scanner_System_Desc_DeepDmp", "Scanner_System_Expl_DeepDmp", "Scanner_System_HowTo_DeepDmp"),
+            _ => ("Scanner_System_Desc_DeepTmp", "Scanner_System_Expl_DeepTmp", "Scanner_System_HowTo_DeepTmp")
+        };
 }

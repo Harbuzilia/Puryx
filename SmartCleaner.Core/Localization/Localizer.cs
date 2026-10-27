@@ -540,6 +540,12 @@ public static class Localizer
     public static string Settings_BrowserCleanCookies => GetString(nameof(Settings_BrowserCleanCookies));
     public static string Settings_BrowserCleanCookiesHint => GetString(nameof(Settings_BrowserCleanCookiesHint));
 
+    // День 15, фаза F: deep-pass системного мусора — переключатель в Settings
+    // (XAML-ключи); Scanner_System_*Deep* — строки кода сканера, static-props
+    // не нужны
+    public static string Settings_DeepJunkScan => GetString(nameof(Settings_DeepJunkScan));
+    public static string Settings_DeepJunkScanHint => GetString(nameof(Settings_DeepJunkScanHint));
+
     // День 4: строка со статусом результата сканирования (первый VM-ключ
     // с плейсхолдерами {0}/{1} — форматирование по текущей культуре)
     public static string Main_Status_Found => GetString(nameof(Main_Status_Found));
