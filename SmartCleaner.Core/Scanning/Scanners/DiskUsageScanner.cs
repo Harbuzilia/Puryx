@@ -257,7 +257,12 @@ public class DiskUsageScanner : ScannerBase
         }
     }
 
-    private static RiskCategory ClassifyRisk(string path, bool isDirectory)
+    /// <summary>
+    /// Риск элемента по пути (День 9: internal — общий для MFT-конверсии
+    /// MftDiskScanner.ToFolderItems, чтобы выдача MFT-режима не отличалась
+    /// от walk-режима).
+    /// </summary>
+    internal static RiskCategory ClassifyRisk(string path, bool isDirectory)
     {
         var normalized = path.Replace('/', '\\').ToLowerInvariant();
 
@@ -278,7 +283,8 @@ public class DiskUsageScanner : ScannerBase
         return RiskCategory.UserData;
     }
 
-    private static string BuildDescription(string name, long size, RiskCategory risk, bool isDirectory)
+    /// <summary>Описание элемента (День 9: internal — общий для MFT-конверсии).</summary>
+    internal static string BuildDescription(string name, long size, RiskCategory risk, bool isDirectory)
     {
         var riskHint = risk switch
         {

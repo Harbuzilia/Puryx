@@ -2646,6 +2646,27 @@ Windows может использовать эти драйверы прямо �
   <data name="DiskMap_Progress_Done" xml:space="preserve">
     <value>Готово. {0} в {1}</value>
   </data>
+  <data name="Mft_Status_Mode_Mft" xml:space="preserve">
+    <value>Режим MFT</value>
+  </data>
+  <data name="Mft_Status_Mode_Walk" xml:space="preserve">
+    <value>обход каталогов: {0}</value>
+  </data>
+  <data name="Mft_Fallback_Disabled" xml:space="preserve">
+    <value>MFT-режим отключён в настройках</value>
+  </data>
+  <data name="Mft_Fallback_Rights" xml:space="preserve">
+    <value>для чтения MFT нужны права администратора — запустите приложение от имени администратора, чтобы включить MFT-режим</value>
+  </data>
+  <data name="Mft_Fallback_NotNtfs" xml:space="preserve">
+    <value>том не NTFS</value>
+  </data>
+  <data name="Mft_Fallback_Error" xml:space="preserve">
+    <value>не удалось прочитать MFT: {0}</value>
+  </data>
+  <data name="Mft_Fallback_PathNotFound" xml:space="preserve">
+    <value>путь не найден в MFT-дереве</value>
+  </data>
   <data name="Knowledge_Reason_ProtectedPattern" xml:space="preserve">
     <value>Совпадает с защищённым паттерном: {0}</value>
   </data>

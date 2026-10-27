@@ -2646,6 +2646,27 @@ Remove these entries from the system registry?</value>
   <data name="DiskMap_Progress_Done" xml:space="preserve">
     <value>Done. {0} in {1}</value>
   </data>
+  <data name="Mft_Status_Mode_Mft" xml:space="preserve">
+    <value>MFT mode</value>
+  </data>
+  <data name="Mft_Status_Mode_Walk" xml:space="preserve">
+    <value>directory walk: {0}</value>
+  </data>
+  <data name="Mft_Fallback_Disabled" xml:space="preserve">
+    <value>MFT mode is disabled in settings</value>
+  </data>
+  <data name="Mft_Fallback_Rights" xml:space="preserve">
+    <value>administrator rights are required to read the MFT — run the app as administrator to enable MFT mode</value>
+  </data>
+  <data name="Mft_Fallback_NotNtfs" xml:space="preserve">
+    <value>the volume is not NTFS</value>
+  </data>
+  <data name="Mft_Fallback_Error" xml:space="preserve">
+    <value>MFT read failed: {0}</value>
+  </data>
+  <data name="Mft_Fallback_PathNotFound" xml:space="preserve">
+    <value>the path is not present in the MFT tree</value>
+  </data>
   <data name="Knowledge_Reason_ProtectedPattern" xml:space="preserve">
     <value>Matches a protected pattern: {0}</value>
   </data>

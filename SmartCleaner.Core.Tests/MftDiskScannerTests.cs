@@ -68,7 +68,7 @@ public class MftDiskScannerTests : IDisposable
     /// <summary>
     /// Синтетическое дерево: root(5) → Users{big1 5000, big2 3000, small 10,
     /// hard.bin 1000 (hardlink)}, Cache{deep 4000, Inner{inner 2000}}.
-    /// Итоги: Users 9010, Cache 6000, root 15001.
+    /// Итоги: Users 9010, Cache 6000, root 15010.
     /// </summary>
     private static MftTree BuildSampleTree()
     {
@@ -232,7 +232,7 @@ public class MftDiskScannerTests : IDisposable
         Assert.Equal(@"C:\", root.FullPath);
         Assert.False(root.IsFile);
         Assert.Equal(0, root.Depth);
-        Assert.Equal(15001L, root.Size);
+        Assert.Equal(15010L, root.Size);
 
         // дети корня отсортированы по размеру desc: Users(9010), Cache(6000)
         Assert.Equal(2, root.Children.Count);
@@ -253,8 +253,8 @@ public class MftDiskScannerTests : IDisposable
             cache.Children.Select(c => (c.Name, c.Size)).ToList());
         Assert.Equal(2000L, Assert.Single(cache.Children[1].Children).Size);
 
-        Assert.Equal(100.0, root.Children[0].Percentage, 3);
-        Assert.Equal((double)9010 / 15001 * 100, root.Children[0].Percentage, 3);
+        Assert.Equal(100.0, root.Children.Sum(c => c.Percentage), 3); // дети заполняют родителя
+        Assert.Equal((double)9010 / 15010 * 100, root.Children[0].Percentage, 3);
         Assert.Equal((double)5000 / 9010 * 100, root.Children[0].Children[0].Percentage, 3);
     }
 
@@ -269,7 +269,7 @@ public class MftDiskScannerTests : IDisposable
         DiskNode cache = Assert.Single(root.Children, c => c.Name == "Cache");
         Assert.Equal(4000L, cache.Size); // только файлы своего уровня
         Assert.Equal("deep.dat", Assert.Single(cache.Children).Name);
-        Assert.Equal(13001L, root.Size); // 9010 + 4000 (без Inner)
+        Assert.Equal(13010L, root.Size); // 9010 + 4000 (без Inner)
     }
 
     [Fact]
@@ -507,7 +507,7 @@ public class MftDiskScannerTests : IDisposable
         Assert.Null(result.FailureText);
         Assert.NotNull(result.Tree);
         Assert.NotNull(result.Tree.Root);
-        Assert.Equal(15001UL, result.Tree.Root.Size);
+        Assert.Equal(15010UL, result.Tree.Root.Size);
         Assert.Equal((long)records.Count, result.RecordCount); // все записи посчитаны
         Assert.True(result.Elapsed >= TimeSpan.Zero);
     }
