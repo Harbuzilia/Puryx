@@ -178,6 +178,23 @@ public class UpdateCheckerTests
     }
 
     [Fact]
+    public async Task Check_MarkdownDecoratedSha256_Matches()
+    {
+        // Реальный формат заметок релиза (живой API 2026-10-27): markdown-обёртка
+        // «**SHA256:** `hex`» — между меткой и хэшем «:**», пробел и бэктик.
+        // Репро бага, найденного живым прогоном: узкий разделитель [:\s]+ его не брал.
+        var body = $"# Puryx 3.1.0\n\nFinal release.\n\n**SHA256:** `{ShaA}`\n";
+        var handler = new StubHandler(_ => Ok(BuildReleaseJson("v3.1.0", body)));
+        var checker = new UpdateChecker(handler, "3.0.0");
+
+        var result = await checker.CheckAsync();
+
+        Assert.True(result.HasUpdate);
+        Assert.Equal(ShaA, result.Sha256);
+        Assert.Null(result.ErrorKey);
+    }
+
+    [Fact]
     public async Task Check_Http403_RateLimited_ExplicitStatus()
     {
         var handler = new StubHandler(_ => new HttpResponseMessage(HttpStatusCode.Forbidden));

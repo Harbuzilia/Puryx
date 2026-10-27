@@ -72,9 +72,13 @@ public sealed class UpdateChecker : IUpdateChecker, IDisposable
     /// <summary>Тайм-аут запроса: ручная проверка не должна подвешивать UI.</summary>
     private static readonly TimeSpan RequestTimeout = TimeSpan.FromSeconds(15);
 
-    /// <summary>SHA256 в заметках: строка «SHA256: &lt;64 hex&gt;»; берётся ПОСЛЕДНИЙ матч.</summary>
+    /// <summary>
+    /// SHA256 в заметках: метка «SHA256», затем разделитель-не-буквы (реальный
+    /// формат — markdown «**SHA256:** `hex`»; допустимы «:», «*», бэктик,
+    /// пробелы и прочая пунктуация) и 64 hex. Берётся ПОСЛЕДНИЙ матч.
+    /// </summary>
     private static readonly Regex Sha256Pattern =
-        new(@"SHA256[:\s]+([0-9A-Fa-f]{64})", RegexOptions.Compiled | RegexOptions.CultureInvariant);
+        new(@"SHA256\W*([0-9A-Fa-f]{64})", RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
     private readonly HttpClient _httpClient;
     private readonly Version _current;
