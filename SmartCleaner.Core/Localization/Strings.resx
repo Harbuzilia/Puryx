@@ -4158,4 +4158,25 @@ What exactly would you like to do?</value>
   <data name="Settings_AutoCheckUpdatesHint" xml:space="preserve">
     <value>At most once every 24 hours; only a notification in the tray — nothing is downloaded or installed automatically.</value>
   </data>
+  <data name="Settings_BrowserCleanCookies" xml:space="preserve">
+    <value>Browser cookie files (requires confirmation)</value>
+  </data>
+  <data name="Settings_BrowserCleanCookiesHint" xml:space="preserve">
+    <value>Off by default. When enabled, the scan lists cookie storages of supported browsers (Chrome, Edge, Brave, Opera, Vivaldi, Yandex, Firefox). Cookie items are never selected automatically: deletion is manual only and asks for an extra confirmation — you will be signed out of websites.</value>
+  </data>
+  <data name="Browser_Cookies_Desc" xml:space="preserve">
+    <value>{0} cookie storage</value>
+  </data>
+  <data name="Browser_Cookies_Explanation" xml:space="preserve">
+    <value>Cookies are site sessions and preferences kept by the browser. Deleting them signs you out of websites and resets per-site settings; your browsing history is not affected.</value>
+  </data>
+  <data name="Browser_Cookies_HowToRestore" xml:space="preserve">
+    <value>Sign in to the sites again — the browser will create fresh cookies automatically.</value>
+  </data>
+  <data name="Main_CookieConfirmTitle" xml:space="preserve">
+    <value>Delete browser cookies?</value>
+  </data>
+  <data name="Main_CookieConfirmText" xml:space="preserve">
+    <value>You are deleting browser cookies: you will be signed out of websites and their per-site settings will be reset. Continue?</value>
+  </data>
 </root>

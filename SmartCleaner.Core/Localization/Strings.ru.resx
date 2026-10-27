@@ -4158,4 +4158,25 @@ Windows может использовать эти драйверы прямо �
   <data name="Settings_AutoCheckUpdatesHint" xml:space="preserve">
     <value>Не чаще одного раза в 24 часа; только уведомление в трее — ничего не скачивается и не устанавливается автоматически.</value>
   </data>
+  <data name="Settings_BrowserCleanCookies" xml:space="preserve">
+    <value>Cookie-файлы браузеров (требует подтверждения)</value>
+  </data>
+  <data name="Settings_BrowserCleanCookiesHint" xml:space="preserve">
+    <value>По умолчанию выключено. Если включить, скан покажет cookie-хранилища поддерживаемых браузеров (Chrome, Edge, Brave, Opera, Vivaldi, Yandex, Firefox). Cookie-элементы никогда не выбираются автоматически: удаление только вручную и с дополнительным подтверждением — вы будете разлогинены на сайтах.</value>
+  </data>
+  <data name="Browser_Cookies_Desc" xml:space="preserve">
+    <value>Cookie-хранилище ({0})</value>
+  </data>
+  <data name="Browser_Cookies_Explanation" xml:space="preserve">
+    <value>Cookie — сессии и настройки сайтов, которые хранит браузер. Их удаление разлогинит вас на сайтах и сбросит настройки для конкретных сайтов; история просмотров не затрагивается.</value>
+  </data>
+  <data name="Browser_Cookies_HowToRestore" xml:space="preserve">
+    <value>Войдите на сайты заново — браузер создаст новые cookie автоматически.</value>
+  </data>
+  <data name="Main_CookieConfirmTitle" xml:space="preserve">
+    <value>Удалить cookie браузеров?</value>
+  </data>
+  <data name="Main_CookieConfirmText" xml:space="preserve">
+    <value>Вы удаляете cookie браузеров: будете разлогинены на сайтах, настройки сайтов сбросятся. Продолжить?</value>
+  </data>
 </root>

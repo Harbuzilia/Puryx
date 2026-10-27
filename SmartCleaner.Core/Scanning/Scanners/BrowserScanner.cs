@@ -110,36 +110,14 @@ public class BrowserScanner : ScannerBase
 
     private void ScanChromiumBrowser(List<ScannedItem> items, string browserName, string pathTemplate, CancellationToken ct)
     {
-        var basePath = ExpandPath(pathTemplate);
+        var basePath = ExpandBrowserPath(pathTemplate);
         if (!Directory.Exists(basePath)) return;
 
         try
         {
-            // Получаем все профили (Default, Profile 1, Profile 2, ...)
-            // Fix #10: Opera не использует подпапку Default — кэш в корне
-            var isOpera = browserName.Equals("Opera", StringComparison.OrdinalIgnoreCase);
-            var profiles = isOpera 
-                ? new List<string> { "" } // Opera: cache прямо в basePath
-                : new List<string> { "Default" };
-
-            if (!isOpera)
-            {
-                foreach (var dir in Directory.EnumerateDirectories(basePath))
-                {
-                    var dirName = Path.GetFileName(dir);
-                    if (dirName.StartsWith("Profile "))
-                    {
-                        profiles.Add(dirName);
-                    }
-                }
-            }
-
-            foreach (var profile in profiles)
+            foreach (var profilePath in EnumerateChromiumProfiles(browserName, basePath))
             {
                 ct.ThrowIfCancellationRequested();
-                
-                var profilePath = isOpera ? basePath : Path.Combine(basePath, profile);
-                if (!Directory.Exists(profilePath)) continue;
 
                 foreach (var cacheFolder in ChromiumCacheFolders)
                 {
@@ -202,7 +180,7 @@ public class BrowserScanner : ScannerBase
 
     private void ScanFirefox(List<ScannedItem> items, CancellationToken ct)
     {
-        var profilesPath = ExpandPath(@"%APPDATA%\Mozilla\Firefox\Profiles");
+        var profilesPath = ExpandBrowserPath(@"%APPDATA%\Mozilla\Firefox\Profiles");
         if (!Directory.Exists(profilesPath)) return;
 
         try
@@ -264,10 +242,127 @@ public class BrowserScanner : ScannerBase
     /// <summary>
     /// Cookie-хранилища браузеров — категория <see cref="RiskCategory.UserData"/>
     /// с явным opt-in (ROADMAP v3.1, День 14, фаза B).
+    /// Chromium: <c>Network\Cookies</c> в профиле, фолбэк — legacy <c>Cookies</c>;
+    /// Firefox: <c>cookies.sqlite</c> в каждом профиле. Элементы всегда
+    /// <c>IsSelected = false</c> (только ручной выбор) и помечены
+    /// <see cref="ScannedItem.IsUserDataOptIn"/> — удаление требует подтверждения.
+    /// Защита путей — обычная: whitelist-гейт по реальному пути (<see cref="ScannerBase.IsProtectedScanTarget"/>).
     /// </summary>
     private void ScanBrowserCookies(List<ScannedItem> items, CancellationToken ct)
     {
-        // RED (TDD): сканер cookie-хранилищ ещё не реализован — элементы не выдаются.
+        foreach (var (name, pathTemplate) in ChromiumBrowsers)
+        {
+            ct.ThrowIfCancellationRequested();
+
+            var basePath = ExpandBrowserPath(pathTemplate);
+            if (!Directory.Exists(basePath)) continue;
+
+            try
+            {
+                foreach (var profilePath in EnumerateChromiumProfiles(name, basePath))
+                {
+                    ct.ThrowIfCancellationRequested();
+
+                    // Актуальный путь Chromium; legacy Cookies — только при его отсутствии
+                    var networkCookies = Path.Combine(profilePath, "Network", "Cookies");
+                    if (File.Exists(networkCookies))
+                    {
+                        AddCookieItem(items, name, networkCookies);
+                        continue;
+                    }
+
+                    var legacyCookies = Path.Combine(profilePath, "Cookies");
+                    if (File.Exists(legacyCookies))
+                    {
+                        AddCookieItem(items, name, legacyCookies);
+                    }
+                }
+            }
+            catch (UnauthorizedAccessException) { }
+            catch (IOException) { }
+        }
+
+        var firefoxProfiles = ExpandBrowserPath(@"%APPDATA%\Mozilla\Firefox\Profiles");
+        if (!Directory.Exists(firefoxProfiles)) return;
+
+        try
+        {
+            foreach (var profilePath in Directory.EnumerateDirectories(firefoxProfiles))
+            {
+                ct.ThrowIfCancellationRequested();
+
+                var cookiesPath = Path.Combine(profilePath, "cookies.sqlite");
+                if (File.Exists(cookiesPath))
+                {
+                    AddCookieItem(items, "Firefox", cookiesPath);
+                }
+            }
+        }
+        catch (UnauthorizedAccessException) { }
+        catch (IOException) { }
+    }
+
+    /// <summary>
+    /// Элемент cookie-хранилища: UserData + opt-in-флаг, никогда не выбран
+    /// автоматически. Пустой/нечитаемый файл и путь под whitelist'ом не выдаются.
+    /// </summary>
+    private void AddCookieItem(List<ScannedItem> items, string browserName, string cookiePath)
+    {
+        if (IsProtectedScanTarget(cookiePath)) return;
+
+        var size = GetFileSize(cookiePath);
+        if (size <= 0) return;
+
+        items.Add(new ScannedItem
+        {
+            Path = cookiePath,
+            Size = size,
+            LastAccess = GetLastAccess(cookiePath),
+            Risk = RiskCategory.UserData,
+            IsUserDataOptIn = true,
+            Description = Localizer.GetString("Browser_Cookies_Desc", browserName),
+            Explanation = Localizer.GetString("Browser_Cookies_Explanation"),
+            HowToRestore = Localizer.GetString("Browser_Cookies_HowToRestore"),
+            IsDirectory = false,
+            ParentApp = browserName,
+            IsSelected = false, // opt-in: только ручной выбор
+            IsLocked = IsBrowserRunning(browserName)
+        });
+    }
+
+    /// <summary>
+    /// Профили Chromium-браузера: Opera хранит профиль прямо в корне (Fix #10),
+    /// остальные — <c>Default</c> + <c>Profile N</c>. Возвращаются только
+    /// существующие каталоги; ошибки доступа — пустой/частичный список.
+    /// </summary>
+    private static List<string> EnumerateChromiumProfiles(string browserName, string basePath)
+    {
+        if (browserName.Equals("Opera", StringComparison.OrdinalIgnoreCase))
+        {
+            return [basePath];
+        }
+
+        var profiles = new List<string>();
+        var defaultProfile = Path.Combine(basePath, "Default");
+        if (Directory.Exists(defaultProfile))
+        {
+            profiles.Add(defaultProfile);
+        }
+
+        try
+        {
+            foreach (var dir in Directory.EnumerateDirectories(basePath))
+            {
+                if (Path.GetFileName(dir).StartsWith("Profile ", StringComparison.Ordinal))
+                {
+                    profiles.Add(dir);
+                }
+            }
+        }
+        catch (UnauthorizedAccessException) { }
+        catch (IOException) { }
+
+        return profiles;
     }
 
     /// <summary>Opt-in cookie-категории из единой настройки сканирования.</summary>
@@ -281,6 +376,26 @@ public class BrowserScanner : ScannerBase
         {
             return false; // битая настройка — безопасный дефолт (opt-in выключен)
         }
+    }
+
+    /// <summary>
+    /// Развернуть путь-шаблон браузера. Тест-шов: при заданных корнях
+    /// %LOCALAPPDATA%/%APPDATA% подменяются ими, иначе — окружение процесса
+    /// (поведение прежних версий без изменений).
+    /// </summary>
+    private string ExpandBrowserPath(string template)
+    {
+        if (_localAppDataRoot is null && _roamingAppDataRoot is null)
+        {
+            return ExpandPath(template);
+        }
+
+        var localAppData = _localAppDataRoot ?? ExpandPath("%LOCALAPPDATA%");
+        var roamingAppData = _roamingAppDataRoot ?? ExpandPath("%APPDATA%");
+
+        return template
+            .Replace("%LOCALAPPDATA%", localAppData, StringComparison.OrdinalIgnoreCase)
+            .Replace("%APPDATA%", roamingAppData, StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>

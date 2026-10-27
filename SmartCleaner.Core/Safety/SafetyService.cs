@@ -198,7 +198,10 @@ public class SafetyService : ISafetyService
 
         // 4. Проверяем период защиты — только для пользовательских данных.
         // Кэши (SafeToDelete, PerformanceCache) обновляются постоянно, блокировка по времени бессмысленна.
-        if (item.Risk == RiskCategory.UserData && IsWithinProtectedPeriod(realPath))
+        // Явный opt-in (cookie-хранилища браузеров, День 14) — узкое исключение:
+        // cookie-БД пишется браузером постоянно, иначе категория нефункциональна.
+        // Остальные защиты (whitelist, per-app, блокировка) действуют как обычно.
+        if (item.Risk == RiskCategory.UserData && !item.IsUserDataOptIn && IsWithinProtectedPeriod(realPath))
         {
             return new DeleteValidation
             {

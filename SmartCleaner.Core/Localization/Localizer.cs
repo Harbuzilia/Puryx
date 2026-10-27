@@ -534,6 +534,12 @@ public static class Localizer
     public static string Settings_AutoCheckUpdates => GetString(nameof(Settings_AutoCheckUpdates));
     public static string Settings_AutoCheckUpdatesHint => GetString(nameof(Settings_AutoCheckUpdatesHint));
 
+    // День 14, фаза B: cookie-файлы браузеров — переключатель в Settings
+    // (XAML-ключи); Browser_Cookies_* и Main_CookieConfirm* — строки кода
+    // (сканер/VM), static-props не нужны
+    public static string Settings_BrowserCleanCookies => GetString(nameof(Settings_BrowserCleanCookies));
+    public static string Settings_BrowserCleanCookiesHint => GetString(nameof(Settings_BrowserCleanCookiesHint));
+
     // День 4: строка со статусом результата сканирования (первый VM-ключ
     // с плейсхолдерами {0}/{1} — форматирование по текущей культуре)
     public static string Main_Status_Found => GetString(nameof(Main_Status_Found));
