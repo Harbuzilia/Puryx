@@ -2667,6 +2667,24 @@ Remove these entries from the system registry?</value>
   <data name="Mft_Fallback_PathNotFound" xml:space="preserve">
     <value>the path is not present in the MFT tree</value>
   </data>
+  <data name="Settings_SectionScanning" xml:space="preserve">
+    <value>Scanning</value>
+  </data>
+  <data name="Settings_MftModeLabel" xml:space="preserve">
+    <value>MFT mode (NTFS, faster)</value>
+  </data>
+  <data name="Settings_MftModeAuto" xml:space="preserve">
+    <value>Auto</value>
+  </data>
+  <data name="Settings_MftModeOn" xml:space="preserve">
+    <value>On</value>
+  </data>
+  <data name="Settings_MftModeOff" xml:space="preserve">
+    <value>Off</value>
+  </data>
+  <data name="Settings_MftModeHint" xml:space="preserve">
+    <value>MFT reads the volume's master file table in one pass — much faster than walking directories. Requires administrator rights; without them, a regular directory walk is used instead.</value>
+  </data>
   <data name="Knowledge_Reason_ProtectedPattern" xml:space="preserve">
     <value>Matches a protected pattern: {0}</value>
   </data>

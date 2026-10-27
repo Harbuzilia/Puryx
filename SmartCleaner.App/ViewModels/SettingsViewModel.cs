@@ -71,6 +71,25 @@ public partial class SettingsViewModel : ObservableObject
     /// </summary>
     public event Action? LanguageRestartHintRequested;
 
+    // ─── Режим сканирования: MFT (ROADMAP v3.1, День 9, фаза M) ───
+
+    /// <summary>Единая точка режима MFT — имя файла Core (MftDiskScanner).</summary>
+    private const string ScanSettingsFilename = SmartCleaner.Core.Mft.MftDiskScanner.SettingsFilename;
+
+    [ObservableProperty]
+    private int _selectedMftModeIndex;
+
+    /// <summary>
+    /// Варианты режима MFT: Авто (NTFS + права → MFT, иначе фолбэк) | Вкл |
+    /// Выкл. Единая настройка scan_settings.json — не хардкодится в сканеры.
+    /// </summary>
+    public IReadOnlyList<string> MftModeOptions { get; } =
+    [
+        Localizer.GetString("Settings_MftModeAuto"),
+        Localizer.GetString("Settings_MftModeOn"),
+        Localizer.GetString("Settings_MftModeOff")
+    ];
+
     [ObservableProperty]
     private string _newWhitelistPattern = string.Empty;
 
@@ -132,6 +151,14 @@ public partial class SettingsViewModel : ObservableObject
         {
             "ru" => 1,
             "en" => 2,
+            _ => 0
+        };
+
+        // Режим MFT — так же прямым полем (MftDiskScanner нормализует значения)
+        _selectedMftModeIndex = _configService.Load<ScanSettingsConfig>(ScanSettingsFilename).MftScanMode switch
+        {
+            "On" => 1,
+            "Off" => 2,
             _ => 0
         };
 
@@ -211,6 +238,20 @@ public partial class SettingsViewModel : ObservableObject
         var settings = _configService.Load<UiSettingsConfig>(UiSettingsFilename);
         settings.Language = language;
         _configService.Save(UiSettingsFilename, settings);
+    }
+
+    partial void OnSelectedMftModeIndexChanged(int value)
+    {
+        // Read-modify-write: scan_settings.json — единая точка режима MFT,
+        // файл читается MftDiskScanner'ом в Core при каждом скане
+        var settings = _configService.Load<ScanSettingsConfig>(ScanSettingsFilename);
+        settings.MftScanMode = value switch
+        {
+            1 => "On",
+            2 => "Off",
+            _ => "Auto"
+        };
+        _configService.Save(ScanSettingsFilename, settings);
     }
 
     partial void OnIsSoundEnabledChanged(bool value)

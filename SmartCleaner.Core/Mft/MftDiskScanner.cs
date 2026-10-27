@@ -386,7 +386,7 @@ public class MftDiskScanner
     }
 
     /// <summary>Буква тома из корня пути ("E:\foo" → 'E'); '\0' — путь не распознан.</summary>
-    private static char ExtractDriveLetter(string driveRoot)
+    internal static char ExtractDriveLetter(string driveRoot)
     {
         string trimmed = driveRoot.Trim();
         if (trimmed.Length >= 2

@@ -510,6 +510,14 @@ public static class Localizer
     public static string Settings_ShellCompactMenu => GetString(nameof(Settings_ShellCompactMenu));
     public static string Settings_ShellShredMenu => GetString(nameof(Settings_ShellShredMenu));
 
+    // День 9, фаза M: режим сканирования — MFT (карточка в Settings)
+    public static string Settings_SectionScanning => GetString(nameof(Settings_SectionScanning));
+    public static string Settings_MftModeLabel => GetString(nameof(Settings_MftModeLabel));
+    public static string Settings_MftModeAuto => GetString(nameof(Settings_MftModeAuto));
+    public static string Settings_MftModeOn => GetString(nameof(Settings_MftModeOn));
+    public static string Settings_MftModeOff => GetString(nameof(Settings_MftModeOff));
+    public static string Settings_MftModeHint => GetString(nameof(Settings_MftModeHint));
+
     // День 4: строка со статусом результата сканирования (первый VM-ключ
     // с плейсхолдерами {0}/{1} — форматирование по текущей культуре)
     public static string Main_Status_Found => GetString(nameof(Main_Status_Found));

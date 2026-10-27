@@ -1,4 +1,5 @@
 using SmartCleaner.Core.Localization;
+using SmartCleaner.Core.Mft;
 using SmartCleaner.Core.Models;
 using SmartCleaner.Core.Safety;
 using SmartCleaner.Core.Services;
@@ -18,6 +19,7 @@ public class DiskUsageScanner : ScannerBase
     };
 
     private readonly IConfigService _configService;
+    private readonly MftDiskScanner? _mftScanner;
 
     public override string CategoryName => "Анализ диска";
     public override string CategoryIcon => "\uE9D9"; // Segoe MDL2: Diagnostics
@@ -39,10 +41,11 @@ public class DiskUsageScanner : ScannerBase
     /// </summary>
     public int MaxItems { get; set; } = 30;
 
-    public DiskUsageScanner(ISafetyService safety, IConfigService configService)
+    public DiskUsageScanner(ISafetyService safety, IConfigService configService, MftDiskScanner? mftScanner = null)
         : base(safety)
     {
         _configService = configService;
+        _mftScanner = mftScanner;
     }
 
     public override async Task<ScanResult> ScanAsync(IProgress<string>? progress = null, CancellationToken ct = default)
@@ -52,6 +55,9 @@ public class DiskUsageScanner : ScannerBase
         await Task.Run(() =>
         {
             var roots = GetEffectiveScanPaths();
+            // Кэш MFT-скана на том — по букве диска, живёт один ScanAsync:
+            // несколько корней на одном томе не перечитывают $MFT
+            var mftCache = new Dictionary<char, MftScanResult>();
 
             foreach (var root in roots)
             {
@@ -63,6 +69,11 @@ public class DiskUsageScanner : ScannerBase
                 }
 
                 progress?.Report(Localizer.GetString("Scanner_DiskUsage_Progress", root));
+                if (TryScanRootWithMft(root, mftCache, candidates, progress, ct))
+                {
+                    continue;
+                }
+
                 AnalyzeRoot(root, candidates, ct);
             }
         }, ct);
@@ -71,6 +82,9 @@ public class DiskUsageScanner : ScannerBase
             .OrderByDescending(i => i.Size)
             .ThenBy(i => i.Path, PathComparer)
             .Take(MaxItems)
+            // MFT-конверсия даёт default(LastAccess): best-effort обогащение
+            // только финальных top-N, не всего дерева
+            .Select(i => i.LastAccess == default ? i with { LastAccess = GetLastAccess(i.Path) } : i)
             .ToList();
 
         return new ScanResult
@@ -120,6 +134,57 @@ public class DiskUsageScanner : ScannerBase
         catch (IOException)
         {
         }
+    }
+
+    /// <summary>
+    /// День 9 (ROADMAP v3.1, фаза M): MFT-путь сканирования корня — том читается
+    /// одним проходом $MFT, поддерево корня конвертируется в папки
+    /// (MftDiskScanner.ToFolderItems). Успех — true, обход пропускается;
+    /// отказ — false, фактический режим и причина сообщаются в progress
+    /// (ключи Mft_Status_Mode_*), дальше честный обход каталогов.
+    /// MFT-режим выдаёт только папки: большие файлы — LargeFiles.
+    /// </summary>
+    private bool TryScanRootWithMft(
+        string rootPath,
+        Dictionary<char, MftScanResult> mftCache,
+        List<ScannedItem> candidates,
+        IProgress<string>? progress,
+        CancellationToken ct)
+    {
+        if (_mftScanner is null)
+        {
+            return false;
+        }
+
+        char letter = MftDiskScanner.ExtractDriveLetter(rootPath);
+        if (letter == '\0')
+        {
+            return false;
+        }
+
+        if (!mftCache.TryGetValue(letter, out MftScanResult? volumeScan))
+        {
+            volumeScan = _mftScanner.TryScanDrive(rootPath, ct);
+            mftCache[letter] = volumeScan;
+        }
+
+        if (!volumeScan.Success || volumeScan.Tree is null || volumeScan.Tree.Root is null)
+        {
+            progress?.Report(Localizer.GetString("Mft_Status_Mode_Walk", volumeScan.FailureText ?? ""));
+            return false;
+        }
+
+        MftTreeNode? subtree = MftDiskScanner.FindSubtree(volumeScan.Tree, $"{letter}:\\", rootPath);
+        if (subtree is null)
+        {
+            progress?.Report(Localizer.GetString(
+                "Mft_Status_Mode_Walk", Localizer.GetString("Mft_Fallback_PathNotFound")));
+            return false;
+        }
+
+        progress?.Report(Localizer.GetString("Mft_Status_Mode_Mft"));
+        candidates.AddRange(MftDiskScanner.ToFolderItems(subtree, rootPath, MinInsightBytes));
+        return true;
     }
 
     private long TraverseDirectory(

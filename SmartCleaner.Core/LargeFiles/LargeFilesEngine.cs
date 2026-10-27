@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using SmartCleaner.Core.Helpers;
 using SmartCleaner.Core.Localization;
+using SmartCleaner.Core.Mft;
 
 namespace SmartCleaner.Core.LargeFiles;
 
@@ -24,6 +25,17 @@ public sealed class LargeFileInfo
 /// </summary>
 public sealed class LargeFilesEngine
 {
+    private readonly MftDiskScanner? _mftScanner;
+
+    /// <summary>
+    /// DI-конструктор (День 9, ROADMAP v3.1, фаза M): MFT-путь включается
+    /// передачей фасада; null — прежний directory-walk.
+    /// </summary>
+    public LargeFilesEngine(MftDiskScanner? mftScanner = null)
+    {
+        _mftScanner = mftScanner;
+    }
+
     /// <summary>
     /// Сканирует папку и возвращает Top-N самых больших файлов.
     /// </summary>
@@ -40,6 +52,37 @@ public sealed class LargeFilesEngine
         CancellationToken ct = default)
     {
         progress?.Report(Localizer.GetString("LargeFiles_Progress_Scanning", rootPath));
+
+        // День 9 (ROADMAP v3.1, фаза M): MFT-путь — том одним проходом $MFT,
+        // топ-N собирается из дерева; отказ → честный фолбэк на обход
+        // с причиной в progress (ключи Mft_Status_Mode_*)
+        if (_mftScanner is not null)
+        {
+            MftScanResult volumeScan = _mftScanner.TryScanDrive(rootPath, ct);
+            if (volumeScan.Success && volumeScan.Tree is not null && volumeScan.Tree.Root is not null)
+            {
+                char letter = MftDiskScanner.ExtractDriveLetter(rootPath);
+                MftTreeNode? subtree = letter != '\0'
+                    ? MftDiskScanner.FindSubtree(volumeScan.Tree, $"{letter}:\\", rootPath)
+                    : null;
+                if (subtree is not null)
+                {
+                    progress?.Report(Localizer.GetString("Mft_Status_Mode_Mft"));
+                    List<LargeFileInfo> files = MftDiskScanner.ToLargeFiles(subtree, rootPath, minSizeBytes, topN);
+                    EnrichModifiedFromDisk(files);
+                    progress?.Report(Localizer.GetString(
+                        "LargeFiles_Progress_Done", (int)Math.Min(int.MaxValue, volumeScan.RecordCount)));
+                    return files;
+                }
+
+                progress?.Report(Localizer.GetString(
+                    "Mft_Status_Mode_Walk", Localizer.GetString("Mft_Fallback_PathNotFound")));
+            }
+            else
+            {
+                progress?.Report(Localizer.GetString("Mft_Status_Mode_Walk", volumeScan.FailureText ?? ""));
+            }
+        }
 
         // Используем SortedSet с ограничением по размеру для эффективности
         var result = new SortedSet<LargeFileInfo>(Comparer<LargeFileInfo>.Create(
@@ -59,6 +102,29 @@ public sealed class LargeFilesEngine
 
         progress?.Report(Localizer.GetString("LargeFiles_Progress_Done", totalScanned));
         return result.Take(topN).ToList();
+    }
+
+    /// <summary>
+    /// Best-effort обогащение Modified для финальных top-N (конверсия MFT
+    /// даёт default(DateTime), walk-режим берёт LastWriteTime из файловой
+    /// системы — выдача MFT-режима не отличается от walk-режима).
+    /// </summary>
+    private static void EnrichModifiedFromDisk(List<LargeFileInfo> files)
+    {
+        foreach (var file in files)
+        {
+            try
+            {
+                if (File.Exists(file.Path))
+                {
+                    file.Modified = File.GetLastWriteTime(file.Path);
+                }
+            }
+            catch (IOException)
+            {
+                // best-effort: остаётся default
+            }
+        }
     }
 
     /// <summary>

@@ -2667,6 +2667,24 @@ Windows может использовать эти драйверы прямо �
   <data name="Mft_Fallback_PathNotFound" xml:space="preserve">
     <value>путь не найден в MFT-дереве</value>
   </data>
+  <data name="Settings_SectionScanning" xml:space="preserve">
+    <value>Сканирование</value>
+  </data>
+  <data name="Settings_MftModeLabel" xml:space="preserve">
+    <value>MFT-режим (NTFS, быстрее)</value>
+  </data>
+  <data name="Settings_MftModeAuto" xml:space="preserve">
+    <value>Авто</value>
+  </data>
+  <data name="Settings_MftModeOn" xml:space="preserve">
+    <value>Вкл</value>
+  </data>
+  <data name="Settings_MftModeOff" xml:space="preserve">
+    <value>Выкл</value>
+  </data>
+  <data name="Settings_MftModeHint" xml:space="preserve">
+    <value>MFT читает главную файловую таблицу тома за один проход — заметно быстрее обхода каталогов. Требуются права администратора; без них используется обычный обход каталогов.</value>
+  </data>
   <data name="Knowledge_Reason_ProtectedPattern" xml:space="preserve">
     <value>Совпадает с защищённым паттерном: {0}</value>
   </data>

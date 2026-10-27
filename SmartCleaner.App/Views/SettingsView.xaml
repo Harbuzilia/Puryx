@@ -144,6 +144,38 @@
                 </StackPanel>
             </Border>
 
+            <!-- Scanning: MFT mode (ROADMAP v3.1, День 9) -->
+            <Border Style="{StaticResource Card}" Margin="0,0,0,16">
+                <StackPanel>
+                    <TextBlock Text="{x:Static loc:Localizer.Settings_SectionScanning}" 
+                               Style="{StaticResource Heading2}"
+                               Margin="0,0,0,12"/>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Text="{x:Static loc:Localizer.Settings_MftModeLabel}" 
+                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                   VerticalAlignment="Center"
+                                   Margin="0,0,16,0"/>
+                        <StackPanel Grid.Column="1">
+                            <ComboBox Width="180"
+                                      HorizontalAlignment="Left"
+                                      ItemsSource="{Binding MftModeOptions}"
+                                      SelectedIndex="{Binding SelectedMftModeIndex}"/>
+                            <TextBlock Text="{x:Static loc:Localizer.Settings_MftModeHint}"
+                                       Style="{StaticResource Caption}"
+                                       Foreground="{DynamicResource TextSecondaryBrush}"
+                                       Margin="0,6,0,0"
+                                       TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
             <!-- Custom Scan Paths -->
             <Border Style="{StaticResource Card}" Margin="0,0,0,16">
                 <StackPanel>

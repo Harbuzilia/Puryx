@@ -1,5 +1,6 @@
 using SmartCleaner.Core.Helpers;
 using SmartCleaner.Core.Localization;
+using SmartCleaner.Core.Mft;
 
 namespace SmartCleaner.Core.DiskMap;
 
@@ -9,6 +10,17 @@ namespace SmartCleaner.Core.DiskMap;
 /// </summary>
 public sealed class DiskMapEngine
 {
+    private readonly MftDiskScanner? _mftScanner;
+
+    /// <summary>
+    /// DI-конструктор (День 9, ROADMAP v3.1, фаза M): MFT-путь включается
+    /// передачей фасада; null — прежний directory-walk.
+    /// </summary>
+    public DiskMapEngine(MftDiskScanner? mftScanner = null)
+    {
+        _mftScanner = mftScanner;
+    }
+
     /// <summary>
     /// Сканирует указанную директорию и строит дерево узлов.
     /// </summary>
@@ -25,7 +37,37 @@ public sealed class DiskMapEngine
     {
         progress?.Report(Localizer.GetString("DiskMap_Progress_Scanning", rootPath));
 
-        var root = await Task.Run(() => BuildNode(rootPath, 0, maxDepth, progress, ct), ct);
+        // День 9 (ROADMAP v3.1, фаза M): MFT-путь — том одним проходом $MFT,
+        // дерево узлов строится конверсией ToTreemapInput; отказ → честный
+        // фолбэк на обход с причиной в progress (ключи Mft_Status_Mode_*)
+        var root = await Task.Run(() =>
+        {
+            if (_mftScanner is not null)
+            {
+                MftScanResult volumeScan = _mftScanner.TryScanDrive(rootPath, ct);
+                if (volumeScan.Success && volumeScan.Tree is not null && volumeScan.Tree.Root is not null)
+                {
+                    char letter = MftDiskScanner.ExtractDriveLetter(rootPath);
+                    MftTreeNode? subtree = letter != '\0'
+                        ? MftDiskScanner.FindSubtree(volumeScan.Tree, $"{letter}:\\", rootPath)
+                        : null;
+                    if (subtree is not null)
+                    {
+                        progress?.Report(Localizer.GetString("Mft_Status_Mode_Mft"));
+                        return MftDiskScanner.ToTreemapInput(subtree, rootPath, maxDepth);
+                    }
+
+                    progress?.Report(Localizer.GetString(
+                        "Mft_Status_Mode_Walk", Localizer.GetString("Mft_Fallback_PathNotFound")));
+                }
+                else
+                {
+                    progress?.Report(Localizer.GetString("Mft_Status_Mode_Walk", volumeScan.FailureText ?? ""));
+                }
+            }
+
+            return BuildNode(rootPath, 0, maxDepth, progress, ct);
+        }, ct);
 
         // Вычисляем проценты
         CalculatePercentages(root);

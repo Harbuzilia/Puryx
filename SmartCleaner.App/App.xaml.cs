@@ -232,6 +232,11 @@ public partial class App : Application
         // Startup Analyzer (separate module)
         services.AddSingleton<SmartCleaner.Core.Startup.StartupEngine>();
 
+        // MFT scanner (День 9, ROADMAP v3.1, фаза M): единый фасад для
+        // DiskUsage/LargeFiles/DiskMap; сам читает режим из scan_settings.json
+        services.AddSingleton<SmartCleaner.Core.Mft.MftDiskScanner>(sp =>
+            new SmartCleaner.Core.Mft.MftDiskScanner(sp.GetRequiredService<IConfigService>()));
+
         // DiskMap (separate module)
         services.AddSingleton<SmartCleaner.Core.DiskMap.DiskMapEngine>();
 
