@@ -104,7 +104,7 @@ public readonly struct NtfsBootSector
             < 0 => 1 << -hint,                          // 2^(-v) байт
             _ => hint * (bytesPerSector * sectorsPerCluster), // v × кластер
         };
-        if (recordSize is < MinRecordSize or > MaxRecordSize || !IsPowerOfTwo(recordSize.Value))
+        if (recordSize is int size && (size < MinRecordSize || size > MaxRecordSize || !IsPowerOfTwo(size)))
             return false;
 
         boot = new NtfsBootSector(

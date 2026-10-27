@@ -79,6 +79,11 @@ public readonly struct MftRecord
     internal static MftRecord Invalid(MftRecordError error)
         => new(0, null, null, 0, null, null, 0, 0, MftRecordFlags.None, 0, false, error);
 
+    /// <summary>Копия записи с заменёнными размерами (слияние extension-записей, День 8).</summary>
+    internal MftRecord WithSizes(ulong allocatedSize, ulong realSize)
+        => new(Number, BaseRecordNumber, BestFileName, Sequence, ParentRecordNumber, ParentSequence,
+            allocatedSize, realSize, Flags, ExtraLinks, HasAttributeList, Error);
+
     /// <summary>Номер записи (self-референс заголовка XP+; День 8 сверяет с позицией в $MFT).</summary>
     public ulong Number { get; }
 
