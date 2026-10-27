@@ -108,6 +108,12 @@ public partial class MainWindow : Window
         ContentArea.Visibility = Visibility.Visible;
     }
 
+    /// <summary>
+    /// Открыть страницу настроек извне окна (клик по балуну обновления в трее,
+    /// ROADMAP v3.1, День 13): та же навигация, что по кнопке сайдбара.
+    /// </summary>
+    public void ShowSettingsPage() => NavigateToSettings(this, new RoutedEventArgs());
+
     private void NavigateToDiscovery(object sender, RoutedEventArgs e)
     {
         if (_discoveryView == null && App.Services != null)

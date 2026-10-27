@@ -88,6 +88,11 @@ public partial class App : Application
             };
             mainWindow.Show();
 
+            // День 13: трей-иконка создаётся после показа окна — StateChanged
+            // главного окна уже подписан, minimize→hide работает с первого клика
+            _serviceProvider.GetRequiredService<SmartCleaner.App.Services.TrayService>()
+                .Initialize(mainWindow);
+
             // Обработка --scan-path (от контекстного меню): открыть приложение и вставить путь
             if (TryGetScanPath(e.Args, out var scanPath))
             {
@@ -305,6 +310,9 @@ public partial class App : Application
         services.AddSingleton<SmartCleaner.Core.Shell.ExplorerContextMenuManager>();
         services.AddSingleton<SmartCleaner.Core.Reporting.SystemReportGenerator>();
         services.AddSingleton<SmartCleaner.App.Services.AudioFeedbackService>();
+        // Трей (День 13, ROADMAP v3.1, фаза A): иконка/меню/minimize→hide;
+        // Initialize вызывается после Show главного окна (ниже)
+        services.AddSingleton<SmartCleaner.App.Services.TrayService>();
 
         // Обновления (День 11, ROADMAP v3.1, фаза U): проверка релизов GitHub
         // по требованию — сеть только при явном вызове из настроек

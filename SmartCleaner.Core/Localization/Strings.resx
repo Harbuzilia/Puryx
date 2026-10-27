@@ -4128,4 +4128,22 @@ What exactly would you like to do?</value>
   <data name="Update_ApplyFailed" xml:space="preserve">
     <value>Failed to apply the update — the current version keeps running.</value>
   </data>
+  <data name="Tray_Open" xml:space="preserve">
+    <value>Open Puryx</value>
+  </data>
+  <data name="Tray_Exit" xml:space="preserve">
+    <value>Exit</value>
+  </data>
+  <data name="Tray_Tooltip" xml:space="preserve">
+    <value>Puryx {0}</value>
+  </data>
+  <data name="Settings_SectionTray" xml:space="preserve">
+    <value>Tray</value>
+  </data>
+  <data name="Settings_MinimizeToTray" xml:space="preserve">
+    <value>Minimize to tray</value>
+  </data>
+  <data name="Settings_MinimizeToTrayHint" xml:space="preserve">
+    <value>The Minimize button hides the window to the notification area. Closing the window (X) always exits Puryx.</value>
+  </data>
 </root>

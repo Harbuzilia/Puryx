@@ -35,6 +35,8 @@ public partial class SettingsViewModel : ObservableObject
 
     private readonly IUpdateInstaller _updateInstaller;
 
+    private readonly TrayService _trayService;
+
     [ObservableProperty]
     private bool _useRecycleBin = true;
 
@@ -169,6 +171,15 @@ public partial class SettingsViewModel : ObservableObject
         }
     }
 
+    // ─── Трей (ROADMAP v3.1, День 13, фаза A) ───
+
+    /// <summary>
+    /// Сворачивать окно в трей по кнопке «свернуть». Закрытие окна (X) всегда
+    /// завершает приложение — одна опция, один смысл (docs/TRAY-MODE.md).
+    /// </summary>
+    [ObservableProperty]
+    private bool _minimizeToTray;
+
     [ObservableProperty]
     private string _newWhitelistPattern = string.Empty;
 
@@ -207,7 +218,8 @@ public partial class SettingsViewModel : ObservableObject
         DiskHealthService diskHealthService,
         RamOptimizerService ramOptimizer,
         IUpdateChecker updateChecker,
-        IUpdateInstaller updateInstaller)
+        IUpdateInstaller updateInstaller,
+        TrayService trayService)
     {
         _safetyService = safetyService;
         _configService = configService;
@@ -220,6 +232,7 @@ public partial class SettingsViewModel : ObservableObject
         _ramOptimizer = ramOptimizer;
         _updateChecker = updateChecker;
         _updateInstaller = updateInstaller;
+        _trayService = trayService;
 
         _protectedHours = (int)_safetyService.ProtectedPeriod.TotalHours;
         _selectedThemeIndex = _themeManager.CurrentTheme switch
@@ -244,6 +257,9 @@ public partial class SettingsViewModel : ObservableObject
             "Off" => 2,
             _ => 0
         };
+
+        // Трей — прямым полем: загрузка не триггерит OnChanged/сохранение
+        _minimizeToTray = _configService.Load<TraySettingsConfig>(TraySettingsConfig.Filename).MinimizeToTray;
 
         _isSoundEnabled = _audioService.IsSoundEnabled;
         _isAnalyzeMenuEnabled = _shellManager.IsAnalyzeFolderRegistered();
@@ -335,6 +351,15 @@ public partial class SettingsViewModel : ObservableObject
             _ => "Auto"
         };
         _configService.Save(ScanSettingsFilename, settings);
+    }
+
+    partial void OnMinimizeToTrayChanged(bool value)
+    {
+        var settings = _configService.Load<TraySettingsConfig>(TraySettingsConfig.Filename);
+        settings.MinimizeToTray = value;
+        _configService.Save(TraySettingsConfig.Filename, settings);
+        // Применение на лету: перезапуск для трей-опции не нужен
+        _trayService.ApplyOptions(value);
     }
 
     partial void OnIsSoundEnabledChanged(bool value)

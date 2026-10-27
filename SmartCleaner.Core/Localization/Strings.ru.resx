@@ -4128,4 +4128,22 @@ Windows может использовать эти драйверы прямо �
   <data name="Update_ApplyFailed" xml:space="preserve">
     <value>Не удалось применить обновление — текущая версия продолжает работу.</value>
   </data>
+  <data name="Tray_Open" xml:space="preserve">
+    <value>Открыть Puryx</value>
+  </data>
+  <data name="Tray_Exit" xml:space="preserve">
+    <value>Выход</value>
+  </data>
+  <data name="Tray_Tooltip" xml:space="preserve">
+    <value>Puryx {0}</value>
+  </data>
+  <data name="Settings_SectionTray" xml:space="preserve">
+    <value>Трей</value>
+  </data>
+  <data name="Settings_MinimizeToTray" xml:space="preserve">
+    <value>Сворачивать в трей</value>
+  </data>
+  <data name="Settings_MinimizeToTrayHint" xml:space="preserve">
+    <value>Кнопка «Свернуть» скрывает окно в область уведомлений. Закрытие окна (X) всегда завершает Puryx.</value>
+  </data>
 </root>

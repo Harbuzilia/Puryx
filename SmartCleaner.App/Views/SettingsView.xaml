@@ -136,6 +136,26 @@
                 </StackPanel>
             </Border>
 
+            <!-- Tray (ROADMAP v3.1, День 13): минимизация в трей; закрытие окна (X) = выход -->
+            <Border Style="{StaticResource Card}" Margin="0,0,0,16">
+                <StackPanel>
+                    <TextBlock Text="{x:Static loc:Localizer.Settings_SectionTray}" 
+                               Style="{StaticResource Heading2}"
+                               Margin="0,0,0,12"/>
+
+                    <CheckBox Content="{x:Static loc:Localizer.Settings_MinimizeToTray}"
+                              IsChecked="{Binding MinimizeToTray, Mode=TwoWay}"
+                              Foreground="{DynamicResource TextPrimaryBrush}"
+                              FontSize="13"
+                              Margin="0,0,0,6"/>
+
+                    <TextBlock Text="{x:Static loc:Localizer.Settings_MinimizeToTrayHint}"
+                               Style="{StaticResource Caption}"
+                               Foreground="{DynamicResource TextSecondaryBrush}"
+                               TextWrapping="Wrap"/>
+                </StackPanel>
+            </Border>
+
             <!-- Cleaning Settings -->
             <Border Style="{StaticResource Card}" Margin="0,0,0,16">
                 <StackPanel>

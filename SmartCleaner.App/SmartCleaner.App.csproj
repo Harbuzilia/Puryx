@@ -16,6 +16,12 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Трей-иконка: app.ico уже встроена в exe (ApplicationIcon), но NotifyIcon
+         грузит файл рядом с exe (fallback — иконка процесса) -->
+    <None Update="app.ico" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
